@@ -4,6 +4,113 @@ import config from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- 0. UI ENHANCEMENT SYSTEM ---
+    class UIEnhancer {
+        constructor() {
+            this.isEnhanced = localStorage.getItem('ui-enhanced') === 'true';
+            this.init();
+        }
+        
+        init() {
+            this.createToggleButton();
+            if (this.isEnhanced) {
+                this.enableEnhancements();
+            }
+        }
+        
+        createToggleButton() {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'ui-toggle-btn';
+            toggleBtn.textContent = this.isEnhanced ? '回到原版' : '启用增强UI';
+            toggleBtn.onclick = () => this.toggle();
+            document.body.appendChild(toggleBtn);
+        }
+        
+        toggle() {
+            this.isEnhanced = !this.isEnhanced;
+            localStorage.setItem('ui-enhanced', this.isEnhanced);
+            
+            if (this.isEnhanced) {
+                this.enableEnhancements();
+            } else {
+                this.disableEnhancements();
+            }
+            
+            // 更新按钮文字
+            document.querySelector('.ui-toggle-btn').textContent = 
+                this.isEnhanced ? '回到原版' : '启用增强UI';
+        }
+        
+        enableEnhancements() {
+            document.body.classList.add('ui-enhanced');
+            // 重新渲染房源卡片以应用新样式
+            if (window.lastFilteredProperties) {
+                this.updateExistingCards();
+            }
+        }
+        
+        disableEnhancements() {
+            document.body.classList.remove('ui-enhanced');
+        }
+        
+        updateExistingCards() {
+            // 为现有卡片添加必要的CSS类
+            const cards = document.querySelectorAll('.card-container');
+            cards.forEach(card => {
+                card.classList.add('property-card');
+                
+                // 更新价格显示
+                const priceElement = card.querySelector('.text-2xl.font-extrabold');
+                if (priceElement) {
+                    priceElement.classList.add('property-price');
+                    const unitElement = priceElement.querySelector('span');
+                    if (unitElement) {
+                        unitElement.classList.add('property-price-unit');
+                    }
+                }
+                
+                // 更新地址显示
+                const addressPrimary = card.querySelector('.text-lg.font-semibold');
+                if (addressPrimary) {
+                    addressPrimary.classList.add('property-address-primary');
+                }
+                
+                const addressSecondary = card.querySelector('.text-base.text-textSecondary');
+                if (addressSecondary) {
+                    addressSecondary.classList.add('property-address-secondary');
+                }
+                
+                // 更新房型信息
+                const featuresContainer = card.querySelector('.flex.items-center.gap-4.mt-3');
+                if (featuresContainer) {
+                    featuresContainer.classList.add('property-features');
+                    
+                    const featureItems = featuresContainer.querySelectorAll('.flex.items-center.gap-2');
+                    featureItems.forEach(item => {
+                        item.classList.add('feature-item');
+                        const number = item.querySelector('.font-bold');
+                        if (number) {
+                            number.classList.add('feature-number');
+                        }
+                        const icon = item.querySelector('i');
+                        if (icon) {
+                            icon.classList.add('feature-icon');
+                        }
+                    });
+                }
+                
+                // 更新图片容器
+                const imageCarousel = card.querySelector('.image-carousel img');
+                if (imageCarousel) {
+                    imageCarousel.parentElement.classList.add('property-image');
+                }
+            });
+        }
+    }
+
+    // 初始化UI增强器
+    const uiEnhancer = new UIEnhancer();
+
     // --- 1. FAVORITES UTILITIES ---
     const favoritesManager = {
         key: 'rentalHubFavorites',
@@ -284,8 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="image-counter absolute bottom-2 right-2 bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-full">1 / ${imageList.length}</div>` : '';
 
         return `
-            <div class="card-container bg-bgCard rounded-lg shadow-sm overflow-hidden">
-                <div class="image-carousel relative" data-images='${JSON.stringify(imageList)}' data-current-index="0">
+            <div class="card-container property-card bg-bgCard rounded-lg shadow-sm overflow-hidden">
+                <div class="image-carousel property-image relative" data-images='${JSON.stringify(imageList)}' data-current-index="0">
                     <a href="./details.html?id=${property.listing_id}">
                         <img src="${coverImage}" alt="房源图片: ${streetAddress}" class="w-full h-52 object-cover image-tag">
                     </a>
@@ -295,10 +402,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>
                 </div>
                 <a href="./details.html?id=${property.listing_id}" class="p-4 block">
-                    <p class="text-2xl font-extrabold text-textPrice">$${rent}<span class="text-base font-medium text-textSecondary"> / week</span></p>
-                    <div class="mt-2"><p class="text-lg font-semibold text-textPrimary truncate">${streetAddress}</p><p class="text-base text-textSecondary">${suburbAndPostcode}</p></div>
-                    <div class="flex items-center gap-4 mt-3 text-textSecondary border-t border-borderDefault pt-3"><div class="flex items-center gap-2"><i class="fa-solid fa-bed text-lg w-5 text-center"></i><span class="font-bold text-textPrimary">${bedrooms}</span></div><div class="flex items-center gap-2"><i class="fa-solid fa-bath text-lg w-5 text-center"></i><span class="font-bold text-textPrimary">${bathrooms}</span></div><div class="flex items-center gap-2"><i class="fa-solid fa-car text-lg w-5 text-center"></i><span class="font-bold text-textPrimary">${parking}</span></div><span class="text-sm text-textSecondary pl-2 border-l border-borderDefault">${propertyType}</span></div>
-                    <div class="flex items-center gap-2 mt-3 text-textSecondary text-sm"><i class="fa-regular fa-calendar-check w-5 text-center"></i><span>Available from ${availableDate}</span></div>
+                    <p class="property-price text-2xl font-extrabold text-textPrice">$${rent}<span class="property-price-unit text-base font-medium text-textSecondary"> / week</span></p>
+                    <div class="mt-2">
+                        <p class="property-address-primary text-lg font-semibold text-textPrimary truncate">${streetAddress}</p>
+                        <p class="property-address-secondary text-base text-textSecondary">${suburbAndPostcode}</p>
+                    </div>
+                    <div class="property-features flex items-center gap-4 mt-3 text-textSecondary border-t border-borderDefault pt-3">
+                        <div class="feature-item flex items-center gap-2">
+                            <i class="feature-icon fa-solid fa-bed text-lg w-5 text-center"></i>
+                            <span class="feature-number font-bold text-textPrimary">${bedrooms}</span>
+                            <span class="feature-unit chinese-text">室</span>
+                        </div>
+                        <div class="feature-item flex items-center gap-2">
+                            <i class="feature-icon fa-solid fa-bath text-lg w-5 text-center"></i>
+                            <span class="feature-number font-bold text-textPrimary">${bathrooms}</span>
+                            <span class="feature-unit chinese-text">卫</span>
+                        </div>
+                        <div class="feature-item flex items-center gap-2">
+                            <i class="feature-icon fa-solid fa-car text-lg w-5 text-center"></i>
+                            <span class="feature-number font-bold text-textPrimary">${parking}</span>
+                            <span class="feature-unit chinese-text">车位</span>
+                        </div>
+                        <span class="text-sm text-textSecondary pl-2 border-l border-borderDefault">${propertyType}</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-3 text-textSecondary text-sm chinese-text">
+                        <i class="fa-regular fa-calendar-check w-5 text-center"></i>
+                        <span>可入住时间: ${availableDate}</span>
+                    </div>
                 </a>
                 <style>
                     .favorite-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #2d2d2d; font-size: 18px; transition: color 0.2s; z-index: 10; cursor: pointer; border: none; }

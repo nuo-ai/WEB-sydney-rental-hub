@@ -33,14 +33,53 @@
     </script>
 
     <style>
-        /* Style for the active nav link */
+        /* ========== 专业设计系统 ========== */
+        :root {
+            /* 专业字体系统 */
+            --font-english: "SF Pro Text", -apple-system, "Segoe UI", Roboto, sans-serif;
+            --font-chinese: "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+            --font-system: -apple-system, "PingFang SC", "Inter", sans-serif;
+            
+            /* 专业间距系统 */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            
+            /* 增强色彩系统 */
+            --color-primary-50: #eff6ff;
+            --color-primary-500: #3b82f6;
+            --color-primary-600: #2563eb;
+            --color-primary-700: #1d4ed8;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-600: #4b5563;
+            --color-gray-700: #374151;
+            --color-gray-900: #111827;
+            
+            /* 专业阴影系统 */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* 专业圆角系统 */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        /* ========== 原有样式保持不变 ========== */
         .nav-link.active {
             color: #007BFF;
         }
         #filter-panel-container {
             transition: opacity 0.3s ease-in-out;
         }
-        /* 自定义 noUiSlider 样式以匹配我们的设计 */
         .noUi-target {
             border: none;
             background: #E3E3E3;
@@ -58,6 +97,261 @@
         }
         .noUi-handle:after, .noUi-handle:before {
             display: none;
+        }
+
+        /* ========== 增强版组件样式 ========== */
+        
+        /* 开发阶段：UI切换按钮 */
+        .ui-toggle-btn {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            z-index: 9999;
+            background: var(--color-primary-500);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s ease;
+        }
+        
+        .ui-toggle-btn:hover {
+            background: var(--color-primary-600);
+            transform: translateY(-1px);
+        }
+
+        /* 增强版：应用头部 */
+        .ui-enhanced .app-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-bottom: 1px solid var(--color-gray-200);
+            backdrop-filter: blur(20px);
+        }
+
+        .ui-enhanced h1 {
+            font-family: var(--font-chinese);
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.02em;
+        }
+
+        .ui-enhanced p {
+            font-family: var(--font-chinese);
+            color: var(--color-gray-600);
+            font-size: 16px;
+            line-height: 1.5;
+            letter-spacing: 0.02em;
+        }
+
+        /* 增强版：搜索栏 */
+        .ui-enhanced .search-container input {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            font-family: var(--font-system);
+            font-size: 16px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ui-enhanced .search-container input:focus {
+            border-color: var(--color-primary-500);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* 增强版：筛选按钮 */
+        .ui-enhanced #filter-button {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .ui-enhanced #filter-button:hover {
+            border-color: var(--color-primary-500);
+            background: var(--color-primary-50);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 增强版：房源卡片 - 核心组件 */
+        .ui-enhanced .property-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateZ(0);
+        }
+
+        .ui-enhanced .property-card:hover {
+            transform: translateY(-4px) translateZ(0);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--color-primary-200);
+        }
+
+        /* 增强版：价格显示 */
+        .ui-enhanced .property-price {
+            font-family: var(--font-english);
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #000000 0%, #374151 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .ui-enhanced .property-price-unit {
+            font-family: var(--font-english);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--color-gray-600);
+            margin-left: 4px;
+        }
+
+        /* 增强版：地址信息 */
+        .ui-enhanced .property-address-primary {
+            font-family: var(--font-english);
+            font-size: 18px;
+            font-weight: 650;
+            line-height: 1.3;
+            color: var(--color-gray-900);
+            letter-spacing: -0.015em;
+            margin-bottom: 4px;
+        }
+
+        .ui-enhanced .property-address-secondary {
+            font-family: var(--font-english);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--color-gray-600);
+            letter-spacing: -0.01em;
+        }
+
+        /* 增强版：房型信息 */
+        .ui-enhanced .property-features {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            padding-top: var(--space-md);
+            margin-top: var(--space-md);
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .ui-enhanced .feature-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-gray-700);
+        }
+
+        .ui-enhanced .feature-number {
+            font-family: var(--font-english);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .ui-enhanced .feature-unit {
+            font-family: var(--font-chinese);
+            font-size: 13px;
+            color: var(--color-gray-600);
+            letter-spacing: 0.02em;
+        }
+
+        .ui-enhanced .feature-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--color-gray-500);
+        }
+
+        /* 增强版：中文界面元素 */
+        .ui-enhanced .chinese-text {
+            font-family: var(--font-chinese);
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+        }
+
+        /* 增强版：底部导航 */
+        .ui-enhanced #main-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .ui-enhanced .nav-link {
+            transition: all 0.2s ease;
+        }
+
+        .ui-enhanced .nav-link:hover {
+            transform: translateY(-1px);
+        }
+
+        .ui-enhanced .nav-link.active {
+            color: var(--color-primary-500);
+        }
+
+        /* 增强版：按钮微交互 */
+        .ui-enhanced button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ui-enhanced button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+            pointer-events: none;
+        }
+
+        .ui-enhanced button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* 增强版：图片容器 */
+        .ui-enhanced .property-image {
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ui-enhanced .property-card:hover .property-image {
+            transform: scale(1.02);
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .ui-enhanced .property-price {
+                font-size: 24px;
+            }
+            
+            .ui-enhanced .property-address-primary {
+                font-size: 16px;
+            }
+            
+            .ui-enhanced .property-features {
+                gap: var(--space-md);
+            }
         }
     </style>
 </head>
@@ -93,7 +387,7 @@
                         <div class="sticky top-0 bg-bgPage py-3 z-10">
                             <!-- 搜索和筛选栏 -->
                             <div class="flex items-center gap-3">
-                                <div class="relative flex-grow">
+                                <div class="relative flex-grow search-container">
                                     <i class="fa-solid fa-magnifying-glass text-textSecondary absolute top-1/2 left-3.5 -translate-y-1/2"></i>
                                     <input type="text" id="search-input" placeholder="搜索区域, 例如 'Zetland'" class="w-full pl-10 pr-4 py-2.5 bg-bgCard border border-borderDefault rounded-lg focus:outline-none focus:ring-2 focus:ring-accentPrimary text-sm">
                                 </div>
@@ -101,7 +395,7 @@
                                     <i class="fa-solid fa-sliders text-lg"></i>
                                 </button>
                             </div>
-                            <div id="results-summary-container" class="pt-3 text-sm text-textSecondary">
+                            <div id="results-summary-container" class="pt-3 text-sm text-textSecondary chinese-text">
                                 <!-- JS将在这里填充结果数量 -->
                             </div>
                         </div>
