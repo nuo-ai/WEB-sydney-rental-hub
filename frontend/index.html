@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>悉尼学生房源中心</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- 新增: 引入 noUiSlider 的 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        textPrimary: '#2d2d2d',
+                        textSecondary: '#595959',
+                        textPrice: '#000000',
+                        accentPrimary: '#007BFF',
+                        borderDefault: '#E3E3E3',
+                        bgPage: '#F4F7F9',
+                        bgCard: '#FFFFFF',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Style for the active nav link */
+        .nav-link.active {
+            color: #007BFF;
+        }
+        #filter-panel-container {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* 自定义 noUiSlider 样式以匹配我们的设计 */
+        .noUi-target {
+            border: none;
+            background: #E3E3E3;
+            box-shadow: none;
+        }
+        .noUi-connect {
+            background: #007BFF;
+        }
+        .noUi-handle {
+            border: 3px solid #007BFF;
+            border-radius: 50%;
+            background: #FFFFFF;
+            box-shadow: none;
+            cursor: pointer;
+        }
+        .noUi-handle:after, .noUi-handle:before {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-bgPage flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-[393px] h-[852px] bg-black rounded-[60px] shadow-2xl p-4">
+        <div class="w-full h-full bg-black rounded-[40px] overflow-hidden relative">
+            
+            <div class="w-full h-full bg-white flex flex-col">
+
+                <!-- 1. 顶部iOS状态栏 -->
+                <div class="absolute top-0 left-0 w-full h-[44px] px-7 flex justify-between items-center z-20 text-textPrimary">
+                    <span class="font-semibold text-sm">9:41</span>
+                    <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full"></div>
+                    <div class="flex items-center space-x-1">
+                        <i class="fa-solid fa-signal text-xs"></i>
+                        <i class="fa-solid fa-wifi text-xs"></i>
+                        <i class="fa-solid fa-battery-full text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- 2. 主内容显示区域 -->
+                <main class="flex-1 pt-[44px] pb-[84px] overflow-y-auto">
+                    <div class="p-4">
+                        <!-- 顶部：欢迎语和标题 -->
+                        <header class="mb-4">
+                            <h1 class="text-2xl font-bold text-textPrimary">为你找到的房源</h1>
+                            <p class="text-textSecondary">基于你的偏好，我们推荐以下房源</p>
+                        </header>
+
+                        <!-- 搜索和筛选功能 -->
+                        <div class="sticky top-0 bg-bgPage py-3 z-10">
+                            <!-- 搜索和筛选栏 -->
+                            <div class="flex items-center gap-3">
+                                <div class="relative flex-grow">
+                                    <i class="fa-solid fa-magnifying-glass text-textSecondary absolute top-1/2 left-3.5 -translate-y-1/2"></i>
+                                    <input type="text" id="search-input" placeholder="搜索区域, 例如 'Zetland'" class="w-full pl-10 pr-4 py-2.5 bg-bgCard border border-borderDefault rounded-lg focus:outline-none focus:ring-2 focus:ring-accentPrimary text-sm">
+                                </div>
+                                <button id="filter-button" class="flex-shrink-0 w-11 h-11 bg-bgCard border border-borderDefault rounded-lg flex items-center justify-center text-textPrimary">
+                                    <i class="fa-solid fa-sliders text-lg"></i>
+                                </button>
+                            </div>
+                            <div id="results-summary-container" class="pt-3 text-sm text-textSecondary">
+                                <!-- JS将在这里填充结果数量 -->
+                            </div>
+                        </div>
+
+                        <!-- 结果列表 -->
+                        <div id="listings-container" class="space-y-4 pt-2">
+                            <!-- JavaScript将会在这里动态生成房源卡片 -->
+                        </div>
+                    </div>
+                </main>
+
+                <!-- 3. 底部iOS Tab Bar导航栏 -->
+                <nav id="main-nav" class="absolute bottom-0 left-0 w-full h-[84px] bg-neutral-100/80 backdrop-blur-md border-t border-borderDefault flex justify-around items-center pt-2 z-20">
+                    <a href="#" class="nav-link flex flex-col items-center gap-1 w-16 active">
+                        <i class="fa-solid fa-magnifying-glass text-xl"></i>
+                        <span class="text-xs font-medium">搜索</span>
+                    </a>
+                    <a href="#" class="nav-link flex flex-col items-center gap-1 text-textSecondary w-16 hover:text-accentPrimary transition-colors">
+                        <i class="fa-regular fa-heart text-xl"></i>
+                        <span class="text-xs font-medium">收藏</span>
+                    </a>
+                    <a href="#" class="nav-link flex flex-col items-center gap-1 text-textSecondary w-16 hover:text-accentPrimary transition-colors">
+                        <i class="fa-regular fa-map text-xl"></i>
+                        <span class="text-xs font-medium">地图</span>
+                    </a>
+                    <a href="#" class="nav-link flex flex-col items-center gap-1 text-textSecondary w-16 hover:text-accentPrimary transition-colors">
+                        <i class="fa-regular fa-user text-xl"></i>
+                        <span class="text-xs font-medium">我的</span>
+                    </a>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选面板容器 -->
+    <div id="filter-panel-container">
+        <!-- JS将在这里加载filter-panel.html -->
+    </div>
+
+    <!-- 新增: 引入 noUiSlider 的 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+    <!-- 引入主JavaScript文件 -->
+    <script type="module" src="./scripts/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+2025-07-07 15:53:10,399 - __main__ - INFO - Successfully loaded .env file from: C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\rentalAU_mcp\etl\..\.env
+2025-07-07 15:53:10,399 - __main__ - INFO - Initializing Property Data Scheduler...
+2025-07-07 15:53:10,399 - __main__ - INFO - APScheduler version: 3.11.0
+2025-07-07 15:53:10,426 - __main__ - INFO - Starting Property Data Scheduler...
+2025-07-07 15:53:10,426 - __main__ - INFO - Current time: 2025-07-07T05:53:10.426878+00:00
+2025-07-07 15:53:10,427 - __main__ - INFO - Setting up scheduled jobs...
+2025-07-07 15:53:10,428 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-07 15:53:10,428 - __main__ - INFO - Scheduled full pipeline job: 0 */8 * * *
+2025-07-07 15:53:10,429 - __main__ - INFO - Scheduling immediate test run...
+2025-07-07 15:53:10,430 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-07-07 15:53:10,430 - __main__ - INFO - Scheduled jobs:
+2025-07-07 15:53:10,431 - __main__ - INFO -   - Full Data Pipeline (full_pipeline_job): cron[month='*', day='*', day_of_week='*', hour='*/8', minute='0']
+2025-07-07 15:53:10,431 - __main__ - INFO -   - Startup Test Run (startup_job): date[2025-07-07 15:53:10 AEST]
+2025-07-07 15:53:10,431 - __main__ - INFO - Scheduler started. Press Ctrl+C to exit.
+2025-07-07 15:53:10,432 - apscheduler.scheduler - INFO - Added job "Full Data Pipeline" to job store "default"
+2025-07-07 15:53:10,432 - apscheduler.scheduler - INFO - Added job "Startup Test Run" to job store "default"
+2025-07-07 15:53:10,432 - apscheduler.scheduler - INFO - Scheduler started
+2025-07-07 15:53:10,434 - apscheduler.executors.default - INFO - Running job "Startup Test Run (trigger: date[2025-07-07 15:53:10 AEST], next run at: 2025-07-07 15:53:10 AEST)" (scheduled at 2025-07-07 15:53:10.430437+10:00)
+2025-07-07 15:53:10,435 - __main__ - INFO - ============================================================
+2025-07-07 15:53:10,435 - __main__ - INFO - Starting full data pipeline execution
+2025-07-07 15:53:10,435 - apscheduler.scheduler - INFO - Removed job startup_job
+2025-07-07 15:53:10,436 - __main__ - INFO - Timestamp: 2025-07-07T05:53:10.436239+00:00
+2025-07-07 15:53:10,437 - __main__ - INFO - ============================================================
+2025-07-07 15:53:10,437 - __main__ - INFO - Starting spider execution...
+2025-07-07 15:53:10,437 - __main__ - ERROR - Spider script not found: C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\rentalAU_mcp\etl\..\v2.py
+2025-07-07 15:53:10,437 - __main__ - ERROR - Pipeline failed: Spider execution failed
+2025-07-07 15:53:10,438 - apscheduler.executors.default - INFO - Job "Startup Test Run (trigger: date[2025-07-07 15:53:10 AEST], next run at: 2025-07-07 15:53:10 AEST)" executed successfully
+2025-07-07 16:00:00,014 - apscheduler.executors.default - INFO - Running job "Full Data Pipeline (trigger: cron[month='*', day='*', day_of_week='*', hour='*/8', minute='0'], next run at: 2025-07-08 00:00:00 AEST)" (scheduled at 2025-07-07 16:00:00+10:00)
+2025-07-07 16:00:00,015 - __main__ - INFO - ============================================================
+2025-07-07 16:00:00,015 - __main__ - INFO - Starting full data pipeline execution
+2025-07-07 16:00:00,015 - __main__ - INFO - Timestamp: 2025-07-07T06:00:00.015615+00:00
+2025-07-07 16:00:00,015 - __main__ - INFO - ============================================================
+2025-07-07 16:00:00,016 - __main__ - INFO - Starting spider execution...
+2025-07-07 16:00:00,016 - __main__ - ERROR - Spider script not found: C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\rentalAU_mcp\etl\..\v2.py
+2025-07-07 16:00:00,016 - __main__ - ERROR - Pipeline failed: Spider execution failed
+2025-07-07 16:00:00,016 - apscheduler.executors.default - INFO - Job "Full Data Pipeline (trigger: cron[month='*', day='*', day_of_week='*', hour='*/8', minute='0'], next run at: 2025-07-08 00:00:00 AEST)" executed successfully

@@ -1,0 +1,43 @@
+{
+  "name": "sydney-rental-api",
+  "version": "1.0.0",
+  "description": "悉尼租房API服务 - 生产环境版本",
+  "main": "production-server.js",
+  "scripts": {
+    "start": "node production-server.js",
+    "dev": "nodemon production-server.js",
+    "test": "jest",
+    "build": "echo 'No build step required for production server'",
+    "docker:build": "docker build -t sydney-rental-api .",
+    "docker:run": "docker run -p 3001:3001 --env-file .env.production sydney-rental-api"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.8.1",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "winston": "^3.10.0",
+    "compression": "^1.7.4",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.1",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "sydney",
+    "rental",
+    "property",
+    "api",
+    "real-estate"
+  ],
+  "author": "Sydney Rental Hub",
+  "license": "MIT"
+}
