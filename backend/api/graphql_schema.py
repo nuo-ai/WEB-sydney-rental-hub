@@ -6,14 +6,14 @@ from enum import Enum as PythonEnum
 import asyncio # Added import
 from strawberry.schema.config import StrawberryConfig
 
-from models.property_models import Property # GraphQL type
-from models.commute_models import (
+from ..models.property_models import Property # GraphQL type
+from ..models.commute_models import (
     UniversityNameEnum
     # UniversityCommuteProfileResponse, # Likely removable now
 )
-from config.university_data import get_university_coordinates, CORE_UNIVERSITIES
-from crud.commute_crud import get_direct_walk_properties_crud # Specific import
-from crud.properties_crud import (
+from ..config.university_data import get_university_coordinates, CORE_UNIVERSITIES
+from ..crud.commute_crud import get_direct_walk_properties_crud # Specific import
+from ..crud.properties_crud import (
     get_all_properties_from_db,
     get_property_by_id_from_db,
     get_properties_near_location_from_db,

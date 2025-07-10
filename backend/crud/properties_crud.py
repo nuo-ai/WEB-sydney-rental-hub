@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 import logging
 from typing import List, Optional, Dict, Any, Tuple
 import strawberry # Required for strawberry.ID if used in type hints here, or Property type
-from models.property_models import Property # Adjusted import path
-from models.commute_models import (
+from ..models.property_models import Property # Adjusted import path
+from ..models.commute_models import (
     PropertyInfoForCommute,
     DirectWalkToUniversityProperty,
     StationInfo,
@@ -15,7 +15,7 @@ from models.commute_models import (
     PaginatedPropertiesNearStation,
     # UniversityCommuteProfileResponse is built by the resolver
 )
-from config.university_data import CORE_UNIVERSITIES # Assuming this path
+from ..config.university_data import CORE_UNIVERSITIES # Assuming this path
 import math
 
 # Configure logging

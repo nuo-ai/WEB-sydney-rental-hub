@@ -51,10 +51,18 @@ def start_mcp_server():
     print("🚀 启动MCP服务器...")
     mcp_path = Path(__file__).parent.parent / "mcp-server"
     
-    cmd = ["npm", "start"]
+    # 首先确保已经编译
+    build_cmd = ["npm", "run", "build"]
+    try:
+        subprocess.run(build_cmd, cwd=str(mcp_path), shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"❌ MCP服务器编译失败: {e}")
+        return None
+
+    cmd = ["node", "build/index.js"]
     
     try:
-        process = subprocess.Popen(cmd, cwd=str(mcp_path))
+        process = subprocess.Popen(cmd, cwd=str(mcp_path), shell=True)
         print("✅ MCP服务器启动成功")
         return process
     except Exception as e:
@@ -73,12 +81,15 @@ def main():
         processes.append(backend_process)
     
     # 等待一下让后端启动
-    time.sleep(2)
+    time.sleep(5)
     
     # 启动前端
     frontend_process = start_frontend()
     if frontend_process:
         processes.append(frontend_process)
+        
+    # 等待一下让前端启动
+    time.sleep(2)
     
     # 启动MCP服务器
     mcp_process = start_mcp_server()

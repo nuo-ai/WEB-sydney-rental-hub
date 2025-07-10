@@ -1,6 +1,6 @@
 {
-  "name": "sydney-rental-mcp",
-  "version": "0.1.0",
+  "name": "mcp-server",
+  "version": "0.1.1",
   "description": "Sydney Rental MCP Server - 为Cline提供悉尼租房搜索功能",
   "type": "module",
   "main": "build/index.js",

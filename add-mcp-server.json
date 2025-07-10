@@ -1,0 +1,15 @@
+{
+  "name": "mcp-server",
+  "command": "python scripts/start_all.py",
+  "windows": {
+    "command": "python scripts/start_all.py"
+  },
+  "mac": {
+    "command": "python3 scripts/start_all.py"
+  },
+  "linux": {
+    "command": "python3 scripts/start_all.py"
+  },
+  "cwd": ".",
+  "source": "local"
+}

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房源详情 - 地图功能演示</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        textPrimary: '#2d2d2d',
+                        textSecondary: '#595959',
+                        textPrice: '#000000',
+                        accentPrimary: '#007BFF',
+                        borderDefault: '#E3E3E3',
+                        bgPage: '#F4F7F9',
+                        bgCard: '#FFFFFF',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 专业设计系统 - 与您的项目完全一致 */
+        :root {
+            --font-english: "SF Pro Text", -apple-system, "Segoe UI", Roboto, sans-serif;
+            --font-chinese: "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+            --font-system: -apple-system, "PingFang SC", "Inter", sans-serif;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            
+            --color-primary-50: #eff6ff;
+            --color-primary-500: #3b82f6;
+            --color-primary-600: #2563eb;
+            --color-primary-700: #1d4ed8;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-600: #4b5563;
+            --color-gray-700: #374151;
+            --color-gray-900: #111827;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        /* 地图相关样式 */
+        .property-map {
+            width: 100%;
+            height: 300px;
+            border-radius: var(--radius-md);
+            border: 1px solid #E3E3E3;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .property-map:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .map-placeholder {
+            font-size: 48px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .map-info {
+            text-align: center;
+            color: #595959;
+            font-size: 14px;
+            font-family: var(--font-chinese);
+            line-height: 1.5;
+        }
+        
+        .map-marker {
+            position: absolute;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 2px 8px rgba(0,123,255,0.3));
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) translateX(-50%);
+            }
+            40% {
+                transform: translateY(-10px) translateX(-50%);
+            }
+            60% {
+                transform: translateY(-5px) translateX(-50%);
+            }
+        }
+
+        .map-actions button {
+            background: #f8f9fa;
+            color: #595959;
+            border: 1px solid #E3E3E3;
+            border-radius: var(--radius-sm);
+            padding: 12px 8px;
+            font-size: 14px;
+            font-family: var(--font-chinese);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .map-actions button:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-actions button:active {
+            transform: translateY(0);
+        }
+
+        /* 交通信息样式 */
+        .commute-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #E3E3E3;
+        }
+
+        .commute-item:last-child {
+            border-bottom: none;
+        }
+
+        .university-name {
+            font-size: 14px;
+            color: #2d2d2d;
+            margin-bottom: 3px;
+            font-family: var(--font-chinese);
+        }
+
+        .commute-time {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007BFF;
+            font-family: var(--font-english);
+        }
+
+        .transport-method {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #595959;
+            font-family: var(--font-chinese);
+        }
+
+        /* Toast样式 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-family: var(--font-chinese);
+            z-index: 1000;
+            display: none;
+            box-shadow: var(--shadow-xl);
+        }
+    </style>
+</head>
+
+<body class="bg-bgPage flex items-center justify-center min-h-screen p-4">
+    <!-- 手机模拟器外壳 - 完全匹配您的设计 -->
+    <div class="w-[393px] h-[852px] bg-black rounded-[60px] shadow-2xl p-4">
+        <div class="w-full h-full bg-black rounded-[40px] overflow-hidden relative">
+            
+            <div class="w-full h-full bg-white flex flex-col">
+
+                <!-- 1. 顶部iOS状态栏 -->
+                <div class="absolute top-0 left-0 w-full h-[44px] px-7 flex justify-between items-center z-20 text-textPrimary">
+                    <span class="font-semibold text-sm">9:41</span>
+                    <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full"></div>
+                    <div class="flex items-center space-x-1">
+                        <i class="fa-solid fa-signal text-xs"></i>
+                        <i class="fa-solid fa-wifi text-xs"></i>
+                        <i class="fa-solid fa-battery-full text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- 2. 主内容显示区域 -->
+                <main class="flex-1 pt-[44px] pb-[84px] overflow-y-auto">
+                    <div class="bg-bgPage min-h-full">
+                        
+                        <!-- 房源图片轮播区域 -->
+                        <div class="h-[200px] bg-gradient-to-br from-accentPrimary to-blue-600 flex items-center justify-center text-white text-lg font-medium">
+                            📷 房源图片轮播区域
+                        </div>
+
+                        <div class="p-4 space-y-4">
+                            <!-- 房源基本信息 -->
+                            <div class="bg-bgCard rounded-xl p-4 shadow-sm border border-borderDefault">
+                                <div class="mb-3">
+                                    <span class="text-2xl font-bold text-textPrice font-english">$776</span>
+                                    <span class="text-sm text-textSecondary ml-1 font-english">/周</span>
+                                    <span class="text-sm text-textSecondary ml-3 chinese-text">约$3,360/月</span>
+                                </div>
+                                <h1 class="text-xl font-bold text-textPrimary mb-2 font-english">Central Park Student Village</h1>
+                                <p class="text-sm text-textSecondary mb-3 chinese-text">📍 28 Broadway, Chippendale NSW 2008</p>
+                                
+                                <!-- 房源特点 -->
+                                <div class="flex items-center gap-6 pt-3 mt-3 border-t border-borderDefault">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fa-solid fa-bed text-textSecondary text-sm"></i>
+                                        <span class="text-sm font-semibold text-textPrimary">
+                                            <span class="font-english">1</span><span class="chinese-text">房</span>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fa-solid fa-shower text-textSecondary text-sm"></i>
+                                        <span class="text-sm font-semibold text-textPrimary">
+                                            <span class="font-english">1</span><span class="chinese-text">浴</span>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fa-solid fa-couch text-textSecondary text-sm"></i>
+                                        <span class="text-sm font-semibold text-textPrimary chinese-text">已装修</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 位置和交通 -->
+                            <div class="bg-bgCard rounded-xl p-4 shadow-sm border border-borderDefault">
+                                <h2 class="text-lg font-bold text-textPrimary mb-4 chinese-text">位置和交通</h2>
+                                
+                                <!-- 小程序原生地图演示 -->
+                                <div class="mb-4">
+                                    <div class="property-map" onclick="clickMap()">
+                                        <div class="map-placeholder">🗺️</div>
+                                        <div class="map-info">
+                                            <strong>小程序原生地图组件</strong><br>
+                                            支持拖拽、缩放、旋转操作<br>
+                                            显示房源位置和用户定位
+                                        </div>
+                                        <div class="map-marker">🏠</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 交通信息 -->
+                                <div class="mb-4">
+                                    <div class="commute-item">
+                                        <div>
+                                            <div class="university-name">🎓 悉尼科技大学</div>
+                                            <div class="commute-time">8分钟</div>
+                                        </div>
+                                        <div class="transport-method">
+                                            <span>🚇</span>
+                                            <span>步行 + 轻轨</span>
+                                        </div>
+                                    </div>
+                                    <div class="commute-item">
+                                        <div>
+                                            <div class="university-name">🎓 悉尼大学</div>
+                                            <div class="commute-time">15分钟</div>
+                                        </div>
+                                        <div class="transport-method">
+                                            <span>🚇</span>
+                                            <span>地铁</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 地图操作按钮 -->
+                                <div class="map-actions flex gap-3">
+                                    <button onclick="copyAddress()">📋 复制地址</button>
+                                    <button onclick="centerMap()">🎯 居中显示</button>
+                                    <button onclick="toggleMapType()">🗺️ 卫星图</button>
+                                </div>
+                            </div>
+
+                            <!-- 设施信息 -->
+                            <div class="bg-bgCard rounded-xl p-4 shadow-sm border border-borderDefault">
+                                <h2 class="text-lg font-bold text-textPrimary mb-4 chinese-text">设施</h2>
+                                <div class="flex flex-wrap gap-2">
+                                    <div class="flex items-center gap-2 bg-bgPage px-3 py-2 rounded-lg">
+                                        <span>💪</span><span class="text-sm text-textSecondary chinese-text">健身房</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-bgPage px-3 py-2 rounded-lg">
+                                        <span>👕</span><span class="text-sm text-textSecondary chinese-text">洗衣房</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-bgPage px-3 py-2 rounded-lg">
+                                        <span>📚</span><span class="text-sm text-textSecondary chinese-text">学习室</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-bgPage px-3 py-2 rounded-lg">
+                                        <span>🔒</span><span class="text-sm text-textSecondary chinese-text">24小时安保</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-bgPage px-3 py-2 rounded-lg">
+                                        <span>📶</span><span class="text-sm text-textSecondary">WiFi</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-bgPage px-3 py-2 rounded-lg">
+                                        <span>❄️</span><span class="text-sm text-textSecondary chinese-text">空调</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 底部操作区域 -->
+                            <div class="flex gap-3 p-4 bg-bgCard rounded-xl shadow-sm border border-borderDefault">
+                                <button onclick="toggleFavorite()" class="flex-1 py-3 px-4 bg-bgPage border border-borderDefault rounded-lg text-textSecondary font-medium chinese-text" id="favoriteBtn">
+                                    🤍 收藏
+                                </button>
+                                <button onclick="bookViewing()" class="flex-1 py-3 px-4 bg-green-500 text-white rounded-lg font-medium chinese-text">
+                                    代看房 $35
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </main>
+
+                <!-- 3. 底部iOS Tab Bar导航栏 -->
+                <nav class="absolute bottom-0 left-0 w-full h-[84px] bg-neutral-100/80 backdrop-blur-md border-t border-borderDefault flex justify-around items-center pt-2 z-20">
+                    <a href="#" class="flex flex-col items-center gap-1 text-textSecondary w-16">
+                        <i class="fa-solid fa-magnifying-glass text-xl"></i>
+                        <span class="text-xs font-medium chinese-text">搜索</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-1 text-textSecondary w-16">
+                        <i class="fa-regular fa-heart text-xl"></i>
+                        <span class="text-xs font-medium chinese-text">收藏</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-1 text-accentPrimary w-16">
+                        <i class="fa-solid fa-home text-xl"></i>
+                        <span class="text-xs font-medium chinese-text">详情</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-1 text-textSecondary w-16">
+                        <i class="fa-regular fa-map text-xl"></i>
+                        <span class="text-xs font-medium chinese-text">地图</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center gap-1 text-textSecondary w-16">
+                        <i class="fa-regular fa-user text-xl"></i>
+                        <span class="text-xs font-medium chinese-text">我的</span>
+                    </a>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let isFavorited = false;
+        let mapType = 'standard';
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+
+        function clickMap() {
+            showToast('在小程序中可以拖拽和缩放地图');
+        }
+
+        function copyAddress() {
+            const address = '28 Broadway, Chippendale NSW 2008';
+            navigator.clipboard.writeText(address).then(() => {
+                showToast('地址已复制');
+            }).catch(() => {
+                showToast('复制失败，请手动复制地址');
+            });
+        }
+
+        function centerMap() {
+            showToast('地图已居中到房源位置');
+        }
+
+        function toggleMapType() {
+            mapType = mapType === 'standard' ? 'satellite' : 'standard';
+            const btn = event.target;
+            btn.innerHTML = mapType === 'standard' ? '🗺️ 卫星图' : '🗺️ 标准图';
+            showToast(`已切换到${mapType === 'standard' ? '标准' : '卫星'}地图`);
+        }
+
+        function toggleFavorite() {
+            isFavorited = !isFavorited;
+            const btn = document.getElementById('favoriteBtn');
+            btn.innerHTML = isFavorited ? '❤️ 已收藏' : '🤍 收藏';
+            showToast(isFavorited ? '已收藏' : '已取消收藏');
+        }
+
+        function bookViewing() {
+            showToast('跳转到预约代看房页面...');
+            setTimeout(() => {
+                alert('在实际小程序中，这里会跳转到预约代看房页面');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

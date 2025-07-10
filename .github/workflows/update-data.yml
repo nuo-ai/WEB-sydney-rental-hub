@@ -1,0 +1,72 @@
+name: 自动更新房源数据
+
+on:
+  schedule:
+    # 每天澳洲东部时间凌晨3点运行 (UTC时间17:00)
+    - cron: '0 17 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: 缓存Python依赖
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: 安装系统依赖
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev python3-dev
+    
+    - name: 安装Python依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: 运行数据更新
+      env:
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+      run: |
+        python scripts/automated_data_update.py --once
+    
+    - name: 上传日志文件
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: update-logs
+        path: logs/automated_updates/*.log
+        retention-days: 7
+    
+    - name: 发送成功通知
+      if: success()
+      run: |
+        echo "✅ 房源数据更新成功！"
+        echo "更新时间: $(date '+%Y-%m-%d %H:%M:%S')"
+    
+    - name: 发送失败通知
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: '❌ 房源数据更新失败！请检查日志。'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
