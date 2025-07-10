@@ -40,7 +40,7 @@ else:
 DB_NAME = os.getenv("DB_NAME", "rental_mcp_db")
 DB_USER = os.getenv("DB_USER", "etl_user")
 DB_PASSWORD = os.getenv("DB_PASSWORD") # CRITICAL: No default for password
-print(f"✅ DB_PASSWORD in .env: {repr(DB_PASSWORD)}")
+print(f"DB_PASSWORD in .env: {repr(DB_PASSWORD)}")
 
 # Initial check for DB_PASSWORD after attempting to load .env
 if DB_PASSWORD is None:

@@ -4,6 +4,113 @@ import config from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- 0. UI ENHANCEMENT SYSTEM ---
+    class UIEnhancer {
+        constructor() {
+            this.isEnhanced = localStorage.getItem('ui-enhanced') === 'true';
+            this.init();
+        }
+        
+        init() {
+            this.createToggleButton();
+            if (this.isEnhanced) {
+                this.enableEnhancements();
+            }
+        }
+        
+        createToggleButton() {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'ui-toggle-btn';
+            toggleBtn.textContent = this.isEnhanced ? '回到原版' : '启用增强UI';
+            toggleBtn.onclick = () => this.toggle();
+            document.body.appendChild(toggleBtn);
+        }
+        
+        toggle() {
+            this.isEnhanced = !this.isEnhanced;
+            localStorage.setItem('ui-enhanced', this.isEnhanced);
+            
+            if (this.isEnhanced) {
+                this.enableEnhancements();
+            } else {
+                this.disableEnhancements();
+            }
+            
+            // 更新按钮文字
+            document.querySelector('.ui-toggle-btn').textContent = 
+                this.isEnhanced ? '回到原版' : '启用增强UI';
+        }
+        
+        enableEnhancements() {
+            document.body.classList.add('ui-enhanced');
+            // 重新渲染房源卡片以应用新样式
+            if (window.lastFilteredProperties) {
+                this.updateExistingCards();
+            }
+        }
+        
+        disableEnhancements() {
+            document.body.classList.remove('ui-enhanced');
+        }
+        
+        updateExistingCards() {
+            // 为现有卡片添加必要的CSS类
+            const cards = document.querySelectorAll('.card-container');
+            cards.forEach(card => {
+                card.classList.add('property-card');
+                
+                // 更新价格显示
+                const priceElement = card.querySelector('.text-2xl.font-extrabold');
+                if (priceElement) {
+                    priceElement.classList.add('property-price');
+                    const unitElement = priceElement.querySelector('span');
+                    if (unitElement) {
+                        unitElement.classList.add('property-price-unit');
+                    }
+                }
+                
+                // 更新地址显示
+                const addressPrimary = card.querySelector('.text-lg.font-semibold');
+                if (addressPrimary) {
+                    addressPrimary.classList.add('property-address-primary');
+                }
+                
+                const addressSecondary = card.querySelector('.text-base.text-textSecondary');
+                if (addressSecondary) {
+                    addressSecondary.classList.add('property-address-secondary');
+                }
+                
+                // 更新房型信息
+                const featuresContainer = card.querySelector('.flex.items-center.gap-4.mt-3');
+                if (featuresContainer) {
+                    featuresContainer.classList.add('property-features');
+                    
+                    const featureItems = featuresContainer.querySelectorAll('.flex.items-center.gap-2');
+                    featureItems.forEach(item => {
+                        item.classList.add('feature-item');
+                        const number = item.querySelector('.font-bold');
+                        if (number) {
+                            number.classList.add('feature-number');
+                        }
+                        const icon = item.querySelector('i');
+                        if (icon) {
+                            icon.classList.add('feature-icon');
+                        }
+                    });
+                }
+                
+                // 更新图片容器
+                const imageCarousel = card.querySelector('.image-carousel img');
+                if (imageCarousel) {
+                    imageCarousel.parentElement.classList.add('property-image');
+                }
+            });
+        }
+    }
+
+    // 初始化UI增强器
+    const uiEnhancer = new UIEnhancer();
+
     // --- 1. FAVORITES UTILITIES ---
     const favoritesManager = {
         key: 'rentalHubFavorites',
@@ -258,11 +365,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createListingCard(property) {
         const streetAddress = property.address || '地址未知';
-        const suburbAndPostcode = `${property.suburb || ''} ${property.state || ''} ${property.postcode || ''}`.trim();
         const bedrooms = property.bedrooms || 0;
         const bathrooms = property.bathrooms || 0;
         const parking = property.parking_spaces || 0;
-        const propertyType = property.property_type || '房产';
         const availableDate = property.available_date || '待定';
         const rent = property.rent_pw ? `$${property.rent_pw}` : '价格待定';
         const placeholderSvg = `<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#E3E3E3"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="200" dy=".3em" fill="white" text-anchor="middle">?</text></svg>`;
@@ -282,27 +387,54 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="carousel-btn absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/60 transition" data-direction="prev"><i class="fa-solid fa-chevron-left pointer-events-none"></i></button>
             <button class="carousel-btn absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/60 transition" data-direction="next"><i class="fa-solid fa-chevron-right pointer-events-none"></i></button>
             <div class="image-counter absolute bottom-2 right-2 bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-full">1 / ${imageList.length}</div>` : '';
+        
+        const isNew = property.listing_id > 2500; // Example logic for "New" tag
+        const newTag = isNew ? `<div class="property-tag absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">新房源</div>` : '';
 
         return `
-            <div class="card-container bg-bgCard rounded-lg shadow-sm overflow-hidden">
-                <div class="image-carousel relative" data-images='${JSON.stringify(imageList)}' data-current-index="0">
-                    <a href="./details.html?id=${property.listing_id}">
-                        <img src="${coverImage}" alt="房源图片: ${streetAddress}" class="w-full h-52 object-cover image-tag">
+            <div class="card-container property-card bg-bgCard rounded-lg shadow-sm overflow-hidden flex flex-col">
+                <div class="image-carousel property-image relative" data-images='${JSON.stringify(imageList)}' data-current-index="0">
+                    <a href="./details.html?id=${property.listing_id}" class="block h-52">
+                        <img src="${coverImage}" alt="房源图片: ${streetAddress}" class="w-full h-full object-cover image-tag">
                     </a>
                     ${carouselControls}
+                    ${newTag}
                     <button class="favorite-btn ${favoriteClass}" data-listing-id="${property.listing_id}">
                         <i class="${favoriteIcon} fa-heart"></i>
                     </button>
                 </div>
-                <a href="./details.html?id=${property.listing_id}" class="p-4 block">
-                    <p class="text-2xl font-extrabold text-textPrice">$${rent}<span class="text-base font-medium text-textSecondary"> / week</span></p>
-                    <div class="mt-2"><p class="text-lg font-semibold text-textPrimary truncate">${streetAddress}</p><p class="text-base text-textSecondary">${suburbAndPostcode}</p></div>
-                    <div class="flex items-center gap-4 mt-3 text-textSecondary border-t border-borderDefault pt-3"><div class="flex items-center gap-2"><i class="fa-solid fa-bed text-lg w-5 text-center"></i><span class="font-bold text-textPrimary">${bedrooms}</span></div><div class="flex items-center gap-2"><i class="fa-solid fa-bath text-lg w-5 text-center"></i><span class="font-bold text-textPrimary">${bathrooms}</span></div><div class="flex items-center gap-2"><i class="fa-solid fa-car text-lg w-5 text-center"></i><span class="font-bold text-textPrimary">${parking}</span></div><span class="text-sm text-textSecondary pl-2 border-l border-borderDefault">${propertyType}</span></div>
-                    <div class="flex items-center gap-2 mt-3 text-textSecondary text-sm"><i class="fa-regular fa-calendar-check w-5 text-center"></i><span>Available from ${availableDate}</span></div>
-                </a>
+                <div class="p-4 flex flex-col flex-grow">
+                    <div class="flex-grow">
+                        <p class="property-price text-2xl font-extrabold text-textPrice">${rent}<span class="property-price-unit text-base font-medium text-textSecondary"> / week</span></p>
+                        <div class="mt-1">
+                            <p class="property-address-primary text-lg font-semibold text-textPrimary">${streetAddress}</p>
+                        </div>
+                        <div class="property-features flex items-center gap-4 mt-3 text-textSecondary">
+                            <div class="feature-item flex items-center gap-2">
+                                <i class="feature-icon fa-solid fa-bed text-lg w-5 text-center"></i>
+                                <span class="feature-number font-bold text-textPrimary">${bedrooms}</span>
+                            </div>
+                            <div class="feature-item flex items-center gap-2">
+                                <i class="feature-icon fa-solid fa-bath text-lg w-5 text-center"></i>
+                                <span class="feature-number font-bold text-textPrimary">${bathrooms}</span>
+                            </div>
+                            <div class="feature-item flex items-center gap-2">
+                                <i class="feature-icon fa-solid fa-car text-lg w-5 text-center"></i>
+                                <span class="feature-number font-bold text-textPrimary">${parking}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="property-footer mt-4 pt-3 border-t border-borderDefault flex justify-between items-center">
+                         <div class="flex items-center gap-2 text-xs text-green-600 font-bold">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>${availableDate}</span>
+                        </div>
+                        <span class="text-xs text-textSecondary">ID: ${property.listing_id}</span>
+                    </div>
+                </div>
                 <style>
-                    .favorite-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #2d2d2d; font-size: 18px; transition: color 0.2s; z-index: 10; cursor: pointer; border: none; }
-                    .favorite-btn.is-favorite { color: #ef4444; }
+                    .favorite-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #2d2d2d; font-size: 18px; transition: all 0.2s; z-index: 10; cursor: pointer; border: none; }
+                    .favorite-btn.is-favorite { color: #ef4444; transform: scale(1.1); }
                     .favorite-btn:hover { color: #ef4444; }
                 </style>
             </div>`;

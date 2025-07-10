@@ -1,0 +1,24 @@
+{
+  "name": "sydney-rental-miniprogram",
+  "version": "1.0.0",
+  "description": "悉尼租房平台微信小程序",
+  "main": "main.js",
+  "scripts": {
+    "build:mp-weixin": "cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin vue-cli-service uni-build",
+    "build:h5": "cross-env NODE_ENV=production UNI_PLATFORM=h5 vue-cli-service uni-build",
+    "dev:mp-weixin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin vue-cli-service uni-build --watch",
+    "dev:h5": "cross-env NODE_ENV=development UNI_PLATFORM=h5 vue-cli-service uni-serve"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
+  "author": "Sydney Rental Hub",
+  "license": "MIT",
+  "keywords": [
+    "uni-app",
+    "微信小程序",
+    "租房",
+    "悉尼"
+  ]
+}

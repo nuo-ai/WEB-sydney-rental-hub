@@ -18,7 +18,7 @@ from typing import List, Optional, Dict, Any
 # from server.models.commute_models import UniversityNameEnum # If needed
 import math
 import psycopg2 # For psycopg2.Error
-from models.property_models import Property # Assuming this is a Pydantic model or dataclass for DB rows
+from ..models.property_models import Property # Assuming this is a Pydantic model or dataclass for DB rows
 # CommuteProperty and PaginatedCommuteProperties are GraphQL types, so we'll return dicts matching their structure.
 # from server.api.graphql_schema import CommuteProperty, PaginatedCommuteProperties
 
