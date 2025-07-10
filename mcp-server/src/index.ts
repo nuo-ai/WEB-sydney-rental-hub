@@ -777,12 +777,28 @@ class SydneyRentalMCP {
     return result;
   }
 
-  async run() {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.error('Sydney Rental MCP server running on stdio');
+  async handleRequest(req: any, res: any) {
+    // A simple adapter to make the SDK's StdioServerTransport work over HTTP
+    const requestStr = JSON.stringify(req.body);
+    let output = '';
+    const transport = {
+      send: (data: string) => {
+        output += data;
+      },
+      registerHandler: (handler: (data: string) => void) => {
+        handler(requestStr);
+      },
+      close: () => {},
+    };
+    
+    await this.server.connect(transport as any);
+    
+    res.status(200).send(output);
   }
 }
 
-const server = new SydneyRentalMCP();
-server.run().catch(console.error);
+const mcpServer = new SydneyRentalMCP();
+
+export default async function handler(req: any, res: any) {
+  await mcpServer.handleRequest(req, res);
+}
