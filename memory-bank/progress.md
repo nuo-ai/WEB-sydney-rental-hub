@@ -67,3 +67,15 @@
         *   ✅ 更新后的 `backend/main.py` 文件。
         *   ✅ `git commit -m "feat(api): add endpoint for latest listings"`
         *   ✅ 更新 `memory-bank`。
+
+**Phase 4: 监控与通知**
+
+*   [x] **任务 4.1: 添加任务执行通知** (完成于 2025年7月12日)
+    *   **动作**: ✅ 修改 `.github/workflows/update-data.yml`，在任务成功或失败时发送Discord通知。
+    *   **动作**: ✅ 修改 `database/process_csv.py`，使其输出数据处理摘要。
+    *   **测试**: ✅ 手动触发GitHub Actions，确认Discord能收到包含正确信息的通知。
+    *   **交付**:
+        *   ✅ 更新后的 `.github/workflows/update-data.yml` 文件。
+        *   ✅ 更新后的 `database/process_csv.py` 文件。
+        *   ✅ `git commit -m "feat(automation): add discord notifications to workflow"`
+        *   ✅ 更新 `memory-bank`。
