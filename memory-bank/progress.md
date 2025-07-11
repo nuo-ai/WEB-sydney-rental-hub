@@ -42,13 +42,13 @@
 
 **Phase 2: 自动化与监控**
 
-*   [ ] **任务 2.1: 完善一键执行脚本**
-    *   **动作**: 为 `scripts/automated_data_update.py` 正式添加并测试 `--run-once` 参数。
-    *   **测试**: 运行 `python scripts/automated_data_update.py --run-once`，确认脚本在完成一次更新后能自动退出。
+*   [x] **任务 2.1: 完善一键执行脚本** (完成于 2025年7月11日)
+    *   **动作**: ✅ 为 `scripts/automated_data_update.py` 正式添加并测试 `--run-once` 参数。
+    *   **测试**: ✅ 运行 `python scripts/automated_data_update.py --run-once`，确认脚本在完成一次更新后能自动退出。
     *   **交付**:
-        *   更新后的 `scripts/automated_data_update.py` 文件。
-        *   `git commit -m "feat(scripts): add --run-once flag for manual trigger"`
-        *   更新 `memory-bank`。
+        *   ✅ 更新后的 `scripts/automated_data_update.py` 文件。
+        *   ✅ `git commit -m "feat(scripts): add --run-once flag for manual trigger"`
+        *   ✅ 更新 `memory-bank`。
 
 *   [ ] **任务 2.2: 配置 GitHub Actions 自动化**
     *   **动作**: 编写并测试 `.github/workflows/update-data.yml`，使其能按照 `11:00, 15:00, 18:00` 的策略每日定时调用更新脚本。
