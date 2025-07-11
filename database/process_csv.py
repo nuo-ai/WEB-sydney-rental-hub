@@ -222,6 +222,12 @@ def load_data_to_db(df, conn):
             conn.commit()
             logging.info("Database update process completed and transaction committed.")
 
+            # Print summary for GitHub Actions
+            print(f"新增房源: {len(new_listings)}")
+            print(f"更新房源: {len(updated_listings)}")
+            print(f"下架房源: {len(active_off_market_ids)}")
+            print(f"重新上架: {len(relisted_ids)}")
+
         except psycopg2.Error as e:
             logging.error(f"!!! DATABASE ERROR !!!: {e}")
             logging.error("Rolling back transaction...")
