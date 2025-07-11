@@ -177,11 +177,16 @@ def run_once():
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='自动化数据更新')
-    parser.add_argument('--once', action='store_true', help='只运行一次')
+    parser = argparse.ArgumentParser(description='自动化数据更新脚本')
+    parser.add_argument('--run-once', action='store_true', help='只运行一次更新流程然后退出')
     args = parser.parse_args()
     
-    if args.once:
+    logger.info("脚本启动...")
+    
+    if args.run_once:
+        logger.info("检测到 --run-once 参数，将执行单次更新。")
         run_once()
+        logger.info("单次更新完成，脚本退出。")
     else:
+        logger.info("未提供 --run-once 参数，将启动定时更新服务。")
         run_scheduled_updates()
