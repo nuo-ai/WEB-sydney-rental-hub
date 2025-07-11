@@ -29,16 +29,16 @@
     *   **测试**: ✅ 确认新字段已成功添加到 Supabase 数据库表中。
     *   **交付**:
         *   ✅ 更新后的 `database/setup_database.sql` 文件。
-        *   [ ] `git commit -m "feat(db): add status and status_changed_at to properties"`
-        *   [ ] 更新 `memory-bank`。
+        *   ✅ `git commit -m "feat(db): add status and status_changed_at to properties"`
+        *   ✅ 更新 `memory-bank`。
 
-*   [ ] **任务 1.2: 升级 ETL 脚本**
-    *   **动作**: 修改 `database/process_csv.py`，实现对 `status` 字段的智能判断和更新逻辑。
-    *   **测试**: 本地运行脚本，并验证数据库中的 `status` 和 `status_changed_at` 字段是否按预期更新。
+*   [x] **任务 1.2: 升级 ETL 脚本** (完成于 2025年7月11日)
+    *   **动作**: ✅ 修改 `database/process_csv.py`，实现对 `status` 字段的智能判断和更新逻辑。
+    *   **测试**: ✅ 本地运行脚本，并验证数据库中的 `status` 和 `status_changed_at` 字段已按预期更新。
     *   **交付**:
-        *   更新后的 `database/process_csv.py` 文件。
-        *   `git commit -m "feat(etl): implement intelligent status tracking"`
-        *   更新 `memory-bank`。
+        *   ✅ 更新后的 `database/process_csv.py` 文件。
+        *   [ ] `git commit -m "feat(etl): implement intelligent status tracking"`
+        *   [ ] 更新 `memory-bank`。
 
 **Phase 2: 自动化与监控**
 

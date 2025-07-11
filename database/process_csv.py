@@ -5,6 +5,7 @@ from sqlalchemy import create_engine # Using sqlalchemy for easier connection st
 import os
 import glob
 import logging
+from datetime import datetime
 
 # 处理 dotenv 导入 - 添加错误处理来解决 Pylance 警告
 try:
@@ -16,60 +17,32 @@ except ImportError:
     # 提供一个空的 load_dotenv 函数作为备选
     def load_dotenv(*args, **kwargs):
         pass
-# from shapely.geometry import Point # Not strictly needed for direct EWKT string construction
-# from geoalchemy2.shape import from_shape # Not strictly needed for direct EWKT string construction
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load environment variables from .env file if it exists
-# Ensure .env is in the project root, one level up from 'etl' directory
 dotenv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env')
 if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path, override=True) # Added override=True
+    load_dotenv(dotenv_path, override=True)
     logging.info(f"Successfully loaded .env file from: {dotenv_path} (with override)")
 else:
-    # Fallback for cases where script might be run from a different context or .env is elsewhere in search path
-    load_dotenv(override=True) # Added override=True
+    load_dotenv(override=True)
     logging.warning(
         f".env file not found at {dotenv_path}. Attempting default load_dotenv() search (with override). "
         "Ensure your .env file is correctly placed in the project root for reliable loading."
     )
 
-# Database connection parameters from environment variables
-DB_NAME = os.getenv("DB_NAME", "rental_mcp_db")
-DB_USER = os.getenv("DB_USER", "etl_user")
-DB_PASSWORD = os.getenv("DB_PASSWORD") # CRITICAL: No default for password
-print(f"DB_PASSWORD in .env: {repr(DB_PASSWORD)}")
-
-# Initial check for DB_PASSWORD after attempting to load .env
-if DB_PASSWORD is None:
-    logging.critical("CRITICAL: DB_PASSWORD environment variable is not set or not loaded from .env file.")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-
-# Initial check for DB_PASSWORD after attempting to load .env
-# This provides an early warning if the crucial password is not set.
-if DB_PASSWORD is None: # Check for None explicitly, as an empty string might be a (bad) password
-    logging.critical("CRITICAL: DB_PASSWORD environment variable is not set or not loaded from .env file. ETL process cannot proceed without it.")
-    # Depending on desired strictness, could raise ValueError here to halt script immediately.
-    # raise ValueError("DB_PASSWORD not set. Halting script.")
-
 def find_latest_csv_file():
     """Finds the most recent CSV file in the output directory."""
-    # Construct the search path relative to this script's location
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(script_dir, '..', 'crawler', 'dist', 'output')
     search_pattern = os.path.join(output_dir, '*_results.csv')
-    
     logging.info(f"Searching for CSV files in: {search_pattern}")
-    
     list_of_files = glob.glob(search_pattern)
-    
     if not list_of_files:
         logging.error(f"No CSV files found in {output_dir}")
         raise FileNotFoundError(f"No CSV files matching pattern found in {output_dir}")
-        
     latest_file = max(list_of_files, key=os.path.getctime)
     logging.info(f"Found latest CSV file: {latest_file}")
     return latest_file
@@ -77,52 +50,30 @@ def find_latest_csv_file():
 def get_db_connection():
     """Establishes a connection to the PostgreSQL database."""
     database_url = os.getenv("DATABASE_URL")
-    
     try:
         if database_url:
             logging.info("Connecting to database using DATABASE_URL...")
             conn = psycopg2.connect(dsn=database_url)
             logging.info("Successfully connected to the database using DATABASE_URL.")
         else:
-            logging.warning("DATABASE_URL not found, falling back to individual DB variables.")
-            # Ensure DB_PASSWORD is available before attempting to connect.
+            # Fallback to individual components if DATABASE_URL is not set
+            DB_NAME = os.getenv("DB_NAME", "rental_mcp_db")
+            DB_USER = os.getenv("DB_USER", "etl_user")
+            DB_PASSWORD = os.getenv("DB_PASSWORD")
+            DB_HOST = os.getenv("DB_HOST", "localhost")
+            DB_PORT = os.getenv("DB_PORT", "5432")
             if DB_PASSWORD is None:
-                logging.error("DB_PASSWORD is not set. Cannot establish database connection.")
-                raise ValueError("DB_PASSWORD environment variable is not set. Please configure it in your .env file.")
-            
-            # Check if other essential DB parameters are present
-            missing_vars = [var_name for var_name, var_val in {
-                                "DB_NAME": DB_NAME, "DB_USER": DB_USER, 
-                                "DB_HOST": DB_HOST, "DB_PORT": DB_PORT
-                            }.items() if var_val is None]
-            if missing_vars:
-                logging.error(f"Missing essential database configuration: {', '.join(missing_vars)}. Cannot establish database connection.")
-                raise ValueError(f"Missing database configuration for: {', '.join(missing_vars)}")
-
-            conn = psycopg2.connect(
-                dbname=DB_NAME,
-                user=DB_USER,
-                password=DB_PASSWORD,
-                host=DB_HOST,
-                port=DB_PORT
-            )
+                raise ValueError("DB_PASSWORD environment variable is not set.")
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
             logging.info(f"Successfully connected to the database: {DB_USER}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
         return conn
-    except psycopg2.OperationalError as e: # Catch specific operational errors like auth failure, db not found etc.
-        logging.error(f"Database operational error: {e}")
-        raise
-    except Exception as e: # Catch any other psycopg2 or unexpected errors
+    except Exception as e:
         logging.error(f"An unexpected error occurred while connecting to the database: {e}")
         raise
 
 def clean_data(df):
     """Cleans and transforms the DataFrame."""
     logging.info("Starting data cleaning and transformation...")
-
-    # Rename columns to match database (snake_case) - if not already
-    # df.rename(columns={'Old Name': 'new_name'}, inplace=True)
-
-    # Handle boolean string columns (example, adjust as per your CSV)
     bool_cols = [
         'has_air_conditioning', 'is_furnished', 'has_balcony', 'has_dishwasher',
         'has_laundry', 'has_built_in_wardrobe', 'has_gym', 'has_pool',
@@ -131,68 +82,39 @@ def clean_data(df):
     ]
     for col in bool_cols:
         if col in df.columns:
-            # Convert various string representations of True/False to actual booleans
             df[col] = df[col].astype(str).str.upper().map({'TRUE': True, 'FALSE': False, 'YES': True, 'NO': False, '1': True, '0': False}).fillna(False).astype(bool)
         else:
-            logging.warning(f"Boolean column '{col}' not found in CSV. Will be skipped or defaulted in DB.")
-            df[col] = False # Default to False if column is missing
-
-    # Convert numeric columns
+            df[col] = False
     numeric_cols = ['rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces']
     for col in numeric_cols:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0) # Coerce errors to NaN, then fill with 0
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
             if col in ['bedrooms', 'bathrooms', 'parking_spaces']:
-                 df[col] = df[col].astype('Int64') # Use Int64 to allow for NA if needed, or int if 0 is acceptable for NA
+                 df[col] = df[col].astype('Int64')
             else:
                  df[col] = df[col].astype(int)
         else:
-            logging.warning(f"Numeric column '{col}' not found in CSV.")
             df[col] = 0
-
-
-    # Convert date columns
     if 'available_date' in df.columns:
         df['available_date'] = pd.to_datetime(df['available_date'], errors='coerce').dt.date
     else:
-        logging.warning("Date column 'available_date' not found in CSV.")
         df['available_date'] = None
-
-
-    # Handle latitude and longitude, create geom
     if 'latitude' in df.columns and 'longitude' in df.columns:
         df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
         df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
-        # Create EWKT string for PostGIS geom column
-        # SRID 4326 is standard for GPS coordinates
         df['geom'] = df.apply(
             lambda row: f"SRID=4326;POINT({row['longitude']} {row['latitude']})"
             if pd.notnull(row['longitude']) and pd.notnull(row['latitude']) else None,
             axis=1
         )
     else:
-        logging.warning("Latitude or Longitude columns not found. 'geom' will be null.")
         df['geom'] = None
-
-    # For JSONB columns (images, property_features), ensure they are valid JSON strings or None
-    # Pandas read_csv might interpret "[]" as a string, not an empty list for JSON.
-    # We'll handle actual JSON conversion/validation during insertion if psycopg2 needs it,
-    # or ensure they are None if empty/invalid.
     json_cols = ['images', 'property_features']
     for col in json_cols:
         if col in df.columns:
-            # Example: if it's an empty string or "[]", make it None so DB stores NULL
             df[col] = df[col].apply(lambda x: x if isinstance(x, str) and x.strip() and x.strip() != '[]' else None)
         else:
-            logging.warning(f"JSON column '{col}' not found in CSV.")
             df[col] = None
-            
-    # Select and order columns to match the database table structure
-    # This is CRITICAL for execute_values to work correctly.
-    # Add any missing columns that have defaults in the DB (like is_active, created_at, last_updated)
-    # or ensure they are handled appropriately.
-    # 'created_at' and 'last_updated' have defaults in DB, 'is_active' also defaults to TRUE.
-    # We only need to provide columns that are present in the CSV.
     
     db_columns_from_csv = [
         'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
@@ -206,11 +128,9 @@ def clean_data(df):
         'agent_logo_url', 'enquiry_form_action', 'geom'
     ]
     
-    # Filter df to only include columns that exist in the CSV and are in our target list
     final_df_columns = [col for col in db_columns_from_csv if col in df.columns]
     df_processed = df[final_df_columns].copy()
 
-    # Deduplicate based on listing_id, keeping the first occurrence
     if 'listing_id' in df_processed.columns:
         initial_row_count = len(df_processed)
         df_processed.drop_duplicates(subset=['listing_id'], keep='first', inplace=True)
@@ -220,70 +140,88 @@ def clean_data(df):
     else:
         logging.warning("listing_id column not found, cannot perform deduplication.")
 
-
     logging.info("Data cleaning and transformation finished.")
     return df_processed
 
 def load_data_to_db(df, conn):
-    """Loads the DataFrame into the PostgreSQL database using an UPSERT strategy."""
+    """Loads the DataFrame into the PostgreSQL database using an intelligent UPSERT strategy."""
     if df.empty:
         logging.info("DataFrame is empty. No data to load.")
         return
 
     table_name = "properties"
-    columns = df.columns.tolist()
+    csv_ids = set(df['listing_id'])
     
-    if 'listing_id' not in columns:
-        logging.error("`listing_id` column is missing, which is required for UPSERT operation. Aborting.")
-        raise ValueError("DataFrame must contain 'listing_id' for database operations.")
-
-    # Prepare columns for the UPDATE SET clause
-    # Exclude the primary key 'listing_id' from the columns to be updated
-    update_cols = [f"{col} = EXCLUDED.{col}" for col in columns if col != 'listing_id']
-    
-    # Add tracking fields to the update clause
-    # The 'last_updated' field is handled by a database trigger, so we don't need to set it here.
-    # We just need to ensure the record is marked as active.
-    update_cols.append("is_active = TRUE")
-
-    # Convert DataFrame to list of tuples
-    data_tuples = [tuple(x) for x in df.replace({pd.NaT: None, pd.NA: None, float('nan'): None}).to_numpy()]
-
-    # Construct the UPSERT query
-    # This query inserts a new row. If a row with the same `listing_id` already exists,
-    # it updates the existing row with the new values from the CSV.
-    # `first_seen_at` is only set on initial insert due to its DEFAULT value.
-    insert_query = f"""
-        INSERT INTO {table_name} ({', '.join(columns)})
-        VALUES %s
-        ON CONFLICT (listing_id) DO UPDATE SET
-        {', '.join(update_cols)};
-    """
-
     with conn.cursor() as cursor:
         try:
-            logging.info(f"Attempting to upsert {len(data_tuples)} rows into '{table_name}'...")
-            execute_values(cursor, insert_query, data_tuples, page_size=500)
-            logging.info(f"execute_values completed. {cursor.rowcount} rows affected by INSERT/UPDATE.")
+            # 1. Get existing properties from DB for comparison
+            logging.info("Fetching existing properties from database for comparison...")
+            cursor.execute("SELECT listing_id, rent_pw, is_active FROM properties")
+            db_properties = {row[0]: {'rent_pw': row[1], 'is_active': row[2]} for row in cursor.fetchall()}
+            db_ids = set(db_properties.keys())
+            logging.info(f"Found {len(db_ids)} existing properties in the database.")
 
-            current_listing_ids = tuple(df['listing_id'].unique().tolist())
+            # 2. Identify new, updated, and unchanged properties
+            new_listings = []
+            updated_listings = []
             
-            if current_listing_ids:
-                logging.info(f"Found {len(current_listing_ids)} unique listing_ids in the current CSV.")
-                update_inactive_query = """
-                    UPDATE properties
-                    SET is_active = FALSE
-                    WHERE listing_id NOT IN %s AND is_active = TRUE;
-                """
-                cursor.execute(update_inactive_query, (current_listing_ids,))
-                logging.info(f"{cursor.rowcount} properties marked as inactive.")
-            else:
-                logging.warning("No listing_ids found in the current CSV to process inactive properties.")
+            for _, row in df.iterrows():
+                listing_id = row['listing_id']
+                if listing_id not in db_ids:
+                    new_listings.append(row)
+                else:
+                    # Check for changes (e.g., rent)
+                    if row['rent_pw'] != db_properties[listing_id]['rent_pw']:
+                        updated_listings.append(row)
+            
+            logging.info(f"Identified {len(new_listings)} new listings and {len(updated_listings)} updated listings.")
 
-            logging.info("Committing transaction...")
+            # 3. Batch INSERT new listings
+            if new_listings:
+                new_df = pd.DataFrame(new_listings)
+                # Add status columns
+                new_df['status'] = 'new'
+                new_df['status_changed_at'] = datetime.now()
+                
+                # Ensure all columns in the dataframe exist in the database table before creating the query
+                cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}'")
+                db_cols = [row[0] for row in cursor.fetchall()]
+                
+                columns = [col for col in new_df.columns if col in db_cols]
+                
+                insert_query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES %s"
+                data_tuples = [tuple(x) for x in new_df[columns].replace({pd.NaT: None, pd.NA: None}).to_numpy()]
+                
+                execute_values(cursor, insert_query, data_tuples, page_size=500)
+                logging.info(f"Successfully inserted {len(new_listings)} new properties.")
+
+            # 4. Batch UPDATE updated listings
+            if updated_listings:
+                update_query = f"UPDATE {table_name} SET rent_pw = %s, status = 'updated', status_changed_at = %s, is_active = TRUE WHERE listing_id = %s"
+                update_tuples = [(row['rent_pw'], datetime.now(), row['listing_id']) for row in updated_listings]
+                
+                cursor.executemany(update_query, update_tuples)
+                logging.info(f"Successfully updated {len(updated_listings)} properties.")
+
+            # 5. Identify and mark off-market properties
+            off_market_ids = db_ids - csv_ids
+            active_off_market_ids = [pid for pid in off_market_ids if db_properties[pid]['is_active']]
+
+            if active_off_market_ids:
+                off_market_query = "UPDATE properties SET is_active = FALSE, status = 'off-market', status_changed_at = %s WHERE listing_id IN %s"
+                cursor.execute(off_market_query, (datetime.now(), tuple(active_off_market_ids)))
+                logging.info(f"Marked {len(active_off_market_ids)} properties as off-market.")
+
+            # 6. Mark properties that are back on the market
+            relisted_ids = [pid for pid in csv_ids if pid in db_ids and not db_properties[pid]['is_active']]
+            if relisted_ids:
+                relisted_query = "UPDATE properties SET is_active = TRUE, status = 'relisted', status_changed_at = %s WHERE listing_id IN %s"
+                cursor.execute(relisted_query, (datetime.now(), tuple(relisted_ids)))
+                logging.info(f"Marked {len(relisted_ids)} properties as relisted.")
+
             conn.commit()
-            logging.info("Transaction committed successfully.")
-            
+            logging.info("Database update process completed and transaction committed.")
+
         except psycopg2.Error as e:
             logging.error(f"!!! DATABASE ERROR !!!: {e}")
             logging.error("Rolling back transaction...")
@@ -298,32 +236,18 @@ def main():
     try:
         csv_file_path = find_latest_csv_file()
         logging.info(f"Reading CSV file from: {csv_file_path}")
-        # Specify dtype for problematic columns if necessary, e.g., dtype={'postcode': str}
-        # Handle potential "मिक्स" encoding issues if they arise by specifying encoding
         try:
             df = pd.read_csv(csv_file_path, keep_default_na=True, na_values=['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A', 'NULL', 'NaN', 'n/a', 'nan', 'null', 'NA'])
         except UnicodeDecodeError:
             logging.warning("UTF-8 decoding failed, trying with 'latin1'")
             df = pd.read_csv(csv_file_path, keep_default_na=True, na_values=['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A', 'NULL', 'NaN', 'n/a', 'nan', 'null', 'NA'], encoding='latin1')
-        except Exception as e:
-            logging.error(f"Error reading CSV file: {e}")
-            return
-
-        logging.info(f"Successfully read {len(df)} rows from CSV.")
         
-        # Drop fully empty columns that might have been read as 'Column 1', 'Column 2'
+        logging.info(f"Successfully read {len(df)} rows from CSV.")
         df.dropna(axis=1, how='all', inplace=True)
         logging.info(f"Columns after dropping empty ones: {df.columns.tolist()}")
 
-
-        df_cleaned = clean_data(df.copy()) # Use .copy() to avoid SettingWithCopyWarning
-        
+        df_cleaned = clean_data(df.copy())
         conn = get_db_connection()
-        
-        # For the simplified "clear and insert" strategy, we'll use ON CONFLICT DO UPDATE
-        # which effectively replaces rows based on listing_id or inserts new ones.
-        # If we wanted a true "clear all then insert", we'd TRUNCATE or DELETE ALL first.
-        # The current ON CONFLICT is a good compromise for idempotency.
         load_data_to_db(df_cleaned, conn)
         
         logging.info("ETL process completed successfully.")
