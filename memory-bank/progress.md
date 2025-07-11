@@ -60,10 +60,10 @@
 
 **Phase 3: 数据应用**
 
-*   [ ] **任务 3.1: 创建“最新房源”API**
-    *   **动作**: 在 `backend/main.py` 中增加一个新的 GraphQL 查询或 RESTful API 接口，用于获取指定时间范围内 `status` 为 'new' 或 'updated' 的房源。
-    *   **测试**: 本地启动后端服务，并使用工具成功调用新接口，验证返回数据是否正确。
+*   [x] **任务 3.1: 创建“最新房源”API** (完成于 2025年7月12日)
+    *   **动作**: ✅ 在 `backend/main.py` 中增加一个新的 RESTful API 接口 (`/api/properties/latest`)，用于获取24小时内 `status` 为 'new' 或 'updated' 的房源。
+    *   **测试**: ✅ 本地启动后端服务，并使用工具成功调用新接口，验证返回数据是否正确。
     *   **交付**:
-        *   更新后的 `backend/main.py` 文件。
-        *   `git commit -m "feat(api): add endpoint for latest listings"`
-        *   更新 `memory-bank`。
+        *   ✅ 更新后的 `backend/main.py` 文件。
+        *   ✅ `git commit -m "feat(api): add endpoint for latest listings"`
+        *   ✅ 更新 `memory-bank`。
