@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS properties (
     enquiry_form_action TEXT,
     geom GEOMETRY(Point, 4326), -- For PostGIS spatial data
     is_active BOOLEAN DEFAULT TRUE,
+    status TEXT,
+    status_changed_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
