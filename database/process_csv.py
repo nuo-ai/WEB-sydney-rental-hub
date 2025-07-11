@@ -181,7 +181,7 @@ def load_data_to_db(df, conn):
                 new_df = pd.DataFrame(new_listings)
                 # Add status columns
                 new_df['status'] = 'new'
-                new_df['status_changed_at'] = datetime.now()
+                new_df['status_changed_at'] = datetime.now().isoformat()
                 
                 # Ensure all columns in the dataframe exist in the database table before creating the query
                 cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}'")
@@ -198,7 +198,7 @@ def load_data_to_db(df, conn):
             # 4. Batch UPDATE updated listings
             if updated_listings:
                 update_query = f"UPDATE {table_name} SET rent_pw = %s, status = 'updated', status_changed_at = %s, is_active = TRUE WHERE listing_id = %s"
-                update_tuples = [(row['rent_pw'], datetime.now(), row['listing_id']) for row in updated_listings]
+                update_tuples = [(row['rent_pw'], datetime.now().isoformat(), row['listing_id']) for row in updated_listings]
                 
                 cursor.executemany(update_query, update_tuples)
                 logging.info(f"Successfully updated {len(updated_listings)} properties.")
@@ -209,14 +209,14 @@ def load_data_to_db(df, conn):
 
             if active_off_market_ids:
                 off_market_query = "UPDATE properties SET is_active = FALSE, status = 'off-market', status_changed_at = %s WHERE listing_id IN %s"
-                cursor.execute(off_market_query, (datetime.now(), tuple(active_off_market_ids)))
+                cursor.execute(off_market_query, (datetime.now().isoformat(), tuple(active_off_market_ids)))
                 logging.info(f"Marked {len(active_off_market_ids)} properties as off-market.")
 
             # 6. Mark properties that are back on the market
             relisted_ids = [pid for pid in csv_ids if pid in db_ids and not db_properties[pid]['is_active']]
             if relisted_ids:
                 relisted_query = "UPDATE properties SET is_active = TRUE, status = 'relisted', status_changed_at = %s WHERE listing_id IN %s"
-                cursor.execute(relisted_query, (datetime.now(), tuple(relisted_ids)))
+                cursor.execute(relisted_query, (datetime.now().isoformat(), tuple(relisted_ids)))
                 logging.info(f"Marked {len(relisted_ids)} properties as relisted.")
 
             conn.commit()

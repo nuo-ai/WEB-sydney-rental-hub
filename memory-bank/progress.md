@@ -37,8 +37,8 @@
     *   **测试**: ✅ 本地运行脚本，并验证数据库中的 `status` 和 `status_changed_at` 字段已按预期更新。
     *   **交付**:
         *   ✅ 更新后的 `database/process_csv.py` 文件。
-        *   [ ] `git commit -m "feat(etl): implement intelligent status tracking"`
-        *   [ ] 更新 `memory-bank`。
+        *   ✅ `git commit -m "feat(etl): implement intelligent status tracking"`
+        *   ✅ 更新 `memory-bank`。
 
 **Phase 2: 自动化与监控**
 
