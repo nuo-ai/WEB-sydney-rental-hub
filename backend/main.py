@@ -480,3 +480,24 @@ async def chat_endpoint(request: ChatRequest, db_conn: Any = Depends(get_db_conn
 # Note: Ensure that `server.api.graphql_schema.py` uses `info.context.get('sync_db_conn')`
 # to retrieve the database connection in its resolvers.
 # The `get_db_session` context manager will handle returning the connection to the pool.
+
+@app.get("/api/properties/latest", tags=["Properties"])
+async def get_latest_properties(db: Any = Depends(get_db_conn_dependency)):
+    """
+    Get the latest properties with status 'new' or 'updated' in the last 24 hours.
+    """
+    try:
+        with db.cursor() as cursor:
+            cursor.execute("""
+                SELECT *
+                FROM properties
+                WHERE status IN ('new', 'updated')
+                  AND status_changed_at >= NOW() - INTERVAL '24 hours'
+                ORDER BY status_changed_at DESC;
+            """)
+            properties = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            return [dict(zip(columns, row)) for row in properties]
+    except Exception as e:
+        logger.error(f"Error fetching latest properties: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch latest properties")
