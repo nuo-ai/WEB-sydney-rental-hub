@@ -50,13 +50,13 @@
         *   ✅ `git commit -m "feat(scripts): add --run-once flag for manual trigger"`
         *   ✅ 更新 `memory-bank`。
 
-*   [ ] **任务 2.2: 配置 GitHub Actions 自动化**
-    *   **动作**: 编写并测试 `.github/workflows/update-data.yml`，使其能按照 `11:00, 15:00, 18:00` 的策略每日定时调用更新脚本。
-    *   **测试**: 手动触发一次 GitHub Actions workflow，检查其是否在云端成功运行并更新了数据库。
+*   [x] **任务 2.2: 配置 GitHub Actions 自动化** (完成于 2025年7月11日)
+    *   **动作**: ✅ 编写并测试 `.github/workflows/update-data.yml`，使其能按照 `11:00, 15:00, 18:00` 的策略每日定时调用更新脚本。
+    *   **测试**: ✅ 手动触发一次 GitHub Actions workflow，检查其是否在云端成功运行并更新了数据库。
     *   **交付**:
-        *   最终的 `.github/workflows/update-data.yml` 文件。
-        *   `git commit -m "ci(automation): configure daily data update workflow"`
-        *   更新 `memory-bank`。
+        *   ✅ 最终的 `.github/workflows/update-data.yml` 文件。
+        *   ✅ `git commit -m "ci(automation): configure daily data update workflow"`
+        *   ✅ 更新 `memory-bank`。
 
 **Phase 3: 数据应用**
 
