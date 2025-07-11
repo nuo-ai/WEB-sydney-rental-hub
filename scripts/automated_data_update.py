@@ -46,13 +46,17 @@ load_dotenv(PROJECT_ROOT / ".env")
 def test_db_connection():
     """测试数据库连接"""
     try:
-        conn = psycopg2.connect(
-            dbname=os.getenv("DB_NAME", "rental_mcp_db"),
-            user=os.getenv("DB_USER", "etl_user"),
-            password=os.getenv("DB_PASSWORD"),
-            host=os.getenv("DB_HOST", "localhost"),
-            port=os.getenv("DB_PORT", "5432")
-        )
+        database_url = os.getenv("DATABASE_URL")
+        if database_url:
+            conn = psycopg2.connect(database_url)
+        else:
+            conn = psycopg2.connect(
+                dbname=os.getenv("DB_NAME", "rental_mcp_db"),
+                user=os.getenv("DB_USER", "etl_user"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST", "localhost"),
+                port=os.getenv("DB_PORT", "5432")
+            )
         conn.close()
         logger.info("数据库连接测试成功")
         return True

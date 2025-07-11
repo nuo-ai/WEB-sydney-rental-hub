@@ -54,8 +54,8 @@ sydney-rental-platform/
     - **详情**: 成功修复了 `requirements.txt` 中的依赖问题，解决了在 Python 3.13 环境下的编译错误。`test_auto_update.bat` 脚本现在可以完整、成功地执行，确认了本地数据管道的稳定性。
 
 2.  **云端部署**
-    - **状态**: ⏳ 未开始
-    - **数据库**: 部署到Supabase。
+    - **状态**: 🔄 进行中
+    - **数据库**: ✅ 部署完成 (2025年7月11日)。Schema 和数据已成功迁移到 Supabase。
     - **后端**: 部署到Railway或Render。
     - **前端**: 部署到Netlify。
     - **自动化**: 配置并测试GitHub Actions的定时数据更新。

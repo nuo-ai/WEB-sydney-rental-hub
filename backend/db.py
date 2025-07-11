@@ -35,35 +35,45 @@ def init_db_pool():
             "Ensure your .env file is correctly placed in the project root."
         )
 
-    db_name = os.getenv("DB_NAME")
-    db_user = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
-    db_host = os.getenv("DB_HOST")
-    db_port = os.getenv("DB_PORT")
-
-    if not db_password:
-        logger.critical("CRITICAL: DB_PASSWORD environment variable not set. Cannot initialize database pool.")
-        # raise ValueError("DB_PASSWORD environment variable is not set.") # Or let it fail below
-        return # Prevent pool initialization
-
-    if not all([db_name, db_user, db_host, db_port]):
-        logger.critical(
-            "One or more database connection environment variables (DB_NAME, DB_USER, DB_HOST, DB_PORT) "
-            "are not set. Cannot initialize pool."
-        )
-        return # Prevent pool initialization
+    database_url = os.getenv("DATABASE_URL")
 
     try:
-        logger.info(f"Initializing database connection pool for {db_user}@{db_host}:{db_port}/{db_name}...")
-        db_pool = psycopg2.pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=10, # Adjust maxconn based on expected load
-            dbname=db_name,
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port
-        )
+        if database_url:
+            logger.info("Initializing database connection pool using DATABASE_URL...")
+            db_pool = psycopg2.pool.SimpleConnectionPool(
+                minconn=1,
+                maxconn=10,
+                dsn=database_url
+            )
+        else:
+            logger.warning("DATABASE_URL not found, falling back to individual DB variables.")
+            db_name = os.getenv("DB_NAME")
+            db_user = os.getenv("DB_USER")
+            db_password = os.getenv("DB_PASSWORD")
+            db_host = os.getenv("DB_HOST")
+            db_port = os.getenv("DB_PORT")
+
+            if not db_password:
+                logger.critical("CRITICAL: DB_PASSWORD environment variable not set. Cannot initialize database pool.")
+                return
+
+            if not all([db_name, db_user, db_host, db_port]):
+                logger.critical(
+                    "One or more database connection environment variables (DB_NAME, DB_USER, DB_HOST, DB_PORT) "
+                    "are not set. Cannot initialize pool."
+                )
+                return
+
+            logger.info(f"Initializing database connection pool for {db_user}@{db_host}:{db_port}/{db_name}...")
+            db_pool = psycopg2.pool.SimpleConnectionPool(
+                minconn=1,
+                maxconn=10,
+                dbname=db_name,
+                user=db_user,
+                password=db_password,
+                host=db_host,
+                port=db_port
+            )
         # Test connection by getting and putting one
         conn_test = db_pool.getconn()
         db_pool.putconn(conn_test)

@@ -59,7 +59,7 @@ def find_latest_csv_file():
     """Finds the most recent CSV file in the output directory."""
     # Construct the search path relative to this script's location
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    output_dir = os.path.join(script_dir, '..', 'dist', 'output')
+    output_dir = os.path.join(script_dir, '..', 'crawler', 'dist', 'output')
     search_pattern = os.path.join(output_dir, '*_results.csv')
     
     logging.info(f"Searching for CSV files in: {search_pattern}")
@@ -76,29 +76,37 @@ def find_latest_csv_file():
 
 def get_db_connection():
     """Establishes a connection to the PostgreSQL database."""
-    # Ensure DB_PASSWORD is available before attempting to connect.
-    if DB_PASSWORD is None:
-        logging.error("DB_PASSWORD is not set. Cannot establish database connection.")
-        raise ValueError("DB_PASSWORD environment variable is not set. Please configure it in your .env file.")
+    database_url = os.getenv("DATABASE_URL")
     
-    # Check if other essential DB parameters are present
-    missing_vars = [var_name for var_name, var_val in {
-                        "DB_NAME": DB_NAME, "DB_USER": DB_USER, 
-                        "DB_HOST": DB_HOST, "DB_PORT": DB_PORT
-                    }.items() if var_val is None]
-    if missing_vars:
-        logging.error(f"Missing essential database configuration: {', '.join(missing_vars)}. Cannot establish database connection.")
-        raise ValueError(f"Missing database configuration for: {', '.join(missing_vars)}")
-
     try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            host=DB_HOST,
-            port=DB_PORT
-        )
-        logging.info(f"Successfully connected to the database: {DB_USER}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+        if database_url:
+            logging.info("Connecting to database using DATABASE_URL...")
+            conn = psycopg2.connect(dsn=database_url)
+            logging.info("Successfully connected to the database using DATABASE_URL.")
+        else:
+            logging.warning("DATABASE_URL not found, falling back to individual DB variables.")
+            # Ensure DB_PASSWORD is available before attempting to connect.
+            if DB_PASSWORD is None:
+                logging.error("DB_PASSWORD is not set. Cannot establish database connection.")
+                raise ValueError("DB_PASSWORD environment variable is not set. Please configure it in your .env file.")
+            
+            # Check if other essential DB parameters are present
+            missing_vars = [var_name for var_name, var_val in {
+                                "DB_NAME": DB_NAME, "DB_USER": DB_USER, 
+                                "DB_HOST": DB_HOST, "DB_PORT": DB_PORT
+                            }.items() if var_val is None]
+            if missing_vars:
+                logging.error(f"Missing essential database configuration: {', '.join(missing_vars)}. Cannot establish database connection.")
+                raise ValueError(f"Missing database configuration for: {', '.join(missing_vars)}")
+
+            conn = psycopg2.connect(
+                dbname=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD,
+                host=DB_HOST,
+                port=DB_PORT
+            )
+            logging.info(f"Successfully connected to the database: {DB_USER}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
         return conn
     except psycopg2.OperationalError as e: # Catch specific operational errors like auth failure, db not found etc.
         logging.error(f"Database operational error: {e}")
@@ -217,44 +225,70 @@ def clean_data(df):
     return df_processed
 
 def load_data_to_db(df, conn):
-    """Loads the DataFrame into the PostgreSQL database."""
+    """Loads the DataFrame into the PostgreSQL database using an UPSERT strategy."""
     if df.empty:
         logging.info("DataFrame is empty. No data to load.")
         return
 
     table_name = "properties"
-    # Columns in the DataFrame must match the order of columns in the INSERT statement
-    # and the table structure if not explicitly listing columns in INSERT.
     columns = df.columns.tolist()
     
-    # Ensure 'geom' is properly formatted if it exists
-    if 'geom' in columns and not df['geom'].empty:
-         # Assuming 'geom' column already contains WKT strings from from_shape
-         pass # It should be ready for psycopg2
+    if 'listing_id' not in columns:
+        logging.error("`listing_id` column is missing, which is required for UPSERT operation. Aborting.")
+        raise ValueError("DataFrame must contain 'listing_id' for database operations.")
 
-    # Convert DataFrame to list of tuples for execute_values
-    # Handle NaT for dates and NaN for numbers appropriately for psycopg2 (should become NULL)
-    data_tuples = [tuple(x) for x in df.replace({pd.NaT: None, float('nan'): None}).to_numpy()]
+    # Prepare columns for the UPDATE SET clause
+    # Exclude the primary key 'listing_id' from the columns to be updated
+    update_cols = [f"{col} = EXCLUDED.{col}" for col in columns if col != 'listing_id']
+    
+    # Add tracking fields to the update clause
+    # The 'last_updated' field is handled by a database trigger, so we don't need to set it here.
+    # We just need to ensure the record is marked as active.
+    update_cols.append("is_active = TRUE")
 
-    insert_query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES %s"
-    # Add last_updated to be set by trigger, or explicitly:
-    # insert_query += ", last_updated = CURRENT_TIMESTAMP"
+    # Convert DataFrame to list of tuples
+    data_tuples = [tuple(x) for x in df.replace({pd.NaT: None, pd.NA: None, float('nan'): None}).to_numpy()]
 
+    # Construct the UPSERT query
+    # This query inserts a new row. If a row with the same `listing_id` already exists,
+    # it updates the existing row with the new values from the CSV.
+    # `first_seen_at` is only set on initial insert due to its DEFAULT value.
+    insert_query = f"""
+        INSERT INTO {table_name} ({', '.join(columns)})
+        VALUES %s
+        ON CONFLICT (listing_id) DO UPDATE SET
+        {', '.join(update_cols)};
+    """
 
     with conn.cursor() as cursor:
         try:
-            logging.info(f"Clearing all existing data from {table_name} table before loading new data...")
-            cursor.execute(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE;") # Added CASCADE for dependent objects if any
-            logging.info(f"Table {table_name} truncated.")
+            logging.info(f"Attempting to upsert {len(data_tuples)} rows into '{table_name}'...")
+            execute_values(cursor, insert_query, data_tuples, page_size=500)
+            logging.info(f"execute_values completed. {cursor.rowcount} rows affected by INSERT/UPDATE.")
+
+            current_listing_ids = tuple(df['listing_id'].unique().tolist())
             
-            logging.info(f"Loading data into {table_name}...")
-            execute_values(cursor, insert_query, data_tuples)
+            if current_listing_ids:
+                logging.info(f"Found {len(current_listing_ids)} unique listing_ids in the current CSV.")
+                update_inactive_query = """
+                    UPDATE properties
+                    SET is_active = FALSE
+                    WHERE listing_id NOT IN %s AND is_active = TRUE;
+                """
+                cursor.execute(update_inactive_query, (current_listing_ids,))
+                logging.info(f"{cursor.rowcount} properties marked as inactive.")
+            else:
+                logging.warning("No listing_ids found in the current CSV to process inactive properties.")
+
+            logging.info("Committing transaction...")
             conn.commit()
-            logging.info(f"Successfully loaded {len(data_tuples)} rows into {table_name}.")
+            logging.info("Transaction committed successfully.")
+            
         except psycopg2.Error as e:
+            logging.error(f"!!! DATABASE ERROR !!!: {e}")
+            logging.error("Rolling back transaction...")
             conn.rollback()
-            logging.error(f"Error loading data into database: {e}")
-            logging.error(f"Failed query: {cursor.query}") # Log the failed query if possible
+            logging.error("Transaction has been rolled back.")
             raise
 
 def main():
