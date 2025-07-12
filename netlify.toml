@@ -1,12 +1,6 @@
+# Netlify build configuration
 [build]
-      command = "npm run build:h5"
-      publish = "dist"
-
-    [build.environment]
-      NODE_VERSION = "18"
-      NPM_VERSION = "10"
-
-    [[redirects]]
-      from = "/*"
-      to = "/index.html"
-      status = 200
+  # 这是我们的构建命令
+  command = "npm run build:h5"
+  # 这是构建产物的发布目录
+  publish = "dist"
