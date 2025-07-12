@@ -1,0 +1,13 @@
+[build]
+  base    = "sydney-rental-taro"
+  command = "npm run build:h5"
+  publish = "sydney-rental-taro/dist"
+  
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "10"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

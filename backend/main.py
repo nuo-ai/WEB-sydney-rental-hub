@@ -1,19 +1,214 @@
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request, Depends, HTTPException, Query, status, Security
+from fastapi.security import APIKeyHeader, OAuth2PasswordBearer
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
-from pydantic import BaseModel
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+from redis import asyncio as aioredis
+from pydantic import BaseModel, Field, validator
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from jose import JWTError, jwt
+from datetime import datetime, timedelta, date
 # import os # os and load_dotenv are now handled in server.db
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypeVar, Generic
 import json
 import asyncio
 import os
 from contextlib import asynccontextmanager
+import math
+import base64
 
 # 从我们的模块导入
 from .api.graphql_schema import schema as gql_schema # Renamed to avoid conflict with strawberry.Schema
 from . import db as db_module # Import the module itself
 from .db import init_db_pool, close_db_pool, get_db_conn_dependency # Import specific functions
+
+# Standardized API Response Models
+T = TypeVar('T')
+
+class PaginationInfo(BaseModel):
+    total: int
+    page: int = 1
+    page_size: int = 20
+    pages: int
+    has_next: bool
+    has_prev: bool
+    next_cursor: Optional[str] = None
+
+class ErrorInfo(BaseModel):
+    code: str
+    message: str
+    details: Optional[Dict[str, Any]] = None
+
+class APIResponse(BaseModel, Generic[T]):
+    status: str = "success"
+    data: Optional[T] = None
+    pagination: Optional[PaginationInfo] = None
+    error: Optional[ErrorInfo] = None
+
+# Response Factory Functions
+def success_response(data: Any = None, pagination: Optional[PaginationInfo] = None) -> Dict[str, Any]:
+    return APIResponse(status="success", data=data, pagination=pagination).dict()
+
+def error_response(code: str, message: str, status_code: int, details: Optional[Dict[str, Any]] = None) -> JSONResponse:
+    return JSONResponse(
+        status_code=status_code,
+        content=APIResponse(status="error", error=ErrorInfo(code=code, message=message, details=details)).dict(exclude_none=True)
+    )
+
+# Error Codes
+class ErrorCodes:
+    VALIDATION_ERROR = "VALIDATION_ERROR"
+    AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR"
+    AUTHORIZATION_ERROR = "AUTHORIZATION_ERROR"
+    RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND"
+    RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED"
+    INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR"
+    BAD_REQUEST = "BAD_REQUEST"
+
+# --- Security Configurations ---
+
+# API Key Authentication
+API_KEY = os.getenv("API_KEY", "your_default_dev_api_key") # Get API Key from environment
+API_KEY_NAME = "X-API-Key"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+async def get_api_key(api_key_header: str = Security(api_key_header)):
+    if api_key_header is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="API key is missing")
+    if api_key_header != API_KEY:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid API Key")
+    return api_key_header
+
+# Rate Limiting
+limiter = Limiter(key_func=get_remote_address)
+
+# JWT Authentication
+SECRET_KEY = os.getenv("SECRET_KEY", "a_very_secret_key_for_development")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token") # Placeholder token URL
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+# Placeholder for user model and DB interaction
+class User(BaseModel):
+    username: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    disabled: Optional[bool] = None
+
+async def get_user(username: str):
+    # This is a placeholder. In a real app, you'd query the database.
+    if username == "johndoe":
+        return User(username="johndoe", email="johndoe@example.com", full_name="John Doe")
+    return None
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    user = await get_user(username=username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+# Input Validation Model
+class PropertyCreate(BaseModel):
+    title: str = Field(..., min_length=3, max_length=100)
+    description: str = Field(..., min_length=10)
+    price: float = Field(..., gt=0)
+    bedrooms: int = Field(..., ge=0)
+    available_from: date
+    
+    @validator('title')
+    def title_must_be_valid(cls, v):
+        if '<script>' in v.lower():
+            raise ValueError('Title cannot contain script tags')
+        return v
+    
+    @validator('price')
+    def price_must_be_reasonable(cls, v):
+        if v > 10000000: # Set a reasonable max price
+            raise ValueError('Price is out of reasonable range')
+        return v
+
+# --- End Security Configurations ---
+
+
+# Pydantic Models for Pagination
+class PaginationParams:
+    def __init__(
+        self,
+        page: int = Query(1, ge=1, description="页码，从1开始"),
+        page_size: int = Query(20, ge=1, le=100, description="每页项目数"),
+        cursor: Optional[str] = Query(None, description="游标值（用于游标分页）")
+    ):
+        self.page = page
+        self.page_size = page_size
+        self.cursor = cursor
+
+
+# Cursor helper functions
+def encode_cursor(value: Any) -> str:
+    return base64.urlsafe_b64encode(str(value).encode('utf-8')).decode('utf-8')
+
+def decode_cursor(cursor: str) -> str:
+    return base64.urlsafe_b64decode(cursor.encode('utf-8')).decode('utf-8')
+
+# Asynchronous pagination logic adapted for psycopg2
+async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> (List[Dict], PaginationInfo):
+    def _db_calls():
+        with db_conn.cursor() as cursor:
+            cursor.execute(count_query, params)
+            total = cursor.fetchone()[0]
+            
+            offset = (pagination.page - 1) * pagination.page_size
+            paginated_query = f"{query} LIMIT %s OFFSET %s"
+            cursor.execute(paginated_query, params + (pagination.page_size, offset))
+            
+            items = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            return items, columns, total
+
+    items, columns, total = await asyncio.to_thread(_db_calls)
+    
+    pages = math.ceil(total / pagination.page_size) if total > 0 else 0
+    
+    pagination_info = PaginationInfo(
+        total=total,
+        page=pagination.page,
+        page_size=pagination.page_size,
+        pages=pages,
+        has_next=pagination.page < pages,
+        has_prev=pagination.page > 1,
+    )
+    return [dict(zip(columns, row)) for row in items], pagination_info
+
 
 # 配置日志 - (保持您现有的详细配置)
 # Ensure this basicConfig is called only once, typically at the application entry point.
@@ -46,6 +241,13 @@ async def lifespan(app: FastAPI):
     else:
         app.state.db_pool_initialized = False
         logger.error("Database pool is None after init.")
+    
+    # Initialize Redis Cache
+    # Assuming Redis is running on localhost. In production, use env variables.
+    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    logger.info("FastAPI Cache initialized with Redis backend.")
+
     yield
     # Shutdown
     logger.info("FastAPI application shutdown event triggered...")
@@ -53,6 +255,7 @@ async def lifespan(app: FastAPI):
 
 # FastAPI 应用实例
 app = FastAPI(title="Rental MCP Server", version="1.0.0", lifespan=lifespan)
+app.state.limiter = limiter
 
 # CORS Middleware Configuration
 origins = [
@@ -70,6 +273,47 @@ app.add_middleware(
     allow_methods=["*"], # Allows all methods
     allow_headers=["*"], # Allows all headers
 )
+
+# Exception Handlers
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
+    return error_response(
+        code=ErrorCodes.RATE_LIMIT_EXCEEDED,
+        message=f"Rate limit exceeded: {exc.detail}",
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS
+    )
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        code = ErrorCodes.RESOURCE_NOT_FOUND
+    elif exc.status_code == 401:
+        code = ErrorCodes.AUTHENTICATION_ERROR
+    elif exc.status_code == 403:
+        code = ErrorCodes.AUTHORIZATION_ERROR
+    # Note: Rate limit (429) would be handled by its own library if used
+    else:
+        code = ErrorCodes.BAD_REQUEST
+    
+    return error_response(code=code, message=exc.detail, status_code=exc.status_code)
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return error_response(
+        code=ErrorCodes.VALIDATION_ERROR,
+        message="Input validation failed",
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        details={"errors": exc.errors()}
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    logger.error(f"An unhandled exception occurred: {exc}", exc_info=True)
+    return error_response(
+        code=ErrorCodes.INTERNAL_SERVER_ERROR,
+        message="An internal server error occurred.",
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
 
 
 # 自定义 GraphQL 上下文获取器
@@ -100,6 +344,12 @@ app.include_router(graphql_app_router, prefix="/graphql", tags=["GraphQL"])
 async def root():
     """Root endpoint providing basic server status."""
     return {"message": "Rental MCP Server is running. Access GraphQL at /graphql"}
+
+@app.get("/api/health", tags=["Debug"])
+async def health_check():
+    """A simple health check endpoint."""
+    logger.info("Health check endpoint was called.")
+    return {"status": "ok"}
 
 # Optional: Test endpoint for DB connection
 @app.get("/test_db_connection", tags=["Debug"])
@@ -136,7 +386,7 @@ class ChatResponse(BaseModel):
     suggestions: Optional[List[str]] = None
 
 class PropertyCard(BaseModel):
-    id: int
+    listing_id: int
     image: str
     price: int
     address: str
@@ -481,23 +731,117 @@ async def chat_endpoint(request: ChatRequest, db_conn: Any = Depends(get_db_conn
 # to retrieve the database connection in its resolvers.
 # The `get_db_session` context manager will handle returning the connection to the pool.
 
-@app.get("/api/properties/latest", tags=["Properties"])
-async def get_latest_properties(db: Any = Depends(get_db_conn_dependency)):
-    """
-    Get the latest properties with status 'new' or 'updated' in the last 24 hours.
-    """
+# --- Celery Task Endpoints ---
+from .celery_config import celery_app
+from .tasks import debug_task, example_db_task
+from celery.result import AsyncResult
+
+@app.post("/api/tasks/debug", status_code=status.HTTP_202_ACCEPTED, tags=["Tasks"])
+async def start_debug_task(api_key: str = Security(get_api_key)):
+    """Endpoint to trigger the simple debug task."""
     try:
-        with db.cursor() as cursor:
-            cursor.execute("""
-                SELECT *
-                FROM properties
-                WHERE status IN ('new', 'updated')
-                  AND status_changed_at >= NOW() - INTERVAL '24 hours'
-                ORDER BY status_changed_at DESC;
-            """)
-            properties = cursor.fetchall()
-            columns = [desc[0] for desc in cursor.description]
-            return [dict(zip(columns, row)) for row in properties]
+        logger.info("Attempting to queue debug_task...")
+        task = debug_task.delay()
+        logger.info(f"Task {task.id} queued successfully.")
+        return success_response(data={"task_id": task.id, "message": "Debug task started"})
     except Exception as e:
-        logger.error(f"Error fetching latest properties: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch latest properties")
+        logger.error(f"Failed to queue debug_task: {e}", exc_info=True)
+        return error_response(
+            code=ErrorCodes.INTERNAL_SERVER_ERROR,
+            message="Failed to queue task.",
+            status_code=500
+        )
+
+@app.post("/api/tasks/db", status_code=status.HTTP_202_ACCEPTED, tags=["Tasks"])
+async def start_db_task(api_key: str = Security(get_api_key)):
+    """Endpoint to trigger the example database task."""
+    try:
+        logger.info("Attempting to queue example_db_task...")
+        # Pass some example data to the task
+        task = example_db_task.delay("Hello from FastAPI endpoint!")
+        logger.info(f"Task {task.id} queued successfully.")
+        return success_response(data={"task_id": task.id, "message": "Database task started"})
+    except Exception as e:
+        logger.error(f"Failed to queue db_task: {e}", exc_info=True)
+        return error_response(
+            code=ErrorCodes.INTERNAL_SERVER_ERROR,
+            message="Failed to queue task.",
+            status_code=500
+        )
+
+@app.get("/api/tasks/{task_id}", tags=["Tasks"], response_model=APIResponse)
+async def get_task_status(task_id: str, api_key: str = Security(get_api_key)):
+    """Endpoint to check the status of a Celery task."""
+    task_result = AsyncResult(task_id, app=celery_app)
+    
+    response_data = {
+        "task_id": task_id,
+        "status": task_result.status,
+        "result": task_result.result if task_result.ready() else None,
+    }
+
+    if task_result.failed():
+        return error_response(
+            code="TASK_FAILED",
+            message="The task failed to execute.",
+            status_code=500,
+            details=response_data
+        )
+        
+    return success_response(data=response_data)
+# --- End Celery Task Endpoints ---
+
+
+@app.get("/api/properties/", tags=["Properties"], response_model=APIResponse[List[Dict]])
+@cache(expire=900) # Cache for 15 minutes
+async def get_properties(pagination: PaginationParams = Depends(), db: Any = Depends(get_db_conn_dependency)):
+    """
+    Get a paginated list of properties.
+    Supports both page-based and cursor-based pagination.
+    """
+    # For now, we will just paginate all properties. Filtering can be added later.
+    base_query = "SELECT * FROM properties"
+    count_query = "SELECT COUNT(*) FROM properties"
+    
+    # Simple cursor implementation based on listing_id
+    # A more robust implementation would handle sorting
+    if pagination.cursor:
+        try:
+            cursor_val = int(decode_cursor(pagination.cursor))
+            query = f"{base_query} WHERE listing_id > %s ORDER BY listing_id ASC"
+            params = (cursor_val,)
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="Invalid cursor")
+
+        def _db_call_cursor():
+            with db.cursor() as cur:
+                # Fetch one more than page_size to check for has_next
+                cur.execute(f"{query} LIMIT %s", params + (pagination.page_size + 1,))
+                items = cur.fetchall()
+                columns = [desc[0] for desc in cur.description]
+                return items, columns
+        
+        items, columns = await asyncio.to_thread(_db_call_cursor)
+        
+        has_next = len(items) > pagination.page_size
+        if has_next:
+            items = items[:-1] # remove extra item
+        
+        items_as_dicts = [dict(zip(columns, row)) for row in items]
+        next_cursor = encode_cursor(items_as_dicts[-1]['listing_id']) if items_as_dicts and has_next else None
+
+        pagination_info = PaginationInfo(
+            total=-1, # Cursor pagination doesn't usually return total
+            page=1, # Page number is not relevant for cursor
+            page_size=pagination.page_size,
+            pages=-1,
+            has_next=has_next,
+            has_prev=pagination.cursor is not None,
+            next_cursor=next_cursor
+        )
+        return success_response(data=items_as_dicts, pagination=pagination_info)
+    else:
+        # Page-based pagination
+        query = f"{base_query} ORDER BY listing_id ASC"
+        items, pagination_info = await paginate_query(db, query, count_query, (), pagination)
+        return success_response(data=items, pagination=pagination_info)
