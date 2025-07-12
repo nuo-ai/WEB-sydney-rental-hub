@@ -1,7 +1,7 @@
 [build]
   base    = "sydney-rental-taro"
   command = "npm run build:h5"
-  publish = "sydney-rental-taro/dist"
+  publish = "dist"
   
 [build.environment]
   NODE_VERSION = "18"
