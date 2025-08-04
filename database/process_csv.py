@@ -14,9 +14,9 @@ try:
 except ImportError:
     logging.warning("python-dotenv not available. Environment variables will be loaded from system environment only.")
     DOTENV_AVAILABLE = False
-    # 提供一个空的 load_dotenv 函数作为备选
-    def load_dotenv(*args, **kwargs):
-        pass
+    # 提供一个返回 False 的备用函数，以匹配原始函数的类型签名
+    def load_dotenv(*args, **kwargs) -> bool:
+        return False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -181,6 +181,7 @@ def load_data_to_db(df, conn):
             # 2. Identify new, updated, and unchanged properties
             new_listings = []
             updated_listings = []
+            unchanged_listings_count = 0
             
             for _, row in df.iterrows():
                 listing_id = row['listing_id']
@@ -190,8 +191,10 @@ def load_data_to_db(df, conn):
                     # Check for changes (e.g., rent)
                     if row['rent_pw'] != db_properties[listing_id]['rent_pw']:
                         updated_listings.append(row)
+                    else:
+                        unchanged_listings_count += 1
             
-            logging.info(f"Identified {len(new_listings)} new listings and {len(updated_listings)} updated listings.")
+            logging.info(f"Identified {len(new_listings)} new, {len(updated_listings)} updated, and {unchanged_listings_count} unchanged listings.")
 
             # 3. Batch INSERT new listings
             if new_listings:
@@ -243,6 +246,7 @@ def load_data_to_db(df, conn):
             summary = (
                 f"新增房源: {len(new_listings)}\n"
                 f"更新房源: {len(updated_listings)}\n"
+                f"未变房源: {unchanged_listings_count}\n"
                 f"下架房源: {len(active_off_market_ids)}\n"
                 f"重新上架: {len(relisted_ids)}\n"
             )
