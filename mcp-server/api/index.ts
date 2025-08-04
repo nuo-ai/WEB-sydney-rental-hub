@@ -1,3 +1,4 @@
+import http from 'http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import {
   CallToolRequestSchema,
@@ -72,5 +73,66 @@ class SydneyRentalMCP {
 const mcpServer = new SydneyRentalMCP();
 
 export default async function handler(req: any, res: any) {
-  await mcpServer.handleRequest(req, res);
+  // Vercel's `req` is a stream, but we need to parse the body for local dev.
+  // This is a simplified body parser for local testing.
+  if (typeof req.body === 'undefined' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk: Buffer) => {
+      body += chunk.toString();
+    });
+    req.on('end', async () => {
+      try {
+        req.body = JSON.parse(body);
+        await mcpServer.handleRequest(req, res);
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      }
+    });
+  } else {
+    await mcpServer.handleRequest(req, res);
+  }
+}
+
+// Local development server - only runs when not in a serverless environment
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3002; // Use a different port to avoid conflicts
+  const localServer = http.createServer(async (req, res) => {
+    // A mock response object for Vercel-like environment
+    const mockRes = {
+      statusCode: 200,
+      headers: {} as Record<string, string>,
+      body: '',
+      status: function(code: number) {
+        this.statusCode = code;
+        return this;
+      },
+      send: function(data: any) {
+        this.body = data;
+        res.writeHead(this.statusCode, this.headers);
+        res.end(this.body);
+      },
+      json: function(data: any) {
+        this.setHeader('Content-Type', 'application/json');
+        this.body = JSON.stringify(data);
+        res.writeHead(this.statusCode, this.headers);
+        res.end(this.body);
+      },
+      setHeader: function(name: string, value: string) {
+        this.headers[name] = value;
+      },
+      writeHead: function(statusCode: number, headers: Record<string, string>) {
+        res.writeHead(statusCode, headers);
+      },
+      end: function(data: any) {
+        res.end(data);
+      }
+    };
+    await handler(req, mockRes as any);
+  });
+
+  localServer.listen(PORT, () => {
+    console.log(`[Local MCP Server] Running for development at http://localhost:${PORT}`);
+    console.log('This server simulates a Vercel environment for the serverless function.');
+  });
 }

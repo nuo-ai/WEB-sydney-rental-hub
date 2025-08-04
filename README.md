@@ -2,17 +2,51 @@
 
 这是一个专为悉尼学生设计的租房平台，以“到校通勤时间”为核心，帮助用户快速找到最合适的房源。
 
-## 快速开始
+## 快速开始 (本地开发)
 
-所有详细的运行、部署和技术说明，都统一存放在 `memory-bank` 目录中。
+本项目包含多个服务（前端、后端等）。为了简化本地开发，我们提供了一个统一的启动脚本。
 
-**对于普通用户，请直接查看 `memory-bank/deployment.md` 中的 “如何在本地一键运行” 部分。**
+**1. 环境配置**
+   - 复制根目录下的 `.env.example` 文件，并重命名为 `.env`。
+   - 根据你的环境（特别是Supabase数据库连接信息）填写 `.env` 文件中的必要变量。
+
+**2. 安装依赖**
+   - **后端 (Python)**:
+     ```bash
+     pip install -r requirements.txt
+     ```
+   - **MCP Server (Node.js)**:
+     ```bash
+     npm install --prefix mcp-server
+     ```
+
+**3. 一键启动所有服务**
+   - 运行以下命令来启动后端和前端服务：
+     ```bash
+     python scripts/start_services.py
+     ```
+   - 这将启动：
+     - ✅ **后端服务**: `http://localhost:8000`
+     - ✅ **前端服务**: `http://localhost:8080`
+   - 在终端中按 `Ctrl+C` 可以一次性关闭所有服务。
+
+---
+
+## 项目结构
+
+- `backend/`: FastAPI 后端，提供GraphQL API。
+- `frontend/`: 原生的 HTML/CSS/JS 前端应用。
+- `mcp-server/`: 用于AI Agent集成的MCP服务器 (Node.js)。
+- `database/`: 数据库迁移、ETL脚本和SQL文件。
+- `scripts/`: 用于开发和管理的辅助脚本。
+- `sydney-rental-taro/`: 基于Taro的跨平台小程序代码。
+- `docs/` & `memory-bank/`: 项目文档和开发记忆库。
 
 ---
 
 ## 部署 (Deployment)
 
-前端应用 (`sydney-rental-taro`) 已配置为可轻松部署到 [Netlify](https://www.netlify.com/)。
+Taro小程序 (`sydney-rental-taro`) 已配置为可轻松部署到 [Netlify](https://www.netlify.com/)。
 
 ### 部署步骤
 

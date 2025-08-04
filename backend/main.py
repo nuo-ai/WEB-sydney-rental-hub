@@ -88,7 +88,9 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
     return api_key_header
 
 # Rate Limiting
-limiter = Limiter(key_func=get_remote_address)
+# We set config_filename="" to prevent slowapi from trying to read the .env file,
+# which causes encoding issues on Windows. We load .env manually elsewhere.
+limiter = Limiter(key_func=get_remote_address, config_filename="")
 
 # JWT Authentication
 SECRET_KEY = os.getenv("SECRET_KEY", "a_very_secret_key_for_development")
@@ -127,7 +129,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        username: Optional[str] = payload.get("sub")
         if username is None:
             raise credentials_exception
     except JWTError:
@@ -181,7 +183,7 @@ def decode_cursor(cursor: str) -> str:
     return base64.urlsafe_b64decode(cursor.encode('utf-8')).decode('utf-8')
 
 # Asynchronous pagination logic adapted for psycopg2
-async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> (List[Dict], PaginationInfo):
+async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> tuple[List[Dict], PaginationInfo]:
     def _db_calls():
         with db_conn.cursor() as cursor:
             cursor.execute(count_query, params)
