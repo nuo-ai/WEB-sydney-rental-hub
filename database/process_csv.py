@@ -34,10 +34,13 @@ else:
     )
 
 def find_latest_csv_file():
-    """Finds the most recent CSV file in the output directory."""
+    """Finds the most recent CSV file in the crawler's output directory."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    output_dir = os.path.join(script_dir, '..', 'crawler', 'dist', 'output')
-    search_pattern = os.path.join(output_dir, '*_results.csv')
+    # Point to the actual crawler output directory
+    output_dir = os.path.join(script_dir, '..', 'crawler', 'output')
+    
+    # You can use more specific patterns if needed, e.g., 'properties_*.csv'
+    search_pattern = os.path.join(output_dir, '*.csv')
     logging.info(f"Searching for CSV files in: {search_pattern}")
     list_of_files = glob.glob(search_pattern)
     if not list_of_files:
@@ -74,11 +77,20 @@ def get_db_connection():
 def clean_data(df):
     """Cleans and transforms the DataFrame."""
     logging.info("Starting data cleaning and transformation...")
+
+    # Handle column name mismatches
+    df.rename(columns={
+        'has_wardrobes': 'has_built_in_wardrobe',
+        'has_study': 'has_study_room'
+    }, inplace=True)
+
     bool_cols = [
         'has_air_conditioning', 'is_furnished', 'has_balcony', 'has_dishwasher',
         'has_laundry', 'has_built_in_wardrobe', 'has_gym', 'has_pool',
         'has_parking', 'allows_pets', 'has_security_system', 'has_storage',
-        'has_study_room', 'has_garden'
+        'has_study_room', 'has_garden', 'has_gas_cooking', 'has_heating',
+        'has_intercom', 'has_lift', 'has_garbage_disposal', 'has_city_view',
+        'has_water_view'
     ]
     for col in bool_cols:
         if col in df.columns:
@@ -120,12 +132,17 @@ def clean_data(df):
         'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
         'property_type', 'rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces',
         'available_date', 'inspection_times', 'agency_name', 'agent_name', 'agent_phone',
-        'agent_email', 'property_headline', 'property_description', 'has_air_conditioning',
-        'is_furnished', 'has_balcony', 'has_dishwasher', 'has_laundry',
-        'has_built_in_wardrobe', 'has_gym', 'has_pool', 'has_parking', 'allows_pets',
-        'has_security_system', 'has_storage', 'has_study_room', 'has_garden',
-        'latitude', 'longitude', 'images', 'property_features', 'agent_profile_url',
-        'agent_logo_url', 'enquiry_form_action', 'geom'
+        'agent_email', 'property_headline', 'property_description', 'latitude', 'longitude',
+        'images', 'property_features', 'agent_profile_url', 'agent_logo_url',
+        'enquiry_form_action', 'geom', 'cover_image', 'furnishing_status',
+        'air_conditioning_type',
+        # Boolean flags
+        'is_furnished', 'has_air_conditioning', 'has_built_in_wardrobe', 'has_laundry',
+        'has_dishwasher', 'has_parking', 'has_gas_cooking', 'has_heating', 'has_intercom',
+        'has_lift', 'has_gym', 'has_pool', 'has_garbage_disposal', 'has_study_room',
+        'has_balcony', 'has_city_view', 'has_water_view', 'allows_pets',
+        # Other DB columns that might be in the CSV
+        'has_security_system', 'has_storage', 'has_garden'
     ]
     
     final_df_columns = [col for col in db_columns_from_csv if col in df.columns]
@@ -222,11 +239,19 @@ def load_data_to_db(df, conn):
             conn.commit()
             logging.info("Database update process completed and transaction committed.")
 
-            # Print summary for GitHub Actions
-            print(f"新增房源: {len(new_listings)}")
-            print(f"更新房源: {len(updated_listings)}")
-            print(f"下架房源: {len(active_off_market_ids)}")
-            print(f"重新上架: {len(relisted_ids)}")
+            # Print summary for GitHub Actions, ensuring UTF-8 encoding for Windows
+            summary = (
+                f"新增房源: {len(new_listings)}\n"
+                f"更新房源: {len(updated_listings)}\n"
+                f"下架房源: {len(active_off_market_ids)}\n"
+                f"重新上架: {len(relisted_ids)}\n"
+            )
+            # Use a more robust method for printing to avoid console encoding errors
+            import sys
+            try:
+                print(summary)
+            except UnicodeEncodeError:
+                sys.stdout.buffer.write(summary.encode('utf-8'))
 
         except psycopg2.Error as e:
             logging.error(f"!!! DATABASE ERROR !!!: {e}")

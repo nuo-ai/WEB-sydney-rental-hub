@@ -1,0 +1,229 @@
+features:
+- column_name: is_furnished
+  keywords:
+  - furnished
+  name: 带家具
+- column_name: has_air_conditioning
+  keywords:
+  - air conditioning
+  - air-conditioner
+  - air con
+  - ducted cooling
+  - split system
+  - reverse cycle
+  - cooling
+  - heating and cooling
+  - climate control
+  name: 空调
+- column_name: has_wardrobes
+  keywords:
+  - wardrobe
+  - built in
+  - walk in robe
+  - built-in wardrobe
+  - built in wardrobe
+  - fitted wardrobe
+  - closet
+  - storage
+  - built in storage
+  - robe
+  - walk-in wardrobe
+  - walk in closet
+  - built-in robes
+  - fitted robes
+  - bedroom storage
+  - wardrobe space
+  - hanging space
+  - clothes storage
+  - built-in storage
+  - cupboard space
+  - storage cupboards
+  name: 内置衣柜
+- column_name: has_laundry
+  keywords:
+  - laundry
+  - washer
+  - dryer
+  - washing machine
+  - laundry room
+  - internal laundry
+  - laundry facilities
+  - washer and dryer
+  - washing facilities
+  - laundry area
+  - laundry space
+  - wash area
+  - utility room
+  - laundry cupboard
+  - laundry nook
+  - washing area
+  - drying area
+  - laundry tub
+  - laundry sink
+  - clothes line
+  - indoor drying
+  name: 内部洗衣房
+- column_name: has_dishwasher
+  keywords:
+  - dishwasher
+  - dish washer
+  - kitchen appliances
+  - integrated dishwasher
+  - built-in dishwasher
+  - dishwashing machine
+  - kitchen dishwasher
+  - appliance dishwasher
+  - dishwasher included
+  - dishwasher provided
+  - dish washing
+  - kitchen equipment
+  - modern appliances
+  - european appliances
+  - stainless steel appliances
+  name: 洗碗机
+- column_name: has_parking
+  keywords:
+  - parking
+  - garage
+  - car space
+  - carport
+  name: 停车位
+- column_name: has_gas_cooking
+  keywords:
+  - gas
+  - gas appliances
+  - gas cooktop
+  - gas cooking
+  - gas stove
+  - gas burner
+  - gas hob
+  - gas range
+  - cooking gas
+  - gas kitchen
+  - gas oven
+  - gas stovetop
+  - natural gas
+  - lpg cooking
+  - gas fired
+  - gas connection
+  - gas point
+  - gas outlet
+  - kitchen gas
+  name: 燃气灶
+- column_name: has_heating
+  keywords:
+  - heating
+  - ducted heating
+  name: 暖气
+- column_name: has_intercom
+  keywords:
+  - intercom
+  - security access
+  - security building
+  - secure entry
+  - buzzer system
+  - door entry
+  - access control
+  - security door
+  - entry system
+  - secure building
+  - video intercom
+  - audio intercom
+  - door phone
+  - entry phone
+  - security system
+  - keypad entry
+  - fob access
+  - card access
+  - swipe access
+  - controlled access
+  - building security
+  - secure access
+  name: 安保门禁
+- column_name: has_lift
+  keywords:
+  - lift
+  - elevator
+  name: 电梯
+- column_name: has_gym
+  keywords:
+  - gym
+  - fitness
+  name: 健身房
+- column_name: has_pool
+  keywords:
+  - pool
+  name: 游泳池
+- column_name: has_garbage_disposal
+  keywords:
+  - garbage chute
+  - rubbish chute
+  - waste disposal
+  - bin room
+  name: 垃圾处理
+- column_name: has_study
+  keywords:
+  - study
+  - home office
+  - office space
+  - work space
+  - workspace
+  - study room
+  - den
+  - study area
+  - office area
+  - study nook
+  - office nook
+  - work area
+  - work room
+  - home study
+  - reading room
+  - computer room
+  - work from home
+  - study corner
+  - office corner
+  - desk area
+  - work station
+  name: 书房
+- column_name: has_balcony
+  keywords:
+  - balcony
+  - deck
+  - terrace
+  - patio
+  name: 阳台
+- column_name: has_city_view
+  keywords:
+  - city view
+  - district view
+  - area view
+  - harbour bridge view
+  - opera house view
+  name: 城市景观
+- column_name: has_water_view
+  keywords:
+  - water view
+  - ocean view
+  - river view
+  - harbour view
+  - beach front
+  - water front
+  name: 水景
+- column_name: allows_pets
+  keywords:
+  - pet friendly
+  - pets allowed
+  - pets welcome
+  - pet ok
+  - pets considered
+  - small pets ok
+  - cats ok
+  - dogs ok
+  - pet-friendly
+  negative_keywords:
+  - no pets
+  - pets not allowed
+  - no animals
+  - pet free
+  - pets prohibited
+  name: 允许养宠物
