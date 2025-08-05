@@ -17,8 +17,13 @@ import schedule
 import psycopg2
 from dotenv import load_dotenv
 from typing import Tuple
-
-# 设置路径
+import json
+import re
+import io
+from datetime import timezone
+# --- 关键修复：强制stdout使用UTF-8编码，解决在子进程中打印中文的UnicodeEncodeError ---
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 PROJECT_ROOT = Path(__file__).parent.parent
 CRAWLER_SCRIPT = PROJECT_ROOT / "crawler" / "v5_furniture.py"
 ETL_SCRIPT = PROJECT_ROOT / "database" / "process_csv.py"
@@ -65,7 +70,7 @@ def send_discord_notification(message: str, success: bool, stage: str = ""):
             "title": title,
             "description": message,
             "color": color,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "footer": {
                 "text": f"悉尼租房平台 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
             }
@@ -122,7 +127,9 @@ def run_crawler() -> Tuple[bool, str]:
             capture_output=True,
             text=True,
             cwd=str(CRAWLER_SCRIPT.parent),
-            timeout=3600  # 1小时超时
+            timeout=3600,  # 1小时超时
+            encoding='utf-8',
+            errors='ignore'
         )
         
         if result.returncode == 0:
@@ -152,40 +159,56 @@ def run_crawler() -> Tuple[bool, str]:
         return False, error_msg
 
 def run_etl() -> Tuple[bool, str]:
-    """运行ETL脚本导入数据"""
+    """运行ETL脚本导入数据，并解析其JSON输出"""
     try:
         logger.info("开始运行ETL导入...")
         
-        # 确保ETL脚本存在
         if not ETL_SCRIPT.exists():
             error_msg = f"ETL脚本不存在: {ETL_SCRIPT}"
             logger.error(error_msg)
             return False, error_msg
         
-        # 运行ETL
         result = subprocess.run(
             [sys.executable, str(ETL_SCRIPT)],
             capture_output=True,
             text=True,
             cwd=str(ETL_SCRIPT.parent),
-            timeout=1800,  # 30分钟超时
+            timeout=1800,
             encoding='utf-8',
             errors='ignore'
         )
         
         if result.returncode == 0:
-            logger.info("ETL导入成功")
+            logger.info("ETL脚本执行成功。正在解析摘要...")
             
-            # 提取摘要信息用于通知
-            summary_lines = []
-            for line in result.stdout.splitlines():
-                if any(keyword in line for keyword in ["房源", "下架", "新增", "更新", "条记录"]):
-                    summary_lines.append(line)
+            # 使用正则表达式从输出中提取JSON摘要
+            match = re.search(r"---ETL_SUMMARY_START---(.*?)---ETL_SUMMARY_END---", result.stdout, re.DOTALL)
             
-            summary = '\n'.join(summary_lines[-10:])  # 最后10行关键信息
-            return True, summary
+            if match:
+                json_str = match.group(1).strip()
+                try:
+                    stats = json.loads(json_str)
+                    # 格式化摘要用于通知
+                    summary = (
+                        f"新增房源: {stats.get('new', 0)}\n"
+                        f"更新房源: {stats.get('updated', 0)}\n"
+                        f"未变房源: {stats.get('unchanged', 0)}\n"
+                        f"下架房源: {stats.get('off_market', 0)}\n"
+                        f"重新上架: {stats.get('relisted', 0)}"
+                    )
+                    logger.info(f"成功解析ETL摘要: \n{summary}")
+                    return True, summary
+                except json.JSONDecodeError as e:
+                    error_msg = f"ETL成功，但无法解析其JSON摘要: {e}\n原始输出: {json_str}"
+                    logger.error(error_msg)
+                    return True, "ETL任务成功，但无法生成处理结果报告。"
+            else:
+                error_msg = "ETL成功，但未找到摘要标记。无法生成报告。"
+                logger.warning(error_msg)
+                logger.debug(f"完整ETL输出:\n{result.stdout}")
+                return True, "ETL任务成功，但未找到处理结果报告。"
         else:
-            error_msg = f"ETL导入失败: {result.stderr}"
+            error_msg = f"ETL脚本运行失败: {result.stderr}"
             logger.error(error_msg)
             return False, error_msg
             
@@ -220,25 +243,15 @@ def update_data():
         return
     status_report.append("✅ 数据库连接正常")
     
-    # 2. 运行爬虫
-    crawler_success, crawler_summary = run_crawler()
-    if not crawler_success:
-        logger.error("爬虫运行失败，终止更新")
-        send_discord_notification(
-            f"爬虫运行失败:\n```\n{crawler_summary}\n```", 
-            success=False, 
-            stage="爬虫"
-        )
-        total_success = False
-        return
+    # 2. 运行ETL导入 (爬虫已在此脚本被调用前运行)
+    # 注意：我们不再从此脚本中调用 run_crawler()
     
-    status_report.append("✅ 爬虫运行成功")
+    logger.info("爬虫已完成，直接进入ETL步骤。")
     
-    # 3. 等待一段时间确保文件写入完成
-    logger.info("等待5秒确保文件写入完成...")
+    # 等待一段时间确保文件写入完成
+    logger.info("等待5秒确保爬虫生成的文件写入完成...")
     time.sleep(5)
     
-    # 4. 运行ETL导入
     etl_success, etl_summary = run_etl()
     if not etl_success:
         logger.error("ETL导入失败")
@@ -261,11 +274,6 @@ def update_data():
 
 **流程状态:**
 {chr(10).join(status_report)}
-
-**爬虫结果:**
-```
-{crawler_summary}
-```
 
 **ETL处理结果:**
 ```

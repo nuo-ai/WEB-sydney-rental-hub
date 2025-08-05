@@ -14,8 +14,8 @@
 
 ### 数据库 (Database)
 
-- **[自动化ETL工作流](./database/automated_etl_workflow.md)**
-  - 详细说明了如何自动将爬虫数据同步到数据库的完整流程。
+- **[自动化数据工作流](./database/automated_etl_workflow.md)**
+  - 描述了从爬虫启动，到ETL处理，再到发送通知的完整链式自动化流程。
 
 ### 爬虫 (Crawler)
 

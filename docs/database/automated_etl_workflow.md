@@ -4,27 +4,28 @@
 
 ## 核心思想
 
-本工作流的核心是**全自动化**，旨在消除所有手动操作（如重命名文件），以适应定时任务（如Windows计划任务）的真实工作场景。脚本会自动寻找最新的数据文件进行处理。
+本工作流的核心是**链式自动化**。您只需要启动一个入口脚本（爬虫），后续所有的数据处理、数据库同步和状态通知都将自动依次触发。这极大地简化了手动操作和定时任务的配置。
 
 ## 自动化流程图
 
 ```mermaid
 graph TD
-    A[开始: Windows计划任务触发] --> B[执行主脚本<br/>python scripts/run_etl_job.py];
+    A[开始: Windows计划任务触发] --> B[1. 执行爬虫脚本<br/>python crawler/v5_furniture.py];
+    B --> C[2. 爬虫完成, 自动调用通知脚本<br/>scripts/automated_data_update_with_notifications.py --run-once];
     
-    subgraph "主脚本内部流程"
-        B --> C{1. 自动寻找最新CSV文件<br/>在 'database/crawler_output/' 目录};
-        C --> D[2. 读取并处理最新CSV文件的数据];
-        D --> E[3. 连接到Supabase数据库];
-        E --> F[4. 智能对比并更新数据库<br/>(新增/更新/下架)];
-        F --> G[5. 记录详细日志];
+    subgraph "通知脚本内部流程"
+        C --> D[3. 跳过爬虫, 直接进入ETL];
+        D --> E[4. 调用 process_csv.py 处理最新数据];
+        E --> F[5. 智能同步数据库<br/>(新增/更新/下架)];
+        F --> G[6. 发送包含处理结果的Discord通知];
     end
 
-    G --> H[结束: 数据库已是最新状态];
+    G --> H[结束: 数据库与通知均已更新];
 
     style A fill:#f9f,stroke:#333,stroke-width:2px
     style H fill:#ccf,stroke:#333,stroke-width:2px
     style B fill:#9f9,stroke:#333,stroke-width:2px
+    style C fill:#9f9,stroke:#333,stroke-width:2px
 ```
 
 ## 新增功能：智能特征提取
@@ -55,21 +56,21 @@ graph TD
 在Windows的“任务计划程序”中，创建一个新的计划任务。
 - **触发器**: 根据您的需求设置，例如每天3次。
 - **操作**: 设置为“启动程序”，并配置如下：
-  - **程序/脚本**: `python.exe` (建议使用绝对路径，例如 `C:\Python39\python.exe`)
-  - **添加参数(可选)**: `D:\WEB-sydney-rental-hub\scripts\run_etl_job.py` (这是我们将要创建的主控脚本)
-  - **起始于(可选)**: `D:\WEB-sydney-rental-hub\`
+  - **程序/脚本**: `python.exe` (建议使用绝对路径，例如 `C:\Python313\python.exe`)
+  - **添加参数(可选)**: `crawler\v5_furniture.py` (这是唯一的入口脚本)
+  - **起始于(可选)**: `D:\WEB-sydney-rental-hub\` (确保设置为项目根目录)
 
-### 3. 运行ETL任务
+### 3. 运行自动化流程
 
-一旦计划任务被触发，它将执行 `run_etl_job.py` 脚本，该脚本会自动完成以下所有操作：
-1.  在 `database/crawler_output/` 目录中找到最新的 `.csv` 文件。
-2.  读取该文件的数据。
-3.  连接到Supabase数据库。
-4.  执行智能数据同步：
-    - **新增**: 将新出现的房源插入数据库。
-    - **更新**: 如果现有房源信息有变（例如租金），则更新它。
-    - **下架**: 将数据库中存在、但最新数据文件中已消失的房源标记为“已下架” (`is_active = FALSE`)。
-5.  输出详细的操作日志。
+一旦计划任务被触发（或您手动运行 `python crawler/v5_furniture.py`），整个链式流程将自动执行：
+1.  **爬虫运行**: `v5_furniture.py` 抓取最新的房源数据并保存为CSV文件。
+2.  **触发后续**: 爬虫成功后，它会自动调用 `automated_data_update_with_notifications.py` 脚本。
+3.  **ETL与通知**: 通知脚本会：
+    - 连接数据库。
+    - 调用 `process_csv.py` 处理最新的CSV文件。
+    - 将处理结果（新增、更新、下架）同步到数据库。
+    - 发送一条包含详细处理结果的Discord通知。
+4.  **完成**: 整个流程结束。
 
 ## 数据库结构变更
 

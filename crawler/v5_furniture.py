@@ -13,7 +13,7 @@ import time
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Tuple, Set, Any
+from typing import Dict, List, Optional, Union, Tuple, Set, Any, Type
 from dataclasses import dataclass, field, fields, make_dataclass
 from functools import wraps
 import threading
@@ -23,6 +23,12 @@ import random
 import gc
 import sys # Added for printing to stdout
 import subprocess
+
+# --- 关键修复：强制stdout使用UTF-8编码，解决Windows下print中文的UnicodeEncodeError ---
+# 使用io.TextIOWrapper来确保跨平台的类型兼容性，并解决Pylance的 "reconfigure" 警告
+import io
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 import pandas as pd
 import requests
@@ -219,7 +225,7 @@ class PropertyData:
                 result[field_name] = field_value
         return result
 
-def get_expected_columns(features_class: type) -> List[str]:
+def get_expected_columns(features_class: Type[Any]) -> List[str]: # 使用 Type[Any] 来解决Pylance的动态类型错误
     base_columns = [
         'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
         'property_type', 'rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces',
@@ -799,40 +805,40 @@ class DomainCrawler:
 
 def trigger_etl_job():
     """
-    Triggers the ETL job script after the crawler successfully finishes.
+    Triggers the new, notification-enabled ETL job script after the crawler successfully finishes.
     """
-    logger.info("爬取完成，正在触发ETL数据更新任务...")
+    logger.info("爬取完成，正在触发带通知的ETL数据更新任务...")
     try:
-        # Construct the absolute path to the ETL script
+        # 更改为调用新的主控脚本
         project_root = Path(__file__).parent.parent
-        etl_script_path = project_root / 'scripts' / 'run_etl_job.py'
+        etl_script_path = project_root / 'scripts' / 'automated_data_update_with_notifications.py'
         
         if not etl_script_path.exists():
-            logger.error(f"ETL主控脚本未找到: {etl_script_path}")
+            logger.error(f"新的ETL主控脚本未找到: {etl_script_path}")
             return
 
-        # Use the same Python interpreter that is running the crawler
         python_executable = sys.executable
         
-        logger.info(f"正在执行: {python_executable} {etl_script_path}")
+        # 附带 --run-once 参数
+        command = [python_executable, str(etl_script_path), '--run-once']
+        logger.info(f"正在执行: {' '.join(command)}")
         
-        # Use Popen for non-blocking execution if needed, but run is fine for sequential tasks
         process = subprocess.run(
-            [python_executable, str(etl_script_path)],
+            command,
             capture_output=True,
             text=True,
             encoding='utf-8',
-            errors='ignore' # Ignore encoding errors from the subprocess output
+            errors='ignore'
         )
         
-        logger.info("ETL任务执行完成。")
+        logger.info("ETL任务触发完成。")
         if process.stdout:
             logger.info("ETL输出:\n" + process.stdout)
         if process.stderr:
             logger.warning("ETL 错误输出:\n" + process.stderr)
         
         if process.returncode != 0:
-             logger.error(f"ETL任务执行失败，返回码: {process.returncode}")
+             logger.error(f"被触发的ETL任务执行失败，返回码: {process.returncode}")
 
     except FileNotFoundError:
         logger.error(f"无法找到Python解释器 '{sys.executable}' 或ETL脚本 '{etl_script_path}'")
@@ -849,7 +855,7 @@ if __name__ == "__main__":
         for output_file in output_files:
             print(output_file)
         
-        # After successfully generating files, trigger the ETL job
+        # 恢复链式调用
         trigger_etl_job()
         
         sys.exit(0)

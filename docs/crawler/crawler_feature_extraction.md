@@ -38,38 +38,40 @@
 
 ## 技术实现
 
-### 特征提取算法
+### 特征提取架构
+
+系统采用**配置驱动的增强特征提取器**，支持三态逻辑和模块化扩展：
 
 ```python
-def extract_features_from_description(description):
-    """从房源描述中提取特征的核心函数"""
-    
-    # 1. 文本预处理
-    desc_lower = description.lower()
-    
-    # 2. 关键词匹配
-    features = {}
-    
-    # 家具状态检测
-    if any(word in desc_lower for word in ['furnished', 'fully furnished']):
-        features['furnishing_status'] = 'furnished'
-    elif any(word in desc_lower for word in ['unfurnished', 'bare']):
-        features['furnishing_status'] = 'unfurnished'
-    else:
-        features['furnishing_status'] = 'unknown'
-    
-    # 空调类型细分
-    if 'ducted' in desc_lower:
-        features['air_conditioning_type'] = 'ducted'
-    elif 'reverse cycle' in desc_lower:
-        features['air_conditioning_type'] = 'reverse_cycle'
-    elif 'split system' in desc_lower:
-        features['air_conditioning_type'] = 'split_system'
-    else:
-        features['air_conditioning_type'] = 'general'
-    
-    return features
+# 核心特征提取器类
+from crawler.enhanced_feature_extractor import EnhancedFeatureExtractor
+
+# 初始化提取器（使用YAML配置）
+extractor = EnhancedFeatureExtractor(
+    features_config=load_features_config(),
+    furniture_keywords=load_furniture_keywords(),
+    aircon_keywords=load_aircon_keywords()
+)
+
+# 提取特征
+features = extractor.extract(
+    json_data=property_json,
+    headline=property_headline,
+    description=property_description,
+    feature_list=structured_features
+)
 ```
+
+#### 三态逻辑系统
+所有特征使用统一的三态值：
+- **'yes'**: 明确存在该特征
+- **'no'**: 明确不存在该特征  
+- **'unknown'**: 信息不明确或未提及
+
+#### 配置文件驱动
+- `crawler/config/features_config.yaml`: 通用特征关键词配置
+- `crawler/config/furniture_keywords.yaml`: 家具状态关键词
+- `crawler/config/aircon_keywords.yaml`: 空调类型关键词
 
 ### 数据质量保证
 
@@ -103,26 +105,76 @@ graph TD
 
 ## 配置和使用
 
-### 启用特征提取
+### 集成到ETL流程
 
-在`database/process_csv.py`中，特征提取默认启用：
+特征提取在**爬虫阶段**完成，然后通过ETL流程导入数据库：
 
 ```python
-# 处理每行数据时自动调用特征提取
-features = extract_features_from_description(row.get('property_description', ''))
-row.update(features)
+# 在爬虫中进行特征提取
+from crawler.enhanced_feature_extractor import EnhancedFeatureExtractor
+import yaml
+
+# 加载配置文件
+def load_extractor_config():
+    with open('crawler/config/features_config.yaml', 'r') as f:
+        features_config = yaml.safe_load(f)
+    with open('crawler/config/furniture_keywords.yaml', 'r') as f:
+        furniture_keywords = yaml.safe_load(f)
+    with open('crawler/config/aircon_keywords.yaml', 'r') as f:
+        aircon_keywords = yaml.safe_load(f)
+    return features_config, furniture_keywords, aircon_keywords
+
+# 爬虫中的特征提取
+extractor = EnhancedFeatureExtractor(*load_extractor_config())
+features = extractor.extract(
+    json_data=property_data,
+    headline=property_headline, 
+    description=property_description,
+    feature_list=structured_features
+)
+
+# 将提取的特征合并到房源数据
+property_data.update(features.to_dict())
+```
+
+### ETL处理
+
+`database/process_csv.py`负责处理爬虫生成的CSV文件，包含已提取的特征：
+
+```python
+# ETL只需要清理和标准化已提取的特征
+feature_cols = [
+    'has_air_conditioning', 'is_furnished', 'has_balcony', 
+    'furnishing_status', 'air_conditioning_type', ...
+]
+
+for col in feature_cols:
+    if col in df.columns:
+        # 标准化三态值格式
+        df[col] = df[col].astype(str).str.lower().map({
+            'yes': 'yes', 'no': 'no', 'unknown': 'unknown',
+            'true': 'yes', 'false': 'no',  # 向后兼容
+            'nan': 'unknown', 'none': 'unknown'
+        }).fillna('unknown')
 ```
 
 ### 自定义特征规则
 
-要添加新的特征识别规则，编辑`database/process_csv.py`中的`extract_features_from_description()`函数：
+要添加新的特征识别规则，编辑相应的YAML配置文件：
 
-```python
-# 添加新特征示例
-if any(word in desc_lower for word in ['balcony', 'outdoor space']):
-    features['has_balcony'] = 'yes'
-else:
-    features['has_balcony'] = 'unknown'
+**添加通用特征** (`crawler/config/features_config.yaml`):
+```yaml
+- column_name: "has_balcony"
+  keywords: ["balcony", "outdoor space", "terrace"]
+  negative_keywords: ["no balcony", "internal"]
+```
+
+**添加家具关键词** (`crawler/config/furniture_keywords.yaml`):
+```yaml
+positive_keywords:
+  basic: ["furnished", "fully furnished", "包家具"]
+negative_keywords:
+  basic: ["unfurnished", "bare", "empty"]
 ```
 
 ## 性能统计

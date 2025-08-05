@@ -6,6 +6,7 @@ import os
 import glob
 import logging
 from datetime import datetime
+import json # 导入json模块
 
 # 处理 dotenv 导入 - 添加错误处理来解决 Pylance 警告
 try:
@@ -200,7 +201,10 @@ def load_data_to_db(df, conn):
     """Loads the DataFrame into the PostgreSQL database using an intelligent UPSERT strategy."""
     if df.empty:
         logging.info("DataFrame is empty. No data to load.")
-        return
+        return {
+            "new": 0, "updated": 0, "unchanged": 0, 
+            "off_market": 0, "relisted": 0
+        }
 
     table_name = "properties"
     csv_ids = set(df['listing_id'])
@@ -278,20 +282,15 @@ def load_data_to_db(df, conn):
             conn.commit()
             logging.info("Database update process completed and transaction committed.")
 
-            # Print summary for GitHub Actions, ensuring UTF-8 encoding for Windows
-            summary = (
-                f"新增房源: {len(new_listings)}\n"
-                f"更新房源: {len(updated_listings)}\n"
-                f"未变房源: {unchanged_listings_count}\n"
-                f"下架房源: {len(active_off_market_ids)}\n"
-                f"重新上架: {len(relisted_ids)}\n"
-            )
-            # Use a more robust method for printing to avoid console encoding errors
-            import sys
-            try:
-                print(summary)
-            except UnicodeEncodeError:
-                sys.stdout.buffer.write(summary.encode('utf-8'))
+            # Return a dictionary with the summary statistics
+            summary_stats = {
+                "new": len(new_listings),
+                "updated": len(updated_listings),
+                "unchanged": unchanged_listings_count,
+                "off_market": len(active_off_market_ids),
+                "relisted": len(relisted_ids)
+            }
+            return summary_stats
 
         except psycopg2.Error as e:
             logging.error(f"!!! DATABASE ERROR !!!: {e}")
@@ -299,11 +298,13 @@ def load_data_to_db(df, conn):
             conn.rollback()
             logging.error("Transaction has been rolled back.")
             raise
+        return {} # Return empty dict on failure before summary
 
 def main():
     """Main ETL process function."""
     logging.info("Starting ETL process...")
     conn = None
+    summary_stats = {}
     try:
         csv_file_path = find_latest_csv_file()
         logging.info(f"Reading CSV file from: {csv_file_path}")
@@ -319,7 +320,7 @@ def main():
 
         df_cleaned = clean_data(df.copy())
         conn = get_db_connection()
-        load_data_to_db(df_cleaned, conn)
+        summary_stats = load_data_to_db(df_cleaned, conn)
         
         logging.info("ETL process completed successfully.")
 
@@ -329,6 +330,11 @@ def main():
         if conn:
             conn.close()
             logging.info("Database connection closed.")
+        
+        # Print summary as a JSON string, wrapped in markers
+        print("\n---ETL_SUMMARY_START---")
+        print(json.dumps(summary_stats))
+        print("---ETL_SUMMARY_END---")
 
 if __name__ == "__main__":
     main()
