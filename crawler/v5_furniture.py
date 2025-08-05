@@ -30,6 +30,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from lxml import etree # type: ignore
 
+# 导入增强版特征提取器
+from enhanced_feature_extractor import EnhancedFeatureExtractor, create_enhanced_property_features_class
+
 # =============================================================================
 # 项目路径配置
 # =============================================================================
@@ -181,53 +184,8 @@ def extract_region_from_url(url: str) -> str:
 # =============================================================================
 # 数据模型 (Unchanged from v1)
 # =============================================================================
-def create_property_features_class(features_config: Optional[List[Dict[str, Any]]]) -> type:
-    """
-    Dynamically creates the PropertyFeatures dataclass from the features configuration.
-    """
-    fields_to_create = [
-        ('furnishing_status', str, field(default='unfurnished')),
-        ('air_conditioning_type', str, field(default='none')),
-    ]
-    
-    if features_config:
-        for config in features_config:
-            field_name = config.get('column_name')
-            if field_name and not any(f[0] == field_name for f in fields_to_create):
-                fields_to_create.append((field_name, bool, field(default=False)))
-
-    # Add methods to the class
-    def to_dict(self) -> Dict[str, Union[bool, str]]:
-        return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-
-    def merge(self, other: 'PropertyFeatures') -> None:
-        # Custom merge logic for furnishing_status
-        if self.furnishing_status == 'unfurnished':
-            self.furnishing_status = other.furnishing_status
-        
-        # Custom merge logic for air_conditioning_type
-        if self.air_conditioning_type == 'none':
-            self.air_conditioning_type = other.air_conditioning_type
-            
-        # Merge boolean fields
-        for f in fields(self):
-            if f.type is bool and not getattr(self, f.name):
-                setattr(self, f.name, getattr(other, f.name))
-
-    namespace = {
-        'to_dict': to_dict,
-        'merge': merge,
-        '__annotations__': {f[0]: f[1] for f in fields_to_create}
-    }
-
-    DynamicPropertyFeatures = make_dataclass(
-        'PropertyFeatures',
-        fields=[(f[0], f[1], f[2]) if len(f) > 2 else (f[0], f[1]) for f in fields_to_create],
-        namespace=namespace
-    )
-    return DynamicPropertyFeatures
-
-PropertyFeatures = create_property_features_class(FEATURES_CONFIG)
+# 使用增强版三态逻辑的PropertyFeatures
+PropertyFeatures = create_enhanced_property_features_class(FEATURES_CONFIG)
 
 
 
@@ -276,171 +234,8 @@ def get_expected_columns(features_class: type) -> List[str]:
 EXPECTED_COLUMNS = get_expected_columns(PropertyFeatures)
 
 # =============================================================================
-# 特征提取, 数据清洗 & 验证
+# 数据清洗 & 验证
 # =============================================================================
-class FeatureExtractor:
-    def __init__(self, features_config: Optional[List[Dict[str, Any]]]):
-        self.keyword_patterns = {}  # 改为 keyword_patterns
-        if features_config:
-            for config in features_config:
-                column_name = config.get('column_name')
-                keywords = config.get('keywords', [])
-                if column_name and keywords:
-                    # 使用优化的词根匹配策略
-                    optimized_keywords = []
-                    for kw in keywords:
-                        kw_lower = kw.lower()
-                        # 词根优化策略
-                        if 'wardrobe' in kw_lower:
-                            optimized_keywords.append('wardr')
-                        elif 'dishwasher' in kw_lower:
-                            optimized_keywords.append('dishwash')
-                        elif 'parking' in kw_lower:
-                            optimized_keywords.append('park')
-                        elif 'laundry' in kw_lower:
-                            optimized_keywords.append('laundr')
-                        elif 'heating' in kw_lower:
-                            optimized_keywords.append('heat')
-                        elif 'intercom' in kw_lower:
-                            optimized_keywords.append('intercom')
-                        elif 'lift' in kw_lower or 'elevator' in kw_lower:
-                            optimized_keywords.extend(['lift', 'elevator'])
-                        elif 'gym' in kw_lower:
-                            optimized_keywords.append('gym')
-                        else:
-                            optimized_keywords.append(kw_lower)
-                    
-                    self.keyword_patterns[column_name] = optimized_keywords
-            logger.info(f"Successfully loaded and optimized keywords for {len(self.keyword_patterns)} features from config.")
-        else:
-            logger.warning("Features config not found or invalid. Feature extraction will be based on default fields only.")
-
-        # Load and process all furniture keywords once during initialization
-        self._positive_keywords = set()
-        self._negative_keywords = set()
-        self._optional_keywords = set()
-        if FURNITURE_KEYWORDS:
-            for key, keyword_set in [('positive_keywords', self._positive_keywords), 
-                                     ('negative_keywords', self._negative_keywords), 
-                                     ('optional_keywords', self._optional_keywords)]:
-                config = FURNITURE_KEYWORDS.get(key, {})
-                if config:
-                    for category_keywords in config.values():
-                        keyword_set.update(kw.lower() for kw in category_keywords)
-            
-            logger.info(f"Loaded {len(self._positive_keywords)} positive, {len(self._negative_keywords)} negative, and {len(self._optional_keywords)} optional furniture keywords.")
-        else:
-            logger.warning("Furniture keywords configuration not found or empty. Furnished detection will be degraded.")
-
-        # Load and process all aircon keywords
-        self._aircon_keywords: Dict[str, Set[str]] = {}
-        self._aircon_keyword_order: List[str] = []
-        if AIRCON_KEYWORDS:
-            self._aircon_keyword_order = [
-                'negative_keywords', 'ducted_keywords', 'reverse_cycle_keywords', 
-                'split_system_keywords', 'general_keywords', 'other_keywords'
-            ]
-            for key in self._aircon_keyword_order:
-                config = AIRCON_KEYWORDS.get(key, {})
-                if config:
-                    self._aircon_keywords[key] = set()
-                    for category_keywords in config.values():
-                        self._aircon_keywords[key].update(kw.lower() for kw in category_keywords)
-            logger.info(f"Loaded {sum(len(s) for s in self._aircon_keywords.values())} air conditioning keywords across {len(self._aircon_keywords)} categories.")
-        else:
-            logger.warning("Aircon keywords configuration not found or empty. AC detection will be degraded.")
-
-    def _get_furnishing_status(self, text: str) -> str:
-        """
-        Robustly determines furnishing status using pre-loaded keyword sets.
-        Logic: Negative > Optional > Positive. If no keywords found, defaults to Optional.
-        """
-        if not text: return 'optional' # Default to optional if no text is provided
-        text_lower = text.lower()
-        if any(keyword in text_lower for keyword in self._negative_keywords): return 'unfurnished'
-        if any(keyword in text_lower for keyword in self._optional_keywords): return 'optional'
-        if any(keyword in text_lower for keyword in self._positive_keywords): return 'furnished'
-        return 'optional' # Default to optional if no specific keywords are matched
-
-    def _get_air_conditioning_type(self, text: str) -> str:
-        """
-        Determines air conditioning type based on a prioritized keyword search.
-        """
-        if not text or not self._aircon_keywords: return 'none'
-        text_lower = text.lower()
-
-        for key in self._aircon_keyword_order:
-            if key in self._aircon_keywords:
-                for keyword in self._aircon_keywords[key]:
-                    if keyword in text_lower:
-                        if key == 'negative_keywords':
-                            return 'none'
-                        return key.replace('_keywords', '')
-        
-        return 'none'
-
-    def extract(self, json_data: dict, headline: str, description: str, feature_list: List[str]) -> PropertyFeatures:
-        features = PropertyFeatures()
-
-        # 修正 2: 将 headline 加入到待分析的文本中
-        text_blob = f"{headline.lower()} {description.lower()} {' '.join(f.lower() for f in feature_list)}"
-        
-        s_features_set = {f.get("name", "").lower() for f in json_data.get("structuredFeatures", [])}
-        text_blob += " " + " ".join(s_features_set)
-
-        # 改进的特征提取：使用灵活的词根匹配，但排除需要特殊处理的特征
-        excluded_features = {'has_pool', 'has_study', 'has_air_conditioning', 'has_gas_cooking'}
-        for feature_name, keywords in self.keyword_patterns.items():
-            if hasattr(features, feature_name) and feature_name not in excluded_features:
-                if any(keyword in text_blob for keyword in keywords):
-                    setattr(features, feature_name, True)
-        
-        # 特殊处理：泳池检测（添加spa关键词）
-        if 'spa' in text_blob or 'swimming pool' in text_blob or 'pool' in text_blob:
-            features.has_pool = True
-            
-        # 特殊处理：书房检测（添加office关键词）
-        if any(keyword in text_blob for keyword in ['study', 'office', 'den', 'home office', 'work space', 'workspace']):
-            features.has_study = True
-        
-        # Use the new, tri-state furnishing status check
-        features.furnishing_status = self._get_furnishing_status(text_blob)
-        
-        # 改进的空调检测：使用更严格的逻辑避免误报
-        ac_type = self._get_air_conditioning_type(text_blob)
-        if ac_type != 'none':
-            features.has_air_conditioning = True
-            features.air_conditioning_type = ac_type
-        else:
-            # 额外检查：只有明确提到空调相关词汇才设为True
-            ac_keywords = ['air conditioning', 'air con', 'a/c', 'ducted', 'split system', 'reverse cycle', 'climate control']
-            if any(keyword in text_blob for keyword in ac_keywords):
-                features.has_air_conditioning = True
-                features.air_conditioning_type = 'general'
-        
-        # 改进的燃气烹饪检测：使用更严格的逻辑避免误报
-        gas_cooking_keywords = ['gas cooking', 'gas stove', 'gas cooktop', 'gas appliances', 'gas burner', 'gas hob', 'gas range', 'cooking gas', 'gas kitchen', 'gas oven']
-        # 排除非烹饪相关的燃气关键词
-        gas_exclusions = ['gas heating', 'gas hot water', 'gas fireplace', 'gas ducted heating']
-        
-        has_gas_cooking_keyword = any(keyword in text_blob for keyword in gas_cooking_keywords)
-        has_gas_exclusion = any(keyword in text_blob for keyword in gas_exclusions)
-        
-        # 只有找到烹饪相关的燃气关键词且没有排除关键词时才设为True
-        if has_gas_cooking_keyword and not has_gas_exclusion:
-            features.has_gas_cooking = True
-        # 如果只有排除关键词（如gas heating），则不设为True
-        elif has_gas_exclusion and not has_gas_cooking_keyword:
-            features.has_gas_cooking = False
-
-        # More specific keyword checks can be added here for higher accuracy if needed
-        if any(keyword in text_blob for keyword in ["built in wardrobe", "builtin wardrobe", "robe", "walk in robe"]):
-            features.has_built_in_wardrobe = True
-        if any(keyword in text_blob for keyword in ["secure parking", "underground parking", "carport"]):
-            features.has_parking = True
-        
-        return features
-
 class DataCleaner:
     @staticmethod
     def clean_price(price: str) -> float:
@@ -639,7 +434,7 @@ class BatchWriter:
 # =============================================================================
 class DomainCrawler:
     def __init__(self):
-        self.request_manager = RequestManager(); self.feature_extractor = FeatureExtractor(FEATURES_CONFIG)
+        self.request_manager = RequestManager(); self.feature_extractor = EnhancedFeatureExtractor(FEATURES_CONFIG, FURNITURE_KEYWORDS, AIRCON_KEYWORDS)
         self.data_cleaner = DataCleaner(); self.data_validator = DataValidator()
         self.batch_writer = BatchWriter(); self._lock = threading.Lock()
     

@@ -17,6 +17,11 @@
 - **[自动化ETL工作流](./database/automated_etl_workflow.md)**
   - 详细说明了如何自动将爬虫数据同步到数据库的完整流程。
 
+### 爬虫 (Crawler)
+
+- **[爬虫特征提取系统](./crawler/crawler_feature_extraction.md)**
+  - 智能特征提取系统的详细技术文档，包括算法实现和质量保证。
+
 ### 后端 (Backend)
 
 *（待补充：可在此处添加API接口文档、后端架构图等。）*

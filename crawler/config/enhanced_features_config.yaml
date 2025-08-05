@@ -1,0 +1,430 @@
+# 增强的特征配置文件 - 支持三态逻辑
+# 每个特征都可以配置 positive 和 negative 关键词
+
+features:
+  # 宠物政策 - 已有negative_keywords的示例
+  - column_name: allows_pets
+    keywords:
+      - pet friendly
+      - pets allowed
+      - pets welcome
+      - pet ok
+      - pets considered
+      - small pets ok
+      - cats ok
+      - dogs ok
+      - pet-friendly
+    negative_keywords:
+      - no pets
+      - pets not allowed
+      - no animals
+      - pet free
+      - pets prohibited
+      - pets not permitted
+      - no pet policy
+    name: 允许养宠物
+
+  # 燃气灶 - 增强负向检测
+  - column_name: has_gas_cooking
+    keywords:
+      - gas cooking
+      - gas stove
+      - gas cooktop
+      - gas appliances
+      - gas burner
+      - gas hob
+      - gas range
+      - cooking gas
+      - gas kitchen
+      - gas oven
+      - gas stovetop
+      - natural gas cooking
+      - lpg cooking
+    negative_keywords:
+      - no gas cooking
+      - no gas stove
+      - no gas appliances
+      - electric cooking only
+      - electric stove only
+      - induction cooking only
+      - no cooking gas
+      - electric kitchen only
+    name: 燃气灶
+
+  # 空调 - 基础检测（详细逻辑在aircon_keywords.yaml中）
+  - column_name: has_air_conditioning
+    keywords:
+      - air conditioning
+      - air con
+      - a/c
+      - cooling
+      - climate control
+    negative_keywords:
+      - no air conditioning
+      - no air con
+      - no a/c
+      - no cooling
+      - air conditioning not included
+    name: 空调
+
+  # 内置衣柜 - 增强检测
+  - column_name: has_wardrobes
+    keywords:
+      - wardrobe
+      - built in wardrobe
+      - walk in robe
+      - built-in wardrobe
+      - fitted wardrobe
+      - closet
+      - built in storage
+      - robe
+      - walk-in wardrobe
+      - built-in robes
+      - fitted robes
+      - bedroom storage
+      - wardrobe space
+      - hanging space
+      - clothes storage
+      - built-in storage
+    negative_keywords:
+      - no wardrobes
+      - no built-in storage
+      - no closets
+      - no storage
+      - wardrobes not included
+      - storage not provided
+    name: 内置衣柜
+
+  # 洗衣房 - 增强检测
+  - column_name: has_laundry
+    keywords:
+      - laundry
+      - washer
+      - dryer
+      - washing machine
+      - laundry room
+      - internal laundry
+      - laundry facilities
+      - washer and dryer
+      - washing facilities
+      - laundry area
+      - laundry space
+      - utility room
+      - laundry cupboard
+      - laundry nook
+    negative_keywords:
+      - no laundry
+      - no washing machine
+      - no dryer
+      - no laundry facilities
+      - laundry not included
+      - external laundry only
+      - shared laundry only
+      - no internal laundry
+    name: 内部洗衣房
+
+  # 洗碗机 - 增强检测
+  - column_name: has_dishwasher
+    keywords:
+      - dishwasher
+      - dish washer
+      - kitchen appliances
+      - integrated dishwasher
+      - built-in dishwasher
+      - dishwashing machine
+      - dishwasher included
+      - dishwasher provided
+      - modern appliances
+      - european appliances
+      - stainless steel appliances
+    negative_keywords:
+      - no dishwasher
+      - no dish washer
+      - dishwasher not included
+      - dishwasher not provided
+      - no kitchen appliances
+      - basic kitchen only
+    name: 洗碗机
+
+  # 停车位 - 增强检测
+  - column_name: has_parking
+    keywords:
+      - parking
+      - garage
+      - car space
+      - carport
+      - secure parking
+      - underground parking
+      - parking space
+      - parking bay
+      - car park
+      - allocated parking
+      - designated parking
+    negative_keywords:
+      - no parking
+      - no garage
+      - no car space
+      - parking not included
+      - street parking only
+      - no allocated parking
+      - no designated parking
+    name: 停车位
+
+  # 暖气 - 增强检测
+  - column_name: has_heating
+    keywords:
+      - heating
+      - ducted heating
+      - central heating
+      - gas heating
+      - electric heating
+      - hydronic heating
+      - radiant heating
+      - underfloor heating
+      - heater
+      - heating system
+    negative_keywords:
+      - no heating
+      - no heater
+      - heating not included
+      - no central heating
+      - no heating system
+    name: 暖气
+
+  # 安保门禁 - 增强检测
+  - column_name: has_intercom
+    keywords:
+      - intercom
+      - security access
+      - security building
+      - secure entry
+      - buzzer system
+      - door entry
+      - access control
+      - security door
+      - entry system
+      - secure building
+      - video intercom
+      - audio intercom
+      - door phone
+      - entry phone
+      - security system
+      - keypad entry
+      - fob access
+      - card access
+      - swipe access
+      - controlled access
+      - building security
+      - secure access
+    negative_keywords:
+      - no intercom
+      - no security access
+      - no secure entry
+      - no security building
+      - no access control
+      - no security system
+      - open access
+      - no building security
+    name: 安保门禁
+
+  # 电梯 - 增强检测
+  - column_name: has_lift
+    keywords:
+      - lift
+      - elevator
+      - lifts
+      - elevators
+    negative_keywords:
+      - no lift
+      - no elevator
+      - no lifts
+      - no elevators
+      - stairs only
+      - walk up
+      - no lift access
+    name: 电梯
+
+  # 健身房 - 增强检测
+  - column_name: has_gym
+    keywords:
+      - gym
+      - fitness
+      - fitness centre
+      - fitness center
+      - gymnasium
+      - fitness room
+      - fitness facilities
+      - gym facilities
+      - exercise room
+      - workout area
+    negative_keywords:
+      - no gym
+      - no fitness
+      - no fitness centre
+      - no fitness center
+      - no fitness facilities
+      - no gym facilities
+      - gym not included
+    name: 健身房
+
+  # 游泳池 - 增强检测
+  - column_name: has_pool
+    keywords:
+      - pool
+      - swimming pool
+      - spa
+      - pool area
+      - resort pool
+      - outdoor pool
+      - indoor pool
+      - swimming facilities
+      - pool facilities
+    negative_keywords:
+      - no pool
+      - no swimming pool
+      - no spa
+      - no swimming facilities
+      - no pool facilities
+      - pool not included
+    name: 游泳池
+
+  # 垃圾处理 - 增强检测
+  - column_name: has_garbage_disposal
+    keywords:
+      - garbage chute
+      - rubbish chute
+      - waste disposal
+      - bin room
+      - waste chute
+      - garbage disposal
+      - rubbish disposal
+      - waste management
+      - garbage facilities
+      - waste facilities
+    negative_keywords:
+      - no garbage chute
+      - no rubbish chute
+      - no waste disposal
+      - no bin room
+      - no garbage disposal
+      - no waste facilities
+    name: 垃圾处理
+
+  # 书房 - 增强检测
+  - column_name: has_study
+    keywords:
+      - study
+      - home office
+      - office space
+      - work space
+      - workspace
+      - study room
+      - den
+      - study area
+      - office area
+      - study nook
+      - office nook
+      - work area
+      - work room
+      - home study
+      - reading room
+      - computer room
+      - work from home
+      - study corner
+      - office corner
+      - desk area
+      - work station
+    negative_keywords:
+      - no study
+      - no home office
+      - no office space
+      - no work space
+      - no workspace
+      - no study room
+      - no office area
+      - study not included
+    name: 书房
+
+  # 阳台 - 增强检测
+  - column_name: has_balcony
+    keywords:
+      - balcony
+      - deck
+      - terrace
+      - patio
+      - outdoor area
+      - outdoor space
+      - private outdoor
+      - balconies
+      - verandah
+      - courtyard
+    negative_keywords:
+      - no balcony
+      - no deck
+      - no terrace
+      - no patio
+      - no outdoor area
+      - no outdoor space
+      - no private outdoor
+      - internal only
+    name: 阳台
+
+  # 城市景观 - 增强检测
+  - column_name: has_city_view
+    keywords:
+      - city view
+      - district view
+      - area view
+      - harbour bridge view
+      - opera house view
+      - skyline view
+      - urban view
+      - city skyline
+      - downtown view
+      - cbd view
+    negative_keywords:
+      - no view
+      - no city view
+      - no views
+      - internal view
+      - courtyard view only
+      - no outlook
+    name: 城市景观
+
+  # 水景 - 增强检测
+  - column_name: has_water_view
+    keywords:
+      - water view
+      - ocean view
+      - river view
+      - harbour view
+      - beach front
+      - water front
+      - waterfront
+      - sea view
+      - bay view
+      - canal view
+      - lake view
+    negative_keywords:
+      - no water view
+      - no ocean view
+      - no river view
+      - no harbour view
+      - no sea view
+      - no waterfront
+      - land view only
+    name: 水景
+
+  # 家具状态（特殊处理，在furniture_keywords.yaml中详细定义）
+  - column_name: is_furnished
+    keywords:
+      - furnished
+      - fully furnished
+      - comes furnished
+      - includes furniture
+    negative_keywords:
+      - unfurnished
+      - not furnished
+      - no furniture
+      - bare property
+    name: 带家具

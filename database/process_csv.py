@@ -78,13 +78,32 @@ def clean_data(df):
     """Cleans and transforms the DataFrame."""
     logging.info("Starting data cleaning and transformation...")
 
+    # --- CRITICAL: Validate and clean listing_id first ---
+    if 'listing_id' not in df.columns:
+        raise ValueError("CSV file must contain a 'listing_id' column.")
+    
+    initial_rows = len(df)
+    # Coerce to numeric, turning non-numeric IDs into NaN
+    df['listing_id'] = pd.to_numeric(df['listing_id'], errors='coerce')
+    # Drop rows where listing_id is NaN
+    df.dropna(subset=['listing_id'], inplace=True)
+    
+    # Convert valid listing_ids to integer
+    df['listing_id'] = df['listing_id'].astype('Int64')
+    
+    cleaned_rows = len(df)
+    if initial_rows > cleaned_rows:
+        logging.warning(f"Removed {initial_rows - cleaned_rows} rows with invalid or missing listing_id.")
+    # --- END CRITICAL VALIDATION ---
+
     # Handle column name mismatches
     df.rename(columns={
         'has_wardrobes': 'has_built_in_wardrobe',
         'has_study': 'has_study_room'
     }, inplace=True)
 
-    bool_cols = [
+    # Handle feature columns that are now varchar ('yes', 'no', 'unknown') instead of boolean
+    feature_cols = [
         'has_air_conditioning', 'is_furnished', 'has_balcony', 'has_dishwasher',
         'has_laundry', 'has_built_in_wardrobe', 'has_gym', 'has_pool',
         'has_parking', 'allows_pets', 'has_security_system', 'has_storage',
@@ -92,11 +111,22 @@ def clean_data(df):
         'has_intercom', 'has_lift', 'has_garbage_disposal', 'has_city_view',
         'has_water_view'
     ]
-    for col in bool_cols:
+    for col in feature_cols:
         if col in df.columns:
-            df[col] = df[col].astype(str).str.upper().map({'TRUE': True, 'FALSE': False, 'YES': True, 'NO': False, '1': True, '0': False}).fillna(False).astype(bool)
+            # Convert to lowercase and map values, supporting both new and legacy formats
+            df[col] = df[col].astype(str).str.lower().map({
+                'yes': 'yes', 
+                'no': 'no', 
+                'unknown': 'unknown',
+                'true': 'yes',   # Legacy format compatibility
+                'false': 'no',   # Legacy format compatibility
+                '1': 'yes',      # Legacy format compatibility
+                '0': 'no',       # Legacy format compatibility
+                'nan': 'unknown',
+                'none': 'unknown'
+            }).fillna('unknown')
         else:
-            df[col] = False
+            df[col] = 'unknown'
     numeric_cols = ['rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces']
     for col in numeric_cols:
         if col in df.columns:
@@ -128,6 +158,10 @@ def clean_data(df):
         else:
             df[col] = None
     
+    if 'agent_phone' in df.columns:
+        # Ensure agent_phone is treated as a string, remove trailing .0 if it was inferred as float
+        df['agent_phone'] = df['agent_phone'].astype(str).str.replace(r'\.0$', '', regex=True)
+    
     db_columns_from_csv = [
         'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
         'property_type', 'rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces',
@@ -136,13 +170,15 @@ def clean_data(df):
         'images', 'property_features', 'agent_profile_url', 'agent_logo_url',
         'enquiry_form_action', 'geom', 'cover_image', 'furnishing_status',
         'air_conditioning_type',
-        # Boolean flags
+        # Feature flags (now varchar instead of boolean)
         'is_furnished', 'has_air_conditioning', 'has_built_in_wardrobe', 'has_laundry',
         'has_dishwasher', 'has_parking', 'has_gas_cooking', 'has_heating', 'has_intercom',
         'has_lift', 'has_gym', 'has_pool', 'has_garbage_disposal', 'has_study_room',
         'has_balcony', 'has_city_view', 'has_water_view', 'allows_pets',
         # Other DB columns that might be in the CSV
-        'has_security_system', 'has_storage', 'has_garden'
+        'has_security_system', 'has_storage', 'has_garden',
+        # New fields from the updated CSV format
+        'bedroom_display'
     ]
     
     final_df_columns = [col for col in db_columns_from_csv if col in df.columns]

@@ -1,5 +1,3 @@
-https://www.domain.com.au/rent/eastlakes-nsw-2018/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
-https://www.domain.com.au/rent/eastgardens-nsw-2036/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/zetland-nsw-2017/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/ultimo-nsw-2007/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/chippendale-nsw-2008/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc 
@@ -19,6 +17,8 @@ https://www.domain.com.au/rent/darlington-nsw-2008/apartment/?price=300-2500&exc
 https://www.domain.com.au/rent/kensington-nsw-2033/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/randwick-nsw-2031/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/kingsford-nsw-2032/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
+https://www.domain.com.au/rent/eastlakes-nsw-2018/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
+https://www.domain.com.au/rent/eastgardens-nsw-2036/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/maroubra-nsw-2035/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/alexandria-nsw-2015/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/beaconsfield-nsw-2015/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
@@ -34,5 +34,4 @@ https://www.domain.com.au/rent/wolli-creek-nsw-2205/apartment/?price=300-2500&ex
 https://www.domain.com.au/rent/burwood-nsw-2134/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/hurstville-nsw-2220/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/parramatta-nsw-2150/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=dateupdated-desc
-
 

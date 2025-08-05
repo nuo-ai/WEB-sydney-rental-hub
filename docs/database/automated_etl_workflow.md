@@ -27,6 +27,18 @@ graph TD
     style B fill:#9f9,stroke:#333,stroke-width:2px
 ```
 
+## 新增功能：智能特征提取
+
+🎉 **重大更新 (2025-08-05)**: ETL流程现在包含**智能特征提取系统**，能够从房源描述中自动识别和提取详细的设施特征。
+
+### 自动提取的特征
+- **家具状态**: furnished/unfurnished/unknown
+- **空调类型**: ducted/reverse_cycle/split_system/general  
+- **设施信息**: 游泳池、健身房、停车位、宠物政策等
+- **布尔特征**: has_air_conditioning, is_furnished, has_pool, has_gym, has_parking, allows_pets
+
+详细的技术实现请参考：**[爬虫特征提取系统文档](../crawler/crawler_feature_extraction.md)**
+
 ## 操作步骤
 
 ### 1. (一次性) 配置您的爬虫
@@ -35,6 +47,8 @@ graph TD
 `database/crawler_output/`
 
 文件名可以包含时间戳，例如 `properties_20250804_210000.csv`。ETL脚本会自动根据文件的创建或修改时间来寻找最新的一个。
+
+**新增**: 爬虫数据现在会自动经过特征提取处理，确保您的原始CSV包含`property_description`字段以获得最佳特征提取效果。
 
 ### 2. (一次性) 设置Windows计划任务
 

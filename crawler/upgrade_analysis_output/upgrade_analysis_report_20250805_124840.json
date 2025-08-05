@@ -1,0 +1,549 @@
+{
+  "structure": {
+    "old_record_count": 154,
+    "new_record_count": 149,
+    "common_columns_count": 53,
+    "added_columns": [],
+    "removed_columns": [],
+    "total_columns_old": 53,
+    "total_columns_new": 53
+  },
+  "type_changes": {
+    "furnishing_status": {
+      "old_type": "object",
+      "new_type": "object",
+      "old_unique_values": [
+        "furnished",
+        "optional",
+        "unfurnished"
+      ],
+      "new_unique_values": [
+        "furnished",
+        "optional",
+        "unfurnished",
+        "unknown"
+      ],
+      "type_changed": false
+    },
+    "has_air_conditioning": {
+      "old_type": "bool",
+      "new_type": "object",
+      "old_unique_values": [
+        "True"
+      ],
+      "new_unique_values": [
+        "yes"
+      ],
+      "type_changed": true
+    },
+    "air_conditioning_type": {
+      "old_type": "object",
+      "new_type": "object",
+      "old_unique_values": [
+        "ducted",
+        "general",
+        "reverse_cycle",
+        "split_system"
+      ],
+      "new_unique_values": [
+        "ducted",
+        "general",
+        "reverse_cycle",
+        "split_system"
+      ],
+      "type_changed": false
+    },
+    "has_gas_cooking": {
+      "old_type": "bool",
+      "new_type": "object",
+      "old_unique_values": [
+        "False",
+        "True"
+      ],
+      "new_unique_values": [
+        "unknown",
+        "yes"
+      ],
+      "type_changed": true
+    }
+  },
+  "tristate": {
+    "has_pool": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 136,
+        "unknown": 13
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.087248322147651,
+      "yes_ratio": 0.912751677852349,
+      "no_ratio": 0.0
+    },
+    "has_gym": {
+      "is_tristate": true,
+      "value_counts": {
+        "unknown": 80,
+        "yes": 69
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.5369127516778524,
+      "yes_ratio": 0.46308724832214765,
+      "no_ratio": 0.0
+    },
+    "has_parking": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 110,
+        "unknown": 39
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.26174496644295303,
+      "yes_ratio": 0.738255033557047,
+      "no_ratio": 0.0
+    },
+    "allows_pets": {
+      "is_tristate": true,
+      "value_counts": {
+        "unknown": 129,
+        "yes": 19,
+        "no": 1
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.8657718120805369,
+      "yes_ratio": 0.12751677852348994,
+      "no_ratio": 0.006711409395973154
+    },
+    "has_dishwasher": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 88,
+        "unknown": 61
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.40939597315436244,
+      "yes_ratio": 0.5906040268456376,
+      "no_ratio": 0.0
+    },
+    "has_air_conditioning": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 149
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.0,
+      "yes_ratio": 1.0,
+      "no_ratio": 0.0
+    },
+    "has_gas_cooking": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 82,
+        "unknown": 67
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.44966442953020136,
+      "yes_ratio": 0.5503355704697986,
+      "no_ratio": 0.0
+    },
+    "has_balcony": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 113,
+        "unknown": 36
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.24161073825503357,
+      "yes_ratio": 0.7583892617449665,
+      "no_ratio": 0.0
+    },
+    "has_study": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 112,
+        "unknown": 37
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.2483221476510067,
+      "yes_ratio": 0.7516778523489933,
+      "no_ratio": 0.0
+    },
+    "has_intercom": {
+      "is_tristate": true,
+      "value_counts": {
+        "yes": 114,
+        "unknown": 35
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.2348993288590604,
+      "yes_ratio": 0.7651006711409396,
+      "no_ratio": 0.0
+    },
+    "has_lift": {
+      "is_tristate": true,
+      "value_counts": {
+        "unknown": 91,
+        "yes": 58
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.610738255033557,
+      "yes_ratio": 0.38926174496644295,
+      "no_ratio": 0.0
+    },
+    "has_heating": {
+      "is_tristate": true,
+      "value_counts": {
+        "unknown": 113,
+        "yes": 36
+      },
+      "total_non_null": 149,
+      "unknown_ratio": 0.7583892617449665,
+      "yes_ratio": 0.24161073825503357,
+      "no_ratio": 0.0
+    }
+  },
+  "distribution_comparison": {
+    "furnishing_status": {
+      "old_distribution": {
+        "optional": 0.5909090909090909,
+        "furnished": 0.24025974025974026,
+        "unfurnished": 0.16883116883116883
+      },
+      "new_distribution": {
+        "unknown": 0.5838926174496645,
+        "furnished": 0.2483221476510067,
+        "unfurnished": 0.15436241610738255,
+        "optional": 0.013422818791946308
+      },
+      "old_null_ratio": 0.0,
+      "new_null_ratio": 0.0
+    },
+    "has_air_conditioning": {
+      "old_distribution": {
+        "true": 1.0
+      },
+      "new_distribution": {
+        "yes": 1.0
+      },
+      "old_null_ratio": 0.0,
+      "new_null_ratio": 0.0
+    },
+    "air_conditioning_type": {
+      "old_distribution": {
+        "general": 0.6298701298701299,
+        "ducted": 0.18831168831168832,
+        "reverse_cycle": 0.15584415584415584,
+        "split_system": 0.025974025974025976
+      },
+      "new_distribution": {
+        "general": 0.6510067114093959,
+        "ducted": 0.18120805369127516,
+        "reverse_cycle": 0.14093959731543623,
+        "split_system": 0.026845637583892617
+      },
+      "old_null_ratio": 0.0,
+      "new_null_ratio": 0.0
+    },
+    "has_gas_cooking": {
+      "old_distribution": {
+        "false": 0.6038961038961039,
+        "true": 0.3961038961038961
+      },
+      "new_distribution": {
+        "yes": 0.5503355704697986,
+        "unknown": 0.44966442953020136
+      },
+      "old_null_ratio": 0.0,
+      "new_null_ratio": 0.0
+    }
+  },
+  "information_gain": {
+    "furnishing_status": {
+      "unknown_count_new": 87,
+      "unknown_ratio_new": 0.5838926174496645,
+      "false_count_old": 0,
+      "false_ratio_old": 0.0,
+      "potential_misclassification_reduction": 0.5838926174496645
+    },
+    "has_air_conditioning": {
+      "unknown_count_new": 0,
+      "unknown_ratio_new": 0.0,
+      "false_count_old": 0,
+      "false_ratio_old": 0.0,
+      "potential_misclassification_reduction": 0.0
+    },
+    "air_conditioning_type": {
+      "unknown_count_new": 0,
+      "unknown_ratio_new": 0.0,
+      "false_count_old": 0,
+      "false_ratio_old": 0.0,
+      "potential_misclassification_reduction": 0.0
+    },
+    "has_gas_cooking": {
+      "unknown_count_new": 67,
+      "unknown_ratio_new": 0.44966442953020136,
+      "false_count_old": 93,
+      "false_ratio_old": 0.6038961038961039,
+      "potential_misclassification_reduction": 0.44966442953020136
+    }
+  },
+  "sample_improvements": {
+    "17587204": {
+      "record_info": {
+        "address": "618/20 Gadigal Avenue, Zetland NSW 2017",
+        "property_headline": "Fully Furnished Modern Apartment With Pool & Gym..."
+      },
+      "improvements": {
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        }
+      }
+    },
+    "17627653": {
+      "record_info": {
+        "address": "333/11 Victoria Park Parade, Zetland NSW 2017",
+        "property_headline": "MGM MARTIN - TWO BEDROOM APARTMENT..."
+      },
+      "improvements": {
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        }
+      }
+    },
+    "17604618": {
+      "record_info": {
+        "address": "2C 3 Naulty Place, Zetland NSW 2017",
+        "property_headline": "SPACIOUS 2 BEDROOM APARTMENT WITH PARKING, IN PRIME LOCATION! AVAILABLE NOW !!2 WEEKS FREE!!..."
+      },
+      "improvements": {
+        "furnishing_status": {
+          "old_value": "optional",
+          "new_value": "unknown",
+          "improvement_type": "value_change",
+          "description": "值变更: optional → unknown"
+        },
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: False → yes"
+        }
+      }
+    },
+    "17699850": {
+      "record_info": {
+        "address": "2014/6 Kingsborough Way, Zetland NSW 2017",
+        "property_headline": "THE RESERVE - LUXURIOUS 3BED + STUDY IN ZETLAND! Enquiry Now !!!..."
+      },
+      "improvements": {
+        "furnishing_status": {
+          "old_value": "optional",
+          "new_value": "unknown",
+          "improvement_type": "value_change",
+          "description": "值变更: optional → unknown"
+        },
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "unknown",
+          "improvement_type": "false_to_unknown",
+          "description": "从错误的\"否定\"改为\"信息不确定\""
+        }
+      }
+    },
+    "17203214": {
+      "record_info": {
+        "address": "1702/6 Ebsworth Street, Zetland NSW 2017",
+        "property_headline": "Sunny 2-Bedroom Apartment for Rent..."
+      },
+      "improvements": {
+        "furnishing_status": {
+          "old_value": "optional",
+          "new_value": "unknown",
+          "improvement_type": "value_change",
+          "description": "值变更: optional → unknown"
+        },
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "unknown",
+          "improvement_type": "false_to_unknown",
+          "description": "从错误的\"否定\"改为\"信息不确定\""
+        }
+      }
+    },
+    "17647121": {
+      "record_info": {
+        "address": "197/12 Peters Street, Zetland NSW 2017",
+        "property_headline": "Brand new apartment for lease..."
+      },
+      "improvements": {
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "unknown",
+          "improvement_type": "false_to_unknown",
+          "description": "从错误的\"否定\"改为\"信息不确定\""
+        }
+      }
+    },
+    "16597535": {
+      "record_info": {
+        "address": "502/134 Epsom Road, Zetland NSW 2017",
+        "property_headline": "*INSPECTIONS ONLY BY PRIVATE APPOINTMENT\nLuxurious Furnished Two Bedroom Apartment..."
+      },
+      "improvements": {
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        }
+      }
+    },
+    "17690658": {
+      "record_info": {
+        "address": "390/10 Peters Street, Zetland NSW 2017",
+        "property_headline": "Brand new two bedroom apartment at The Daniel..."
+      },
+      "improvements": {
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "unknown",
+          "improvement_type": "false_to_unknown",
+          "description": "从错误的\"否定\"改为\"信息不确定\""
+        }
+      }
+    },
+    "17697316": {
+      "record_info": {
+        "address": "53/2 Hutchinson Walk, Zetland NSW 2017",
+        "property_headline": "MGM MARTIN - TWO BEDROOM APARTMENT..."
+      },
+      "improvements": {
+        "furnishing_status": {
+          "old_value": "optional",
+          "new_value": "unknown",
+          "improvement_type": "value_change",
+          "description": "值变更: optional → unknown"
+        },
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "unknown",
+          "improvement_type": "false_to_unknown",
+          "description": "从错误的\"否定\"改为\"信息不确定\""
+        }
+      }
+    },
+    "17496100": {
+      "record_info": {
+        "address": "1702/6 Ebsworth Street, Zetland NSW 2017",
+        "property_headline": "Sunny 2-Bedroom Apartment for Rent..."
+      },
+      "improvements": {
+        "furnishing_status": {
+          "old_value": "optional",
+          "new_value": "unknown",
+          "improvement_type": "value_change",
+          "description": "值变更: optional → unknown"
+        },
+        "has_air_conditioning": {
+          "old_value": "True",
+          "new_value": "yes",
+          "improvement_type": "value_change",
+          "description": "值变更: True → yes"
+        },
+        "has_gas_cooking": {
+          "old_value": "False",
+          "new_value": "unknown",
+          "improvement_type": "false_to_unknown",
+          "description": "从错误的\"否定\"改为\"信息不确定\""
+        }
+      }
+    }
+  },
+  "summary": {
+    "analysis_timestamp": "2025-08-05 12:48:40",
+    "data_files": {
+      "old_file": "D:\\WEB-sydney-rental-hub\\crawler\\output\\20250805_004531_Zetland_154properties.xlsx",
+      "new_file": "D:\\WEB-sydney-rental-hub\\crawler\\output\\20250805_124003_Zetland_149properties.xlsx"
+    },
+    "focus_features": [
+      "furnishing_status",
+      "has_air_conditioning",
+      "air_conditioning_type",
+      "has_gas_cooking",
+      "has_internal_laundry"
+    ],
+    "key_findings": {
+      "tristate_implementation": {
+        "total_analyzed_features": 16,
+        "tristate_features_count": 12,
+        "tristate_success_rate": 0.75
+      },
+      "information_gain": {
+        "average_unknown_ratio": 0.25838926174496646,
+        "estimated_misclassification_reduction": 0.25838926174496646
+      },
+      "sample_improvements": {
+        "improved_records_found": 10
+      }
+    }
+  }
+}
