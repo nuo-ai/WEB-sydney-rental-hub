@@ -78,6 +78,7 @@ def get_db_connection():
 def clean_data(df):
     """Cleans and transforms the DataFrame."""
     logging.info("Starting data cleaning and transformation...")
+    logging.info(f"Initial DataFrame shape: {df.shape}")
 
     # --- CRITICAL: Validate and clean listing_id first ---
     if 'listing_id' not in df.columns:
@@ -95,6 +96,7 @@ def clean_data(df):
     cleaned_rows = len(df)
     if initial_rows > cleaned_rows:
         logging.warning(f"Removed {initial_rows - cleaned_rows} rows with invalid or missing listing_id.")
+    logging.info(f"DataFrame shape after listing_id cleaning: {df.shape}")
     # --- END CRITICAL VALIDATION ---
 
     # Handle column name mismatches
@@ -207,7 +209,7 @@ def load_data_to_db(df, conn):
         }
 
     table_name = "properties"
-    csv_ids = set(df['listing_id'])
+    csv_ids = set(int(x) for x in df['listing_id'])
     
     with conn.cursor() as cursor:
         try:
@@ -273,7 +275,7 @@ def load_data_to_db(df, conn):
                 logging.info(f"Marked {len(active_off_market_ids)} properties as off-market.")
 
             # 6. Mark properties that are back on the market
-            relisted_ids = [pid for pid in csv_ids if pid in db_ids and not db_properties[pid]['is_active']]
+            relisted_ids = [int(pid) for pid in csv_ids if pid in db_ids and not db_properties[pid]['is_active']]
             if relisted_ids:
                 relisted_query = "UPDATE properties SET is_active = TRUE, status = 'relisted', status_changed_at = %s WHERE listing_id IN %s"
                 cursor.execute(relisted_query, (datetime.now().isoformat(), tuple(relisted_ids)))
@@ -330,11 +332,12 @@ def main():
         if conn:
             conn.close()
             logging.info("Database connection closed.")
-        
-        # Print summary as a JSON string, wrapped in markers
-        print("\n---ETL_SUMMARY_START---")
-        print(json.dumps(summary_stats))
-        print("---ETL_SUMMARY_END---")
+    
+    return summary_stats
 
 if __name__ == "__main__":
-    main()
+    summary = main()
+    # Print summary as a JSON string, wrapped in markers, only when run as a script
+    print("\n---ETL_SUMMARY_START---")
+    print(json.dumps(summary))
+    print("---ETL_SUMMARY_END---")

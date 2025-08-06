@@ -2,360 +2,132 @@
 # -*- coding: utf-8 -*-
 
 """
-增强的特征提取器 - 实现三态逻辑
-支持 'yes'/'no'/'unknown' 三种状态
+特征提取器 V2 - 遵循V4重构计划
+- 为 is_furnished 实现两级判断逻辑
+- 为其他7个核心特征实现基于 property_features 的一级判断
+- 简化整体逻辑，移除动态类创建
 """
 
 import re
-import json
 import yaml
 import logging
-from typing import Dict, List, Optional, Set, Any
-from dataclasses import dataclass, field, fields, make_dataclass
+from typing import List, Optional, Set, Dict, Any
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-def create_enhanced_property_features_class(features_config: Optional[List[Dict[str, Any]]]) -> type:
-    """
-    创建增强的PropertyFeatures数据类，所有特征字段都使用三态逻辑
-    """
-    fields_to_create = [
-        # 保留现有的特殊字段，但统一为三态逻辑
-        ('furnishing_status', str, field(default='unknown')),  # 'furnished'/'unfurnished'/'unknown'
-        ('air_conditioning_type', str, field(default='unknown')),  # 'ducted'/'split'/'reverse_cycle'/'general'/'unknown'
-        ('has_air_conditioning', str, field(default='unknown')),  # 'yes'/'no'/'unknown'
-    ]
-    
-    if features_config:
-        for config in features_config:
-            field_name = config.get('column_name')
-            if field_name and not any(f[0] == field_name for f in fields_to_create):
-                # 所有特征字段都使用str类型，默认值为'unknown'
-                fields_to_create.append((field_name, str, field(default='unknown')))
-
-    def to_dict(self) -> Dict[str, str]:
-        return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-
-    def merge(self, other) -> None:
-        # 三态逻辑合并：unknown < no/yes，优先保留明确的状态
-        for f in fields(self):
-            current_value = getattr(self, f.name)
-            other_value = getattr(other, f.name)
-            
-            if current_value == 'unknown':
-                setattr(self, f.name, other_value)
-            elif other_value != 'unknown' and current_value != other_value:
-                # 如果有冲突，记录警告但保留当前值
-                logger.warning(f"Feature conflict for {f.name}: {current_value} vs {other_value}")
-
-    namespace = {
-        'to_dict': to_dict,
-        'merge': merge,
-        '__annotations__': {f[0]: f[1] for f in fields_to_create}
-    }
-
-    DynamicPropertyFeatures = make_dataclass(
-        'PropertyFeatures',
-        fields=[(f[0], f[1], f[2]) if len(f) > 2 else (f[0], f[1]) for f in fields_to_create],
-        namespace=namespace
-    )
-    return DynamicPropertyFeatures
-
-
 class EnhancedFeatureExtractor:
     """
-    增强的特征提取器，实现统一的三态逻辑
+    重构后的特征提取器，实现V4方案的精准逻辑。
     """
     
-    def __init__(self, features_config: Optional[List[Dict[str, Any]]], 
-                 furniture_keywords: Optional[dict], 
-                 aircon_keywords: Optional[dict]):
-        self.features_config = features_config or []
-        self.furniture_keywords = furniture_keywords or {}
-        self.aircon_keywords = aircon_keywords or {}
-        
-        # 构建特征关键词映射
-        self.feature_keywords = self._build_feature_keywords()
-        
-        # 预处理家具关键词
-        self._load_furniture_keywords()
-        
-        # 预处理空调关键词
-        self._load_aircon_keywords()
-        
-        logger.info(f"Enhanced feature extractor initialized with {len(self.feature_keywords)} features")
-
-    def _build_feature_keywords(self) -> Dict[str, Dict[str, Set[str]]]:
+    def __init__(self):
         """
-        构建特征关键词映射，支持positive和negative关键词
+        初始化提取器，加载唯一的关键词配置文件。
         """
-        feature_keywords = {}
-        
-        for config in self.features_config:
-            column_name = config.get('column_name')
-            if not column_name:
-                continue
-                
-            feature_keywords[column_name] = {
-                'positive': set(),
-                'negative': set()
-            }
-            
-            # 添加正向关键词
-            positive_kws = config.get('keywords', [])
-            for kw in positive_kws:
-                feature_keywords[column_name]['positive'].add(kw.lower())
-            
-            # 添加负向关键词
-            negative_kws = config.get('negative_keywords', [])
-            for kw in negative_kws:
-                feature_keywords[column_name]['negative'].add(kw.lower())
-                
-        return feature_keywords
+        self.keywords = self._load_keywords()
+        logger.info("Enhanced feature extractor (V4 Logic) initialized.")
 
-    def _load_furniture_keywords(self):
-        """加载并预处理家具关键词"""
-        self.furniture_positive = set()
-        self.furniture_negative = set()
-        self.furniture_optional = set()
-        
-        if self.furniture_keywords:
-            # 处理正向关键词
-            positive_config = self.furniture_keywords.get('positive_keywords', {})
-            for category_keywords in positive_config.values():
-                self.furniture_positive.update(kw.lower() for kw in category_keywords)
-            
-            # 处理负向关键词
-            negative_config = self.furniture_keywords.get('negative_keywords', {})
-            for category_keywords in negative_config.values():
-                self.furniture_negative.update(kw.lower() for kw in category_keywords)
-            
-            # 处理可选关键词
-            optional_config = self.furniture_keywords.get('optional_keywords', {})
-            for category_keywords in optional_config.values():
-                self.furniture_optional.update(kw.lower() for kw in category_keywords)
-
-    def _load_aircon_keywords(self):
-        """加载并预处理空调关键词"""
-        self.aircon_categories = {}
-        self.aircon_priority_order = [
-            'negative_keywords', 'ducted_keywords', 'reverse_cycle_keywords',
-            'split_system_keywords', 'general_keywords', 'other_keywords'
-        ]
-        
-        if self.aircon_keywords:
-            for category in self.aircon_priority_order:
-                if category in self.aircon_keywords:
-                    self.aircon_categories[category] = set()
-                    config = self.aircon_keywords[category]
-                    for category_keywords in config.values():
-                        self.aircon_categories[category].update(kw.lower() for kw in category_keywords)
-
-    def _extract_ternary_feature(self, text: str, positive_keywords: Set[str], 
-                                negative_keywords: Set[str]) -> str:
+    def _load_keywords(self) -> Dict[str, Dict[str, Set[str]]]:
         """
-        三态特征提取的核心逻辑
-        优先级：negative > positive > unknown
+        加载并预处理 property_features_keywords.yaml 文件。
         """
-        if not text:
+        config_path = Path(__file__).parent / 'config' / 'property_features_keywords.yaml'
+        if not config_path.exists():
+            logger.error(f"CRITICAL: Keywords config file not found at {config_path}")
+            return {}
+        
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config_data = yaml.safe_load(f)
+            
+            # 将所有关键词转换为小写set以便快速、不区分大小写地查找
+            processed_keywords = {}
+            for feature, types in config_data.items():
+                processed_keywords[feature] = {}
+                for key_type, words in types.items():
+                    processed_keywords[feature][key_type] = {str(word).lower() for word in words} if words else set()
+            return processed_keywords
+        except Exception as e:
+            logger.error(f"Failed to load or process keywords config: {e}")
+            return {}
+
+    def _check_list_for_feature(self, feature_name: str, feature_list: List[str]) -> str:
+        """
+        在官方特征列表中检查单个特征。
+        """
+        if not self.keywords.get(feature_name):
             return 'unknown'
-            
-        text_lower = text.lower()
+
+        positive_kws = self.keywords[feature_name].get('positive', set())
+        negative_kws = self.keywords[feature_name].get('negative', set())
         
-        # 优先检查负向关键词
-        if negative_keywords and any(keyword in text_lower for keyword in negative_keywords):
+        feature_set = {item.lower().strip() for item in feature_list}
+
+        # 优先检查否定关键词
+        if not negative_kws.isdisjoint(feature_set):
             return 'no'
         
-        # 检查正向关键词
-        if positive_keywords and any(keyword in text_lower for keyword in positive_keywords):
+        # 检查肯定关键词
+        if not positive_kws.isdisjoint(feature_set):
             return 'yes'
-        
+            
         return 'unknown'
 
-    def _get_furnishing_status(self, text: str) -> str:
+    def _check_text_for_feature(self, feature_name: str, text_blob: str) -> str:
         """
-        改进的家具状态检测，返回标准化的三态值
+        在文本块中检查单个特征。
         """
-        if not text:
+        if not self.keywords.get(feature_name) or not text_blob:
             return 'unknown'
+
+        positive_kws = self.keywords[feature_name].get('positive', set())
+        negative_kws = self.keywords[feature_name].get('negative', set())
+        optional_kws = self.keywords[feature_name].get('optional', set())
+        
+        text_lower = text_blob.lower()
+
+        # 优先级: negative > optional > positive
+        if negative_kws and any(kw in text_lower for kw in negative_kws):
+            return 'no'
+        
+        if optional_kws and any(kw in text_lower for kw in optional_kws):
+            return 'optional' # 'optional' 仅用于家具状态
+
+        if positive_kws and any(kw in text_lower for kw in positive_kws):
+            return 'yes'
             
-        text_lower = text.lower()
-        
-        # 优先级：negative > optional > positive
-        if any(keyword in text_lower for keyword in self.furniture_negative):
-            return 'unfurnished'  # 保持现有的furnishing_status值格式
-        
-        if any(keyword in text_lower for keyword in self.furniture_optional):
-            return 'optional'
-        
-        if any(keyword in text_lower for keyword in self.furniture_positive):
-            return 'furnished'
-        
         return 'unknown'
 
-    def _get_air_conditioning_info(self, text: str) -> tuple[str, str]:
+    def extract_features(self, property_features_list: List[str], headline: str, description: str) -> Dict[str, Any]:
         """
-        改进的空调检测，返回(has_air_conditioning, air_conditioning_type)
+        主要的特征提取方法，实现V4方案。
         """
-        if not text or not self.aircon_categories:
-            return 'unknown', 'unknown'
-            
-        text_lower = text.lower()
-        
-        # 按优先级检查
-        for category in self.aircon_priority_order:
-            if category in self.aircon_categories:
-                keywords = self.aircon_categories[category]
-                if any(keyword in text_lower for keyword in keywords):
-                    if category == 'negative_keywords':
-                        return 'no', 'none'
-                    else:
-                        ac_type = category.replace('_keywords', '')
-                        return 'yes', ac_type
-        
-        return 'unknown', 'unknown'
+        extracted_data = {}
 
-    def extract(self, json_data: dict, headline: str, description: str, 
-                feature_list: List[str]):
-        """
-        主要的特征提取方法，实现统一的三态逻辑
-        """
-        # 动态创建PropertyFeatures类
-        PropertyFeatures = create_enhanced_property_features_class(self.features_config)
-        features = PropertyFeatures()
+        # 1. 处理 is_furnished (两级判断逻辑)
+        # 第一优先级: 检查官方列表
+        furnish_status_from_list = self._check_list_for_feature('furnished', property_features_list)
         
-        # 构建待分析的文本
-        text_sources = [
-            headline.lower() if headline else "",
-            description.lower() if description else "",
-            ' '.join(f.lower() for f in feature_list)
-        ]
-        
-        # 添加结构化特征
-        structured_features = {f.get("name", "").lower() for f in json_data.get("structuredFeatures", [])}
-        text_sources.append(' '.join(structured_features))
-        
-        text_blob = ' '.join(text_sources)
-        
-        # 使用三态逻辑提取通用特征
-        for feature_name, keywords_dict in self.feature_keywords.items():
-            if hasattr(features, feature_name):
-                positive_keywords = keywords_dict['positive']
-                negative_keywords = keywords_dict['negative']
-                
-                feature_value = self._extract_ternary_feature(
-                    text_blob, positive_keywords, negative_keywords
-                )
-                setattr(features, feature_name, feature_value)
-        
-        # 特殊处理：家具状态
-        features.furnishing_status = self._get_furnishing_status(text_blob)
-        
-        # 特殊处理：空调
-        has_ac, ac_type = self._get_air_conditioning_info(text_blob)
-        features.has_air_conditioning = has_ac
-        features.air_conditioning_type = ac_type
-        
-        # 特殊优化：某些特征的额外逻辑
-        self._apply_special_rules(features, text_blob)
-        
-        return features
-
-    def _apply_special_rules(self, features, text_blob: str):
-        """
-        应用特殊规则来提高准确性
-        """
-        # 燃气灶的精确检测
-        if hasattr(features, 'has_gas_cooking') and features.has_gas_cooking == 'unknown':
-            gas_cooking_patterns = [
-                r'gas\s+cook', r'gas\s+stove', r'gas\s+cooktop', 
-                r'gas\s+range', r'gas\s+burner', r'gas\s+hob'
-            ]
-            gas_exclusion_patterns = [
-                r'gas\s+heat', r'gas\s+hot\s+water', r'gas\s+fireplace'
-            ]
-            
-            has_cooking = any(re.search(pattern, text_blob) for pattern in gas_cooking_patterns)
-            has_exclusion = any(re.search(pattern, text_blob) for pattern in gas_exclusion_patterns)
-            
-            if has_cooking and not has_exclusion:
-                features.has_gas_cooking = 'yes'
-            elif has_exclusion and not has_cooking:
-                features.has_gas_cooking = 'no'
-        
-        # 泳池检测增强
-        if hasattr(features, 'has_pool') and features.has_pool == 'unknown':
-            pool_keywords = ['spa', 'swimming pool', 'pool area', 'resort pool']
-            if any(keyword in text_blob for keyword in pool_keywords):
-                features.has_pool = 'yes'
-        
-        # 书房检测增强
-        if hasattr(features, 'has_study') and features.has_study == 'unknown':
-            study_keywords = ['study', 'office', 'den', 'home office', 'work space', 'workspace']
-            if any(keyword in text_blob for keyword in study_keywords):
-                features.has_study = 'yes'
-
-
-# 使用示例和测试
-if __name__ == "__main__":
-    # 模拟配置数据
-    sample_features_config = [
-        {
-            'column_name': 'has_pool',
-            'keywords': ['pool', 'swimming'],
-            'negative_keywords': ['no pool', 'pool not available']
-        },
-        {
-            'column_name': 'allows_pets',
-            'keywords': ['pet friendly', 'pets allowed'],
-            'negative_keywords': ['no pets', 'pets not allowed']
-        }
-    ]
-    
-    # 创建提取器实例
-    extractor = EnhancedFeatureExtractor(
-        features_config=sample_features_config,
-        furniture_keywords={},
-        aircon_keywords={}
-    )
-    
-    # 测试用例
-    test_cases = [
-        {
-            'description': 'Beautiful apartment with swimming pool and pet friendly policy',
-            'expected': {'has_pool': 'yes', 'allows_pets': 'yes'}
-        },
-        {
-            'description': 'Modern unit, no pets allowed, pool facilities available',
-            'expected': {'has_pool': 'yes', 'allows_pets': 'no'}
-        },
-        {
-            'description': 'Quiet location, great for professionals',
-            'expected': {'has_pool': 'unknown', 'allows_pets': 'unknown'}
-        }
-    ]
-    
-    print("Testing Enhanced Feature Extractor:")
-    print("=" * 50)
-    
-    for i, test_case in enumerate(test_cases, 1):
-        features = extractor.extract({}, '', test_case['description'], [])
-        result = features.to_dict()
-        
-        print(f"\nTest Case {i}:")
-        print(f"Description: {test_case['description']}")
-        print(f"Results: {result}")
-        print(f"Expected: {test_case['expected']}")
-        
-        # 验证结果
-        all_correct = True
-        for feature, expected_value in test_case['expected'].items():
-            if result.get(feature) != expected_value:
-                all_correct = False
-                print(f"❌ {feature}: got {result.get(feature)}, expected {expected_value}")
-        
-        if all_correct:
-            print("✅ All assertions passed!")
+        if furnish_status_from_list != 'unknown':
+            extracted_data['is_furnished'] = furnish_status_from_list
         else:
-            print("❌ Some assertions failed!")
+            # 第二优先级: 检查文本
+            text_blob = (headline + ' ' + description).lower()
+            furnish_status_from_text = self._check_text_for_feature('furnished', text_blob)
+            # 将 'optional' 映射为 'yes' 或其他定义，这里暂时也归为 'yes'
+            if furnish_status_from_text == 'optional':
+                 extracted_data['is_furnished'] = 'yes'
+            else:
+                 extracted_data['is_furnished'] = furnish_status_from_text
+
+        # 2. 处理其他7个核心特征 (仅检查官方列表)
+        other_features = [
+            'air_conditioning', 'laundry', 'dishwasher', 
+            'gas_cooking', 'intercom', 'study', 'balcony'
+        ]
+        for feature in other_features:
+            column_name = f"has_{feature}"
+            extracted_data[column_name] = self._check_list_for_feature(feature, property_features_list)
+
+        return extracted_data

@@ -37,7 +37,7 @@ from urllib3.util.retry import Retry
 from lxml import etree # type: ignore
 
 # 导入增强版特征提取器
-from enhanced_feature_extractor import EnhancedFeatureExtractor, create_enhanced_property_features_class
+from enhanced_feature_extractor import EnhancedFeatureExtractor
 
 # =============================================================================
 # 项目路径配置
@@ -98,54 +98,8 @@ def load_config() -> dict:
     with open(config_path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
-def load_furniture_keywords() -> Optional[dict]:
-    """加载家具关键词配置文件"""
-    # 修正 1: 修正配置文件路径，使其更清晰、更不易出错
-    keywords_path = CONFIG_DIR / 'furniture_keywords.yaml'
-    if not keywords_path.exists():
-        logger.warning(f"Furniture keywords file not found: {keywords_path}. Using fallback keywords.")
-        return None
-    
-    try:
-        with open(keywords_path, 'r', encoding='utf-8') as f:
-            return yaml.safe_load(f)
-    except Exception as e:
-        logger.error(f"Failed to load furniture keywords: {e}. Using fallback keywords.")
-        return None
-
-def load_aircon_keywords() -> Optional[dict]:
-    """加载空调关键词配置文件"""
-    # 修正 1: 修正配置文件路径
-    keywords_path = CONFIG_DIR / 'aircon_keywords.yaml'
-    if not keywords_path.exists():
-        logger.warning(f"Aircon keywords file not found: {keywords_path}. Using fallback keywords.")
-        return None
-    
-    try:
-        with open(keywords_path, 'r', encoding='utf-8') as f:
-            return yaml.safe_load(f)
-    except Exception as e:
-        logger.error(f"Failed to load aircon keywords: {e}. Using fallback keywords.")
-        return None
-
-def load_features_config() -> Optional[List[Dict[str, Any]]]:
-    """加载 features_config.yaml 配置文件并提取 'features' 列表"""
-    config_path = CONFIG_DIR / 'features_config.yaml'
-    if not config_path.exists():
-        logger.warning(f"Features config file not found: {config_path}. Feature extraction will be limited.")
-        return None
-    try:
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config_data = yaml.safe_load(f)
-            return config_data.get('features', [])
-    except Exception as e:
-        logger.error(f"Failed to load features config: {e}. Feature extraction will be limited.")
-        return None
-
 CONFIG = load_config()
-FURNITURE_KEYWORDS = load_furniture_keywords()
-AIRCON_KEYWORDS = load_aircon_keywords()
-FEATURES_CONFIG = load_features_config()
+# FURNITURE_KEYWORDS is no longer needed here, it's handled by the extractor.
 
 # =============================================================================
 # 辅助函数 - 从URL提取区域名称
@@ -188,56 +142,66 @@ def extract_region_from_url(url: str) -> str:
         return "Unknown_Region"
 
 # =============================================================================
-# 数据模型 (Unchanged from v1)
+# 数据模型 (V4 Refactor)
 # =============================================================================
-# 使用增强版三态逻辑的PropertyFeatures
-PropertyFeatures = create_enhanced_property_features_class(FEATURES_CONFIG)
-
-
-
 @dataclass
 class PropertyData:
-    listing_id: str = ""; property_url: str = ""; address: str = ""
-    suburb: str = ""; state: str = ""; postcode: str = ""
-    property_type: str = ""; rent_pw: float = 0.0; bond: float = 0.0
-    bedrooms: int = 0; bathrooms: int = 0; parking_spaces: int = 0
-    bedroom_display: str = ""  # 专门用于前端显示的卧室数（如 "Studio", "1", "2"）
+    listing_id: str = ""
+    property_url: str = ""
+    address: str = ""
+    suburb: str = ""
+    state: str = ""
+    postcode: str = ""
+    property_type: str = ""
+    rent_pw: float = 0.0
+    bond: float = 0.0
+    bedrooms: int = 0
+    bathrooms: int = 0
+    parking_spaces: int = 0
+    bedroom_display: str = ""
     available_date: str = ""
     inspection_times: List[str] = field(default_factory=list)
-    agency_name: str = ""; agent_name: str = ""; cover_image: str = ""; agent_phone: str = ""; agent_email: str = ""
-    property_headline: str = ""; property_description: str = ""
-    features: PropertyFeatures = field(default_factory=PropertyFeatures)
-    latitude: float = 0.0; longitude: float = 0.0
-    images: str = ""; property_features: str = "" # Storing as JSON strings
-    agent_profile_url: str = ""; agent_logo_url: str = ""
+    agency_name: str = ""
+    agent_name: str = ""
+    cover_image: str = ""
+    agent_phone: str = ""
+    agent_email: str = ""
+    property_headline: str = ""
+    property_description: str = ""
+    latitude: float = 0.0
+    longitude: float = 0.0
+    images: str = ""
+    property_features: str = "" # Storing raw feature list as JSON string
+    agent_profile_url: str = ""
+    agent_logo_url: str = ""
     enquiry_form_action: str = ""
+
+    # V4 Refactor: Add specific feature columns
+    is_furnished: str = "unknown"
+    has_air_conditioning: str = "unknown"
+    has_laundry: str = "unknown"
+    has_dishwasher: str = "unknown"
+    has_gas_cooking: str = "unknown"
+    has_intercom: str = "unknown"
+    has_study: str = "unknown"
+    has_balcony: str = "unknown"
+
     def to_dict(self) -> Dict[str, Any]:
+        """Converts the dataclass to a dictionary for DataFrame conversion."""
         result = {}
-        # 使用 dataclasses.fields 来确保所有字段都被包含
         for f in fields(self):
-            field_name = f.name
-            field_value = getattr(self, field_name)
-            if field_name == 'features':
-                result.update(field_value.to_dict())
-            elif field_name == 'inspection_times':
-                result['inspection_times'] = '; '.join(field_value)
+            value = getattr(self, f.name)
+            if f.name == 'inspection_times':
+                result[f.name] = '; '.join(value)
             else:
-                result[field_name] = field_value
+                result[f.name] = value
         return result
 
-def get_expected_columns(features_class: Type[Any]) -> List[str]: # 使用 Type[Any] 来解决Pylance的动态类型错误
-    base_columns = [
-        'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
-        'property_type', 'rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces',
-        'bedroom_display', 'available_date', 'inspection_times', 'agency_name', 'agent_name', 'cover_image', 'agent_phone',
-        'agent_email', 'property_headline', 'property_description',
-        'latitude', 'longitude', 'images', 'property_features', 'agent_profile_url',
-        'agent_logo_url', 'enquiry_form_action', 'image_1', 'image_2', 'image_3', 'image_4'
-    ]
-    feature_columns = [f.name for f in fields(features_class)]
-    return base_columns + feature_columns
+def get_expected_columns() -> List[str]:
+    """Returns a static list of expected columns for the output file."""
+    return [f.name for f in fields(PropertyData)] + ['image_1', 'image_2', 'image_3', 'image_4']
 
-EXPECTED_COLUMNS = get_expected_columns(PropertyFeatures)
+EXPECTED_COLUMNS = get_expected_columns()
 
 # =============================================================================
 # 数据清洗 & 验证
@@ -440,9 +404,12 @@ class BatchWriter:
 # =============================================================================
 class DomainCrawler:
     def __init__(self):
-        self.request_manager = RequestManager(); self.feature_extractor = EnhancedFeatureExtractor(FEATURES_CONFIG, FURNITURE_KEYWORDS, AIRCON_KEYWORDS)
-        self.data_cleaner = DataCleaner(); self.data_validator = DataValidator()
-        self.batch_writer = BatchWriter(); self._lock = threading.Lock()
+        self.request_manager = RequestManager()
+        self.feature_extractor = EnhancedFeatureExtractor()
+        self.data_cleaner = DataCleaner()
+        self.data_validator = DataValidator()
+        self.batch_writer = BatchWriter()
+        self._lock = threading.Lock()
     
     def _extract_inspection_times(self, document: etree._Element) -> List[str]:
         times = []
@@ -509,16 +476,16 @@ class DomainCrawler:
             prop_feat_els = house_document.xpath("//div[@id='property-features']//li")
             prop_feat_list = [li.xpath("string(.)").strip() for li in prop_feat_els if li.xpath("string(.)")]
             
-            # 修正 2: 提取 headline 并将其传递给 extract 方法
+            # V4 Refactor: Call the new feature extractor
             headline_text = root_q.get("headline", "")
             description_text = root_q.get("description", "")
-            features_obj = self.feature_extractor.extract(root_q, headline_text, description_text, prop_feat_list)
+            extracted_features = self.feature_extractor.extract_features(prop_feat_list, headline_text, description_text)
             
             img_urls_raw = [img.get("url", "") for img in root_q.get("largeMedia", []) if img.get("url")]
             images_json = json.dumps(img_urls_raw)
             
             cover_image_val = img_urls_raw[0] if img_urls_raw else ""
-            property_features_json = json.dumps(prop_feat_list)
+            property_features_json = json.dumps(prop_feat_list) # Store the raw list
 
             enquiry_form_action = ""
             apply_link_el = house_document.xpath('//div[@data-testid="listing-details__agent-details-cta-box"]//a[contains(@href, "snug.com") or contains(@href, "2apply.com.au")]/@href')
@@ -589,11 +556,13 @@ class DomainCrawler:
                     description_text, 
                     preserve_format=CONFIG['features'].get('preserve_description_format', True)
                 ),
-                features=features_obj,
                 latitude=float(geo_info.get("latitude", 0.0) or 0.0),
                 longitude=float(geo_info.get("longitude", 0.0) or 0.0),
-                images=images_json, property_features=property_features_json,
+                images=images_json, 
+                property_features=property_features_json,
                 enquiry_form_action=enquiry_form_action,
+                # V4 Refactor: Add extracted features directly
+                **extracted_features
             )
             
             if CONFIG['features'].get('enable_data_validation', False):

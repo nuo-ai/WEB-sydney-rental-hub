@@ -16,17 +16,23 @@ from pathlib import Path
 import schedule
 import psycopg2
 from dotenv import load_dotenv
-from typing import Tuple
+from typing import Tuple, Dict, Any
 import json
 import re
 import io
 from datetime import timezone
+
+PROJECT_ROOT = Path(__file__).parent.parent
+
+# Add the database directory to the system path to allow direct import
+sys.path.append(str(PROJECT_ROOT / "database"))
+from process_csv import main as run_etl_main
+
 # --- 关键修复：强制stdout使用UTF-8编码，解决在子进程中打印中文的UnicodeEncodeError ---
 if sys.stdout.encoding != 'utf-8':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-PROJECT_ROOT = Path(__file__).parent.parent
 CRAWLER_SCRIPT = PROJECT_ROOT / "crawler" / "v5_furniture.py"
-ETL_SCRIPT = PROJECT_ROOT / "database" / "process_csv.py"
+# ETL_SCRIPT is no longer needed as we import it directly
 LOG_DIR = PROJECT_ROOT / "logs" / "automated_updates"
 
 # 创建日志目录
@@ -159,65 +165,30 @@ def run_crawler() -> Tuple[bool, str]:
         return False, error_msg
 
 def run_etl() -> Tuple[bool, str]:
-    """运行ETL脚本导入数据，并解析其JSON输出"""
+    """直接调用ETL函数并格式化其返回的摘要"""
     try:
-        logger.info("开始运行ETL导入...")
+        logger.info("开始直接调用ETL函数...")
         
-        if not ETL_SCRIPT.exists():
-            error_msg = f"ETL脚本不存在: {ETL_SCRIPT}"
-            logger.error(error_msg)
-            return False, error_msg
+        # Directly call the imported main function
+        stats: Dict[str, Any] = run_etl_main()
         
-        result = subprocess.run(
-            [sys.executable, str(ETL_SCRIPT)],
-            capture_output=True,
-            text=True,
-            cwd=str(ETL_SCRIPT.parent),
-            timeout=1800,
-            encoding='utf-8',
-            errors='ignore'
-        )
-        
-        if result.returncode == 0:
-            logger.info("ETL脚本执行成功。正在解析摘要...")
-            
-            # 使用正则表达式从输出中提取JSON摘要
-            match = re.search(r"---ETL_SUMMARY_START---(.*?)---ETL_SUMMARY_END---", result.stdout, re.DOTALL)
-            
-            if match:
-                json_str = match.group(1).strip()
-                try:
-                    stats = json.loads(json_str)
-                    # 格式化摘要用于通知
-                    summary = (
-                        f"新增房源: {stats.get('new', 0)}\n"
-                        f"更新房源: {stats.get('updated', 0)}\n"
-                        f"未变房源: {stats.get('unchanged', 0)}\n"
-                        f"下架房源: {stats.get('off_market', 0)}\n"
-                        f"重新上架: {stats.get('relisted', 0)}"
-                    )
-                    logger.info(f"成功解析ETL摘要: \n{summary}")
-                    return True, summary
-                except json.JSONDecodeError as e:
-                    error_msg = f"ETL成功，但无法解析其JSON摘要: {e}\n原始输出: {json_str}"
-                    logger.error(error_msg)
-                    return True, "ETL任务成功，但无法生成处理结果报告。"
-            else:
-                error_msg = "ETL成功，但未找到摘要标记。无法生成报告。"
-                logger.warning(error_msg)
-                logger.debug(f"完整ETL输出:\n{result.stdout}")
-                return True, "ETL任务成功，但未找到处理结果报告。"
+        if stats:
+            summary = (
+                f"新增房源: {stats.get('new', 0)}\n"
+                f"更新房源: {stats.get('updated', 0)}\n"
+                f"未变房源: {stats.get('unchanged', 0)}\n"
+                f"下架房源: {stats.get('off_market', 0)}\n"
+                f"重新上架: {stats.get('relisted', 0)}"
+            )
+            logger.info(f"成功从ETL函数获取摘要: \n{summary}")
+            return True, summary
         else:
-            error_msg = f"ETL脚本运行失败: {result.stderr}"
+            error_msg = "ETL函数没有返回有效的统计数据。"
             logger.error(error_msg)
             return False, error_msg
-            
-    except subprocess.TimeoutExpired:
-        error_msg = "ETL运行超时（30分钟）"
-        logger.error(error_msg)
-        return False, error_msg
+
     except Exception as e:
-        error_msg = f"运行ETL时出错: {e}"
+        error_msg = f"直接调用ETL时出错: {e}"
         logger.error(error_msg, exc_info=True)
         return False, error_msg
 
