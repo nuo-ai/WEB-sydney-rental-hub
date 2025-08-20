@@ -92,9 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderImageCarousel(imagesData, altText) {
-        const imageList = Array.isArray(imagesData) ? imagesData : [];
+        // 改进的图片列表处理
+        let imageList = [];
+        if (Array.isArray(imagesData) && imagesData.length > 0) {
+            // 过滤掉无效图片URL
+            imageList = imagesData.filter(url => url && typeof url === 'string' && url.trim() !== '');
+        }
 
-        const placeholderSvg = `<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#E3E3E3"/><text x="50%" y="50%" font-family='Inter, sans-serif' font-size='50' dy='.3em' fill='white' text-anchor='middle'>?</text></svg>`;
+        // 改进的占位符图片
+        const placeholderSvg = `<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#E3E3E3"/><text x="50%" y="50%" font-family='Inter, sans-serif' font-size='24' dy='.3em' fill='#999' text-anchor='middle'>暂无图片</text></svg>`;
         const placeholderUrl = `data:image/svg+xml,${encodeURIComponent(placeholderSvg)}`;
         const coverImage = imageList.length > 0 ? imageList[0] : placeholderUrl;
         
@@ -106,15 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
+        // 只有多张有效图片时才显示轮播控制
         const carouselControls = imageList.length > 1 ? `
-            <button class="carousel-btn absolute top-1/2 left-3 -translate-y-1/2 bg-white/80 backdrop-blur-sm text-textPrimary w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition shadow-md" data-direction="prev"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="carousel-btn absolute top-1/2 right-3 -translate-y-1/2 bg-white/80 backdrop-blur-sm text-textPrimary w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition shadow-md" data-direction="next"><i class="fa-solid fa-chevron-right"></i></button>
-            <div class="image-counter absolute bottom-4 right-4 bg-black/50 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2">
+            <button class="carousel-btn absolute top-1/2 left-3 -translate-y-1/2 bg-white/80 backdrop-blur-sm text-textPrimary w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition shadow-md z-20" data-direction="prev"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="carousel-btn absolute top-1/2 right-3 -translate-y-1/2 bg-white/80 backdrop-blur-sm text-textPrimary w-9 h-9 rounded-full flex items-center justify-center hover:bg-white transition shadow-md z-20" data-direction="next"><i class="fa-solid fa-chevron-right"></i></button>
+            <div class="image-counter absolute bottom-4 right-4 bg-black/50 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2 z-10">
                 <i class="fa-solid fa-camera"></i>
                 <span id="image-counter-text">1 / ${imageList.length}</span>
             </div>
         ` : (imageList.length === 1 ? `
-             <div class="image-counter absolute bottom-4 right-4 bg-black/50 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2">
+             <div class="image-counter absolute bottom-4 right-4 bg-black/50 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-2 z-10">
                 <i class="fa-solid fa-camera"></i>
                 <span>1 / 1</span>
             </div>
@@ -122,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         imageCarouselEl.innerHTML = `
             ${backButton}
-            <img id="property-image" src="${coverImage}" alt="${altText}" class="w-full h-60 object-cover">
+            <img id="property-image" src="${coverImage}" alt="${altText}" class="w-full h-60 object-cover" onerror="this.src='${placeholderUrl}'">
             ${carouselControls}
         `;
         imageCarouselEl.dataset.images = JSON.stringify(imageList);
@@ -287,12 +294,18 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchCommuteTimeForDestination(destination, mode) {
         const origin = `${currentProperty.latitude},${currentProperty.longitude}`;
         try {
-            const response = await fetch(`/api/get-directions?origin=${origin}&destination=${destination.address}&mode=${mode}`);
-            if (!response.ok) throw new Error(`API fetch failed`);
+            // 使用Netlify Function而不是不存在的API端点
+            const response = await fetch(`/.netlify/functions/get-directions?origin=${origin}&destination=${encodeURIComponent(destination.address)}&mode=${mode}`);
+            if (!response.ok) throw new Error(`API fetch failed: ${response.status}`);
             destination.results[mode] = await response.json();
         } catch (error) {
-            console.error(error);
-            destination.results[mode] = { error: '无法计算' };
+            console.error('通勤计算失败:', error);
+            // 提供更友好的错误信息
+            destination.results[mode] = { 
+                error: '暂时无法计算',
+                duration: '计算失败', 
+                distance: '请稍后重试' 
+            };
         } finally {
             destination.isLoading = false;
         }

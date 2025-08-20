@@ -107,8 +107,169 @@
             display: none;
         }
 
-        /* ========== 增强版组件样式 ========== */
+        /* ========== 筛选按钮样式 ========== */
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--color-gray-200);
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-gray-600);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
         
+        .filter-btn:hover {
+            border-color: var(--color-primary-500);
+            color: var(--color-primary-600);
+        }
+        
+        .filter-btn.active {
+            background: var(--color-primary-500);
+            border-color: var(--color-primary-500);
+            color: white;
+        }
+        
+        /* Toggle开关样式 */
+        #filter-furnished {
+            position: relative;
+        }
+        
+        .toggle-bg {
+            transition: background-color 0.3s ease;
+        }
+        
+        #filter-furnished:checked + .toggle-bg {
+            background-color: var(--color-primary-500);
+        }
+        
+        .dot {
+            transition: transform 0.3s ease;
+        }
+        
+        #filter-furnished:checked + .toggle-bg .dot {
+            transform: translateX(24px);
+        }
+
+        /* ========== 参考截图标准房源卡片样式 ========== */
+        
+        /* 基础卡片样式 - 匹配参考截图 */
+        .reference-property-card {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .reference-property-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 轮播控制显示 */
+        .group:hover .group-hover\:opacity-100 {
+            opacity: 1 !important;
+        }
+        
+        /* 图片计数器 - 匹配参考截图位置 */
+        .reference-property-card .image-counter {
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* 价格显示 - 完全匹配参考截图 */
+        .reference-property-card .text-xl.font-bold {
+            font-size: 22px;
+            font-weight: 700;
+            color: #000000;
+            line-height: 1.2;
+        }
+        
+        .reference-property-card .text-base.font-normal {
+            font-size: 14px;
+            color: #666666;
+            font-weight: 400;
+        }
+        
+        /* 地址信息 - 两行显示匹配参考 */
+        .reference-property-card .text-base.font-medium {
+            font-size: 15px;
+            color: #333333;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+        
+        .reference-property-card .text-sm.text-gray-600 {
+            font-size: 13px;
+            color: #666666;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+        
+        /* 房型信息图标 - 匹配参考截图 */
+        .reference-property-card .fa-bed,
+        .reference-property-card .fa-bath,
+        .reference-property-card .fa-car {
+            color: #666666;
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .reference-property-card .font-semibold.text-black {
+            color: #000000;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        /* 底部信息区域 - 匹配参考截图 */
+        .reference-property-card .border-t {
+            border-color: #e5e7eb;
+            margin-top: 8px;
+            padding-top: 8px;
+        }
+        
+        .reference-property-card .text-sm.text-gray-700 {
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        
+        /* INSPECTION 文字 - 蓝色匹配参考 */
+        .reference-property-card .text-xs.text-blue-600 {
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* 状态标签 - New标签样式 */
+        .reference-property-card .property-status-tag {
+            background: #22c55e;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        /* 收藏按钮 - 简洁设计 */
+        .reference-property-card .favorite-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .reference-property-card .favorite-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.05);
+        }
+        
+        .reference-property-card .favorite-btn.is-favorite i {
+            color: #ef4444;
+        }
+
         /* 开发阶段：UI切换按钮 */
         .ui-toggle-btn {
             position: fixed;
@@ -126,7 +287,7 @@
             box-shadow: var(--shadow-lg);
             transition: all 0.2s ease;
         }
-        
+
         .ui-toggle-btn:hover {
             background: var(--color-primary-600);
             transform: translateY(-1px);
@@ -470,21 +631,11 @@
                 max-width: 70%;
             }
             
-            /* 平板端筛选面板为桌面样式 */
+            /* 平板端筛选面板保持底部滑入 */
             #filter-panel {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 90%;
                 max-width: 600px;
-                max-height: 80vh;
-                border-radius: 20px;
-                bottom: auto;
-            }
-            
-            #filter-panel.show {
-                transform: translate(-50%, -50%);
+                margin: 0 auto;
+                border-radius: 20px 20px 0 0;
             }
         }
         
@@ -517,21 +668,11 @@
                 max-width: 60%;
             }
             
-            /* 桌面端筛选面板为模态框 */
+            /* 桌面端筛选面板也保持底部滑入，但尺寸优化 */
             #filter-panel {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 90%;
                 max-width: 700px;
-                max-height: 85vh;
-                border-radius: 24px;
-                bottom: auto;
-            }
-            
-            #filter-panel.show {
-                transform: translate(-50%, -50%);
+                margin: 0 auto;
+                border-radius: 24px 24px 0 0;
             }
         }
         

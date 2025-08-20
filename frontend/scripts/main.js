@@ -264,18 +264,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createListingCard(property) {
-        const streetAddress = property.address || '地址未知';
+        // 地址处理 - 完全按照参考截图格式
+        const fullAddress = property.address || '地址未知';
+        const addressParts = fullAddress.split(',');
+        const streetAddress = addressParts[0]?.trim() || fullAddress;
+        
+        // 修复邮编小数点问题 - 匹配参考截图格式
+        const postcode = property.postcode ? Math.floor(property.postcode) : '';
+        const locationInfo = `${property.suburb || ''} NSW ${postcode}`.trim().toUpperCase();
+        
         const bedrooms = property.bedrooms || 0;
         const bathrooms = property.bathrooms || 0;
         const parking = property.parking_spaces || 0;
-        const availableDate = property.available_date || '待定';
-        const rent = property.rent_pw ? `$${property.rent_pw}` : '价格待定';
-        const placeholderSvg = `<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#E3E3E3"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="200" dy=".3em" fill="white" text-anchor="middle">?</text></svg>`;
+        
+        // 可用日期显示 - 完全按照参考截图格式
+        let availabilityText = 'Available from: ';
+        if (property.available_date) {
+            const availDate = new Date(property.available_date);
+            const today = new Date();
+            if (availDate <= today) {
+                availabilityText += 'NOW';
+            } else {
+                // 格式化为类似 "Fri 8 Aug" 的格式
+                const dayName = availDate.toLocaleDateString('en-AU', { weekday: 'short' });
+                const day = availDate.getDate();
+                const month = availDate.toLocaleDateString('en-AU', { month: 'short' });
+                availabilityText += `${dayName} ${day} ${month}`;
+            }
+        } else {
+            availabilityText += 'NOW'; // 不再显示TBA，默认为NOW
+        }
+        
+        // Inspection time 处理 - 按照参考截图格式
+        let inspectionText = '';
+        if (property.inspection_times && property.inspection_times.trim() !== '') {
+            inspectionText = `INSPECTION: ${property.inspection_times}`;
+        }
+        
+        // 价格显示 - 完全匹配参考截图
+        const rent = property.rent_pw ? `$${property.rent_pw}` : 'Price TBA';
+        
+        // 改进的占位符图片 - 4:3比例
+        const placeholderSvg = `<svg width="600" height="450" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="#9ca3af" text-anchor="middle">Property Image</text></svg>`;
         const placeholderUrl = `data:image/svg+xml,${encodeURIComponent(placeholderSvg)}`;
+        
+        // 改进的图片列表处理
         let imageList = [];
         const imagesData = property.images;
-        if (Array.isArray(imagesData)) {
-            imageList = imagesData;
+        if (Array.isArray(imagesData) && imagesData.length > 0) {
+            imageList = imagesData.filter(url => url && typeof url === 'string' && url.trim() !== '');
         }
         const coverImage = (imageList.length > 0) ? imageList[0] : placeholderUrl;
         
@@ -283,60 +320,76 @@ document.addEventListener('DOMContentLoaded', () => {
         const favoriteClass = isFavorite ? 'is-favorite' : '';
         const favoriteIcon = isFavorite ? 'fa-solid' : 'fa-regular';
 
+        // 重新设计的轮播控制 - 修复箭头显示
         const carouselControls = imageList.length > 1 ? `
-            <button class="carousel-btn absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/60 transition" data-direction="prev"><i class="fa-solid fa-chevron-left pointer-events-none"></i></button>
-            <button class="carousel-btn absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/60 transition" data-direction="next"><i class="fa-solid fa-chevron-right pointer-events-none"></i></button>
-            <div class="image-counter absolute bottom-2 right-2 bg-black/50 text-white text-xs font-semibold px-2 py-1 rounded-full">1 / ${imageList.length}</div>` : '';
+            <button class="carousel-btn absolute top-1/2 left-2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 z-10 shadow-md" data-direction="prev">
+                <i class="fa-solid fa-chevron-left text-sm pointer-events-none"></i>
+            </button>
+            <button class="carousel-btn absolute top-1/2 right-2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 z-10 shadow-md" data-direction="next">
+                <i class="fa-solid fa-chevron-right text-sm pointer-events-none"></i>
+            </button>
+            <div class="image-counter absolute bottom-2 left-2 bg-black/75 text-white text-xs font-medium px-2 py-1 rounded">1 / ${imageList.length}</div>` : '';
         
-        const isNew = property.listing_id > 2500; // Example logic for "New" tag
-        const newTag = isNew ? `<div class="property-tag absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">新房源</div>` : '';
+        // 状态标签 - 匹配参考截图的绿色New标签
+        const statusTag = property.listing_id > 2500 
+            ? `<div class="property-status-tag absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">New</div>` 
+            : '';
 
         return `
-            <div class="card-container property-card bg-bgCard rounded-lg shadow-sm overflow-hidden flex flex-col">
-                <div class="image-carousel property-image relative" data-images='${JSON.stringify(imageList)}' data-current-index="0">
-                    <a href="./details.html?id=${property.listing_id}" class="block h-52">
-                        <img src="${coverImage}" alt="房源图片: ${streetAddress}" class="w-full h-full object-cover image-tag">
+            <div class="card-container reference-property-card bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 group">
+                <!-- 图片区域 - 4:3比例 -->
+                <div class="image-carousel relative aspect-[4/3] bg-gray-100 overflow-hidden" data-images='${JSON.stringify(imageList)}' data-current-index="0">
+                    <a href="./details.html?id=${property.listing_id}" class="block w-full h-full">
+                        <img src="${coverImage}" alt="房源图片: ${streetAddress}" 
+                             class="w-full h-full object-cover image-tag"
+                             onerror="this.src='${placeholderUrl}'">
                     </a>
                     ${carouselControls}
-                    ${newTag}
-                    <button class="favorite-btn ${favoriteClass}" data-listing-id="${property.listing_id}">
-                        <i class="${favoriteIcon} fa-heart"></i>
+                    ${statusTag}
+                    <button class="favorite-btn ${favoriteClass} absolute top-2 right-2 bg-white/90 hover:bg-white w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-sm" data-listing-id="${property.listing_id}">
+                        <i class="${favoriteIcon} fa-star text-gray-400 hover:text-yellow-500 text-sm transition-colors duration-200"></i>
                     </button>
                 </div>
-                <div class="p-4 flex flex-col flex-grow">
-                    <div class="flex-grow">
-                        <p class="property-price text-2xl font-extrabold text-textPrice">${rent}<span class="property-price-unit text-base font-medium text-textSecondary"> / week</span></p>
-                        <div class="mt-1">
-                            <p class="property-address-primary text-lg font-semibold text-textPrimary">${streetAddress}</p>
+                
+                <!-- 内容区域 - 完全匹配参考截图布局 -->
+                <div class="p-3">
+                    <!-- 价格 - 大字体黑色 -->
+                    <div class="mb-2">
+                        <p class="text-xl font-bold text-black leading-tight">${rent} <span class="text-base font-normal text-gray-600">per week</span></p>
+                    </div>
+                    
+                    <!-- 地址信息 - 两行显示 -->
+                    <div class="mb-3">
+                        <p class="text-base font-medium text-gray-800 leading-tight">${streetAddress},</p>
+                        <p class="text-sm text-gray-600 font-medium">${locationInfo}</p>
+                    </div>
+                    
+                    <!-- 房型信息 - 图标+数字，匹配参考截图 -->
+                    <div class="flex items-center gap-3 mb-3 text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-bed text-gray-500 text-sm"></i>
+                            <span class="font-medium text-gray-800 text-sm">${bedrooms}</span>
                         </div>
-                        <div class="property-features flex items-center gap-4 mt-3 text-textSecondary">
-                            <div class="feature-item flex items-center gap-2">
-                                <i class="feature-icon fa-solid fa-bed text-lg w-5 text-center"></i>
-                                <span class="feature-number font-bold text-textPrimary">${bedrooms}</span>
-                            </div>
-                            <div class="feature-item flex items-center gap-2">
-                                <i class="feature-icon fa-solid fa-bath text-lg w-5 text-center"></i>
-                                <span class="feature-number font-bold text-textPrimary">${bathrooms}</span>
-                            </div>
-                            <div class="feature-item flex items-center gap-2">
-                                <i class="feature-icon fa-solid fa-car text-lg w-5 text-center"></i>
-                                <span class="feature-number font-bold text-textPrimary">${parking}</span>
-                            </div>
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-bath text-gray-500 text-sm"></i>
+                            <span class="font-medium text-gray-800 text-sm">${bathrooms}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-car text-gray-500 text-sm"></i>
+                            <span class="font-medium text-gray-800 text-sm">${parking}</span>
                         </div>
                     </div>
-                    <div class="property-footer mt-4 pt-3 border-t border-borderDefault flex justify-between items-center">
-                         <div class="flex items-center gap-2 text-xs text-green-600 font-bold">
-                            <i class="fa-regular fa-calendar-check"></i>
-                            <span>${availableDate}</span>
+                    
+                    <!-- 底部信息 - 两行显示，保留Available from -->
+                    <div class="border-t border-gray-200 pt-2 space-y-1">
+                        <div class="text-sm text-gray-700 font-medium">
+                            ${availabilityText}
                         </div>
-                        <span class="text-xs text-textSecondary">ID: ${property.listing_id}</span>
+                        <div class="text-xs text-gray-500 font-medium min-h-[16px]">
+                            ${inspectionText}
+                        </div>
                     </div>
                 </div>
-                <style>
-                    .favorite-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #2d2d2d; font-size: 18px; transition: all 0.2s; z-index: 10; cursor: pointer; border: none; }
-                    .favorite-btn.is-favorite { color: #ef4444; transform: scale(1.1); }
-                    .favorite-btn:hover { color: #ef4444; }
-                </style>
             </div>`;
     }
 
