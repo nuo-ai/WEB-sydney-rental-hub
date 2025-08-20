@@ -147,12 +147,227 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- 3. STATE MANAGEMENT ---
     let allProperties = []; 
+    let locationSuggestions = []; // 存储区域建议数据
+    let selectedLocations = []; // 存储选中的区域标签
     let activeFilters = {
-        searchTerm: '', minPrice: null, maxPrice: null, bedrooms: 'any', 
+        searchTerm: '', selectedLocations: [], minPrice: null, maxPrice: null, bedrooms: 'any', 
         bathrooms: 'any', availableDate: 'any', isFurnished: false
     };
 
-    // --- 4. CORE FUNCTIONS ---
+    // --- 4. LOCATION AUTOCOMPLETE SYSTEM ---
+    
+    // 从房源数据中提取区域建议数据
+    function buildLocationSuggestions(properties) {
+        const locationMap = new Map();
+        
+        properties.forEach(property => {
+            // 处理区域 (suburb)
+            if (property.suburb) {
+                const suburb = property.suburb.trim();
+                const postcode = property.postcode ? Math.floor(property.postcode).toString() : '';
+                const key = `${suburb}_${postcode}`;
+                
+                if (!locationMap.has(key)) {
+                    locationMap.set(key, {
+                        id: key,
+                        type: 'suburb',
+                        name: suburb,
+                        postcode: postcode,
+                        fullName: postcode ? `${suburb} NSW ${postcode}` : suburb,
+                        count: 0
+                    });
+                }
+                locationMap.get(key).count++;
+            }
+            
+            // 处理邮编 (postcode)
+            if (property.postcode) {
+                const postcode = Math.floor(property.postcode).toString();
+                const suburb = property.suburb ? property.suburb.trim() : '';
+                const key = `postcode_${postcode}`;
+                
+                if (!locationMap.has(key)) {
+                    locationMap.set(key, {
+                        id: key,
+                        type: 'postcode',
+                        name: postcode,
+                        suburb: suburb,
+                        fullName: suburb ? `${postcode} (${suburb})` : postcode,
+                        count: 0
+                    });
+                }
+                locationMap.get(key).count++;
+            }
+        });
+        
+        return Array.from(locationMap.values()).sort((a, b) => b.count - a.count);
+    }
+    
+    // 智能搜索匹配算法
+    function searchLocationSuggestions(query, suggestions, maxResults = 8) {
+        if (!query || query.length < 1) return [];
+        
+        const normalizedQuery = query.toLowerCase().trim();
+        const results = [];
+        
+        suggestions.forEach(suggestion => {
+            let score = 0;
+            const name = suggestion.name.toLowerCase();
+            const fullName = suggestion.fullName.toLowerCase();
+            
+            // 完全匹配 (最高分)
+            if (name === normalizedQuery) score += 100;
+            if (fullName === normalizedQuery) score += 100;
+            
+            // 开头匹配 (高分)
+            if (name.startsWith(normalizedQuery)) score += 80;
+            if (fullName.startsWith(normalizedQuery)) score += 70;
+            
+            // 包含匹配 (中等分)
+            if (name.includes(normalizedQuery)) score += 40;
+            if (fullName.includes(normalizedQuery)) score += 30;
+            
+            // 首字母匹配 (例如 "syd" 匹配 "Sydney")
+            const words = name.split(/\s+/);
+            const initials = words.map(word => word[0]).join('').toLowerCase();
+            if (initials.includes(normalizedQuery)) score += 20;
+            
+            // 模糊匹配 (低分)
+            if (normalizedQuery.length >= 3) {
+                const fuzzyMatch = normalizedQuery.split('').some(char => name.includes(char));
+                if (fuzzyMatch) score += 10;
+            }
+            
+            // 根据房源数量调整分数 (热门区域优先)
+            score += Math.log10(suggestion.count + 1) * 5;
+            
+            if (score > 0) {
+                results.push({ ...suggestion, score });
+            }
+        });
+        
+        return results
+            .sort((a, b) => b.score - a.score)
+            .slice(0, maxResults);
+    }
+    
+    // 选择区域标签
+    function selectLocation(location) {
+        // 检查是否已经选中
+        const existingIndex = selectedLocations.findIndex(loc => loc.id === location.id);
+        if (existingIndex !== -1) return;
+        
+        selectedLocations.push(location);
+        activeFilters.selectedLocations = selectedLocations;
+        
+        updateLocationTags();
+        clearSearchInput();
+        hideLocationSuggestions();
+        applyFiltersAndRender();
+    }
+    
+    // 移除选中的区域标签
+    function removeLocation(locationId) {
+        selectedLocations = selectedLocations.filter(loc => loc.id !== locationId);
+        activeFilters.selectedLocations = selectedLocations;
+        
+        updateLocationTags();
+        applyFiltersAndRender();
+    }
+    
+    // 更新区域标签显示
+    function updateLocationTags() {
+        const searchContainer = document.querySelector('.search-container');
+        let tagsContainer = searchContainer.querySelector('.location-tags');
+        
+        if (!tagsContainer) {
+            tagsContainer = document.createElement('div');
+            tagsContainer.className = 'location-tags flex flex-wrap gap-2 mb-2';
+            searchContainer.insertBefore(tagsContainer, searchInput.parentElement);
+        }
+        
+        tagsContainer.innerHTML = selectedLocations.map(location => `
+            <span class="location-tag inline-flex items-center gap-1 bg-accentPrimary text-white px-2 py-1 rounded-md text-sm font-medium">
+                <i class="fa-solid fa-map-marker-alt text-xs"></i>
+                <span>${location.name}</span>
+                <button class="remove-location-btn text-white/80 hover:text-white" data-location-id="${location.id}">
+                    <i class="fa-solid fa-times text-xs"></i>
+                </button>
+            </span>
+        `).join('');
+        
+        // 添加删除标签事件监听
+        tagsContainer.querySelectorAll('.remove-location-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                removeLocation(btn.dataset.locationId);
+            });
+        });
+        
+        // 更新搜索框占位符
+        if (selectedLocations.length > 0) {
+            searchInput.placeholder = '继续搜索区域...';
+        } else {
+            searchInput.placeholder = '输入区域或邮编，例如 "Ultimo" 或 "2007"';
+        }
+    }
+    
+    // 清空搜索输入框
+    function clearSearchInput() {
+        searchInput.value = '';
+        activeFilters.searchTerm = '';
+    }
+    
+    // 显示位置建议列表
+    function showLocationSuggestions(suggestions) {
+        const searchContainer = document.querySelector('.search-container');
+        let suggestionsContainer = searchContainer.querySelector('.location-suggestions');
+        
+        if (!suggestionsContainer) {
+            suggestionsContainer = document.createElement('div');
+            suggestionsContainer.className = 'location-suggestions absolute top-full left-0 right-0 bg-white border border-borderDefault rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto';
+            searchContainer.appendChild(suggestionsContainer);
+        }
+        
+        if (suggestions.length === 0) {
+            suggestionsContainer.innerHTML = '<div class="p-3 text-textSecondary text-sm">没有找到匹配的区域</div>';
+        } else {
+            suggestionsContainer.innerHTML = suggestions.map((suggestion, index) => `
+                <div class="suggestion-item p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0" data-location-id="${suggestion.id}" data-index="${index}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${suggestion.type === 'suburb' ? 'fa-map-marker-alt' : 'fa-hashtag'} text-accentPrimary text-sm"></i>
+                            <div>
+                                <div class="font-medium text-textPrimary">${suggestion.fullName}</div>
+                                <div class="text-xs text-textSecondary">${suggestion.count} 套房源</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        suggestionsContainer.style.display = 'block';
+        
+        // 添加点击事件监听
+        suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const locationId = item.dataset.locationId;
+                const location = suggestions.find(s => s.id === locationId);
+                if (location) selectLocation(location);
+            });
+        });
+    }
+    
+    // 隐藏位置建议列表
+    function hideLocationSuggestions() {
+        const suggestionsContainer = document.querySelector('.location-suggestions');
+        if (suggestionsContainer) {
+            suggestionsContainer.style.display = 'none';
+        }
+    }
+
+    // --- 5. CORE FUNCTIONS ---
 
     async function fetchData(filters = {}) {
         // 构建查询参数字符串
@@ -202,6 +417,24 @@ document.addEventListener('DOMContentLoaded', () => {
         var propertiesData = allProperties;
         
         let filteredProperties = [...propertiesData];
+        
+        // 在 applyFiltersAndRender 函数中的区域筛选部分
+        // 区域筛选 - 支持多选
+        if (activeFilters.selectedLocations && activeFilters.selectedLocations.length > 0) {
+            filteredProperties = filteredProperties.filter(property => {
+                return activeFilters.selectedLocations.some(location => {
+                    if (location.type === 'suburb') {
+                        return property.suburb && property.suburb.toLowerCase() === location.name.toLowerCase();
+                    } else if (location.type === 'postcode') {
+                        const propertyPostcode = property.postcode ? Math.floor(property.postcode).toString() : '';
+                        return propertyPostcode === location.name;
+                    }
+                    return false;
+                });
+            });
+        }
+        
+        // 文本搜索 (在已选择区域的基础上进一步筛选)
         const searchTerm = activeFilters.searchTerm.toLowerCase();
         if (searchTerm) {
             filteredProperties = filteredProperties.filter(p =>
@@ -508,12 +741,31 @@ document.addEventListener('DOMContentLoaded', () => {
         applyBtn?.addEventListener('click', closePanel);
 
         resetBtn?.addEventListener('click', () => {
-            activeFilters = { searchTerm: searchInput.value, minPrice: null, maxPrice: null, bedrooms: 'any', bathrooms: 'any', availableDate: 'any', isFurnished: false };
+            // 重置所有筛选器，包括选中的区域
+            selectedLocations = [];
+            activeFilters = { 
+                searchTerm: '', 
+                selectedLocations: [], 
+                minPrice: null, 
+                maxPrice: null, 
+                bedrooms: 'any', 
+                bathrooms: 'any', 
+                availableDate: 'any', 
+                isFurnished: false 
+            };
+            
+            // 重置UI状态
             if (priceSlider && priceSlider.noUiSlider) priceSlider.noUiSlider.set([minRent, maxRent]);
             dateSelect.value = 'any';
             furnishedToggle.checked = false;
             document.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.filter-btn[data-value="any"]').forEach(b => b.classList.add('active'));
+            
+            // 清空搜索框和标签
+            searchInput.value = '';
+            updateLocationTags();
+            hideLocationSuggestions();
+            
             applyFiltersAndRender();
         });
 
@@ -540,32 +792,169 @@ document.addEventListener('DOMContentLoaded', () => {
         return Promise.resolve();
     }
     
+    // 防抖函数
+    function debounce(func, delay) {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+    
     function setupEventListeners() {
         listingsContainer.addEventListener('click', handleInteraction);
+        
+        // 自动补全搜索框事件
+        let currentSuggestionIndex = -1;
+        
+        // 防抖处理输入事件
+        const debouncedSearch = debounce((query) => {
+            if (query.trim()) {
+                const suggestions = searchLocationSuggestions(query, locationSuggestions);
+                showLocationSuggestions(suggestions);
+                currentSuggestionIndex = -1;
+            } else {
+                hideLocationSuggestions();
+            }
+        }, 300);
+        
         searchInput.addEventListener('input', (event) => {
-            activeFilters.searchTerm = event.target.value;
-            applyFiltersAndRender();
+            const query = event.target.value;
+            activeFilters.searchTerm = query;
+            
+            console.log('🔍 搜索输入:', query, '选中区域数量:', selectedLocations.length, '建议数据:', locationSuggestions.length);
+            
+            // 如果没有选中的区域，显示自动补全
+            if (selectedLocations.length === 0) {
+                console.log('📝 触发自动补全搜索...');
+                debouncedSearch(query);
+            } else {
+                // 如果有选中区域，只做文本筛选
+                console.log('🏷️ 基于选中区域进行文本筛选...');
+                applyFiltersAndRender();
+                hideLocationSuggestions();
+            }
         });
+        
+        // 键盘导航支持
+        searchInput.addEventListener('keydown', (event) => {
+            const suggestionsContainer = document.querySelector('.location-suggestions');
+            const suggestions = suggestionsContainer?.querySelectorAll('.suggestion-item') || [];
+            
+            switch (event.key) {
+                case 'ArrowDown':
+                    event.preventDefault();
+                    if (suggestions.length > 0) {
+                        currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, suggestions.length - 1);
+                        updateSuggestionHighlight(suggestions, currentSuggestionIndex);
+                    }
+                    break;
+                    
+                case 'ArrowUp':
+                    event.preventDefault();
+                    if (suggestions.length > 0) {
+                        currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
+                        updateSuggestionHighlight(suggestions, currentSuggestionIndex);
+                    }
+                    break;
+                    
+                case 'Enter':
+                    event.preventDefault();
+                    if (currentSuggestionIndex >= 0 && suggestions[currentSuggestionIndex]) {
+                        suggestions[currentSuggestionIndex].click();
+                    } else if (selectedLocations.length === 0 && searchInput.value.trim()) {
+                        // 如果没有选择建议但有输入文本，继续文本搜索
+                        applyFiltersAndRender();
+                    }
+                    break;
+                    
+                case 'Escape':
+                    event.preventDefault();
+                    hideLocationSuggestions();
+                    currentSuggestionIndex = -1;
+                    searchInput.blur();
+                    break;
+            }
+        });
+        
+        // 点击外部隐藏建议列表
+        document.addEventListener('click', (event) => {
+            const searchContainer = document.querySelector('.search-container');
+            if (!searchContainer?.contains(event.target)) {
+                hideLocationSuggestions();
+                currentSuggestionIndex = -1;
+            }
+        });
+        
         filterButton.addEventListener('click', () => toggleFilterPanel(true));
+    }
+    
+    // 更新建议项高亮状态
+    function updateSuggestionHighlight(suggestions, activeIndex) {
+        suggestions.forEach((suggestion, index) => {
+            if (index === activeIndex) {
+                suggestion.classList.add('bg-gray-100');
+                suggestion.scrollIntoView({ block: 'nearest' });
+            } else {
+                suggestion.classList.remove('bg-gray-100');
+            }
+        });
     }
 
     // --- 6. INITIALIZATION ---
 
+    // 在文件顶部添加自动补全实例变量
+    let locationAutocomplete = null;
+    
+    // 修改初始化函数
     async function initialize() {
         if (!listingsContainer) return;
         listingsContainer.innerHTML = '<p class="text-center text-textSecondary py-10">正在加载房源...</p>';
         await loadFilterPanel();
-        // 现在 fetchData 可以接受筛选条件
+        
+        // 获取房源数据
         const properties = await fetchData(activeFilters); 
         if (properties) {
             allProperties = properties;
-            // 不再将所有房源存储到localStorage，因为数据将通过API动态获取
-            // localStorage.setItem('allPropertyListings', JSON.stringify(allProperties)); 
+            
+            // 🚀 初始化自动补全功能
+            console.log('🔄 初始化自动补全功能...');
+            if (searchInput && window.LocationAutocomplete) {
+                locationAutocomplete = new LocationAutocomplete(searchInput, {
+                    maxResults: 10,
+                    debounceDelay: 200,
+                    minQueryLength: 2
+                });
+                
+                // 构建区域索引
+                locationAutocomplete.buildLocationIndex(properties);
+                
+                // 监听选择事件
+                searchInput.addEventListener('locationSelected', (e) => {
+                    const { selectedLocations } = e.detail;
+                    activeFilters.selectedLocations = selectedLocations;
+                    applyFiltersAndRender();
+                });
+                
+                // 监听移除事件
+                searchInput.addEventListener('locationRemoved', (e) => {
+                    const { selectedLocations } = e.detail;
+                    activeFilters.selectedLocations = selectedLocations;
+                    applyFiltersAndRender();
+                });
+                
+                console.log('✅ 自动补全功能初始化完成');
+            } else {
+                console.error('❌ 自动补全初始化失败：缺少必要元素或类');
+            }
+            
             setupFilterPanelEventListeners();
             applyFiltersAndRender(); 
             setupEventListeners();
         }
     }
-
+    
+    // 移除或注释掉原有的自动补全相关函数，因为现在由 LocationAutocomplete 类处理
+    // 保留 applyFiltersAndRender 函数中的区域筛选逻辑
     initialize();
 });

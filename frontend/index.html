@@ -688,10 +688,143 @@
             }
         }
         
+        /* ========== 自动补全搜索框样式 ========== */
+        
+        /* 区域标签样式 */
+        .location-tags {
+            margin-bottom: 8px;
+        }
+        
+        .location-tag {
+            background: #007BFF !important;
+            color: white !important;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .location-tag:hover {
+            background: #0056b3 !important;
+        }
+        
+        .remove-location-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .remove-location-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 建议列表样式 */
+        .location-suggestions {
+            background: white;
+            border: 1px solid #E3E3E3;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-height: 256px;
+            overflow-y: auto;
+            z-index: 60 !important;
+            margin-top: 4px;
+        }
+        
+        .suggestion-item {
+            padding: 12px;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-item:hover,
+        .suggestion-item.bg-gray-100 {
+            background-color: #f9fafb;
+        }
+        
+        .suggestion-item .font-medium {
+            color: #2d2d2d;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .suggestion-item .text-xs {
+            color: #666666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        
+        /* 搜索框容器确保相对定位 */
+        .search-container {
+            position: relative;
+        }
+        
+        /* 增强模式下的自动补全样式 */
+        .ui-enhanced .location-tag {
+            background: var(--color-primary-500) !important;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-system);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .ui-enhanced .location-tag:hover {
+            background: var(--color-primary-600) !important;
+            transform: translateY(-1px);
+        }
+        
+        .ui-enhanced .location-suggestions {
+            border: 2px solid var(--color-gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            backdrop-filter: blur(10px);
+        }
+        
+        .ui-enhanced .suggestion-item:hover,
+        .ui-enhanced .suggestion-item.bg-gray-100 {
+            background: var(--color-gray-50);
+            transform: translateX(2px);
+        }
+
         /* 容器间距响应式系统 */
         .container {
             padding-left: 16px;
             padding-right: 16px;
+        }
+        
+        @media (max-width: 767px) {
+            /* 移动端自动补全优化 */
+            .location-suggestions {
+                margin-left: -16px;
+                margin-right: -16px;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+            
+            .location-tags {
+                margin-left: -4px;
+                margin-right: -4px;
+            }
+            
+            .suggestion-item {
+                padding: 16px;
+            }
         }
         
         @media (min-width: 640px) {
@@ -706,12 +839,27 @@
                 padding-left: 24px;
                 padding-right: 24px;
             }
+            
+            /* 平板端自动补全优化 */
+            .location-suggestions {
+                border-radius: 12px;
+            }
         }
         
         @media (min-width: 1024px) {
             .container {
                 padding-left: 32px;
                 padding-right: 32px;
+            }
+            
+            /* 桌面端自动补全优化 */
+            .location-suggestions {
+                border-radius: 16px;
+                max-height: 320px;
+            }
+            
+            .suggestion-item {
+                padding: 14px 16px;
             }
         }
         
@@ -743,8 +891,12 @@
                     <!-- 搜索和筛选栏 -->
                     <div class="flex items-center gap-3 max-w-2xl">
                         <div class="relative flex-grow search-container">
-                            <i class="fa-solid fa-magnifying-glass text-textSecondary absolute top-1/2 left-3.5 -translate-y-1/2"></i>
-                            <input type="text" id="search-input" placeholder="搜索区域, 例如 'Zetland'" class="w-full pl-10 pr-4 py-3 bg-bgCard border border-borderDefault rounded-xl focus:outline-none focus:ring-2 focus:ring-accentPrimary text-base">
+                            <!-- 区域标签容器将由JavaScript动态创建 -->
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass text-textSecondary absolute top-1/2 left-3.5 -translate-y-1/2 z-10"></i>
+                                <input type="text" id="search-input" placeholder="输入区域或邮编，例如 'Ultimo' 或 '2007'" class="w-full pl-10 pr-4 py-3 bg-bgCard border border-borderDefault rounded-xl focus:outline-none focus:ring-2 focus:ring-accentPrimary text-base">
+                            </div>
+                            <!-- 建议列表将由JavaScript动态创建 -->
                         </div>
                         <button id="filter-button" class="flex-shrink-0 w-12 h-12 bg-bgCard border border-borderDefault rounded-xl flex items-center justify-center text-textPrimary hover:border-accentPrimary transition-colors">
                             <i class="fa-solid fa-sliders text-lg"></i>
@@ -906,6 +1058,8 @@
 
     <!-- 新增: 引入 noUiSlider 的 JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+    <!-- 在现有脚本之前添加 -->
+    <script src="scripts/autocomplete.js"></script>
     <!-- 引入主JavaScript文件 -->
     <script type="module" src="./scripts/main.js"></script>
 </body>
