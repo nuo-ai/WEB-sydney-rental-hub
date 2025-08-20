@@ -1,0 +1,25 @@
+# Netlify configuration file
+
+# This rule tells Netlify where our serverless functions are located.
+[functions]
+  directory = "functions/"
+
+# This rule sets up a redirect. 
+# Any request from our app to "/api/fetch-sheet" will be forwarded 
+# to our actual serverless function. This makes our API endpoint clean.
+# [[redirects]]
+#   from = "/api/fetch-sheet"
+#   to = "/.netlify/functions/fetch-sheet"
+#   status = 200
+
+# This rule proxies map script requests to our secure function.
+# [[redirects]]
+#   from = "/api/get-map-script"
+#   to = "/.netlify/functions/get-map-script"
+#   status = 200
+
+# This rule proxies commute time requests to the get-directions function.
+# [[redirects]]
+#   from = "/api/get-directions"
+#   to = "/.netlify/functions/get-directions"
+#   status = 200

@@ -1,0 +1,6 @@
+# Netlify build configuration
+[build]
+  # 这是我们的构建命令
+  command = "npm run build:h5"
+  # 这是构建产物的发布目录
+  publish = "dist"

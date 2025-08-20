@@ -1,0 +1,76 @@
+# This file contains the master keyword list for property features.
+# It is generated based on analysis of real-world data.
+
+air_conditioning:
+  positive:
+    - "air con"
+    - "air conditioning"
+    - "air-conditioner"
+    - "ducted cooling"
+    - "ducted r/c air conditioning"
+    - "ducted reverse cycle air conditioning"
+    - "evaporative cooling"
+    - "reverse cycle air con"
+    - "reverse cycle air conditioning"
+    - "split system air con"
+    - "split system air conditioning"
+    - "split-system air conditioning"
+  negative: []
+
+furnished:
+  positive:
+    - "furnished"
+    - "fully furnished"
+    - "partly furnished"
+  negative:
+    - "unfurnished"
+  optional:
+    - "optional" # Assuming 'optional' might appear in feature lists
+
+laundry:
+  positive:
+    - "communal laundry"
+    - "external laundry"
+    - "internal laundry"
+    - "laundry facilities"
+    - "shared laundry"
+  negative: []
+
+dishwasher:
+  positive:
+    - "dishwasher"
+  negative: []
+
+gas_cooking:
+  positive:
+    - "gas"
+    - "gas cooking"
+    - "gas heating" # Note: This might be ambiguous, but keeping as per user's list
+  negative: []
+
+intercom:
+  positive:
+    - "intercom"
+  negative: []
+
+study:
+  positive:
+    - "study"
+    - "study nook"
+  negative: []
+
+balcony:
+  positive:
+    - "balcony"
+    - "balcony / deck"
+    - "courtyard"
+    - "deck"
+    - "garden"
+    - "garden / courtyard"
+    - "outdoor area"
+    - "outdoor entertaining"
+    - "patio"
+    - "private courtyard"
+    - "terrace"
+    - "terrace/balcony"
+  negative: []

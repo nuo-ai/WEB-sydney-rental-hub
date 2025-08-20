@@ -1,0 +1,36 @@
+# Unified dependencies for Sydney Rental Hub
+
+# Core API
+fastapi
+uvicorn
+strawberry-graphql
+python-multipart
+
+# Database
+psycopg2-binary
+
+# Data processing - using latest versions
+numpy
+pandas
+python-dateutil
+pytz
+
+# Configuration
+python-dotenv
+pydantic[email]
+
+# Automation
+schedule
+requests
+
+# Caching
+redis
+fastapi-cache2==0.2.1
+
+# Security
+slowapi
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Task Queue
+celery
