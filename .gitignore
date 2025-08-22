@@ -156,3 +156,6 @@ dev-debug.log
 
 # Local Netlify folder
 .netlify
+
+# Crawler output
+crawler/output/
