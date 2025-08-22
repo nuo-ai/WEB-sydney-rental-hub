@@ -1,160 +1,24 @@
 # 技术上下文 (Technical Context)
 
-**文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-08-20 (记录重大修复成果)
+> **验证日期**: 2025-08-21  
+> **更新机制**: 每月初复审。
 
----
+## 1. 技术栈现状
+### 前端
+- Vanilla JavaScript (ES6 模块) + HTML5 + CSS3
+- TailwindCSS、Font Awesome、noUiSlider
+- Google Maps JavaScript API 用于地图和通勤计算
 
-## 1. 技术栈现状 (基于代码审计的事实)
+### 后端
+- Python FastAPI 与 Strawberry GraphQL
+- PostgreSQL/PostGIS（通过 Supabase）
+- Celery + Redis 用于异步任务和缓存
 
-经过深度代码审计，我们发现项目**已经拥有一个功能极其完善的技术栈**：
+### 部署与开发
+- 后端启动: `python scripts/run_backend.py`
+- 前端启动: `cd frontend && python -m http.server 8080`
+- `frontend/netlify.toml` 与 `frontend/scripts/config.js` 包含环境配置
 
-### 1.1. 前端 (基于 Old 版本的优秀实现)
-- **框架**: **Vanilla JavaScript (ES6 模块化)** + **HTML5** + **CSS3**
-- **样式**: **TailwindCSS** (CDN 版本)
-- **地图**: **Google Maps JavaScript API** (完整集成)
-- **UI 增强**: 自定义 **UIEnhancer** 系统，支持多种 UI 模式切换
-- **滑块控件**: **noUiSlider** (高级价格范围选择)
-- **图标**: **Font Awesome** 6.x
-
-### 1.2. 后端 (已验证的企业级架构)
-- **框架**: **Python (FastAPI)** + **Strawberry GraphQL**
-- **数据库**: **Supabase (PostgreSQL + PostGIS)** 用于地理空间计算
-- **异步任务**: **Celery** + **Redis** 完整集成
-- **缓存**: **Redis** 缓存系统
-- **安全**: API Key + JWT + 限流 完整方案
-
-### 1.3. 部署 (现有配置)
-- **前端**: **Netlify** (含 Functions 和代理)
-- **后端**: 通过 `scripts/run_backend.py` 在 `localhost:8000`
-
----
-
-## 2. 本地开发环境设置 (Local Development Setup)
-
-本地开发需要同时启动两个服务：**后端 API** 和 **前端开发服务器**。
-
-### 2.1. 环境准备
-- **Python**: 3.8+
-- **Node.js**: 18.x+ (用于运行前端开发环境)
-- **Git**
-- **Docker**: (推荐) 用于快速启动 PostgreSQL 和 Redis 服务。
-
-### 2.2. 首次设置
-1.  **克隆仓库**: `git clone <repo-url>`
-2.  **配置环境变量**:
-    -   在项目根目录，复制 `.env.example` 为 `.env`。
-    -   在 `.env` 文件中填入你的数据库连接信息 (`DATABASE_URL`) 和 Google Maps API 密钥 (`GOOGLE_MAPS_API_KEY`)。
-3.  **安装后端依赖**: `pip install -r requirements.txt`
-
-### 2.3. 服务检查和启动流程
-**重要**: 在启动任何服务前，先检查是否已有服务在运行，避免重复启动。
-
-#### 服务状态检查命令：
-```bash
-# 检查后端API是否响应
-curl -s http://localhost:8000/api/properties?page_size=1
-
-# 检查前端服务器是否运行
-curl -s http://localhost:8080/index.html
-
-# 检查进程
-netstat -ano | findstr :8000  # Windows
-netstat -ano | findstr :8080  # Windows
-```
-
-#### 标准检查流程：
-1. **检查Environment Details** - 查看"Actively Running Terminals"部分
-2. **验证服务响应** - 使用curl测试API
-3. **只在必要时启动** - 如果服务未运行或无响应才启动新服务
-
-#### 启动服务（仅在检查确认需要时）：
-
--   **终端 1 (后端)**:
-    ```bash
-    # 从项目根目录运行
-    python scripts/run_backend.py
-    ```
-    > 后端将运行在 `http://localhost:8000`。
-
--   **终端 2 (前端)**:
-    ```bash
-    # 从项目根目录运行
-    cd frontend
-    python -m http.server 8080
-    ```
-    > 前端开发服务器将运行在 `http://localhost:8080`。
-
-#### 当前常用服务状态：
-- **后端**: 通常运行在8000端口，命令 `python scripts/run_backend.py`
-- **前端**: 通常运行在8080端口，命令 `cd frontend && python -m http.server 8080`
-
-### 2.4. 关键配置文件
-- **`frontend/netlify.toml`**: 包含代理规则，将 `/api/*` 请求转发到后端
-- **`frontend/scripts/config.js`**: 包含 API 端点和通用配置
-- **根目录 `.env`**: 包含数据库连接和 API 密钥
-
----
-
-## 3. 基于发现的新开发策略 (New Development Strategy)
-
-**核心策略**: 以 `Old/frontend/` 的优秀功能为基础，结合当前版本的 API 集成优势。
-
-### 3.1. 功能迁移计划
-- **从 Old 版本恢复**: UIEnhancer 系统、图片轮播、高级筛选面板、价格滑块等
-- **从当前版本保留**: 直接 API 调用方式、Netlify Function 集成
-- **新增功能**: 自动补全区域搜索、用户认证、后端同步收藏系统
-
-### 3.2. 不需要的工作
-- ❌ **React 技术栈迁移**: 现有 Vanilla JS 系统功能已足够强大
-- ❌ **从零开发基础功能**: 大多数核心功能已经实现且运行良好
-- ❌ **复杂的数据层重构**: 后端 API 已经非常完善
-
-### 3.3. 前端问题修复成果 (2025-08-20)
-**重大突破**: 通过系统性问题诊断和修复，解决了4个关键问题：
-
-1. **筛选面板样式缺失修复**:
-   - 添加完整的`.filter-btn`样式系统 (正常、悬停、激活状态)
-   - 修复toggle开关样式和动画效果
-   - 用户现在可以清晰看到筛选状态反馈
-
-2. **通勤计算功能修复**:
-   - 修复错误的API端点 (`/api/get-directions` → `/.netlify/functions/get-directions`)
-   - 改进错误处理机制，提供友好错误信息
-   - 不再出现JavaScript崩溃错误
-
-3. **房源图片显示和轮播优化**:
-   - 改进占位符图片处理，统一视觉体验
-   - 过滤无效图片URL，防止加载失败
-   - 智能控制轮播按钮显示 (仅多张图片时)
-   - 添加图片加载失败的`onerror`处理
-
-4. **筛选面板关闭问题紧急修复**:
-   - 解决响应式CSS与JavaScript动画逻辑冲突
-   - 保持一致的底部滑入动画体验
-   - 筛选面板现在可以正常开关
-
-**修复效果**: 核心找房功能现在稳定可靠，用户体验大幅提升！
-
----
-
-## 4. MCP 服务器状态 (MCP Server Status)
-
-### 4.1. 当前状态 (调查时间: 2025-08-19)
-- **位置**: `Old/mcp-server/` 目录 (完整的 TypeScript 实现)
-- **状态**: **已损坏/不可用**
-- **原因**: 依赖主项目后端 `localhost:8000`，但后端未运行导致连接失败
-
-### 4.2. MCP 服务器技术细节
-- **框架**: Node.js + TypeScript + MCP SDK
-- **功能**: 提供 `search_properties` 和 `get_property_details` 工具
-- **连接方式**: 通过 GraphQL 查询后端 API
-- **部署历史**: 曾部署到 Vercel，但现已失效
-
-### 4.3. 重建计划 (延后任务)
-- **方法**: 从 GitHub 重新克隆和部署
-- **优先级**: P2 (在 MVP 完成后)
-- **依赖**: 需要先确保主项目后端稳定运行
-- **价值**: 为 AI 助手提供租房信息查询能力
-
----
+## 2. 当前策略
+- 整合旧前端功能，完善核心找房体验。
+- MCP 服务器重建计划在 MVP 完成后再评估。
