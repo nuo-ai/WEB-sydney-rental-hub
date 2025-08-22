@@ -1,0 +1,678 @@
+/* JUWO桔屋找房 - 全局样式系统 */
+
+/* ========== JUWO品牌色彩系统 ========== */
+:root {
+  /* JUWO主品牌色 #FF5824 */
+  --juwo-primary: #FF5824;
+  --juwo-primary-light: #FF7851;
+  --juwo-primary-dark: #E64100;
+  --juwo-primary-50: #FFF3F0;
+  --juwo-primary-100: #FFE5D9;
+  --juwo-primary-500: #FF5824;
+  --juwo-primary-600: #E64100;
+  --juwo-primary-700: #CC3700;
+
+  /* Element Plus主题定制 */
+  --el-color-primary: #FF5824;
+  --el-color-primary-light-1: #FF7851;
+  --el-color-primary-light-3: #FFB399;
+  --el-color-primary-light-5: #FFD1BF;
+  --el-color-primary-light-7: #FFE5D9;
+  --el-color-primary-light-8: #FFEBE0;
+  --el-color-primary-light-9: #FFF3F0;
+  --el-color-primary-dark-2: #E64100;
+
+  /* 从现有设计系统继承的颜色 */
+  --color-text-primary: #2d2d2d;
+  --color-text-secondary: #595959;
+  --color-text-price: #000000;
+  --color-border-default: #E3E3E3;
+  --color-bg-page: #F4F7F9;
+  --color-bg-card: #FFFFFF;
+
+  /* 专业字体系统 */
+  --font-english: "SF Pro Text", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-chinese: "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+  --font-system: -apple-system, "PingFang SC", "Inter", sans-serif;
+
+  /* 专业间距系统 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* 专业阴影系统 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* 专业圆角系统 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+/* ========== 全局重置样式 ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-system);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-page);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== Element Plus组件定制 ========== */
+
+/* 按钮组件定制 */
+.el-button--primary {
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
+}
+
+.el-button--primary:active {
+  background-color: var(--juwo-primary-dark);
+  border-color: var(--juwo-primary-dark);
+}
+
+/* 滑块组件定制 */
+.el-slider__bar {
+  background-color: var(--juwo-primary);
+}
+
+.el-slider__button {
+  border-color: var(--juwo-primary);
+}
+
+.el-slider__button:hover {
+  border-color: var(--juwo-primary-light);
+}
+
+/* 单选按钮组定制 */
+.el-radio-button__inner {
+  border-color: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
+.el-radio-button.is-active .el-radio-button__inner {
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  color: white;
+}
+
+.el-radio-button__inner:hover {
+  border-color: var(--juwo-primary);
+  color: var(--juwo-primary);
+}
+
+/* 抽屉组件定制 */
+.el-drawer__header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.el-drawer__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* ========== 房源卡片样式 (复用现有设计) ========== */
+
+/* 保持现有的580px卡片设计 */
+.property-card {
+  width: 580px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.property-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* 图片容器 - 4:3比例 */
+.property-image-container {
+  width: 100%;
+  height: 386px;
+  position: relative;
+  overflow: hidden;
+}
+
+.property-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 图片轮播控制 */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.carousel-btn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn-prev {
+  left: 12px;
+}
+
+.carousel-btn-next {
+  right: 12px;
+}
+
+/* 图片计数器 */
+.image-counter {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* 收藏按钮 */
+.favorite-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.favorite-btn:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.favorite-btn.is-favorite i {
+  color: var(--juwo-primary);
+}
+
+/* 房源内容区域 */
+.property-content {
+  padding: 16px;
+}
+
+/* 价格显示 - 匹配现有设计 */
+.property-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-price);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.property-price .price-unit {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 400;
+}
+
+/* 地址信息 - 两行显示 */
+.property-address-primary {
+  font-size: 15px;
+  color: #333333;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.property-address-secondary {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+/* 房型信息图标 */
+.property-features {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  color: #666666;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.feature-item i {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+}
+
+.feature-item span {
+  color: #000000;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 底部信息区域 */
+.property-footer {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.availability-text {
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.inspection-text {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ========== 筛选组件样式 ========== */
+
+/* 筛选按钮样式 */
+.filter-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--color-border-default);
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--juwo-primary);
+  color: var(--juwo-primary);
+}
+
+.filter-btn.active {
+  background: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  color: white;
+}
+
+/* ========== 响应式设计系统 ========== */
+
+/* 移动端优先设计 */
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* 房源网格布局 */
+.properties-grid {
+  display: grid;
+  gap: 20px;
+}
+
+/* 移动端 - 单列布局 */
+@media (max-width: 767px) {
+  .properties-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .property-card {
+    width: 100%;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+  
+  .property-image-container {
+    width: 100%;
+    height: 250px;
+  }
+}
+
+/* 平板端 - 双列布局 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .properties-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .property-card {
+    width: 100%;
+    max-width: 580px;
+  }
+  
+  .container {
+    padding: 0 24px;
+  }
+}
+
+/* 桌面端 - 多列布局 */
+@media (min-width: 1024px) {
+  .properties-grid {
+    grid-template-columns: repeat(auto-fit, minmax(580px, 1fr));
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+  
+  .container {
+    padding: 0 32px;
+  }
+}
+
+/* 超大屏幕优化 */
+@media (min-width: 1280px) {
+  .properties-grid {
+    justify-content: center;
+  }
+  
+  .container {
+    padding: 0 40px;
+  }
+}
+
+/* ========== 搜索和筛选组件样式 ========== */
+
+/* 搜索栏容器 */
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* 自动补全建议列表 */
+.location-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.suggestion-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f1f1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: var(--juwo-primary-50);
+  color: var(--juwo-primary);
+}
+
+/* 区域标签样式 */
+.location-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.location-tag {
+  background: var(--juwo-primary);
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.location-tag:hover {
+  background: var(--juwo-primary-dark);
+}
+
+.remove-location-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.remove-location-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ========== 导航组件样式 ========== */
+
+/* 底部导航栏 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--color-border-default);
+  padding: 8px;
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: var(--juwo-primary);
+  background: var(--juwo-primary-50);
+}
+
+.nav-item i {
+  font-size: 20px;
+}
+
+.nav-item span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* 顶部导航栏 */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border-default);
+  padding: 0 32px;
+  height: 64px;
+  z-index: 100;
+}
+
+.top-nav-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--juwo-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+}
+
+/* ========== 加载和状态样式 ========== */
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--color-text-secondary);
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-secondary);
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: var(--color-border-default);
+  margin-bottom: 16px;
+}
+
+/* ========== 工具类样式 ========== */
+
+.text-juwo-primary {
+  color: var(--juwo-primary);
+}
+
+.bg-juwo-primary {
+  background-color: var(--juwo-primary);
+}
+
+.border-juwo-primary {
+  border-color: var(--juwo-primary);
+}
+
+.chinese-text {
+  font-family: var(--font-chinese);
+  letter-spacing: 0.02em;
+}
+
+.english-text {
+  font-family: var(--font-english);
+  letter-spacing: -0.01em;
+}
+
+/* ========== 动画效果 ========== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}

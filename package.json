@@ -1,7 +1,0 @@
-{
-  "name": "sydney-rental-hub-monorepo",
-  "private": true,
-  "workspaces": [
-    "react-frontend"
-  ]
-}

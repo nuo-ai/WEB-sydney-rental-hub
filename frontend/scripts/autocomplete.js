@@ -31,7 +31,6 @@ class LocationAutocomplete {
             this.tagsContainer.className = 'location-tags flex flex-wrap gap-2 mb-2';
             this.tagsContainer.style.display = 'none';
             this.container.insertBefore(this.tagsContainer, this.input.parentElement);
-        } else {
             this.tagsContainer = this.container.querySelector('.location-tags');
         }
         
