@@ -152,9 +152,9 @@ const isActive = (path) => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  background: white;
   border-top: 1px solid var(--color-border-default);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
   z-index: 100;
   height: 70px;
 }
@@ -197,19 +197,15 @@ const isActive = (path) => {
 
 /* 桌面端顶部导航 */
 .top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
+  position: relative;
+  background: white;
   border-bottom: 1px solid var(--color-border-default);
-  z-index: 100;
   height: 64px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .top-nav-content {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   height: 100%;
   display: flex;

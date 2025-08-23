@@ -80,13 +80,6 @@
         </div>
       </div>
       
-      <!-- 房源特色 - 中文显示 -->
-      <div v-if="propertyFeatures.length > 0" class="property-amenities chinese-text">
-        <span v-for="feature in propertyFeatures" :key="feature" class="amenity-tag">
-          {{ feature }}
-        </span>
-      </div>
-      
       <!-- 底部信息区域 -->
       <div class="property-footer">
         <!-- 空出日期 - 中文显示 -->
@@ -98,26 +91,6 @@
         <div v-if="property.inspection_times" class="inspection-text chinese-text">
           开放时间: {{ formatInspectionTime(property.inspection_times) }}
         </div>
-      </div>
-      
-      <!-- 操作按钮 -->
-      <div class="property-actions" @click.stop>
-        <el-button 
-          class="action-btn favorite-action"
-          :type="isFavorite ? 'primary' : 'default'"
-          :icon="isFavorite ? 'StarFilled' : 'Star'"
-          @click="toggleFavorite"
-        >
-          {{ isFavorite ? '已收藏' : '收藏' }}
-        </el-button>
-        
-        <el-button 
-          type="primary"
-          class="action-btn contact-action"
-          @click="handleContact"
-        >
-          联系我们
-        </el-button>
       </div>
     </div>
   </div>
@@ -181,19 +154,6 @@ const isNewProperty = computed(() => {
   return props.property.listing_id > 2500
 })
 
-const propertyFeatures = computed(() => {
-  const features = []
-  
-  // 根据property数据生成中文特色标签
-  if (props.property.is_furnished) features.push('带家具')
-  if (props.property.has_air_conditioning) features.push('空调')
-  if (props.property.has_balcony) features.push('阳台') 
-  if (props.property.has_gym) features.push('健身房')
-  if (props.property.has_pool) features.push('游泳池')
-  if (props.property.has_parking) features.push('停车位')
-  
-  return features.slice(0, 4) // 最多显示4个特色
-})
 
 // 方法
 const formatPrice = (price) => {
@@ -254,9 +214,6 @@ const handleCardClick = () => {
   emit('click', props.property)
 }
 
-const handleContact = () => {
-  emit('contact', props.property)
-}
 
 const toggleFavorite = () => {
   propertiesStore.toggleFavorite(props.property.listing_id)
@@ -269,7 +226,7 @@ const toggleFavorite = () => {
   width: 580px;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
+  border-radius: 6px;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
@@ -441,29 +398,12 @@ const toggleFavorite = () => {
   font-size: 14px;
 }
 
-/* 房源特色标签 */
-.property-amenities {
-  margin-bottom: 12px;
-}
-
-.amenity-tag {
-  display: inline-block;
-  background: var(--juwo-primary-50);
-  color: var(--juwo-primary);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 6px;
-  margin-right: 6px;
-  margin-bottom: 4px;
-}
-
 /* 底部信息区域 */
 .property-footer {
   border-top: 1px solid #e5e7eb;
   margin-top: 8px;
   padding-top: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .availability-text {
@@ -479,39 +419,12 @@ const toggleFavorite = () => {
   font-weight: 500;
 }
 
-/* 操作按钮 */
-.property-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.action-btn {
-  flex: 1;
-  font-weight: 600;
-}
-
-.favorite-action.el-button--default {
-  border-color: var(--color-border-default);
-  color: var(--color-text-secondary);
-}
-
-.favorite-action.el-button--primary {
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-}
-
-.contact-action {
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-}
-
 /* 响应式适配 */
 @media (max-width: 767px) {
   .property-card {
     width: 100%;
     max-width: 580px;
-    margin: 0 auto 20px auto;
+    margin: 0 0 20px 0;
   }
   
   .property-image-container {
@@ -520,26 +433,13 @@ const toggleFavorite = () => {
   
   .property-carousel :deep(.el-carousel__container) {
     height: 250px;
-  }
-  
-  .property-actions {
-    flex-direction: column;
-    gap: 8px;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) {
   .property-card {
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .property-image-container {
-    height: 300px;
-  }
-  
-  .property-carousel :deep(.el-carousel__container) {
-    height: 300px;
+    width: 580px;
+    margin: 0 0 20px 0;
   }
 }
 </style>

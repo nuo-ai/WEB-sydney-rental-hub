@@ -63,16 +63,61 @@
   padding: 0;
 }
 
-body {
+html, body {
   font-family: var(--font-system);
   color: var(--color-text-primary);
   background-color: var(--color-bg-page);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* overflow-x: hidden; 隐藏水平滚动条 - 此规则会破坏粘性定位，已移除 */
 }
 
 /* ========== Element Plus组件定制 ========== */
+
+/* 轮播组件定制 - 移除可能的黄色指示器 */
+.el-carousel__indicators {
+  display: none !important;
+}
+
+.el-carousel__indicator {
+  display: none !important;
+}
+
+.el-carousel__button {
+  display: none !important;
+}
+
+/* 移除Element Plus可能的黄色警告色 */
+.el-message--warning {
+  background-color: #f0f9ff !important;
+  border-color: #0ea5e9 !important;
+}
+
+.el-notification--warning {
+  background-color: #f0f9ff !important;
+  border-color: #0ea5e9 !important;
+}
+
+/* 移除任何可能的黄色边框或背景 */
+.el-card {
+  border-color: var(--color-border-default) !important;
+}
+
+.el-divider {
+  border-color: var(--color-border-default) !important;
+}
+
+/* 确保没有意外的黄色样式 */
+* {
+  border-color: currentColor;
+}
+
+/* 
+*:not(.el-button):not(.el-slider):not(.logo-icon):not(.favorite-btn) {
+  background-color: transparent;
+}
+*/
 
 /* 按钮组件定制 */
 .el-button--primary {
@@ -369,12 +414,13 @@ body {
 @media (max-width: 767px) {
   .properties-grid {
     grid-template-columns: 1fr;
+    justify-items: start;
   }
   
   .property-card {
     width: 100%;
     max-width: 580px;
-    margin: 0 auto;
+    margin: 0;
   }
   
   .property-image-container {
@@ -383,45 +429,21 @@ body {
   }
 }
 
-/* 平板端 - 双列布局 */
-@media (min-width: 768px) and (max-width: 1023px) {
+/* 平板端和桌面端 - 保持左对齐 */
+@media (min-width: 768px) {
   .properties-grid {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .property-card {
-    width: 100%;
+    grid-template-columns: 1fr;
+    justify-items: start;
     max-width: 580px;
   }
   
-  .container {
-    padding: 0 24px;
-  }
-}
-
-/* 桌面端 - 多列布局 */
-@media (min-width: 1024px) {
-  .properties-grid {
-    grid-template-columns: repeat(auto-fit, minmax(580px, 1fr));
-    max-width: 1800px;
-    margin: 0 auto;
+  .property-card {
+    width: 580px;
+    margin: 0;
   }
   
   .container {
     padding: 0 32px;
-  }
-}
-
-/* 超大屏幕优化 */
-@media (min-width: 1280px) {
-  .properties-grid {
-    justify-content: center;
-  }
-  
-  .container {
-    padding: 0 40px;
   }
 }
 
@@ -507,92 +529,7 @@ body {
   color: white;
 }
 
-/* ========== 导航组件样式 ========== */
-
-/* 底部导航栏 */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid var(--color-border-default);
-  padding: 8px;
-  z-index: 100;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px;
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border-radius: 8px;
-}
-
-.nav-item:hover,
-.nav-item.active {
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
-}
-
-.nav-item i {
-  font-size: 20px;
-}
-
-.nav-item span {
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/* 顶部导航栏 */
-.top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--color-border-default);
-  padding: 0 32px;
-  height: 64px;
-  z-index: 100;
-}
-
-.top-nav-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  text-decoration: none;
-}
-
-.logo-icon {
-  width: 32px;
-  height: 32px;
-  background: var(--juwo-primary);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-}
+/* ========== 导航组件样式已移至Navigation.vue组件内 ========== */
 
 /* ========== 加载和状态样式 ========== */
 

@@ -162,9 +162,19 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 应用筛选条件
     applyFilters(filters) {
+      // 更新store中的筛选状态，确保单一数据源
+      if (filters.areas) {
+        // 将字符串数组转换为符合预期的对象数组
+        this.selectedLocations = filters.areas.map(area => ({
+          id: area,
+          type: 'suburb', // 假设快速筛选只处理suburb
+          name: area
+        }));
+      }
+
       let filtered = [...this.allProperties]
       
-      // 区域筛选
+      // 区域筛选 (使用更新后的state)
       if (this.selectedLocations.length > 0) {
         filtered = filtered.filter(property => {
           return this.selectedLocations.some(location => {

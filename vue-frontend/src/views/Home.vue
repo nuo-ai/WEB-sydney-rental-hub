@@ -2,31 +2,32 @@
   <div class="home-container">
     <!-- 主页内容 -->
     <main class="main-content">
-      <div class="container">
-        <!-- 页面标题 -->
-        <header class="page-header">
-          <h1 class="page-title chinese-text">为你找到的房源</h1>
-          <p class="page-subtitle chinese-text">基于你的偏好，我们推荐以下房源</p>
-        </header>
+      <!-- 移动端Logo区域 -->
+      <div class="mobile-logo-section">
+        <div class="container">
+          <div class="mobile-logo">
+            <i class="fa-solid fa-house logo-icon"></i>
+            <span class="logo-text">JUWO 桔屋找房</span>
+          </div>
+        </div>
+      </div>
 
-        <!-- 搜索和筛选区域 -->
-        <div class="search-filter-section">
-          <div class="search-filter-container">
-            <!-- 搜索栏 -->
+      <!-- 搜索和筛选区域 - Domain风格全屏容器 -->
+      <div class="search-filter-section">
+        <div class="search-content-container">
+          <!-- PC端：搜索框和筛选标签在同一行 -->
+          <div class="search-filter-row">
             <SearchBar 
               class="search-bar"
               @search="handleSearch"
               @locationSelected="handleLocationSelected"
             />
-            
-            <!-- 筛选按钮 -->
-            <el-button 
-              class="filter-trigger-btn"
-              size="large"
-              @click="showFilterPanel = true"
-            >
-              <i class="fa-solid fa-sliders"></i>
-            </el-button>
+            <FilterTabs 
+              class="filter-tabs-right"
+              :filter-panel-open="showFilterPanel"
+              @toggleFullPanel="handleToggleFullPanel"
+              @filtersChanged="handleQuickFiltersChanged"
+            />
           </div>
           
           <!-- 结果统计 -->
@@ -36,8 +37,10 @@
             </p>
           </div>
         </div>
+      </div>
 
-        <!-- 房源列表 -->
+      <!-- 房源列表 -->
+      <div class="container">
         <div class="properties-section">
           <!-- 加载状态 -->
           <div v-if="propertiesStore.loading" class="loading-spinner">
@@ -111,6 +114,7 @@ import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
 import SearchBar from '@/components/SearchBar.vue'
+import FilterTabs from '@/components/FilterTabs.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 
@@ -138,6 +142,16 @@ const handleLocationSelected = (location) => {
   console.log('📍 区域选择变更:', location)
   // 应用筛选
   applyCurrentFilters()
+}
+
+const handleToggleFullPanel = (show) => {
+  console.log('🔧 切换完整筛选面板:', show)
+  showFilterPanel.value = show
+}
+
+const handleQuickFiltersChanged = (filters) => {
+  console.log('⚡ 快速筛选变更:', filters)
+  // 快速筛选逻辑已在FilterTabs组件中处理
 }
 
 const handleFiltersChanged = (filters) => {
@@ -216,7 +230,6 @@ onMounted(() => {
 
 @media (min-width: 769px) {
   .home-container {
-    padding-top: 64px; /* 为桌面端顶部导航留空间 */
     padding-bottom: 0;
   }
 }
@@ -227,14 +240,14 @@ onMounted(() => {
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1200px; /* 统一最大宽度 */
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 24px 32px;
 }
 
 @media (min-width: 768px) {
   .container {
-    padding: 32px 24px;
+    padding: 32px 32px;
   }
 }
 
@@ -274,68 +287,124 @@ onMounted(() => {
   }
 }
 
-/* 搜索筛选区域 */
-.search-filter-section {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  margin-bottom: 32px;
-  border: 1px solid var(--color-border-default);
-  position: sticky;
-  top: 80px;
-  z-index: 50;
+/* 移动端Logo区域 */
+.mobile-logo-section {
+  display: block;
+  margin-bottom: 20px;
 }
 
+.mobile-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 0;
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--juwo-primary);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* PC端隐藏移动端Logo */
 @media (min-width: 769px) {
-  .search-filter-section {
-    top: 80px;
+  .mobile-logo-section {
+    display: none;
   }
 }
 
-.search-filter-container {
+/* Domain标准搜索区域 - 全屏容器 */
+.search-filter-section {
+  /* 从一开始就横贯整个屏幕，像Domain一样 */
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  position: sticky;
+  top: 0; /* 粘在屏幕顶部，导航栏滚动消失后搜索框占据顶部 */
+  z-index: 50;
+}
+
+.search-content-container {
+  /* 搜索内容居中对齐容器 */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 32px 16px 32px;
+}
+
+/* 搜索行布局 */
+.search-filter-row {
   display: flex;
+  align-items: center;
   gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-bar {
-  flex: 1;
-}
-
-.filter-trigger-btn {
+  width: 580px; /* 与房源卡片宽度一致 */
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--color-border-default);
-  background: white;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
 }
 
-.filter-trigger-btn:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+.filter-tabs-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
-/* 结果统计 */
 .results-summary {
-  border-top: 1px solid var(--color-border-default);
-  padding-top: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .results-count {
-  font-size: 16px;
-  color: var(--color-text-primary);
+  font-size: 14px;
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .results-count strong {
   color: var(--juwo-primary);
-  font-weight: 700;
+  font-weight: 600;
+}
+
+/* 移动端布局调整 */
+@media (max-width: 768px) {
+  .search-filter-section {
+    margin-bottom: 16px;
+  }
+  
+  .search-content-container {
+    padding: 16px 24px 12px 24px;
+  }
+  
+  .search-filter-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-bar {
+    width: 100%;
+  }
+  
+  .filter-tabs-right {
+    width: 100%;
+  }
 }
 
 /* 房源列表区域 */
@@ -394,36 +463,13 @@ onMounted(() => {
   margin: 0;
 }
 
-/* 房源网格 */
+/* 房源网格 - 单列布局 */
 .properties-grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-  justify-items: center;
-}
-
-/* 移动端 - 单列布局 */
-@media (max-width: 767px) {
-  .properties-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 平板端 - 双列布局 */
-@media (min-width: 768px) and (max-width: 1199px) {
-  .properties-grid {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-}
-
-/* 桌面端 - 灵活布局 */
-@media (min-width: 1200px) {
-  .properties-grid {
-    grid-template-columns: repeat(auto-fit, minmax(580px, 1fr));
-    max-width: 1800px;
-    margin: 0 auto;
-  }
+  align-items: flex-start;
+  /* max-width 将由外部容器 .container 控制 */
 }
 
 /* 分页容器 */
@@ -460,21 +506,24 @@ onMounted(() => {
 /* 响应式搜索筛选区域 */
 @media (max-width: 767px) {
   .search-filter-section {
-    margin: 0 -16px 24px -16px;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    top: 0;
+    max-width: none;
+    margin-bottom: 16px;
   }
   
   .search-filter-container {
     flex-direction: column;
     gap: 12px;
+    width: 100%;
+  }
+  
+  .search-bar {
+    width: 100%;
   }
   
   .filter-trigger-btn {
     width: 100%;
     height: 48px;
+    border-radius: 6px;
   }
 }
 </style>

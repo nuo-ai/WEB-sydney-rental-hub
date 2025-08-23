@@ -1,135 +1,121 @@
 <template>
-  <el-drawer
-    v-model="visible"
-    title="筛选条件"
-    :size="drawerSize"
-    direction="btt"
-    class="filter-drawer"
-  >
-    <div class="filter-content">
-      <!-- 价格范围滑块 -->
-      <div class="filter-section">
-        <div class="filter-header">
-          <h3 class="filter-title chinese-text">价格范围 (周租, AUD)</h3>
-          <p class="price-display">{{ priceRangeText }}</p>
-        </div>
-        <el-slider
-          v-model="filters.priceRange"
-          range
-          :min="0"
-          :max="5000"
-          :step="50"
-          :show-stops="false"
-          class="price-slider"
-          @change="handlePriceChange"
-        />
-      </div>
-
-      <!-- 卧室数量 - 相邻多选 -->
-      <div class="filter-section">
-        <h3 class="filter-title chinese-text">卧室</h3>
-        <div class="filter-buttons-group">
-          <button
-            v-for="option in bedroomOptions"
-            :key="option.value"
-            class="filter-btn"
-            :class="{ 'active': isBedroomSelected(option.value) }"
-            @click="toggleBedroom(option.value)"
-          >
-            {{ option.label }}
+  <!-- Domain风格筛选面板 -->
+  <div v-if="visible" class="filter-panel-wrapper">
+    <!-- 遮罩层 -->
+    <div class="filter-overlay" @click="closePanel"></div>
+    
+    <!-- 筛选面板 -->
+    <div class="domain-filter-panel" :class="{ 'visible': visible }">
+      <!-- 面板头部 -->
+      <div class="panel-header">
+        <h3 class="panel-title chinese-text">筛选</h3>
+        <div class="header-actions">
+          <button class="reset-link" @click="resetFilters">重置筛选</button>
+          <button class="close-btn" @click="closePanel">
+            <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
       </div>
-
-      <!-- 浴室数量 - 相邻多选 -->
-      <div class="filter-section">
-        <h3 class="filter-title chinese-text">浴室</h3>
-        <div class="filter-buttons-group">
-          <button
-            v-for="option in bathroomOptions"
-            :key="option.value"
-            class="filter-btn"
-            :class="{ 'active': isBathroomSelected(option.value) }"
-            @click="toggleBathroom(option.value)"
-          >
-            {{ option.label }}
-          </button>
-        </div>
-      </div>
-
-      <!-- 车位数量 - 相邻多选 -->
-      <div class="filter-section">
-        <h3 class="filter-title chinese-text">车位</h3>
-        <div class="filter-buttons-group">
-          <button
-            v-for="option in parkingOptions"
-            :key="option.value"
-            class="filter-btn"
-            :class="{ 'active': isParkingSelected(option.value) }"
-            @click="toggleParking(option.value)"
-          >
-            {{ option.label }}
-          </button>
-        </div>
-      </div>
-
-      <!-- 入住时间 -->
-      <div class="filter-section">
-        <h3 class="filter-title chinese-text">入住时间</h3>
-        <el-date-picker
-          v-model="filters.availableDate"
-          type="date"
-          placeholder="选择入住日期"
-          size="large"
-          class="date-picker"
-          @change="handleDateChange"
-        />
-      </div>
-
-      <!-- 区域选择 -->
-      <div class="filter-section">
-        <h3 class="filter-title chinese-text">区域</h3>
-        <el-select
-          v-model="filters.selectedArea"
-          placeholder="选择区域"
-          size="large"
-          clearable
-          filterable
-          class="area-select"
-          @change="handleAreaChange"
-        >
-          <el-option
-            v-for="area in areaOptions"
-            :key="area.value"
-            :label="area.label"
-            :value="area.value"
+      
+      <!-- 筛选内容 -->
+      <div class="panel-content">
+        <!-- 价格范围滑块 -->
+        <div class="filter-section">
+          <div class="section-header">
+            <h4 class="section-title chinese-text">价格范围 (周租, AUD)</h4>
+            <span class="price-display">{{ priceRangeText }}</span>
+          </div>
+          <el-slider
+            v-model="filters.priceRange"
+            range
+            :min="0"
+            :max="5000"
+            :step="50"
+            :show-stops="false"
+            class="price-slider"
+            @change="handlePriceChange"
           />
-        </el-select>
-      </div>
+        </div>
 
-      <!-- 家具选项 -->
-      <div class="filter-section">
-        <h3 class="filter-title chinese-text">家具</h3>
-        <div class="furnished-toggle">
-          <span class="toggle-label chinese-text">只显示带家具的房源</span>
-          <el-switch
-            v-model="filters.isFurnished"
+        <!-- 卧室数量 -->
+        <div class="filter-section">
+          <h4 class="section-title chinese-text">卧室</h4>
+          <div class="filter-buttons-group">
+            <button
+              v-for="option in bedroomOptions"
+              :key="option.value"
+              class="filter-btn"
+              :class="{ 'active': isBedroomSelected(option.value) }"
+              @click="toggleBedroom(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 浴室数量 -->
+        <div class="filter-section">
+          <h4 class="section-title chinese-text">浴室</h4>
+          <div class="filter-buttons-group">
+            <button
+              v-for="option in bathroomOptions"
+              :key="option.value"
+              class="filter-btn"
+              :class="{ 'active': isBathroomSelected(option.value) }"
+              @click="toggleBathroom(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 车位数量 -->
+        <div class="filter-section">
+          <h4 class="section-title chinese-text">车位</h4>
+          <div class="filter-buttons-group">
+            <button
+              v-for="option in parkingOptions"
+              :key="option.value"
+              class="filter-btn"
+              :class="{ 'active': isParkingSelected(option.value) }"
+              @click="toggleParking(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 入住时间 -->
+        <div class="filter-section">
+          <h4 class="section-title chinese-text">入住时间</h4>
+          <el-date-picker
+            v-model="filters.availableDate"
+            type="date"
+            placeholder="选择入住日期"
             size="large"
-            @change="handleFurnishedChange"
+            class="date-picker"
+            @change="handleDateChange"
           />
         </div>
-      </div>
-    </div>
 
-    <!-- 底部操作按钮 -->
-    <template #footer>
-      <div class="filter-actions">
-        <el-button 
-          class="reset-btn" 
-          size="large"
-          @click="resetFilters"
-        >
-          重置
+        <!-- 家具选项 -->
+        <div class="filter-section">
+          <h4 class="section-title chinese-text">家具</h4>
+          <div class="furnished-toggle">
+            <span class="toggle-label chinese-text">只显示带家具的房源</span>
+            <el-switch
+              v-model="filters.isFurnished"
+              size="large"
+              @change="handleFurnishedChange"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作按钮 -->
+      <div class="panel-footer">
+        <el-button class="cancel-btn" size="large" @click="closePanel">
+          取消
         </el-button>
         <el-button 
           type="primary" 
@@ -140,8 +126,8 @@
           显示结果 ({{ filteredCount }})
         </el-button>
       </div>
-    </template>
-  </el-drawer>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -169,7 +155,6 @@ const filters = ref({
   bathrooms: [],
   parking: [],
   availableDate: null,
-  selectedArea: '',
   isFurnished: false
 })
 
@@ -202,10 +187,6 @@ const visible = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-const drawerSize = computed(() => {
-  return window.innerWidth <= 768 ? '85%' : '60%'
-})
-
 const priceRangeText = computed(() => {
   const [min, max] = filters.value.priceRange
   if (min === 0 && max === 5000) {
@@ -215,15 +196,6 @@ const priceRangeText = computed(() => {
   } else {
     return `$${min} - $${max}`
   }
-})
-
-const areaOptions = computed(() => {
-  return propertiesStore.locationSuggestions
-    .filter(location => location.type === 'suburb')
-    .map(location => ({
-      value: location.id,
-      label: location.fullName
-    }))
 })
 
 const filteredCount = computed(() => {
@@ -284,11 +256,13 @@ const toggleBedroom = (value) => {
     // 添加选择
     if (value === 'any') {
       filters.value.bedrooms = ['any']
+      applyFiltersToStore()
       return
     }
     
     if (currentBedrooms.includes('any')) {
       filters.value.bedrooms = [value]
+      applyFiltersToStore()
       return
     }
     
@@ -302,6 +276,7 @@ const toggleBedroom = (value) => {
   }
   
   filters.value.bedrooms = currentBedrooms
+  applyFiltersToStore()
 }
 
 const toggleBathroom = (value) => {
@@ -313,11 +288,13 @@ const toggleBathroom = (value) => {
   } else {
     if (value === 'any') {
       filters.value.bathrooms = ['any']
+      applyFiltersToStore()
       return
     }
     
     if (currentBathrooms.includes('any')) {
       filters.value.bathrooms = [value]
+      applyFiltersToStore()
       return
     }
     
@@ -330,6 +307,7 @@ const toggleBathroom = (value) => {
   }
   
   filters.value.bathrooms = currentBathrooms
+  applyFiltersToStore()
 }
 
 const toggleParking = (value) => {
@@ -341,11 +319,13 @@ const toggleParking = (value) => {
   } else {
     if (value === 'any') {
       filters.value.parking = ['any']
+      applyFiltersToStore()
       return
     }
     
     if (currentParking.includes('any')) {
       filters.value.parking = [value]
+      applyFiltersToStore()
       return
     }
     
@@ -358,6 +338,7 @@ const toggleParking = (value) => {
   }
   
   filters.value.parking = currentParking
+  applyFiltersToStore()
 }
 
 const handlePriceChange = () => {
@@ -368,12 +349,13 @@ const handleDateChange = () => {
   applyFiltersToStore()
 }
 
-const handleAreaChange = () => {
+const handleFurnishedChange = () => {
   applyFiltersToStore()
 }
 
-const handleFurnishedChange = () => {
-  applyFiltersToStore()
+// 关闭面板方法
+const closePanel = () => {
+  visible.value = false
 }
 
 const applyFiltersToStore = () => {
@@ -393,7 +375,7 @@ const applyFiltersToStore = () => {
 
 const applyFilters = () => {
   applyFiltersToStore()
-  visible.value = false
+  closePanel()
 }
 
 const resetFilters = () => {
@@ -403,7 +385,6 @@ const resetFilters = () => {
     bathrooms: ['any'],
     parking: ['any'],
     availableDate: null,
-    selectedArea: '',
     isFurnished: false
   }
   
@@ -427,34 +408,104 @@ watch(visible, (newValue) => {
 </script>
 
 <style scoped>
-/* 筛选抽屉样式 */
-.filter-drawer :deep(.el-drawer__header) {
-  background: var(--color-bg-card);
-  border-bottom: 1px solid var(--color-border-default);
-  padding: 20px 24px;
-  margin-bottom: 0;
+/* Domain风格筛选面板包装器 */
+.filter-panel-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
 }
 
-.filter-drawer :deep(.el-drawer__title) {
+/* 遮罩层 */
+.filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  transition: opacity 0.3s ease;
+}
+
+/* Domain风格筛选面板 */
+.domain-filter-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.domain-filter-panel.visible {
+  transform: translateX(0);
+}
+
+/* 面板头部 */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border-default);
+  background: white;
+}
+
+.panel-title {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  color: var(--juwo-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+.reset-link:hover {
+  color: var(--juwo-primary-dark);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
   color: var(--color-text-primary);
 }
 
-.filter-drawer :deep(.el-drawer__body) {
-  padding: 0;
-}
-
-.filter-drawer :deep(.el-drawer__footer) {
-  background: var(--color-bg-card);
-  border-top: 1px solid var(--color-border-default);
-  padding: 20px 24px;
-}
-
-/* 筛选内容区域 */
-.filter-content {
+/* 面板内容 */
+.panel-content {
+  flex: 1;
   padding: 24px;
-  max-height: calc(85vh - 140px);
   overflow-y: auto;
 }
 
@@ -467,44 +518,48 @@ watch(visible, (newValue) => {
   margin-bottom: 0;
 }
 
-/* 筛选标题 */
-.filter-header {
+/* 区块标题 */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 16px 0;
+}
+
+/* 价格区块头部 */
+.section-header {
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
 }
 
-.filter-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
 .price-display {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--juwo-primary);
-  margin: 0;
 }
 
 /* 价格滑块 */
 .price-slider {
-  margin: 16px 8px;
+  margin: 8px 0;
 }
 
 .price-slider :deep(.el-slider__runway) {
-  background-color: var(--color-border-default);
+  background-color: #e5e7eb;
+  height: 6px;
 }
 
 .price-slider :deep(.el-slider__bar) {
   background-color: var(--juwo-primary);
+  height: 6px;
 }
 
 .price-slider :deep(.el-slider__button) {
   border: 3px solid var(--juwo-primary);
   background-color: white;
+  width: 20px;
+  height: 20px;
 }
 
 .price-slider :deep(.el-slider__button:hover) {
@@ -515,17 +570,17 @@ watch(visible, (newValue) => {
 .filter-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .filter-btn {
-  padding: 10px 20px;
-  border: 2px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
   background: white;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 500;
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 60px;
@@ -534,6 +589,7 @@ watch(visible, (newValue) => {
 .filter-btn:hover {
   border-color: var(--juwo-primary);
   color: var(--juwo-primary);
+  background: var(--juwo-primary-50);
 }
 
 .filter-btn.active {
@@ -548,8 +604,8 @@ watch(visible, (newValue) => {
 }
 
 .date-picker :deep(.el-input__wrapper) {
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--color-border-default);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-default);
 }
 
 .date-picker :deep(.el-input__wrapper):hover {
@@ -558,26 +614,7 @@ watch(visible, (newValue) => {
 
 .date-picker :deep(.el-input__wrapper.is-focus) {
   border-color: var(--juwo-primary);
-  box-shadow: 0 0 0 4px rgba(255, 88, 36, 0.1);
-}
-
-/* 区域选择器 */
-.area-select {
-  width: 100%;
-}
-
-.area-select :deep(.el-input__wrapper) {
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--color-border-default);
-}
-
-.area-select :deep(.el-input__wrapper):hover {
-  border-color: var(--juwo-primary);
-}
-
-.area-select :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--juwo-primary);
-  box-shadow: 0 0 0 4px rgba(255, 88, 36, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 88, 36, 0.1);
 }
 
 /* 家具开关 */
@@ -586,9 +623,9 @@ watch(visible, (newValue) => {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: white;
-  border: 2px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
+  background: #f8f9fa;
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
 }
 
 .toggle-label {
@@ -597,7 +634,6 @@ watch(visible, (newValue) => {
   color: var(--color-text-primary);
 }
 
-/* 开关组件定制 */
 .furnished-toggle :deep(.el-switch__core) {
   background-color: var(--color-border-default);
 }
@@ -606,31 +642,31 @@ watch(visible, (newValue) => {
   background-color: var(--juwo-primary);
 }
 
-/* 底部操作按钮 */
-.filter-actions {
+/* 面板底部 */
+.panel-footer {
   display: flex;
-  gap: 16px;
-  width: 100%;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid var(--color-border-default);
+  background: white;
 }
 
-.reset-btn {
+.cancel-btn {
   flex: 1;
-  background: #f5f5f5;
-  border-color: #d9d9d9;
+  background: white;
+  border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);
-  font-weight: 600;
 }
 
-.reset-btn:hover {
-  background: #e8e8e8;
-  border-color: #bfbfbf;
+.cancel-btn:hover {
+  border-color: var(--juwo-primary);
+  color: var(--juwo-primary);
 }
 
 .apply-btn {
   flex: 2;
   background-color: var(--juwo-primary);
   border-color: var(--juwo-primary);
-  font-weight: 600;
 }
 
 .apply-btn:hover {
@@ -638,9 +674,18 @@ watch(visible, (newValue) => {
   border-color: var(--juwo-primary-light);
 }
 
-/* 响应式适配 */
+/* 移动端全屏模式 */
 @media (max-width: 767px) {
-  .filter-content {
+  .domain-filter-panel {
+    width: 100%;
+    transform: translateY(100%);
+  }
+  
+  .domain-filter-panel.visible {
+    transform: translateY(0);
+  }
+  
+  .panel-content {
     padding: 20px;
   }
   
@@ -648,24 +693,14 @@ watch(visible, (newValue) => {
     margin-bottom: 24px;
   }
   
-  .filter-buttons-group {
-    gap: 6px;
-  }
-  
   .filter-btn {
-    padding: 8px 16px;
+    padding: 10px 16px;
     font-size: 13px;
-    min-width: 50px;
+    min-width: 55px;
   }
   
-  .filter-actions {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .reset-btn,
-  .apply-btn {
-    flex: none;
+  .panel-footer {
+    padding: 20px;
   }
 }
 </style>

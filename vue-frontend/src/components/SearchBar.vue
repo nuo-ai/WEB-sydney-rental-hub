@@ -261,7 +261,6 @@ watch(() => propertiesStore.searchQuery, (newQuery) => {
 .search-bar-container {
   position: relative;
   width: 100%;
-  max-width: 600px;
 }
 
 /* 区域标签样式 */
@@ -316,8 +315,8 @@ watch(() => propertiesStore.searchQuery, (newQuery) => {
 }
 
 .search-input :deep(.el-input__wrapper) {
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--color-border-default);
+  border-radius: 6px;
+  border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
 }
 

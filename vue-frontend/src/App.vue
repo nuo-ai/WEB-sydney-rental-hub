@@ -38,10 +38,10 @@ import Navigation from '@/components/Navigation.vue'
   }
 }
 
-/* 桌面端适配 - 为顶部导航留空间 */
+/* 桌面端适配 - 使用自然文档流，无需预留空间 */
 @media (min-width: 769px) {
   .main-view {
-    padding-top: 64px;
+    padding-top: 0;
   }
 }
 
