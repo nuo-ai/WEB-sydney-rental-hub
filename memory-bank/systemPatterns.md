@@ -39,3 +39,67 @@
 -   **示例**: `FilterTabs.vue` 在用户选择筛选条件后，调用 `propertiesStore.applyFilters(filters)`。`applyFilters` action 负责接收参数，更新store自身的`state`，然后基于更新后的`state`计算出新的`filteredProperties`。
 -   **反模式 (应避免)**: 在action中混合使用传入的参数和未同步的旧`state`，这会导致数据不一致。
 -   **经验教训**: 我们修复了`applyFilters` action，使其在执行筛选前，首先用传入的参数更新相关的store state，从而解决了筛选功能不正常的问题。
+
+## 移动端响应式设计模式
+
+### 4. 渐进式间距系统
+
+-   **模式**: 在移动端界面中采用渐进式间距设计，从视觉层次上由紧到松：`核心元素间距 < 区域间距 < 容器间距`。
+-   **示例实现**:
+    ```css
+    /* 渐进式间距：8px → 12px → 16px */
+    .mobile-logo-section {
+      padding: 8px 0 12px 0;  /* logo核心间距 */
+    }
+    .search-filter-section {
+      margin-bottom: 12px;     /* 区域间距 */
+    }
+    .container {
+      padding: 16px 32px;      /* 容器间距 */
+    }
+    ```
+-   **反模式 (应避免)**: 使用统一的大间距值（如24px），会造成移动端界面过于松散。
+-   **经验教训**: 通过将logo区域padding从`16px 0`优化为`8px 0 12px 0`，显著改善了移动端界面的紧凑性。
+
+### 5. 移动端滚动逻辑隔离
+
+-   **模式**: 移动端和桌面端应使用不同的滚动处理逻辑，避免跨平台状态污染。
+-   **核心实现**:
+    ```javascript
+    const handleScroll = () => {
+      const isMobileView = windowWidth.value <= 768
+      
+      if (isMobileView) {
+        // 移动端：基于实际DOM高度判断
+        const logoSection = document.querySelector('.mobile-logo-section')
+        const logoHeight = logoSection ? logoSection.offsetHeight : 32
+        const shouldBeFixed = currentScrollY > logoHeight
+        
+        // 移动端状态清洁：避免污染全局导航状态
+        if (isNavHidden.value) {
+          isNavHidden.value = false
+        }
+      } else {
+        // 桌面端：使用getBoundingClientRect判断
+        const shouldBeFixed = searchBarRect.top <= 0
+      }
+    }
+    ```
+-   **反模式 (应避免)**: 移动端和桌面端使用相同的`getBoundingClientRect()`判断逻辑，会导致移动端回滚到顶部时的判断错误。
+-   **经验教训**: 通过将移动端滚动判断改为基于`offsetHeight`的精确计算，解决了回滚到顶部时logo消失的问题。
+
+### 6. 精确高度计算策略
+
+-   **模式**: 对于需要精确定位的移动端组件，应使用实际DOM高度（`offsetHeight`）而非实时计算的边界信息（`getBoundingClientRect()`）。
+-   **技术对比**:
+    ```javascript
+    // ❌ 错误方式：频繁的getBoundingClientRect调用
+    const searchBarRect = searchBarElement.value.getBoundingClientRect()
+    const shouldBeFixed = searchBarRect.top <= 0
+    
+    // ✅ 正确方式：基于实际DOM高度的一次性计算
+    const logoHeight = logoSection ? logoSection.offsetHeight : 32
+    const shouldBeFixed = currentScrollY > logoHeight
+    ```
+-   **性能优势**: `offsetHeight`获取的是缓存的布局信息，避免了`getBoundingClientRect()`引起的强制布局重计算。
+-   **经验教训**: 移动端场景下，基于滚动距离的判断比基于视窗位置的判断更加可靠和高效。
