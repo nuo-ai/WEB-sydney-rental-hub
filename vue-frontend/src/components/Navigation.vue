@@ -233,10 +233,9 @@ onUnmounted(() => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 60;
   transform: translateY(0);
-  transition: transform 0.2s ease-in-out;
-  /* 硬件加速优化 */
+  transition: transform 0.25s ease-in-out;
+  /* 硬件加速优化 - 避免transform冲突 */
   will-change: transform;
-  transform: translateZ(0);
   backface-visibility: hidden;
 }
 

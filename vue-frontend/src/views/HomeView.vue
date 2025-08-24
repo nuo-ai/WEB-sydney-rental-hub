@@ -253,13 +253,19 @@ const handleScroll = () => {
     searchBarHeight.value = 0
   }
   
-  // 导航栏显示/隐藏逻辑（仅在桌面端，移动端完全跳过）
+  // 导航栏显示/隐藏逻辑（仅在桌面端）
   if (!isMobileView) {
-    const scrollThreshold = 5 // 降低滚动阈值，提高响应速度
+    const scrollThreshold = 5
     
-    if (Math.abs(scrollDelta) > scrollThreshold) {
+    // 回到顶部附近时强制重置导航栏状态
+    if (currentScrollY < 50) {
+      if (isNavHidden.value) {
+        isNavHidden.value = false
+        emit('updateNavVisibility', false)
+      }
+    } else if (Math.abs(scrollDelta) > scrollThreshold) {
       if (scrollDelta > 0 && currentScrollY > 100) {
-        // 向下滚动且滚动距离超过100px，隐藏导航栏
+        // 向下滚动且距离超过100px，隐藏导航栏
         if (!isNavHidden.value) {
           isNavHidden.value = true
           emit('updateNavVisibility', true)
@@ -272,8 +278,13 @@ const handleScroll = () => {
         }
       }
     }
+  } else {
+    // 移动端：强制确保状态清洁
+    if (isNavHidden.value) {
+      isNavHidden.value = false
+      // 不发送emit事件，避免影响App组件
+    }
   }
-  // 移动端：完全跳过导航状态逻辑，不做任何处理
   
   lastScrollY.value = currentScrollY
 }
@@ -416,7 +427,7 @@ onUnmounted(() => {
 .mobile-logo-section {
   padding: 16px 0;
   position: relative;
-  z-index: 55; /* 确保高于搜索栏固定状态的z-index: 50，但低于导航栏 */
+  /* 移除高z-index，避免与fixed搜索栏产生叠加问题 */
 }
 
 .mobile-logo {
