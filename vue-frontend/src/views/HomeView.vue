@@ -241,16 +241,33 @@ const handleScroll = () => {
   const scrollDelta = currentScrollY - lastScrollY.value
   const isMobileView = windowWidth.value <= 768
   
-  // 搜索栏固定逻辑
+  // 搜索栏固定逻辑 - 改进移动端逻辑
   const searchBarRect = searchBarElement.value.getBoundingClientRect()
-  const shouldBeFixed = searchBarRect.top <= 0
   
-  if (shouldBeFixed && !isSearchBarFixed.value) {
-    searchBarHeight.value = searchBarElement.value.offsetHeight
-    isSearchBarFixed.value = true
-  } else if (!shouldBeFixed && isSearchBarFixed.value) {
-    isSearchBarFixed.value = false
-    searchBarHeight.value = 0
+  if (isMobileView) {
+    // 移动端：更精确的固定逻辑，考虑logo区域高度
+    const logoSection = document.querySelector('.mobile-logo-section')
+    const logoHeight = logoSection ? logoSection.offsetHeight : 32 // fallback高度
+    const shouldBeFixed = currentScrollY > logoHeight
+    
+    if (shouldBeFixed && !isSearchBarFixed.value) {
+      searchBarHeight.value = searchBarElement.value.offsetHeight
+      isSearchBarFixed.value = true
+    } else if (!shouldBeFixed && isSearchBarFixed.value) {
+      isSearchBarFixed.value = false
+      searchBarHeight.value = 0
+    }
+  } else {
+    // 桌面端：保持原有逻辑
+    const shouldBeFixed = searchBarRect.top <= 0
+    
+    if (shouldBeFixed && !isSearchBarFixed.value) {
+      searchBarHeight.value = searchBarElement.value.offsetHeight
+      isSearchBarFixed.value = true
+    } else if (!shouldBeFixed && isSearchBarFixed.value) {
+      isSearchBarFixed.value = false
+      searchBarHeight.value = 0
+    }
   }
   
   // 导航栏显示/隐藏逻辑（仅在桌面端）
@@ -336,7 +353,7 @@ onUnmounted(() => {
 .container {
   max-width: 1200px; /* 统一最大宽度 */
   margin: 0 auto;
-  padding: 24px 32px;
+  padding: 16px 32px; /* 减少移动端上下padding */
 }
 
 @media (min-width: 768px) {
@@ -388,7 +405,7 @@ onUnmounted(() => {
   width: 100%;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  margin-bottom: 24px;
+  margin-bottom: 16px; /* 减少移动端下边距 */
   z-index: 50;
   transition: all 0.2s ease-out;
 }
@@ -425,7 +442,7 @@ onUnmounted(() => {
 
 /* 移动端Logo区域 */
 .mobile-logo-section {
-  padding: 16px 0;
+  padding: 8px 0 12px 0; /* 减少上下间距，上8px下12px */
   position: relative;
   /* 移除高z-index，避免与fixed搜索栏产生叠加问题 */
 }
@@ -454,7 +471,7 @@ onUnmounted(() => {
   /* 搜索内容居中对齐容器 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 32px 16px 32px;
+  padding: 16px 32px 12px 32px; /* 减少上下padding */
 }
 
 /* 搜索行布局 */
@@ -495,11 +512,11 @@ onUnmounted(() => {
 /* 移动端布局调整 */
 @media (max-width: 768px) {
   .search-filter-section {
-    margin-bottom: 16px;
+    margin-bottom: 12px; /* 进一步减少移动端间距 */
   }
   
   .search-content-container {
-    padding: 16px 24px 12px 24px;
+    padding: 12px 24px 8px 24px; /* 减少移动端搜索内容padding */
   }
   
   .search-filter-row {
