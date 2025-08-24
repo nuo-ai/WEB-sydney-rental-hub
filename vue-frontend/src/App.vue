@@ -1,15 +1,31 @@
 <template>
   <div id="app" class="app-container">
     <!-- 导航组件 -->
-    <Navigation />
+    <Navigation :isHidden="isNavHidden" />
     
     <!-- 主要内容区域 -->
-    <router-view class="main-view" />
+    <router-view class="main-view" @updateNavVisibility="handleNavVisibility" />
+
+    <!-- 对比工具栏 -->
+    <CompareToolbar />
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import Navigation from '@/components/Navigation.vue'
+import CompareToolbar from '@/components/CompareToolbar.vue'
+
+// 导航栏显示状态
+const isNavHidden = ref(false)
+
+// 处理导航栏显示状态变化
+const handleNavVisibility = (hidden) => {
+  // 只在桌面端处理导航状态更新，移动端忽略
+  if (window.innerWidth > 768) {
+    isNavHidden.value = hidden
+  }
+}
 </script>
 
 <style>
@@ -38,10 +54,10 @@ import Navigation from '@/components/Navigation.vue'
   }
 }
 
-/* 桌面端适配 - 使用自然文档流，无需预留空间 */
+/* 桌面端适配 - 为固定导航栏留出空间 */
 @media (min-width: 769px) {
   .main-view {
-    padding-top: 0;
+    padding-top: 64px; /* 为固定导航栏预留空间 */
   }
 }
 

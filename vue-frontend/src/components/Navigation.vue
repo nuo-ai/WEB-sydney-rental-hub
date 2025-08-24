@@ -16,7 +16,7 @@
   </nav>
 
   <!-- 桌面端顶部导航 -->
-  <nav v-else class="top-nav">
+  <nav v-else class="top-nav" :class="{ 'nav-hidden': isNavHidden }">
     <div class="top-nav-content">
       <!-- 左侧 Logo 和主导航 -->
       <div class="nav-left">
@@ -59,8 +59,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+
+// 定义导航栏显示状态的props
+const props = defineProps({
+  isHidden: {
+    type: Boolean,
+    default: false
+  }
+})
 
 // 路由
 const route = useRoute()
@@ -136,13 +144,31 @@ const userNavItems = [
 ]
 
 // 计算属性
+const windowWidth = ref(window.innerWidth)
+
 const isMobile = computed(() => {
-  return window.innerWidth <= 768
+  return windowWidth.value <= 768
+})
+
+const isNavHidden = computed(() => {
+  return props.isHidden
 })
 
 const isActive = (path) => {
   return route.path === path
 }
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
@@ -197,11 +223,25 @@ const isActive = (path) => {
 
 /* 桌面端顶部导航 */
 .top-nav {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   background: white;
   border-bottom: 1px solid var(--color-border-default);
   height: 64px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 60;
+  transform: translateY(0);
+  transition: transform 0.2s ease-in-out;
+  /* 硬件加速优化 */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.top-nav.nav-hidden {
+  transform: translateY(-100%);
 }
 
 .top-nav-content {

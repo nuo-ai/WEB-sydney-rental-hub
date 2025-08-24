@@ -70,7 +70,7 @@ html, body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* overflow-x: hidden; 隐藏水平滚动条 - 此规则会破坏粘性定位，已移除 */
+  /* overflow-x: hidden; 已移除以修复粘性定位 */
 }
 
 /* ========== Element Plus组件定制 ========== */
@@ -397,6 +397,13 @@ html, body {
 
 /* ========== 响应式设计系统 ========== */
 
+/* PC端隐藏移动端Logo */
+@media (min-width: 769px) {
+  .mobile-logo-section {
+    display: none;
+  }
+}
+
 /* 移动端优先设计 */
 .container {
   max-width: 100%;
@@ -434,7 +441,7 @@ html, body {
   .properties-grid {
     grid-template-columns: 1fr;
     justify-items: start;
-    max-width: 580px;
+    max-width: 100%; /* 确保网格不超过其容器 */
   }
   
   .property-card {

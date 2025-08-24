@@ -89,9 +89,11 @@
         <div class="filter-section">
           <h4 class="section-title chinese-text">入住时间</h4>
           <el-date-picker
-            v-model="filters.availableDate"
-            type="date"
-            placeholder="选择入住日期"
+            v-model="filters.dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
             size="large"
             class="date-picker"
             @change="handleDateChange"
@@ -154,7 +156,7 @@ const filters = ref({
   bedrooms: [],
   bathrooms: [],
   parking: [],
-  availableDate: null,
+  dateRange: [],
   isFurnished: false
 })
 
@@ -365,7 +367,8 @@ const applyFiltersToStore = () => {
     bedrooms: filters.value.bedrooms.includes('any') ? 'any' : filters.value.bedrooms.join(','),
     bathrooms: filters.value.bathrooms.includes('any') ? 'any' : filters.value.bathrooms.join(','),
     parking: filters.value.parking.includes('any') ? 'any' : filters.value.parking.join(','),
-    availableDate: filters.value.availableDate || 'any',
+    date_from: filters.value.dateRange ? filters.value.dateRange[0] : null,
+    date_to: filters.value.dateRange ? filters.value.dateRange[1] : null,
     isFurnished: filters.value.isFurnished
   }
   
@@ -384,7 +387,7 @@ const resetFilters = () => {
     bedrooms: ['any'],
     bathrooms: ['any'],
     parking: ['any'],
-    availableDate: null,
+    dateRange: [],
     isFurnished: false
   }
   

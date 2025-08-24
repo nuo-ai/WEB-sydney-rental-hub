@@ -1,0 +1,42 @@
+# ===================================================================
+# Cline Ignore Rules for Sydney Rental Hub Project
+# Purpose: Focus on the modern Vue 3 frontend development.
+# ===================================================================
+
+# 1. Ignore universal build artifacts, dependencies, and logs
+node_modules/
+dist/
+build/
+__pycache__/
+*.log
+*.pyc
+.DS_Store
+
+# Ignore environment files, but keep the example for reference
+.env*
+!.env.example
+
+# 2. Ignore legacy, archived, and irrelevant modules
+# These are not part of the current development scope.
+archive/
+frontend/      # Legacy vanilla JS frontend, replaced by vue-frontend
+crawler/
+database/
+scripts/
+
+# 3. Ignore specific sub-directories within active modules
+# We need the source code for context, but not the dependencies.
+vue-frontend/node_modules/
+vue-frontend/dist/
+
+mcp-server/node_modules/
+mcp-server/build/
+
+backend/.venv/
+backend/venv/
+
+# ===================================================================
+# By default, all other files are INCLUDED.
+# This ensures that memory-bank/, vue-frontend/, backend/ source,
+# and root configuration files are always accessible.
+# ===================================================================

@@ -13,7 +13,7 @@
 
 -   **模式**: 审慎使用全局样式。应将影响布局和定位的规则（如 `overflow`, `position`, `display`）限定在组件作用域内，以避免意料之外的副作用。
 -   **反模式 (应避免)**: 对 `html` 或 `body` 等顶级元素应用强制性的 `overflow` 规则（例如 `overflow-x: hidden`）。
--   **经验教训**: 在本次UI修复任务中，我们发现全局的`overflow-x: hidden`是导致`position: sticky`失效的根本原因。移除此规则后，粘性布局行为立即恢复正常。
+-   **经验教训**: 在UI修复任务中，我们再次确认了全局`overflow-x: hidden`是导致`position: sticky`失效的根本原因。我们已将此规则从`html, body`移至根组件`.app-container`，从而在解决`sticky`定位问题的同时，避免了全局副作用。
 
 ### 2. 布局对齐策略
 

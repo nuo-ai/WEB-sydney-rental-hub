@@ -24,7 +24,13 @@ export const usePropertiesStore = defineStore('properties', {
     selectedLocations: [],
     
     // 收藏状态 (localStorage作为临时方案)
-    favoriteIds: JSON.parse(localStorage.getItem('juwo-favorites') || '[]')
+    favoriteIds: JSON.parse(localStorage.getItem('juwo-favorites') || '[]'),
+    
+    // 历史记录
+    viewHistory: JSON.parse(localStorage.getItem('juwo-history') || '[]'),
+
+    // 对比状态
+    compareIds: JSON.parse(localStorage.getItem('juwo-compare') || '[]')
   }),
 
   getters: {
@@ -112,7 +118,6 @@ export const usePropertiesStore = defineStore('properties', {
         this.filteredProperties = properties
         this.totalCount = properties.length
         
-        console.log('✅ 房源数据加载成功，数量:', properties.length)
       } catch (error) {
         this.error = error.message || '获取房源数据失败'
         console.error('❌ 房源数据加载失败:', error)
@@ -130,7 +135,6 @@ export const usePropertiesStore = defineStore('properties', {
         const property = await propertyAPI.getDetail(id)
         this.currentProperty = property
         
-        console.log('✅ 房源详情加载成功:', property.listing_id)
       } catch (error) {
         this.error = error.message || '获取房源详情失败'
         console.error('❌ 房源详情加载失败:', error)
@@ -151,7 +155,6 @@ export const usePropertiesStore = defineStore('properties', {
         this.totalCount = properties.length
         this.currentPage = 1 // 重置到第一页
         
-        console.log('✅ 房源搜索成功，结果数量:', properties.length)
       } catch (error) {
         this.error = error.message || '搜索房源失败'
         console.error('❌ 房源搜索失败:', error)
@@ -261,12 +264,23 @@ export const usePropertiesStore = defineStore('properties', {
       }
       
       // 入住日期筛选
-      if (filters.availableDate && filters.availableDate !== 'any') {
-        const filterDate = new Date(filters.availableDate)
+      if (filters.date_from) {
+        const startDate = new Date(filters.date_from)
+        startDate.setHours(0, 0, 0, 0) // 标准化到当天的开始
         filtered = filtered.filter(property => {
-          if (!property.available_date) return false
+          if (!property.available_date) return true // 如果房源没有可用日期，暂时不筛选掉
           const propertyDate = new Date(property.available_date)
-          return propertyDate <= filterDate
+          return propertyDate >= startDate
+        })
+      }
+
+      if (filters.date_to) {
+        const endDate = new Date(filters.date_to)
+        endDate.setHours(23, 59, 59, 999) // 标准化到当天的结束
+        filtered = filtered.filter(property => {
+          if (!property.available_date) return false // 如果没有可用日期，则不符合结束日期筛选
+          const propertyDate = new Date(property.available_date)
+          return propertyDate <= endDate
         })
       }
       
@@ -279,7 +293,6 @@ export const usePropertiesStore = defineStore('properties', {
       this.totalCount = filtered.length
       this.currentPage = 1 // 重置到第一页
       
-      console.log('🔍 筛选结果:', filtered.length, '套房源')
     },
 
     // 设置搜索查询
@@ -319,7 +332,6 @@ export const usePropertiesStore = defineStore('properties', {
       // 保存到localStorage
       localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
       
-      console.log('💖 收藏状态更新:', propertyId, this.favoriteIds.includes(id) ? '已收藏' : '已取消')
     },
 
     // 设置当前页
@@ -340,7 +352,35 @@ export const usePropertiesStore = defineStore('properties', {
       this.currentPage = 1
       this.totalCount = this.allProperties.length
       
-      console.log('🔄 筛选条件已重置')
+    },
+
+    // 记录浏览历史
+    logHistory(propertyId) {
+      const id = String(propertyId)
+      // 移除已存在的记录，再添加到最前面
+      const history = this.viewHistory.filter(item => item !== id)
+      history.unshift(id)
+      // 最多只保留50条
+      this.viewHistory = history.slice(0, 50)
+      localStorage.setItem('juwo-history', JSON.stringify(this.viewHistory))
+    },
+
+    // 切换对比状态
+    toggleCompare(propertyId) {
+      const id = String(propertyId)
+      const index = this.compareIds.indexOf(id)
+      
+      if (index > -1) {
+        this.compareIds.splice(index, 1)
+      } else {
+        // 最多只对比4个
+        if (this.compareIds.length < 4) {
+          this.compareIds.push(id)
+        } else {
+          // 在实际应用中，这里应该给用户一个提示
+        }
+      }
+      localStorage.setItem('juwo-compare', JSON.stringify(this.compareIds))
     }
   }
 })

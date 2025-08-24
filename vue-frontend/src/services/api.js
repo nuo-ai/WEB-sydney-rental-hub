@@ -16,7 +16,6 @@ const apiClient = axios.create({
 // 请求拦截器
 apiClient.interceptors.request.use(
   (config) => {
-    console.log('🔍 API请求:', config.method?.toUpperCase(), config.url, config.params)
     return config
   },
   (error) => {
@@ -28,7 +27,6 @@ apiClient.interceptors.request.use(
 // 响应拦截器
 apiClient.interceptors.response.use(
   (response) => {
-    console.log('✅ API响应:', response.config.url, '数据量:', response.data?.data?.length || 0)
     return response
   },
   (error) => {
@@ -113,15 +111,21 @@ export const userAPI = {
   },
 
   // 添加收藏
-  async addFavorite(propertyId) {
+  async addFavorite() {
     // TODO: 实现后端收藏API
-    console.log('添加收藏:', propertyId)
   },
 
   // 移除收藏
-  async removeFavorite(propertyId) {
+  async removeFavorite() {
     // TODO: 实现后端收藏API
-    console.log('移除收藏:', propertyId)
+  },
+
+  // 联系我们
+  async contactUs(payload) {
+    // TODO: 实现后端联系API
+    console.log('发送联系请求:', payload)
+    // 模拟成功响应
+    return { success: true, message: '您的请求已发送' }
   }
 }
 

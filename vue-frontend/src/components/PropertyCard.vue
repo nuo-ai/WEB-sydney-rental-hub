@@ -43,6 +43,12 @@
       >
         <i :class="favoriteIconClass"></i>
       </button>
+      <button 
+        class="compare-btn"
+        @click.stop="toggleCompare"
+      >
+        <i class="fa-solid fa-exchange-alt"></i>
+      </button>
       
       <!-- 新房源标签 -->
       <div v-if="isNewProperty" class="property-status-tag">
@@ -218,6 +224,10 @@ const handleCardClick = () => {
 const toggleFavorite = () => {
   propertiesStore.toggleFavorite(props.property.listing_id)
 }
+
+const toggleCompare = () => {
+  propertiesStore.toggleCompare(props.property.listing_id)
+}
 </script>
 
 <style scoped>
@@ -314,6 +324,30 @@ const toggleFavorite = () => {
 
 .favorite-btn.is-favorite i {
   color: var(--juwo-primary);
+}
+
+.compare-btn {
+  position: absolute;
+  top: 50px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+  color: #666;
+}
+
+.compare-btn:hover {
+  background: white;
+  transform: scale(1.05);
 }
 
 /* 新房源标签 */
