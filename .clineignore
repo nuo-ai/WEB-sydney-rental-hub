@@ -19,10 +19,9 @@ __pycache__/
 # 2. Ignore legacy, archived, and irrelevant modules
 # These are not part of the current development scope.
 archive/
-frontend/      # Legacy vanilla JS frontend, replaced by vue-frontend
+
 crawler/
-database/
-scripts/
+
 
 # 3. Ignore specific sub-directories within active modules
 # We need the source code for context, but not the dependencies.

@@ -68,7 +68,7 @@ export const propertyAPI = {
         throw new Error(`API错误: ${response.data.error.message}`)
       }
       
-      return response.data
+      return response.data.data
     } catch (error) {
       console.error('获取房源详情失败:', error)
       throw error

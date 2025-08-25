@@ -1,79 +1,78 @@
-# 实时上下文：移动端布局间距优化完成
+# 实时上下文：PropertyDetail.vue 像素级UI优化已完成
 
 ## 当前工作焦点
 
-当前刚完成的核心任务是**移动端布局间距优化**，成功解决了用户反馈的三个关键界面问题。这次优化显著提升了移动端用户体验，使界面更加紧凑美观。
+**上一任务已完成**: 我们根据设计稿，对 `PropertyDetail.vue` 进行了像素级的UI优化。
 
-**重要：所有优化已实施完成并等待用户验证效果。**
+**当前核心任务**: **集成通勤时间计算器功能**到 `PropertyDetail.vue` 页面。
 
-## 最新变更和技术决策 (2025-08-24)
+---
 
-### 🎯 移动端布局间距优化成果
--   **解决logo上下距离过大**：将`.mobile-logo-section`的padding从`16px 0`优化为`8px 0 12px 0`，减少冗余空间
--   **解决房源卡片与搜索栏间距过大**：多层面优化容器padding和margin，使布局更紧凑
--   **解决回滚到顶部时logo消失**：重写移动端滚动逻辑，基于logo实际高度精确判断搜索栏固定时机
+## 刚刚完成的重大任务 (2025-08-25)
 
-### 🔧 关键技术实现
+### 任务描述
+根据提供的两张设计截图，对 `PropertyDetail.vue` 进行全面的UI和UX重构，以实现像素级的设计保真度。
+
+### 实施的关键优化点
+1.  **顶层布局与导航**:
+    *   页面背景调整为浅灰色 (`#f0f2f5`)，内容区使用白色卡片设计。
+    *   顶部导航被替换为悬浮在图片上方的圆形、白色、带阴影的图标按钮。
+
+2.  **核心信息区**:
+    *   增加了蓝色圆点的“可入住状态”标签。
+    *   调整了价格和地址的字体样式，并为地址增加了“复制”按钮。
+    *   将独立的看房时间部分，改为一个紧凑的灰色胶囊式标签。
+    *   房源规格信息被简化为一行，并使用 `•` 作为分隔符。
+
+3.  **地图与底部操作区**:
+    *   将地图区块“卡片化”，增加了 `Location` 标题和“展开”按钮。
+    *   移除了旧的四个小图标按钮，替换为两个粘性定位在页面底部的红色按钮 (`Enquire` 和 `Inspect`)。
+
+### 关键代码片段示例
+
+**粘性页脚 (`Sticky Footer`):**
+```html
+<footer v-if="property" class="sticky-footer">
+  <el-button class="footer-btn enquire-btn" @click="handleEmail">Enquire</el-button>
+  <el-button class="footer-btn inspect-btn" @click="handleInspections">Inspect</el-button>
+</footer>
+```
 ```css
-/* Logo区域间距优化 */
-.mobile-logo-section {
-  padding: 8px 0 12px 0; /* 精确控制上下间距 */
-}
-
-/* 容器padding优化 */
-.container {
-  padding: 16px 32px; /* 移动端减少上下padding */
-}
-
-/* 搜索区域间距调整 */
-.search-filter-section {
-  margin-bottom: 16px; /* 减少移动端下边距 */
+.sticky-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding: 16px 24px;
+  display: flex;
+  gap: 16px;
+  border-top: 1px solid #e3e3e3;
 }
 ```
 
-### 📱 移动端滚动逻辑重写
-```javascript
-// 移动端：更精确的固定逻辑，考虑logo区域高度
-const logoSection = document.querySelector('.mobile-logo-section')
-const logoHeight = logoSection ? logoSection.offsetHeight : 32
-const shouldBeFixed = currentScrollY > logoHeight
+**悬浮导航按钮 (`Floating Header Buttons`):**
+```html
+<div class="header-actions">
+  <el-button @click="goBack" circle class="header-btn" :icon="ArrowLeft" />
+  <div class="right-actions">
+    <el-button @click="toggleFavorite" circle class="header-btn">
+       <i :class="isFavorite ? 'fas fa-star' : 'far fa-star'"></i>
+    </el-button>
+    <el-button @click="shareProperty" circle class="header-btn" :icon="Share" />
+  </div>
+</div>
 ```
 
-## 技术模式和经验总结
-
-### 移动端间距设计原则
--   **渐进式紧凑**：从logo(8px-12px) → 搜索区域(12px) → 容器(16px)的层级间距
--   **精确高度计算**：使用`offsetHeight`而非`getBoundingClientRect()`进行滚动判断
--   **响应式适配**：移动端和桌面端使用不同的间距策略
-
-### 滚动处理优化
--   **移动端独立逻辑**：将移动端滚动逻辑从桌面端分离，避免相互影响
--   **状态清洁**：确保移动端状态不污染全局导航状态
--   **性能优化**：使用实际DOM高度而非频繁的getBoundingClientRect调用
+---
 
 ## 当前状态和下一步
 
 ### 已完成工作
-1. ✅ 修复初始状态logo上下距离过大问题
-2. ✅ 解决搜索栏固定时logo消失和间距问题  
-3. ✅ 优化spacer高度计算逻辑
-4. ✅ 全面优化移动端布局间距
-5. ✅ 确保回滚到顶部时logo正确显示
+1.  ✅ **`PropertyDetail.vue` 像素级UI优化已完成**。
+2.  ✅ 页面布局和组件样式现在与设计稿高度一致。
+3.  ✅ Linting错误已清理。
 
-### 等待验证
--   **移动端界面效果**：需要用户在实际移动设备上验证三个问题是否完全解决
--   **滚动交互体验**：确认新的滚动逻辑在各种操作场景下工作正常
--   **跨设备一致性**：验证不同屏幕尺寸下的显示效果
-
-## 项目整体状态
-
-### 核心功能状态（之前完成）
--   **用户认证流程**：代码完成，认证当前禁用以便测试
--   **历史记录功能**：代码完成，未验证
--   **房源对比功能**：代码完成，未验证  
--   **"联系我们"功能**：模拟实现，未验证
-
-### 最新UI优化状态（当前完成）
--   **移动端布局间距**：✅ 完成并等待验证
--   **滚动交互逻辑**：✅ 完成并等待验证
--   **响应式适配**：✅ 完成并等待验证
+### 下一步任务
+-   **集成通勤计算器**:
+    *   **目标**: 将 `frontend/details.html` 中的通勤计算器功能完整地迁移并集成到 `PropertyDetail.vue` 中。
+    *   **策略**: 分析 `details.html` 和 `details.js`，将其中的HTML结构和JavaScript逻辑适配为 Vue 3 Composition API 的风格，并与新UI融合。
+    *   **API**: 继续使用现有的 Netlify Function (`/.netlify/functions/get-directions`) 作为后端服务。

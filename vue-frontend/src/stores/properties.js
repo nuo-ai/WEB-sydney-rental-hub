@@ -318,6 +318,25 @@ export const usePropertiesStore = defineStore('properties', {
       this.selectedLocations = this.selectedLocations.filter(loc => loc.id !== locationId)
     },
 
+    // 添加收藏
+    addFavorite(propertyId) {
+      const id = String(propertyId)
+      if (!this.favoriteIds.includes(id)) {
+        this.favoriteIds.push(id)
+        localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
+      }
+    },
+
+    // 移除收藏
+    removeFavorite(propertyId) {
+      const id = String(propertyId)
+      const index = this.favoriteIds.indexOf(id)
+      if (index > -1) {
+        this.favoriteIds.splice(index, 1)
+        localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
+      }
+    },
+
     // 切换收藏状态
     toggleFavorite(propertyId) {
       const id = String(propertyId)
