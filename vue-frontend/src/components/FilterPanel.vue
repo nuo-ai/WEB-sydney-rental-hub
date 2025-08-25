@@ -88,16 +88,25 @@
         <!-- 入住时间 -->
         <div class="filter-section">
           <h4 class="section-title chinese-text">入住时间</h4>
-          <el-date-picker
-            v-model="filters.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            size="large"
-            class="date-picker"
-            @change="handleDateChange"
-          />
+          <div class="date-picker-group">
+            <el-date-picker
+              v-model="filters.startDate"
+              type="date"
+              placeholder="开始日期"
+              size="large"
+              class="date-picker-start"
+              @change="handleStartDateChange"
+            />
+            <span class="date-separator">至</span>
+            <el-date-picker
+              v-model="filters.endDate"
+              type="date"
+              placeholder="结束日期"
+              size="large"
+              class="date-picker-end"
+              @change="handleEndDateChange"
+            />
+          </div>
         </div>
 
         <!-- 家具选项 -->
@@ -156,7 +165,8 @@ const filters = ref({
   bedrooms: [],
   bathrooms: [],
   parking: [],
-  dateRange: [],
+  startDate: null,
+  endDate: null,
   isFurnished: false
 })
 
@@ -347,7 +357,11 @@ const handlePriceChange = () => {
   applyFiltersToStore()
 }
 
-const handleDateChange = () => {
+const handleStartDateChange = () => {
+  applyFiltersToStore()
+}
+
+const handleEndDateChange = () => {
   applyFiltersToStore()
 }
 
@@ -367,8 +381,8 @@ const applyFiltersToStore = () => {
     bedrooms: filters.value.bedrooms.includes('any') ? 'any' : filters.value.bedrooms.join(','),
     bathrooms: filters.value.bathrooms.includes('any') ? 'any' : filters.value.bathrooms.join(','),
     parking: filters.value.parking.includes('any') ? 'any' : filters.value.parking.join(','),
-    date_from: filters.value.dateRange ? filters.value.dateRange[0] : null,
-    date_to: filters.value.dateRange ? filters.value.dateRange[1] : null,
+    date_from: filters.value.startDate,
+    date_to: filters.value.endDate,
     isFurnished: filters.value.isFurnished
   }
   
@@ -387,7 +401,8 @@ const resetFilters = () => {
     bedrooms: ['any'],
     bathrooms: ['any'],
     parking: ['any'],
-    dateRange: [],
+    startDate: null,
+    endDate: null,
     isFurnished: false
   }
   
@@ -602,8 +617,19 @@ watch(visible, (newValue) => {
 }
 
 /* 日期选择器 */
-.date-picker {
-  width: 100%;
+.date-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-picker-start,
+.date-picker-end {
+  flex: 1;
+}
+
+.date-separator {
+  color: var(--color-text-secondary);
 }
 
 .date-picker :deep(.el-input__wrapper) {

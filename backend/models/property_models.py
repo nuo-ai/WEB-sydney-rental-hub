@@ -51,3 +51,4 @@ class Property:
     # Newly added text features
     furnishing_status: Optional[str] = None
     air_conditioning_type: Optional[str] = None
+    description: Optional[str] = None # <-- This was missing

@@ -32,7 +32,9 @@
               <el-button @click="goBack" circle class="header-btn" :icon="ArrowLeft" />
               <div class="right-actions">
                 <el-button @click="toggleFavorite" circle class="header-btn">
-                   <i :class="isFavorite ? 'fas fa-star' : 'far fa-star'" style="color: #000;"></i>
+                  <el-icon :size="20">
+                    <component :is="isFavorite ? 'StarFilled' : 'Star'" />
+                  </el-icon>
                 </el-button>
                 <el-button @click="shareProperty" circle class="header-btn" :icon="Share" />
               </div>
@@ -95,10 +97,9 @@
                   <div class="address-line">
                     <h2 class="property-address">{{ property.address }}</h2>
                     <el-button @click="copyAddress" text class="copy-btn">
-                      <i class="far fa-copy"></i>
+                      <el-icon><DocumentCopy /></el-icon>
                     </el-button>
                   </div>
-                  <p class="property-suburb">{{ property.suburb }}, {{ property.postcode }}</p>
                 </div>
               </div>
               <div class="property-actions">
@@ -109,23 +110,38 @@
             <!-- 房型与可入住日期 -->
             <div class="property-specs">
               <div class="specs-row-single">
-                <span class="spec-text">{{ propertySpecsText }}</span>
-              </div>
-              <div v-if="firstInspectionText" class="inspection-tag">
-                <i class="far fa-calendar-check"></i>
-                <span>{{ firstInspectionText }}</span>
+                <div class="spec-items-container">
+                  <span v-if="property.bedrooms" class="spec-item"><i class="fa-solid fa-bed"></i>{{ property.bedrooms }}</span>
+                  <span v-if="property.bathrooms" class="spec-item"><i class="fa-solid fa-bath"></i>{{ property.bathrooms }}</span>
+                  <span v-if="property.parking_spaces" class="spec-item"><i class="fa-solid fa-car"></i>{{ property.parking_spaces }}</span>
+                </div>
               </div>
               <div class="availability-info">
                 <p v-if="property.available_date" class="available-date">
                   可入住日期: {{ formatDate(property.available_date) }}
                 </p>
-                <p v-if="property.bond_amount" class="bond-info">
-                  押金: ${{ property.bond_amount }}
+                <p v-if="property.bond" class="bond-info">
+                  押金: ${{ property.bond }}
                 </p>
                 <p v-if="property.is_furnished" class="furnished-info">
-                  <i class="fas fa-couch"></i> 已配家具
+                  <el-icon><House /></el-icon> 已配家具
                 </p>
               </div>
+            </div>
+          </div>
+
+          <!-- Feature Tags Section -->
+          <div v-if="property.property_features && property.property_features.length" class="feature-tags-section">
+            <h3 class="section-title">Features</h3>
+            <div class="tag-group">
+              <el-tag
+                v-for="feature in property.property_features"
+                :key="feature"
+                class="feature-tag"
+                type="info"
+              >
+                {{ feature }}
+              </el-tag>
             </div>
           </div>
 
@@ -164,7 +180,7 @@
             </div>
             <div class="map-container" id="detail-map">
               <div class="map-placeholder">
-                <i class="el-icon-location text-4xl text-gray-400"></i>
+                <el-icon :size="40" color="#cbd5e1"><Location /></el-icon>
                 <p class="text-gray-500">地图功能开发中</p>
               </div>
             </div>
@@ -191,7 +207,7 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { ArrowLeft, Share } from '@element-plus/icons-vue'
+import { ArrowLeft, Share, DocumentCopy, Location } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue';
 
@@ -257,23 +273,7 @@ const availabilityText = computed(() => {
   }
 });
 
-const propertySpecsText = computed(() => {
-  if (!property.value) return '';
-  const specs = [];
-  if (property.value.bedrooms) specs.push(`${property.value.bedrooms} bed`);
-  if (property.value.bathrooms) specs.push(`${property.value.bathrooms} bath`);
-  if (property.value.parking_spaces) specs.push(`${property.value.parking_spaces} parking`);
-  if (property.value.property_type) specs.push(property.value.property_type);
-  return specs.join(' • ');
-});
 
-const firstInspectionText = computed(() => {
-  if (inspectionTimes.value.length > 0) {
-    const first = inspectionTimes.value[0];
-    return `Inspection ${first.date}, ${first.time}`;
-  }
-  return null;
-});
 
 const copyAddress = () => {
   if (!property.value) return;
@@ -671,9 +671,16 @@ onMounted(() => {
 .spec-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px; /* Consistent with PropertyCard */
   font-size: 14px;
   color: #595959;
+}
+
+.spec-item i {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+  color: #666;
 }
 
 .sticky-footer {

@@ -8,7 +8,8 @@
     ```
     Browser (Vue @ :5173) -> Vite Proxy -> Python Backend (@ :8000)
     ```
-    -   **描述**: `vue-frontend` 应用通过 Vite 的开发服务器代理 (`/api`)，将其所有数据请求直接发送到在 `8000` 端口上运行的 `Python/GraphQL` 后端服务。
+    -   **描述**: `vue-frontend` 应用通过 Vite 的开发服务器代理 (`/api`)，将其所有数据请求以 **RESTful** 方式发送到 `http://localhost:8000/api/...`。这是前端获取房源数据的**唯一**路径。
+    -   **GraphQL说明**: Python后端在`/graphql`路径下还提供了一个独立的GraphQL服务。此服务**不由前端直接调用**，而是为AI助手或内部工具提供更灵活的数据查询能力。
     -   **原则**: 这是获取房源列表、详情等核心数据的**唯一**且**正确**的路径。
 
 -   **AI 助手服务数据流 (Standalone)**: 为 AI 助手提供的服务是完全独立的。

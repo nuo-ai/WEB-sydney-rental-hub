@@ -18,15 +18,15 @@ This file establishes the foundational principles and mandatory workflows for ou
 
 **Workflow Steps & Example**:
 
-1.  **Decompose Plan**: Translate the approved plan into a `task_progress` checklist, which is managed via the Focus Chain feature.
-    *   *Example Task: Add a new `PropertyCard.vue` component*
-        *   `- [ ] Generate component skeleton`
-        *   `- [ ] Integrate with Element Plus for styling`
-        *   `- [ ] Connect to API endpoint`
-        *   `- [ ] Write unit tests with Vitest`
-2.  **Iterate & Verify**: Execute one tool at a time for the **first incomplete item** on the checklist, await feedback, and update the checklist upon success. This is a strict "act-then-verify" loop.
-3.  **Validation**: Once the checklist is complete, I will propose a final validation step (e.g., via browser interaction). I will **always assume the development environment (e.g., http://localhost:5173/) is already running** and will not attempt to start or stop any services.
-4.  **Document & Complete**: Following successful validation and your request, I will **update the `memory-bank/`** and then use `<attempt_completion>`.
+1. **Decompose Plan**: Translate the approved plan into a `task_progress` checklist, which is managed via the Focus Chain feature.
+   * *Example Task: Add a new `PropertyCard.vue` component*
+     * `- [ ] Generate component skeleton`
+     * `- [ ] Integrate with Element Plus for styling`
+     * `- [ ] Connect to API endpoint`
+     * `- [ ] Write unit tests with Vitest`
+2. **Iterate & Verify**: Execute one tool at a time for the **first incomplete item** on the checklist, await feedback, and update the checklist upon success. This is a strict "act-then-verify" loop.
+3. **Validation**: Once the checklist is complete, I will propose a final validation step (e.g., via browser interaction). I will **always assume the development environment (e.g., http://localhost:5173/) is already running** and will not attempt to start or stop any services.
+4. **Document & Complete**: Following successful validation and your request, I will **update the `memory-bank/`** and then use `<attempt_completion>`.
 
 **Objective**: To ensure every task is executed in a predictable, systematic, and well-documented manner.
 
@@ -36,21 +36,21 @@ This file establishes the foundational principles and mandatory workflows for ou
 
 **Rule**: All code generated or modified within this project MUST adhere to the following technical standards:
 
-1.  **Vue.js & Naming**:
-    *   Components MUST use the **Composition API** (`<script setup>`).
-    *   Component filenames MUST use `PascalCase` (e.g., `PropertyCard.vue`).
-    *   Pinia store files MUST use the `useXxxStore` pattern (e.g., `usePropertiesStore.js`).
-2.  **Styling**:
-    *   Prioritize using variables and classes from the **Element Plus** UI library.
-    *   All custom component styles MUST be `scoped`.
-3.  **Directory Structure**:
-    *   Reusable components are located in `vue-frontend/src/components/`.
-    *   Pinia stores are located in `vue-frontend/src/stores/`.
-4.  **Testing**:
-    *   All significant business logic in components and stores requires unit tests using **Vitest**.
-    *   Critical user flows should have E2E tests using **Playwright**.
-5.  **Code Formatting**: Adhere strictly to the rules in the root `.prettierrc.json` file.
-6.  **API Integration**: All backend API calls must be routed through the abstractions in `vue-frontend/src/services/api.js`.
+1. **Vue.js & Naming**:
+   * Components MUST use the **Composition API** (`<script setup>`).
+   * Component filenames MUST use `PascalCase` (e.g., `PropertyCard.vue`).
+   * Pinia store files MUST use the `useXxxStore` pattern (e.g., `usePropertiesStore.js`).
+2. **Styling**:
+   * Prioritize using variables and classes from the **Element Plus** UI library.
+   * All custom component styles MUST be `scoped`.
+3. **Directory Structure**:
+   * Reusable components are located in `vue-frontend/src/components/`.
+   * Pinia stores are located in `vue-frontend/src/stores/`.
+4. **Testing**:
+   * All significant business logic in components and stores requires unit tests using **Vitest**.
+   * Critical user flows should have E2E tests using **Playwright**.
+5. **Code Formatting**: Adhere strictly to the rules in the root `.prettierrc.json` file.
+6. **API Integration**: All backend API calls must be routed through the abstractions in `vue-frontend/src/services/api.js`.
 
 **Objective**: To maintain a clean, consistent, and maintainable codebase.
 
@@ -66,12 +66,12 @@ This file establishes the foundational principles and mandatory workflows for ou
 
 **Collaboration Responsibility Matrix**:
 
-| Category                          | My Responsibilities (AI)                                                                                                                                                                                                                           | Your Responsibilities (Developer)                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Code Writing**            | 1. Generate full code for**new components/functions/classes**.`<br>`2. Write **boilerplate code** (e.g., tests, API calls) based on existing patterns.`<br>`3. Perform **complex code refactoring** and logic modifications. | 1. Make**minor, deterministic changes** (e.g., renaming a variable).`<br>`2. Conduct the **final code review and merge**.                                                                                                                                                                                                                                                                                                                                     |
-| **File System**             | 1. Create**new files with complex logic** (`write_to_file`).`<br>`2. Perform **multiple, complex modifications** within files (`replace_in_file`).`<br>`3. **Read and analyze** the content of any file.                 | 1.**Create empty files**.`<br>`2. **Rename or move files**.`<br>`3. **Delete files**.`<br>`*(In these cases, I should provide you with a clear instruction, e.g., "Please create a new file named `x.js`.")*                                                                                                                                                                                                                                    |
+| Category                          | My Responsibilities (AI)                                                                                                                                                                                                                           | Your Responsibilities (Developer)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Code Writing**            | 1. Generate full code for**new components/functions/classes**.`<br>`2. Write **boilerplate code** (e.g., tests, API calls) based on existing patterns.`<br>`3. Perform **complex code refactoring** and logic modifications. | 1. Make**minor, deterministic changes** (e.g., renaming a variable).`<br>`2. Conduct the **final code review and merge**.                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **File System**             | 1. Create**new files with complex logic** (`write_to_file`).`<br>`2. Perform **multiple, complex modifications** within files (`replace_in_file`).`<br>`3. **Read and analyze** the content of any file.                 | 1.**Create empty files**.`<br>`2. **Rename or move files**.`<br>`3. **Delete files**.`<br>`*(In these cases, I should provide you with a clear instruction, e.g., "Please create a new file named `x.js`.")*                                                                                                                                                                                                                                                                                                                                                          |
 | **Environment & Execution** | 1.**Analyze error logs** and outputs to propose solutions.`<br>`2. Write **complex, one-off shell commands** that can be executed non-interactively.                                                                                 | 1.**Run any installation commands** (e.g., `npm install`).`<br>`2. **Start or stop any services. Crucially, all development servers (e.g., frontend on http://localhost:5173, backend API) are considered "always-on". I will never attempt to start or stop them.**`<br>`3. **Execute any command requiring interactive input**.`<br>`4. **Perform any high-risk or destructive operations** (e.g., database migrations, `git push --force`).`<br>`*(In these cases, I should provide you with the complete command and instructions for you to execute.)* |
-| **Planning & Decision**     | 1.**In-depth analysis** of the codebase to suggest improvements.`<br>`2. Create **detailed implementation plans** (`implementation_plan.md`).`<br>`3. **Draft documentation** and comments.                                | 1. Make**final architectural decisions**.`<br>`2. **Approve or veto** plans I propose.`<br>`3. **Define high-level project requirements**.                                                                                                                                                                                                                                                                                                            |
+| **Planning & Decision**     | 1.**In-depth analysis** of the codebase to suggest improvements.`<br>`2. Create **detailed implementation plans** (`implementation_plan.md`).`<br>`3. **Draft documentation** and comments.                                | 1. Make**final architectural decisions**.`<br>`2. **Approve or veto** plans I propose.`<br>`3. **Define high-level project requirements**.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 **Objective**: To leverage our respective strengths, save time and resources, and ensure a safe and efficient workflow.
 
@@ -141,14 +141,14 @@ This file establishes the foundational principles and mandatory workflows for ou
 
 **工作流步骤与示例**：
 
-1.  **计划分解**：将已批准的计划转化为 `task_progress` 清单，并通过 Focus Chain 功能进行管理。*示例任务：新增 `PropertyCard.vue` 组件*
-    *   `- [ ] 生成组件骨架`
-    *   `- [ ] 集成 Element Plus 样式`
-    *   `- [ ] 对接 API 端点`
-    *   `- [ ] 使用 Vitest 编写单元测试`
-2.  **迭代与验证**：针对清单上的**第一个未完成项**，一次只执行一个工具，等待反馈，成功后更新清单。这是严格的“先执行、后验证”循环。
-3.  **验证**：清单完成后，我将提议一个最终验证步骤（例如，通过浏览器交互）。我将**始终假定开发环境（如 http://localhost:5173/）已在运行**，并且绝不会尝试启动或停止任何服务。
-4.  **记录与完成**：在验证成功且收到您的指示后，我将**更新 `memory-bank/`**，然后使用 `<attempt_completion>`。
+1. **计划分解**：将已批准的计划转化为 `task_progress` 清单，并通过 Focus Chain 功能进行管理。*示例任务：新增 `PropertyCard.vue` 组件*
+   * `- [ ] 生成组件骨架`
+   * `- [ ] 集成 Element Plus 样式`
+   * `- [ ] 对接 API 端点`
+   * `- [ ] 使用 Vitest 编写单元测试`
+2. **迭代与验证**：针对清单上的**第一个未完成项**，一次只执行一个工具，等待反馈，成功后更新清单。这是严格的“先执行、后验证”循环。
+3. **验证**：清单完成后，我未经允许，不自动使用浏览器进行验证；默认情况下，用户会手动进行验证，如果用户需要你使用浏览器验证，会提出；如果提出，应**始终假定开发环境（如 http://localhost:5173/）已在运行**，并且绝不会尝试启动或停止任何服务。
+4. **记录与完成**：在验证成功且收到您的指示后，我将**更新 `memory-bank/`**，然后使用 `<attempt_completion>`。
 
 **目标**：确保每个任务以可预测、系统化、文档化的方式完成。
 
@@ -170,12 +170,12 @@ This file establishes the foundational principles and mandatory workflows for ou
 
 **协作责任矩阵**：
 
-| 类别                 | 我的职责（AI）                                                                                                                                                  | 你的职责（开发者）                                                                                                                                                                                                                                                                                                                        |
-| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **代码编写**   | （无变化） | （无变化） |
-| **文件系统**   | （无变化） | （无变化） |
-| **环境与执行** | 1. 分析错误日志与输出并提出解决方案。<br>2. 编写复杂的一次性 Shell 命令（可非交互执行）。 | 1. 执行任何安装命令（如 `npm install`）。<br>2. **启动或停止服务。至关重要的一点是：所有开发服务器（如前端 http://localhost:5173/、后端API）都被视为“永远在线”状态。我绝不会尝试启动或停止它们。**<br>3. 执行任何需要交互输入的命令。<br>4. 执行任何高风险或破坏性操作（如数据库迁移、`git push --force`）。<br>*（此类情况下，我会提供完整命令与说明，由你执行。）* |
-| **规划与决策** | （无变化） | （无变化） |
+| 类别                 | 我的职责（AI）                                                                                | 你的职责（开发者）                                                                                                                                                                                                                                                                                                                                                                                 |
+| :------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **代码编写**   | （无变化）                                                                                    | （无变化）                                                                                                                                                                                                                                                                                                                                                                                         |
+| **文件系统**   | （无变化）                                                                                    | （无变化）                                                                                                                                                                                                                                                                                                                                                                                         |
+| **环境与执行** | 1. 分析错误日志与输出并提出解决方案。`<br>`2. 编写复杂的一次性 Shell 命令（可非交互执行）。 | 1. 执行任何安装命令（如 `npm install`）。`<br>`2. **启动或停止服务。至关重要的一点是：所有开发服务器（如前端 http://localhost:5173/、后端API）都被视为“永远在线”状态。我绝不会尝试启动或停止它们。**`<br>`3. 执行任何需要交互输入的命令。`<br>`4. 执行任何高风险或破坏性操作（如数据库迁移、`git push --force`）。`<br>`*（此类情况下，我会提供完整命令与说明，由你执行。）* |
+| **规划与决策** | （无变化）                                                                                    | （无变化）                                                                                                                                                                                                                                                                                                                                                                                         |
 
 **目标**：充分发挥各自优势，节省时间与资源，确保流程安全高效。
 
