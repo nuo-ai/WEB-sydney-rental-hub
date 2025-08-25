@@ -24,6 +24,8 @@ import os
 from contextlib import asynccontextmanager
 import math
 import base64
+import httpx
+from enum import Enum
 
 # 从我们的模块导入
 from api.graphql_schema import schema as gql_schema # Renamed to avoid conflict with strawberry.Schema
@@ -328,6 +330,76 @@ async def get_graphql_context(request: Request, db_conn: Any = Depends(get_db_co
         "sync_db_conn": db_conn, # The connection from the pool via get_db_conn_dependency
         # Add other context variables if needed
     }
+
+# --- Directions Endpoint Logic ---
+
+class TravelMode(str, Enum):
+    DRIVING = "DRIVING"
+    WALKING = "WALKING"
+    BICYCLING = "BICYCLING"
+    TRANSIT = "TRANSIT"
+
+class DirectionsRequest(BaseModel):
+    origin: str = Query(..., description="起点坐标 'lat,lng'")
+    destination: str = Query(..., description="目的地地址或坐标")
+    mode: TravelMode = Query(TravelMode.DRIVING, description="出行方式")
+
+@app.get("/api/directions", tags=["Services"])
+@limiter.limit("30/minute")
+async def get_directions(request: Request, params: DirectionsRequest = Depends()):
+    """
+    获取两个地点之间的通勤时间和距离。
+    """
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    if not api_key:
+        logger.error("GOOGLE_MAPS_API_KEY not set in environment.")
+        return error_response(
+            code=ErrorCodes.INTERNAL_SERVER_ERROR,
+            message="Server configuration error.",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    url = "https://maps.googleapis.com/maps/api/directions/json"
+    request_params = {
+        "origin": params.origin,
+        "destination": params.destination,
+        "mode": params.mode.value.lower(),
+        "key": api_key
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, params=request_params)
+            response.raise_for_status()  # Will raise an exception for 4XX/5XX responses
+            data = response.json()
+
+            if data["status"] != "OK":
+                logger.warning(f"Google Maps API Warn: {data['status']} - {data.get('error_message', '')}")
+                return success_response(data={"duration": "N/A", "distance": "N/A", "error": data.get('status', 'No results')})
+
+            route = data["routes"][0]
+            leg = route["legs"][0]
+            
+            return success_response(data={
+                "duration": leg["duration"]["text"],
+                "distance": leg["distance"]["text"]
+            })
+
+        except httpx.HTTPStatusError as e:
+            logger.error(f"HTTP error calling Google Maps API: {e.response.status_code} - {e.response.text}")
+            return error_response(
+                code="EXTERNAL_API_ERROR",
+                message="Failed to fetch directions from external service.",
+                status_code=status.HTTP_502_BAD_GATEWAY
+            )
+        except Exception as e:
+            logger.error(f"An unexpected error occurred while fetching directions: {e}", exc_info=True)
+            return error_response(
+                code=ErrorCodes.INTERNAL_SERVER_ERROR,
+                message="An internal error occurred.",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 # 创建 GraphQL 路由器，并使用自定义上下文
 graphql_app_router = GraphQLRouter(

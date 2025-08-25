@@ -32,5 +32,8 @@ slowapi
 python-jose[cryptography]
 passlib[bcrypt]
 
+# HTTP Client (for async requests in FastAPI)
+httpx
+
 # Task Queue
 celery

@@ -129,5 +129,32 @@ export const userAPI = {
   }
 }
 
+// 交通API服务
+export const transportAPI = {
+  // 获取通勤路线
+  async getDirections(origin, destination, mode) {
+    try {
+      // apiClient的baseURL是'/api'，所以请求会发到'/api/directions'
+      const response = await apiClient.get('/directions', {
+        params: { origin, destination, mode }
+      });
+      
+      if (response.data.error) {
+        throw new Error(`API错误: ${response.data.error.message}`);
+      }
+      
+      return response.data.data; // 修正: 直接返回data字段
+    } catch (error) {
+      console.error(`获取通勤路线失败 (模式: ${mode}):`, error);
+      // 返回一个标准错误结构，方便前端处理
+      return { 
+          error: '无法计算通勤时间',
+          duration: 'N/A', 
+          distance: 'N/A' 
+      };
+    }
+  }
+};
+
 // 导出默认API客户端
 export default apiClient

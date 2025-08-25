@@ -188,7 +188,7 @@ const handlePageChange = (page) => {
 }
 
 const goToPropertyDetail = (property) => {
-  router.push(`/property/${property.listing_id}`)
+  router.push({ name: 'PropertyDetail', params: { id: property.listing_id } })
 }
 
 const handleContactProperty = (property) => {

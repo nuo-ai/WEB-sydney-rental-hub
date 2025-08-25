@@ -170,6 +170,11 @@
             </div>
           </div>
 
+          <!-- 6. 通勤时间计算器 -->
+          <div v-if="property && property.latitude && property.longitude" class="commute-section">
+            <CommuteCalculator :property="property" />
+          </div>
+
           <!-- Inspection times are now a tag, this section can be removed if not repurposed -->
         </div>
       </div>
@@ -188,6 +193,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { ArrowLeft, Share } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import CommuteCalculator from '@/components/CommuteCalculator.vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -835,6 +841,10 @@ onMounted(() => {
   .read-more-btn {
     font-size: 16px;
   }
+}
+
+.commute-section {
+  padding: 0 24px 24px 24px;
 }
 
 /* 5. 地图样式 */
