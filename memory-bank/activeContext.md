@@ -1,45 +1,63 @@
-# Active Context & Immediate Focus
+# 当前上下文与紧急焦点
 
-This document outlines the current state of development, recent decisions, and the immediate focus for the Sydney Rental Hub project. It's the most dynamic part of the Memory Bank, designed to provide an instant snapshot of "what's happening right now."
-
----
-
-## 1. Current Task: Property Detail Page Enhancement & Bug Fix
-
-**Objective**: To implement the fixes and enhancements for the Property Detail page as detailed in `implementation_plan.md`.
-
-**Status**: **COMPLETED**.
-
-### Summary of Work Done:
-
-1.  **Backend (`properties_crud.py`)**:
-    *   Corrected the SQL query in `get_property_by_id_from_db` to fetch the `property_description` column from the database.
-    *   Used the `AS description` alias in the SQL query to ensure compatibility with the existing `Property` model and frontend components, avoiding widespread refactoring.
-
-2.  **Model (`property_models.py`)**:
-    *   Added the missing `description: Optional[str] = None` field to the `Property` strawberry model. This resolved a `500 Internal Server Error` that occurred during object instantiation due to the backend trying to populate a non-existent field.
-
-3.  **Frontend (`PropertyDetail.vue`)**:
-    *   Integrated the display of the `description` and `property_features` fields.
-    *   Refactored UI elements to use Element Plus icons (`<el-icon>`) for a consistent look and feel, replacing all previous Font Awesome `<i>` tags.
-    *   Cleaned up the template by removing redundant or placeholder elements.
-
-### Key Learnings & Decisions:
-
-*   **Database Schema Drift**: A critical bug was caused by a mismatch between the database schema (which uses `property_description`) and the application's data access layer (which was incorrectly trying to query `description`). This highlights the need for a more robust schema validation or migration process.
-*   **Targeted Fixes**: Using `AS` in SQL and adding a single field to the model proved to be an effective, low-impact strategy to fix the data flow without requiring major changes to the frontend or Pydantic models.
-*   **API Verification is Crucial**: Direct API verification using `curl` was essential in diagnosing the problem progression from a `404 Not Found` to a `500 Internal Server Error`, and finally to a `200 OK`.
+本文档勾勒了"悉尼租房Hub"项目的当前开发状态、近期决策以及下一个直接焦点。作为记忆库中最具动态性的部分，它旨在提供"当前工作"的即时快照。
 
 ---
 
-## 2. System State & Next Steps
+## 1. 当前任务：Lightbox 深度修复与增强
 
-*   **Backend API**: The `/api/properties/{id}` endpoint is now stable and correctly serving all required data for the Property Detail page.
-*   **Frontend**: The `PropertyDetail.vue` component is visually and functionally complete according to the implementation plan.
-*   **Next Immediate Step**: The final step is to update the `progress.md` file to reflect the completion of this task cycle. After that, the task can be marked as fully complete.
+**目标**：修复详情页图片查看器(Lightbox)的显示问题，确保用户体验流畅且视觉效果专业。
+
+**状态**：✅ **已完成**
+
+### 修复与增强摘要：
+
+经过多轮迭代和问题排查，成功解决了Lightbox的关键显示问题：
+
+1.  **Lightbox 背景修复**:
+    *   **问题**: Element Plus的图片查看器背景显示异常（模糊而非纯黑），且CSS样式覆盖无效。
+    *   **根本原因**: CSS特异性冲突，`:deep()` 选择器无法覆盖Element Plus的内联样式。
+    *   **解决方案**: 采用JavaScript直接操作DOM，在图片点击时动态修改`.el-image-viewer__mask`的样式属性。
+    
+2.  **滚动功能保护**:
+    *   **教训**: 全局CSS样式和过度使用MutationObserver会破坏页面核心功能。
+    *   **最终方案**: 使用事件驱动的局部样式修改，仅在Lightbox激活时执行。
+
+3.  **图片计数器实现**:
+    *   **功能**: 添加了"当前/总数"格式的图片计数器。
+    *   **技术**: 动态创建DOM元素，使用MutationObserver监听图片切换。
+    *   **样式**: 半透明背景，居中显示，确保在各种图片上都清晰可见。
+
+### 关键教训与决策：
+
+1. **CSS vs JavaScript 样式修改**:
+   * **教训**: 当第三方组件使用内联样式或高特异性CSS时，`:deep()` 选择器可能无效。
+   * **决策**: 对于关键的UI修复，JavaScript直接DOM操作是更可靠的备选方案。
+
+2. **渐进式修复策略**:
+   * **重要性**: "一次只改一处，立即验证"的策略避免了连锁故障。
+   * **应用**: 每个修复都应该独立、可验证、可回滚。
+
+3. **副作用管理**:
+   * **风险**: 全局样式和持续运行的观察器可能破坏应用核心功能。
+   * **原则**: 优先使用事件驱动的局部修改，避免全局副作用。
 
 ---
 
-## 3. Active Architectural Considerations
+## 2. 系统状态与后续步骤
 
-*   **Redis Caching**: During debugging, it was noted that the inability to connect to a Redis instance generates significant log noise. While not addressed in this task, a future improvement could be to make the Redis cache connection more resilient or to allow it to be gracefully disabled via an environment variable if not available, preventing startup errors or log spam.
+*   **Lightbox修复已完成**: 
+    * 背景显示正确（95%不透明度黑色）
+    * 页面滚动功能正常
+    * 图片计数器清晰显示
+    * 所有交互功能正常工作
+    
+*   **技术债务清理**: 
+    * 移除了所有实验性代码
+    * 清理了调试用的Playwright脚本
+    * 确保没有全局样式污染
+    
+*   **下一步优先级**: 
+    * 监控用户反馈，确保修复稳定
+    * 考虑将JavaScript样式修复迁移到更优雅的Vue composable
+    * 继续维护详情页与PropertyCard组件的设计一致性

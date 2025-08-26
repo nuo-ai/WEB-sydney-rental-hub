@@ -1,39 +1,128 @@
-# Project Progress & Evolution
+# 项目进展与演进
 
-This document tracks the major features developed, the decisions made, and the overall evolution of the Sydney Rental Hub. It serves as a high-level project diary.
-
----
-
-## August 26, 2025: Property Detail Page - V2 Enhancement
-
-**Status**: ✅ **Completed**
-
-### Feature/Fix Implemented:
-The Property Detail page (`/properties/:id`) has been successfully enhanced and stabilized. This update addressed critical data loading issues and improved the user interface.
-
-### Key Changes:
-
-1.  **Backend Data Integrity**:
-    *   Resolved a critical bug where the API was failing due to a mismatch between the database schema (`property_description`) and the data access code (`description`).
-    *   The `get_property_by_id_from_db` function in `properties_crud.py` now correctly queries for `property_description`.
-    *   The `Property` data model in `property_models.py` was updated to include the `description` field, fixing a server-side serialization error.
-
-2.  **Frontend UI/UX Overhaul**:
-    *   The `PropertyDetail.vue` component now correctly displays the property's detailed description and a list of its features.
-    *   The UI has been standardized to use Element Plus icons exclusively, creating a more consistent and professional appearance.
-    *   Redundant UI elements have been removed, resulting in a cleaner page layout.
-
-### Outcome:
-The Property Detail page is now robust, correctly displays all intended data from the backend, and has a significantly improved user interface. The API endpoint `/api/properties/{id}` is stable and fully verified. This work completes the requirements outlined in `implementation_plan.md`.
+本文档追踪了“悉尼租房Hub”项目开发的主要功能、作出的决策以及整体的演进过程。它作为一份高层级的项目日记。
 
 ---
 
-## August 25, 2025: Initial Setup & Memory Bank Establishment
+## 2025年8月27日：Lightbox 深度修复与优化
 
-**Status**: ✅ **Completed**
+**状态**: ✅ **已完成**
 
-### Feature Implemented:
-Initial project setup and the creation of the Memory Bank documentation system.
+### 功能/修复实现：
 
-### Outcome:
-Established the core documentation framework (`projectbrief.md`, `productContext.md`, etc.) that underpins all development activities. This ensures that project knowledge is maintained and accessible, forming the foundation for all future work.
+经过多轮问题排查和解决方案迭代，成功修复了房源详情页图片查看器(Lightbox)的关键显示和交互问题。
+
+### 关键变更：
+
+1. **Lightbox背景修复**:
+   * 识别并解决了Element Plus组件样式覆盖的问题
+   * 通过JavaScript DOM操作实现了纯黑背景（95%不透明度）
+   * 确保修复不影响页面滚动等核心功能
+
+2. **图片计数器添加**:
+   * 实现了动态图片计数显示（格式："当前/总数"）
+   * 计数器随图片切换自动更新
+   * 采用半透明背景确保在各种图片上的可读性
+
+3. **技术方案演进**:
+   * 从CSS `:deep()` 选择器到JavaScript DOM操作的转变
+   * 从全局MutationObserver到事件驱动的局部修改
+   * 避免了多次尝试中出现的页面滚动失效问题
+
+### 成果：
+
+Lightbox现在提供了专业、流畅的图片浏览体验，包括清晰的黑色背景、直观的导航控制和信息丰富的图片计数器，同时保持了应用的整体稳定性。
+
+---
+
+## 2025年8月26日：V4 详情页修复与增强
+
+**状态**: ✅ **已完成**
+
+### 功能/修复实现：
+
+根据用户的V4行动计划，对房源详情页进行了一系列精确的UI/UX修复与功能增强，使其在设计语言和用户体验上与作为"黄金标准"的 `PropertyCard.vue` 组件完全对齐。
+
+### 关键变更：
+
+1. **沉浸式图片浏览 (Lightbox) 实现**:
+
+   * 通过将原生 `<img>` 标签升级为 Element Plus 的 `<el-image>` 组件，并利用其 `preview-src-list` 功能，成功实现了用户期望的全屏、沉浸式图片浏览体验。
+2. **UI/UX 细节对齐**:
+
+   * **语言统一**: 将详情页中“可入住日期”的显示格式无缝切换为与房源卡片一致的中文格式（“立即入住”或“YYYY年M月D日”）。
+   * **图标统一与修复**: 修复了因缺少依赖导入而损坏的“收藏”和“暂无图片”图标。同时，遵从设计规范，保留了房源规格中使用的 Font Awesome 图标，确保了视觉一致性。
+3. **代码质量提升**:
+
+   * 移除了因重构而产生的冗余 `formatDate` 函数，清理了代码并消除了相关的 Eslint 构建警告。
+
+### 成果：
+
+房源详情页现在不仅功能完整，而且在视觉和交互层面上与项目的核心设计语言达成了高度统一。此任务的完成，不仅修复了表面的UI问题，更重要的是强化了项目的设计标准和代码质量。
+
+### 附注：布局修复
+
+在后续的审阅中，发现之前的一次代码修改意外破坏了页面的核心HTML结构，导致了严重的布局问题。通过恢复关键的布局容器（`.availability-status`），此问题已得到解决，页面的视觉呈现恢复正常。
+
+---
+
+## 2025年8月26日：房源详情页 - 图片显示紧急修复
+
+**状态**: ✅ **已完成**
+
+### 功能/修复实现：
+
+调查并解决了一个导致图片无法在房源详情页上显示的关键bug。根本原因被确定为 `PropertyDetail.vue` 组件内部的逻辑错误，而非后端数据问题。
+
+
+### 关键变更：
+
+1. **调查过程**: 通过从前端状态管理（`Pinia`）、服务层到后端CRUD函数的全栈追踪，确认了后端API为列表视图和详情视图都正确地提供了 `images` 数据数组。
+2. **根本原因定位**: 问题被隔离在 `PropertyDetail.vue` 的 `images` 计算属性上，该属性未能正确处理来自组件props的 `property.images` 数组。
+3. **修复措施**: 将错误的计算属性替换为 `PropertyCard.vue` 中正确且有效的逻辑，确保了数据处理的一致性。
+4. **附带改进**: 作为组件更新的一部分，也修复了轮播图无法正常工作的箭头图标。
+
+### 成果：
+
+房源详情页现在能够正确、可靠地显示房源图片，使其数据处理逻辑与应用中的其他组件保持一致。系统的整体数据流完整性已从数据库到最终的UI渲染层得到验证。
+
+---
+
+## 2025年8月26日：房源详情页 - V2 增强
+
+**状态**: ✅ **已完成**
+
+### 功能/修复实现：
+
+房源详情页 (`/properties/:id`) 已被成功增强和稳定。本次更新解决了关键的数据加载问题并改进了用户界面。
+
+### 关键变更：
+
+1. **后端数据完整性**:
+
+   * 解决了一个因数据库模式 (`property_description`) 与数据访问代码 (`description`) 不匹配导致的API失败关键bug。
+   * `properties_crud.py` 中的 `get_property_by_id_from_db` 函数现在能正确查询 `property_description`。
+   * `property_models.py` 中的 `Property` 数据模型已更新，包含了 `description` 字段，修复了服务端的序列化错误。
+2. **前端UI/UX改造**:
+
+   * `PropertyDetail.vue` 组件现在能正确显示房源的详细描述和其特色列表。
+   * UI已标准化，统一使用Element Plus图标，营造出更一致、更专业的外观。
+   * 移除了冗余的UI元素，使页面布局更加简洁。
+
+### 成果：
+
+房源详情页现在功能稳健，能正确显示所有预期的后端数据，并拥有显著改善的用户界面。API端点 `/api/properties/{id}` 稳定且已通过充分验证。此项工作完成了 `implementation_plan.md` 中概述的要求。
+
+---
+
+## 2025年8月25日：初始设置与记忆库建立
+
+**状态**: ✅ **已完成**
+
+### 实现功能：
+
+完成了项目的初始设置，并创建了记忆库文档系统。
+
+### 成果：
+
+建立了核心的文档框架（`projectbrief.md`, `productContext.md` 等），为所有开发活动提供了支撑。这确保了项目知识得以维护和访问，为所有未来的工作奠定了基础。

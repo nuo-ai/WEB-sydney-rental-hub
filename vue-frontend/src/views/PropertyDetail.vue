@@ -42,11 +42,16 @@
 
             <div class="image-carousel" :class="{ 'single-image': images.length === 1 }">
               <div v-if="images.length > 0" class="carousel-wrapper">
-                <img 
-                  :src="images[currentImageIndex]" 
+                <el-image
+                  :src="images[currentImageIndex]"
                   :alt="`房源图片 ${currentImageIndex + 1}`"
                   class="carousel-image"
                   @error="handleImageError"
+                  :preview-src-list="images"
+                  :initial-index="currentImageIndex"
+                  preview-teleported
+                  fit="cover"
+                  @click="handleImageClick"
                 />
                 
                 <!-- 轮播控制按钮 -->
@@ -56,14 +61,14 @@
                     class="carousel-btn prev-btn"
                     :disabled="currentImageIndex === 0"
                   >
-                    <i class="el-icon-arrow-left"></i>
+                    <el-icon><ArrowLeft /></el-icon>
                   </button>
                   <button 
                     @click="nextImage" 
                     class="carousel-btn next-btn"
                     :disabled="currentImageIndex === images.length - 1"
                   >
-                    <i class="el-icon-arrow-right"></i>
+                    <el-icon><ArrowRight /></el-icon>
                   </button>
                   
                   <!-- 图片计数器 -->
@@ -75,7 +80,7 @@
               
               <!-- 无图片占位符 -->
               <div v-else class="no-image-placeholder">
-                <i class="el-icon-picture text-6xl text-gray-300"></i>
+                <el-icon :size="60"><Picture /></el-icon>
                 <p class="text-gray-500 mt-2">暂无图片</p>
               </div>
             </div>
@@ -117,9 +122,6 @@
                 </div>
               </div>
               <div class="availability-info">
-                <p v-if="property.available_date" class="available-date">
-                  可入住日期: {{ formatDate(property.available_date) }}
-                </p>
                 <p v-if="property.bond" class="bond-info">
                   押金: ${{ property.bond }}
                 </p>
@@ -204,10 +206,10 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { ArrowLeft, Share, DocumentCopy, Location } from '@element-plus/icons-vue'
+import { ArrowLeft, ArrowRight, Share, DocumentCopy, Location, Star, StarFilled, Picture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue';
 
@@ -227,30 +229,10 @@ const loading = computed(() => propertiesStore.loading)
 const error = computed(() => propertiesStore.error)
 
 const images = computed(() => {
-  if (!property.value) return []
-  
-  const imageUrls = []
-  
-  // 处理单个图片字段
-  if (property.value.image_url) {
-    imageUrls.push(property.value.image_url)
+  if (!property.value || !property.value.images || !Array.isArray(property.value.images)) {
+    return []
   }
-  
-  // 处理多个图片字段（如果存在）
-  for (let i = 1; i <= 10; i++) {
-    const imageField = property.value[`image_url_${i}`]
-    if (imageField && imageField.trim() && !imageUrls.includes(imageField)) {
-      imageUrls.push(imageField)
-    }
-  }
-  
-  // 过滤掉无效URL
-  return imageUrls.filter(url => 
-    url && 
-    url.trim() && 
-    url !== 'N/A' && 
-    !url.includes('placeholder')
-  )
+  return property.value.images.filter(url => url && typeof url === 'string' && url.trim() !== '')
 })
 
 const isFavorite = computed(() => {
@@ -260,17 +242,22 @@ const isFavorite = computed(() => {
 
 const availabilityText = computed(() => {
   if (!property.value || !property.value.available_date) {
-    return 'Availability not specified';
+    return '立即入住';
   }
-  const availableDate = new Date(property.value.available_date);
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-
-  if (availableDate <= now) {
-    return 'Available now';
-  } else {
-    return `Available from ${formatDate(property.value.available_date)}`;
+  
+  const availDate = new Date(property.value.available_date)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0);
+  
+  if (availDate <= today) {
+    return '立即入住';
   }
+  
+  const year = availDate.getFullYear();
+  const month = availDate.getMonth() + 1;
+  const day = availDate.getDate();
+  
+  return `${year}年${month}月${day}日起可入住`;
 });
 
 
@@ -353,21 +340,6 @@ const toggleDescription = () => {
   isDescriptionExpanded.value = !isDescriptionExpanded.value
 }
 
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  
-  try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    })
-  } catch {
-    return dateString
-  }
-}
-
 // 操作按钮处理函数
 const handleEmail = () => {
   if (!property.value) return
@@ -384,6 +356,64 @@ const handleInspections = () => {
   } else {
     ElMessage.info('暂无看房时间安排')
   }
+}
+
+const handleImageClick = () => {
+  // Fix lightbox styles after a short delay
+  setTimeout(() => {
+    const mask = document.querySelector('.el-image-viewer__mask');
+    if (mask) {
+      mask.style.position = 'fixed';
+      mask.style.top = '0';
+      mask.style.left = '0';
+      mask.style.width = '100%';
+      mask.style.height = '100%';
+      mask.style.opacity = '0.95';
+      mask.style.backgroundColor = '#000000';
+    }
+    
+    // Add image counter
+    const wrapper = document.querySelector('.el-image-viewer__wrapper');
+    if (wrapper && !wrapper.querySelector('.custom-image-counter')) {
+      const counter = document.createElement('div');
+      counter.className = 'custom-image-counter';
+      counter.style.position = 'absolute';
+      counter.style.top = '20px';
+      counter.style.left = '50%';
+      counter.style.transform = 'translateX(-50%)';
+      counter.style.color = 'white';
+      counter.style.fontSize = '16px';
+      counter.style.fontWeight = 'bold';
+      counter.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      counter.style.padding = '8px 16px';
+      counter.style.borderRadius = '20px';
+      counter.style.zIndex = '2002';
+      
+      // Find current image index
+      const currentImg = wrapper.querySelector('.el-image-viewer__img');
+      if (currentImg && currentImg.src) {
+        const currentIndex = images.value.findIndex(img => currentImg.src.includes(img)) + 1;
+        counter.textContent = `${currentIndex} / ${images.value.length}`;
+      }
+      
+      wrapper.appendChild(counter);
+      
+      // Update counter when image changes
+      const observer = new MutationObserver(() => {
+        const img = wrapper.querySelector('.el-image-viewer__img');
+        if (img && img.src) {
+          const index = images.value.findIndex(imgSrc => img.src.includes(imgSrc)) + 1;
+          counter.textContent = `${index} / ${images.value.length}`;
+        }
+      });
+      
+      observer.observe(wrapper, { 
+        subtree: true, 
+        attributes: true, 
+        attributeFilter: ['src'] 
+      });
+    }
+  }, 50);
 }
 
 onMounted(() => {
@@ -442,7 +472,7 @@ onMounted(() => {
 .property-detail-content {
   background: white;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   overflow: hidden;
 }
 
@@ -1008,5 +1038,51 @@ onMounted(() => {
   .spec-divider {
     display: none;
   }
+}
+
+/* Lightbox (el-image preview) styles - scoped with :deep() */
+:deep(.el-image-viewer__wrapper) {
+  z-index: 9999 !important;
+}
+
+:deep(.el-image-viewer__mask) {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+  background-color: #000000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:deep(.el-image-viewer__btn) {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 24px !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  border-radius: 50% !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.2s !important;
+}
+
+:deep(.el-image-viewer__btn:hover) {
+  opacity: 1 !important;
+}
+
+:deep(.el-image-viewer__close) {
+  top: 40px !important;
+  right: 40px !important;
+}
+
+:deep(.el-image-viewer__actions) {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  border-radius: 22px !important;
+  padding: 8px 22px !important;
+}
+
+:deep(.el-image-viewer__actions__inner) {
+  color: white !important;
 }
 </style>
