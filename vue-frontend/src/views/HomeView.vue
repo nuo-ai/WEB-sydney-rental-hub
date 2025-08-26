@@ -40,7 +40,7 @@
           <!-- 结果统计 -->
           <div class="results-summary chinese-text">
             <p class="results-count">
-              找到 <strong>{{ propertiesStore.filteredProperties.length }}</strong> 套房源
+              找到 <strong>{{ propertiesStore.totalCount }}</strong> 套房源
             </p>
           </div>
         </div>
@@ -101,10 +101,11 @@
           <!-- 分页组件 -->
           <div v-if="propertiesStore.totalPages > 1" class="pagination-container">
             <el-pagination
-              v-model="propertiesStore.currentPage"
+              :current-page="propertiesStore.currentPage"
               :page-size="propertiesStore.pageSize"
-              :total="propertiesStore.filteredProperties.length"
-              layout="prev, pager, next"
+              :total="propertiesStore.totalCount"
+              :disabled="propertiesStore.loading"
+              layout="prev, pager, next, total"
               class="pagination"
               @current-change="handlePageChange"
             />
@@ -177,8 +178,8 @@ const handleFiltersChanged = () => {
   // 筛选逻辑已在FilterPanel组件中处理
 }
 
-const handlePageChange = (page) => {
-  propertiesStore.setCurrentPage(page)
+const handlePageChange = async (page) => {
+  await propertiesStore.setCurrentPage(page)
   
   // 滚动到顶部
   window.scrollTo({

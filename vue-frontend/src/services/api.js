@@ -59,6 +59,25 @@ export const propertyAPI = {
     }
   },
 
+  // 获取房源列表（带分页信息）
+  async getListWithPagination(params = {}) {
+    try {
+      const response = await apiClient.get('/properties', { params })
+      
+      if (response.data.error) {
+        throw new Error(`API错误: ${response.data.error.message}`)
+      }
+      
+      return {
+        data: response.data.data || [],
+        pagination: response.data.pagination || null
+      }
+    } catch (error) {
+      console.error('获取房源列表失败:', error)
+      throw error
+    }
+  },
+
   // 获取房源详情
   async getDetail(id) {
     try {

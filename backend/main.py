@@ -8,6 +8,7 @@ from strawberry.fastapi import GraphQLRouter
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
+from fastapi_cache.coder import JsonCoder
 from redis import asyncio as aioredis
 from pydantic import BaseModel, Field, validator
 from slowapi import Limiter
@@ -209,7 +210,15 @@ async def paginate_query(db_conn: Any, query: str, count_query: str, params: tup
         has_next=pagination.page < pages,
         has_prev=pagination.page > 1,
     )
-    return [dict(zip(columns, row)) for row in items], pagination_info
+    # Transform property_description to description for consistency
+    result = []
+    for row in items:
+        item_dict = dict(zip(columns, row))
+        # Rename property_description to description if it exists
+        if 'property_description' in item_dict:
+            item_dict['description'] = item_dict.pop('property_description')
+        result.append(item_dict)
+    return result, pagination_info
 
 
 # 配置日志 - (保持您现有的详细配置)
@@ -240,9 +249,10 @@ async def lifespan(app: FastAPI):
     app.state.db_pool_initialized = True
     logger.info("Database pool initialization completed.")
     
-    # Initialize Redis Cache
+    # Initialize Redis Cache with global reference
     # Assuming Redis is running on localhost. In production, use env variables.
     redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+    app.state.redis = redis  # Store redis client in app state for cache invalidation
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     logger.info("FastAPI Cache initialized with Redis backend.")
 
@@ -254,6 +264,29 @@ async def lifespan(app: FastAPI):
 # FastAPI 应用实例
 app = FastAPI(title="Rental MCP Server", version="1.0.0", lifespan=lifespan)
 app.state.limiter = limiter
+
+# Cache helper functions for selective invalidation
+async def invalidate_property_cache(property_id: str = None):
+    """Invalidate cache for a specific property or all properties"""
+    redis = app.state.redis
+    if property_id:
+        # Invalidate specific property detail cache
+        pattern = f"fastapi-cache:get_property_by_id:property_id={property_id}*"
+    else:
+        # Invalidate all property-related caches
+        pattern = "fastapi-cache:get_properties*"
+    
+    async for key in redis.scan_iter(match=pattern):
+        await redis.delete(key)
+    
+    logger.info(f"Cache invalidated for pattern: {pattern}")
+
+async def invalidate_all_cache():
+    """Invalidate all cache entries"""
+    redis = app.state.redis
+    async for key in redis.scan_iter(match="fastapi-cache:*"):
+        await redis.delete(key)
+    logger.info("All cache entries invalidated")
 
 # CORS Middleware Configuration
 origins = [
@@ -420,6 +453,60 @@ async def health_check():
     """A simple health check endpoint."""
     logger.info("Health check endpoint was called.")
     return {"status": "ok"}
+
+@app.post("/api/cache/invalidate", tags=["Cache Management"])
+async def invalidate_cache(
+    property_id: Optional[str] = None,
+    invalidate_all: bool = False
+):
+    """
+    Invalidate cache selectively.
+    - If property_id is provided, invalidate cache for that specific property
+    - If invalidate_all is True, invalidate all cache entries
+    - Otherwise, invalidate all property-related caches
+    """
+    try:
+        if invalidate_all:
+            await invalidate_all_cache()
+            return {"status": "success", "message": "All cache entries invalidated"}
+        else:
+            await invalidate_property_cache(property_id)
+            if property_id:
+                return {"status": "success", "message": f"Cache invalidated for property {property_id}"}
+            else:
+                return {"status": "success", "message": "All property caches invalidated"}
+    except Exception as e:
+        logger.error(f"Failed to invalidate cache: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/cache/stats", tags=["Cache Management"])
+async def get_cache_stats():
+    """Get cache statistics"""
+    try:
+        redis = app.state.redis
+        info = await redis.info()
+        keys_count = await redis.dbsize()
+        
+        # Count cache entries by pattern
+        property_list_count = 0
+        property_detail_count = 0
+        
+        async for key in redis.scan_iter(match="fastapi-cache:get_properties*"):
+            property_list_count += 1
+        
+        async for key in redis.scan_iter(match="fastapi-cache:get_property_by_id*"):
+            property_detail_count += 1
+        
+        return {
+            "total_keys": keys_count,
+            "property_list_cached": property_list_count,
+            "property_details_cached": property_detail_count,
+            "memory_used": info.get("used_memory_human", "N/A"),
+            "connected_clients": info.get("connected_clients", 0)
+        }
+    except Exception as e:
+        logger.error(f"Failed to get cache stats: {e}")
+        return {"status": "error", "message": str(e)}
 
 # Optional: Test endpoint for DB connection
 @app.get("/test_db_connection", tags=["Debug"])
@@ -864,6 +951,7 @@ async def get_task_status(task_id: str, api_key: str = Security(get_api_key)):
 from crud.properties_crud import get_property_by_id_from_db
 
 @app.get("/api/properties/{property_id}", tags=["Properties"], response_model=APIResponse[Dict])
+@cache(expire=1800)  # Cache for 30 minutes
 async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dependency)):
     """
     Get a single property by its ID.
@@ -901,7 +989,8 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
         "property_features": prop.property_features,
         "latitude": prop.latitude,
         "longitude": prop.longitude,
-        "geom_wkt": prop.geom_wkt
+        "geom_wkt": prop.geom_wkt,
+        "description": prop.description  # Add description field
     }
     
     return success_response(data=prop_dict)
@@ -942,7 +1031,13 @@ async def get_properties(pagination: PaginationParams = Depends(), db: Any = Dep
         if has_next:
             items = items[:-1] # remove extra item
         
-        items_as_dicts = [dict(zip(columns, row)) for row in items]
+        items_as_dicts = []
+        for row in items:
+            item_dict = dict(zip(columns, row))
+            # Rename property_description to description if it exists
+            if 'property_description' in item_dict:
+                item_dict['description'] = item_dict.pop('property_description')
+            items_as_dicts.append(item_dict)
         next_cursor = encode_cursor(items_as_dicts[-1]['listing_id']) if items_as_dicts and has_next else None
 
         pagination_info = PaginationInfo(

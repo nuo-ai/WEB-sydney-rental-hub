@@ -28,15 +28,16 @@
 - **滑块控件**: **noUiSlider** (高级价格范围选择)
 - **图标**: **Font Awesome** 6.x
 
-### 1.3. 后端 (保持不变的企业级架构)
+### 1.3. 后端 (企业级云架构)
 - **框架**: **Python (FastAPI)** + **Strawberry GraphQL**
-- **数据库**: **Supabase (PostgreSQL + PostGIS)** 用于地理空间计算
-- **异步任务**: **Celery** + **Redis** 完整集成
-- **缓存**: **Redis** 缓存系统
+- **数据库**: **Supabase云数据库 (PostgreSQL + PostGIS)** - AWS悉尼区域
+- **数据源**: 2000+条房源数据存储在Supabase
+- **异步任务**: **Celery** + **Redis** 
+- **缓存**: **Redis** 缓存系统（15分钟TTL）
 - **安全**: API Key + JWT + 限流 完整方案
 
 ### 1.4. 部署 (多版本并存)
-- **Vue版本**: **localhost:5175** (开发环境)
+- **Vue版本**: **localhost:5173** (开发环境)
 - **传统版本**: **Netlify** (生产环境)
 - **后端**: 通过 `scripts/run_backend.py` 在 `localhost:8000`
 
@@ -130,10 +131,10 @@ python scripts/run_backend.py  # 启动后端 (localhost:8000)
 **Vue前端检查**:
 ```bash
 # 检查Vue应用
-curl -s http://localhost:5175/
+curl -s http://localhost:5173/
 
 # 检查API代理
-curl -s http://localhost:5175/api/properties
+curl -s http://localhost:5173/api/properties
 ```
 
 **后端服务检查**:
@@ -143,10 +144,10 @@ curl -s http://localhost:8000/api/properties?page_size=1
 ```
 
 ### 3.3. 当前运行状态
-- **Vue应用**: `localhost:5175` - 正常运行 ✅
-- **后端API**: `localhost:8000` - MCP Server运行中 ✅
+- **Vue应用**: `localhost:5173` - 正常运行 ✅
+- **后端API**: `localhost:8000` - Python FastAPI运行中 ✅
 - **代理配置**: Vite CORS代理 - 配置完成 ✅
-- **数据连接**: 100套房源数据正常显示 ✅
+- **数据连接**: 房源数据正常显示 ✅
 
 ---
 

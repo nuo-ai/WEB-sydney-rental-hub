@@ -14,10 +14,13 @@ export const usePropertiesStore = defineStore('properties', {
     loading: false,
     error: null,
     
-    // 分页状态
+    // 分页状态 (服务端分页)
     currentPage: 1,
     pageSize: 20,
     totalCount: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false,
     
     // 搜索状态
     searchQuery: '',
@@ -34,16 +37,9 @@ export const usePropertiesStore = defineStore('properties', {
   }),
 
   getters: {
-    // 获取当前页的房源
+    // 获取当前页的房源 (使用服务端分页后，直接返回filteredProperties)
     paginatedProperties: (state) => {
-      const startIndex = (state.currentPage - 1) * state.pageSize
-      const endIndex = startIndex + state.pageSize
-      return state.filteredProperties.slice(startIndex, endIndex)
-    },
-
-    // 获取总页数
-    totalPages: (state) => {
-      return Math.ceil(state.filteredProperties.length / state.pageSize)
+      return state.filteredProperties
     },
 
     // 检查是否为收藏房源
@@ -113,10 +109,32 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
       
       try {
-        const properties = await propertyAPI.getList(params)
-        this.allProperties = properties
-        this.filteredProperties = properties
-        this.totalCount = properties.length
+        // 添加分页参数
+        const paginationParams = {
+          page: this.currentPage,
+          page_size: this.pageSize,
+          ...params
+        }
+        
+        const response = await propertyAPI.getListWithPagination(paginationParams)
+        
+        // 更新数据
+        this.filteredProperties = response.data || []
+        
+        // 更新分页信息
+        if (response.pagination) {
+          this.totalCount = response.pagination.total
+          this.totalPages = response.pagination.pages
+          this.hasNext = response.pagination.has_next
+          this.hasPrev = response.pagination.has_prev
+        }
+        
+        // 如果是第一页，也更新allProperties用于搜索建议
+        if (this.currentPage === 1 && !params.search && !params.suburb) {
+          // 获取所有数据用于位置建议（只在首次加载时）
+          const allData = await propertyAPI.getList({ page_size: 100 })
+          this.allProperties = allData
+        }
         
       } catch (error) {
         this.error = error.message || '获取房源数据失败'
@@ -353,9 +371,34 @@ export const usePropertiesStore = defineStore('properties', {
       
     },
 
-    // 设置当前页
-    setCurrentPage(page) {
+    // 设置当前页并重新获取数据
+    async setCurrentPage(page) {
+      if (page < 1 || page > this.totalPages) return
+      
       this.currentPage = page
+      // 重新获取当前页数据
+      await this.fetchProperties()
+    },
+    
+    // 下一页
+    async nextPage() {
+      if (this.hasNext) {
+        await this.setCurrentPage(this.currentPage + 1)
+      }
+    },
+    
+    // 上一页
+    async prevPage() {
+      if (this.hasPrev) {
+        await this.setCurrentPage(this.currentPage - 1)
+      }
+    },
+    
+    // 设置每页大小
+    async setPageSize(size) {
+      this.pageSize = size
+      this.currentPage = 1 // 重置到第一页
+      await this.fetchProperties()
     },
 
     // 清空错误
