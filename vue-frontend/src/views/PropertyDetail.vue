@@ -233,9 +233,9 @@ import {
   HomeFilled, Setting, Grid, Sunny
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import CommuteCalculator from '@/components/CommuteCalculator.vue'
 import GoogleMap from '@/components/GoogleMap.vue'
 import MarkdownContent from '@/components/MarkdownContent.vue'
+import CommuteCalculator from '@/components/CommuteCalculator.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -412,6 +412,7 @@ const handleStaticMapError = () => {
   console.error('Static map failed to load')
   showStaticMap.value = false
 }
+
 
 onMounted(() => {
   propertiesStore.fetchPropertyDetail(propertyId)
