@@ -75,55 +75,39 @@
       <main class="content-container">
         <!-- 价格和地址信息 -->
         <section class="info-section">
-          <!-- 可用状态 -->
           <div class="status-line">
-            <div class="status-indicator">
-              <span class="status-dot"></span>
-              <span class="status-text">Available {{ availabilityText }}</span>
-            </div>
-            <button class="more-btn">
-              <i class="fas fa-ellipsis-h"></i>
-            </button>
+            <span class="status-dot"></span>
+            <span class="status-text">{{ availabilityText }}</span>
+            <el-button text class="more-btn">
+              <el-icon><MoreFilled /></el-icon>
+            </el-button>
           </div>
           
-          <!-- 价格 -->
           <div class="price-section">
-            <h1 class="price">
-              <span class="price-symbol">$</span>{{ property.rent_pw }}
-              <span class="price-unit">per week</span>
-            </h1>
+            <h1 class="price">${{ property.rent_pw }} <span class="price-unit">per week</span></h1>
           </div>
 
-          <!-- 地址 -->
           <div class="address-section">
-            <h2 class="address-main">{{ property.address }}</h2>
-            <p class="address-suburb">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
+            <p class="address">{{ property.address }}</p>
+            <p class="suburb">{{ property.suburb }}, NSW {{ property.postcode }}</p>
           </div>
 
-          <!-- 房源规格 -->
           <div class="specs-section">
-            <div class="spec-item">
-              <i class="fas fa-bed"></i>
-              <span class="spec-value">{{ property.bedrooms || 0 }}</span>
-              <span class="spec-label">Bed</span>
-            </div>
-            <div class="spec-item">
-              <i class="fas fa-bath"></i>
-              <span class="spec-value">{{ property.bathrooms || 0 }}</span>
-              <span class="spec-label">Bath</span>
-            </div>
-            <div class="spec-item">
-              <i class="fas fa-car"></i>
-              <span class="spec-value">{{ property.parking_spaces || 0 }}</span>
-              <span class="spec-label">Car</span>
-            </div>
+            <span class="spec-item">
+              <el-icon><House /></el-icon> {{ property.bedrooms || 0 }}
+            </span>
+            <span class="spec-item">
+              <el-icon><Ticket /></el-icon> {{ property.bathrooms || 0 }}
+            </span>
+            <span class="spec-item">
+              <el-icon><Van /></el-icon> {{ property.parking_spaces || 0 }}
+            </span>
           </div>
 
-          <!-- 看房时间 -->
+          <!-- Inspection Time -->
           <div v-if="inspectionTimes.length > 0" class="inspection-section">
             <div class="inspection-badge">
-              <i class="far fa-calendar"></i>
-              Inspection: {{ formatInspectionTime(inspectionTimes[0]) }}
+              Inspection {{ inspectionTimes[0].date }} {{ inspectionTimes[0].time }}
             </div>
           </div>
         </section>
@@ -132,22 +116,12 @@
         <section class="location-section">
           <h2 class="section-title">Location</h2>
           <div class="map-wrapper">
-            <!-- 尝试加载Google Maps，如果失败则显示静态地图 -->
-            <div v-if="property.latitude && property.longitude" class="map-container">
-              <GoogleMap 
-                :latitude="property.latitude"
-                :longitude="property.longitude"
-                :zoom="15"
-                :height="mapHeight"
-                :marker-title="property.address"
-              />
-              <!-- 静态地图作为后备 -->
+            <!-- 静态地图 -->
+            <div v-if="property.latitude && property.longitude" class="static-map">
               <img 
-                v-if="showStaticMap"
-                :src="`https://maps.googleapis.com/maps/api/staticmap?center=${property.latitude},${property.longitude}&zoom=15&size=600x250&markers=color:red%7C${property.latitude},${property.longitude}&key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU`"
+                :src="`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-l+007bff(${property.longitude},${property.latitude})/${property.longitude},${property.latitude},14,0/600x300@2x?access_token=pk.eyJ1IjoianV3b21hcCIsImEiOiJjbTM2eGhiN3EwMHJnMmxzZW9sZ3N0NnhlIn0.dxPXAtxvnzoNKi_QdPXSyA`"
                 alt="Property Location"
-                class="static-map-image"
-                @error="handleStaticMapError"
+                class="map-image"
               />
             </div>
             <div v-else class="map-placeholder">
@@ -171,11 +145,11 @@
           </div>
           
           <div v-if="property.description" class="description-content">
-            <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
-              <MarkdownContent :content="property.description" />
-            </div>
+            <p class="description-text" :class="{ expanded: isDescriptionExpanded }">
+              {{ property.description }}
+            </p>
             <button 
-              v-if="property.description && property.description.length > 300"
+              v-if="property.description.length > 200"
               @click="toggleDescription"
               class="read-more-btn"
             >
@@ -186,21 +160,21 @@
         </section>
 
         <!-- Property Features -->
-        <section v-if="property.property_features && property.property_features.length > 0" class="features-section">
+        <section v-if="propertyFeatures.length > 0" class="features-section">
           <h2 class="section-title">Property features</h2>
           <div class="features-list">
-            <div v-for="feature in visibleFeatures" :key="feature" class="feature-item">
-              <i :class="getFeatureIcon(feature)"></i>
-              <span>{{ feature }}</span>
+            <div v-for="feature in visibleFeatures" :key="feature.name" class="feature-item">
+              <el-icon><component :is="feature.icon" /></el-icon>
+              <span>{{ feature.name }}</span>
             </div>
           </div>
           <button 
-            v-if="property.property_features.length > 3"
+            v-if="propertyFeatures.length > 3"
             @click="showAllFeatures = !showAllFeatures"
             class="show-more-btn"
           >
-            Show {{ showAllFeatures ? 'less' : `${property.property_features.length - 3} more` }}
-            <i :class="showAllFeatures ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            Show {{ showAllFeatures ? 'less' : `${propertyFeatures.length - 3} more` }}
+            <el-icon><component :is="showAllFeatures ? 'ArrowUp' : 'ArrowDown'" /></el-icon>
           </button>
         </section>
 
@@ -234,8 +208,6 @@ import {
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue'
-import GoogleMap from '@/components/GoogleMap.vue'
-import MarkdownContent from '@/components/MarkdownContent.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -247,7 +219,6 @@ const propertyId = route.params.id
 const currentImageIndex = ref(0)
 const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
-const showStaticMap = ref(false)
 
 // 计算属性
 const property = computed(() => propertiesStore.currentProperty)
@@ -300,16 +271,35 @@ const inspectionTimes = computed(() => {
   return []
 })
 
-const visibleFeatures = computed(() => {
+// Property features mapping
+const propertyFeatures = computed(() => {
   if (!property.value || !property.value.property_features) return []
-  return showAllFeatures.value 
-    ? property.value.property_features 
-    : property.value.property_features.slice(0, 3)
+  
+  const iconMap = {
+    'Air conditioning': 'Sunny',
+    'Alarm system': 'Bell',
+    'Balcony': 'Grid',
+    'Built-in wardrobes': 'Box',
+    'Ensuite': 'Ticket',
+    'Furnished': 'HomeFilled',
+    'Gym': 'Trophy',
+    'Indoor spa': 'Coffee',
+    'Intercom': 'Phone',
+    'Internal laundry': 'Dish',
+    'Pets allowed': 'Guide',
+    'Pool': 'Ship',
+    'Study': 'Reading',
+    'Garden': 'Grape'
+  }
+
+  return property.value.property_features.map(feature => ({
+    name: feature,
+    icon: iconMap[feature] || 'Setting'
+  }))
 })
 
-const mapHeight = computed(() => {
-  // Responsive map height - 使用固定值而不是动态计算
-  return '250px'
+const visibleFeatures = computed(() => {
+  return showAllFeatures.value ? propertyFeatures.value : propertyFeatures.value.slice(0, 3)
 })
 
 // 方法
@@ -382,45 +372,9 @@ const handleImageClick = () => {
   }, 50)
 }
 
-const getFeatureIcon = (feature) => {
-  const featureLower = feature.toLowerCase()
-  if (featureLower.includes('air condition')) return 'fas fa-snowflake'
-  if (featureLower.includes('alarm')) return 'fas fa-shield-alt'
-  if (featureLower.includes('balcony')) return 'fas fa-building'
-  if (featureLower.includes('wardrobe')) return 'fas fa-door-closed'
-  if (featureLower.includes('ensuite')) return 'fas fa-bath'
-  if (featureLower.includes('furnished')) return 'fas fa-couch'
-  if (featureLower.includes('gym')) return 'fas fa-dumbbell'
-  if (featureLower.includes('spa')) return 'fas fa-hot-tub'
-  if (featureLower.includes('intercom')) return 'fas fa-phone'
-  if (featureLower.includes('laundry')) return 'fas fa-tshirt'
-  if (featureLower.includes('pets')) return 'fas fa-paw'
-  if (featureLower.includes('pool')) return 'fas fa-swimming-pool'
-  if (featureLower.includes('study')) return 'fas fa-book'
-  if (featureLower.includes('garden')) return 'fas fa-tree'
-  if (featureLower.includes('parking') || featureLower.includes('garage')) return 'fas fa-car'
-  if (featureLower.includes('security')) return 'fas fa-lock'
-  return 'fas fa-check-circle' // 默认图标
-}
-
-const formatInspectionTime = (inspection) => {
-  if (!inspection) return ''
-  return `${inspection.date} ${inspection.time}`.trim()
-}
-
-const handleStaticMapError = () => {
-  console.error('Static map failed to load')
-  showStaticMap.value = false
-}
-
 onMounted(() => {
   propertiesStore.fetchPropertyDetail(propertyId)
   propertiesStore.logHistory(propertyId)
-  
-  // 3秒后显示静态地图作为后备方案
-  setTimeout(() => {
-    showStaticMap.value = true
-  }, 3000)
 })
 </script>
 
@@ -549,143 +503,81 @@ onMounted(() => {
 
 /* Info Section */
 .info-section {
-  padding: 20px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .status-line {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.status-indicator {
-  display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 12px;
+  position: relative;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
-  background: #22c55e;
+  background: #007bff;
   border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
 }
 
 .status-text {
-  font-size: 13px;
-  font-weight: 500;
-  color: #22c55e;
-  text-transform: lowercase;
+  font-size: 14px;
+  color: #666;
 }
 
 .more-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
+  margin-left: auto;
+  padding: 0;
   color: #999;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
 }
 
-.more-btn:hover {
-  background: #f5f5f5;
-}
-
-/* Price Section */
 .price-section {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .price {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  color: #111;
+  color: #000;
   margin: 0;
-  line-height: 1.2;
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-}
-
-.price-symbol {
-  font-size: 20px;
-  font-weight: 600;
-  color: #666;
 }
 
 .price-unit {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   color: #666;
-  margin-left: 8px;
 }
 
-/* Address Section */
 .address-section {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
-.address-main {
+.address {
   font-size: 16px;
-  font-weight: 600;
-  color: #111;
+  color: #333;
   margin: 0 0 4px 0;
-  line-height: 1.3;
 }
 
-.address-suburb {
+.suburb {
   font-size: 14px;
   color: #666;
   margin: 0;
-  line-height: 1.3;
 }
 
-/* Specs Section */
 .specs-section {
   display: flex;
-  gap: 32px;
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 16px;
 }
 
 .spec-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  position: relative;
-}
-
-.spec-item i {
-  font-size: 18px;
-  color: #999;
-}
-
-.spec-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111;
-}
-
-.spec-label {
-  font-size: 13px;
-  color: #999;
-  margin-left: 2px;
+  gap: 6px;
+  font-size: 14px;
+  color: #333;
 }
 
 .inspection-section {
@@ -695,17 +587,11 @@ onMounted(() => {
 .inspection-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: #fef3c7;
-  border-radius: 20px;
+  padding: 6px 12px;
+  background: #f0f2f5;
+  border-radius: 16px;
   font-size: 13px;
-  font-weight: 500;
-  color: #92400e;
-}
-
-.inspection-badge i {
-  font-size: 14px;
+  color: #666;
 }
 
 /* Location Section */
@@ -725,26 +611,19 @@ onMounted(() => {
   position: relative;
 }
 
-.map-container {
-  position: relative;
+.static-map {
   width: 100%;
-  height: 250px;
+  height: 200px;
   border-radius: 8px;
   overflow: hidden;
   background: #f5f5f5;
 }
 
-.static-map-image {
-  position: absolute;
-  top: 0;
-  left: 0;
+.map-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 1;
 }
-
-/* Google Map styles are handled by the GoogleMap component */
 
 .map-placeholder {
   width: 100%;
@@ -777,118 +656,73 @@ onMounted(() => {
 /* Description Section */
 .description-section {
   padding: 24px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.property-title {
-  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .property-title h2 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  color: #111;
-  margin: 0 0 6px 0;
-  line-height: 1.3;
+  color: #000;
+  margin: 0 0 8px 0;
 }
 
 .property-id {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
   color: #999;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.description-content {
-  position: relative;
+  margin: 0 0 16px 0;
 }
 
 .description-text {
-  max-height: 150px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  max-height: 72px;
   overflow: hidden;
-  transition: max-height 0.5s ease;
-  position: relative;
-}
-
-.description-text::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: linear-gradient(to bottom, transparent, white);
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.3s;
+  transition: max-height 0.3s;
 }
 
 .description-text.expanded {
   max-height: none;
 }
 
-.description-text.expanded::after {
-  opacity: 0;
-}
-
 .read-more-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-top: 10px;
+  margin-top: 8px;
   padding: 0;
   border: none;
   background: none;
   font-size: 14px;
-  font-weight: 500;
   color: #007bff;
   cursor: pointer;
-  transition: color 0.2s;
-}
-
-.read-more-btn:hover {
-  color: #0056b3;
 }
 
 /* Features Section */
 .features-section {
   padding: 24px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.features-section .section-title {
-  margin-bottom: 20px;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .features-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 0;
+  gap: 12px;
   font-size: 14px;
-  color: #444;
-  border-bottom: 1px solid #f8f8f8;
-  transition: background 0.2s;
+  color: #333;
 }
 
-.feature-item:last-child {
-  border-bottom: none;
-}
-
-.feature-item i {
-  font-size: 18px;
-  color: #007bff;
-  width: 24px;
-  text-align: center;
+.feature-item .el-icon {
+  font-size: 20px;
+  color: #666;
 }
 
 .show-more-btn {
@@ -969,15 +803,11 @@ onMounted(() => {
   }
 
   .price {
-    font-size: 32px;
+    font-size: 28px;
   }
-  
-  .address-main {
-    font-size: 18px;
-  }
-  
-  .spec-value {
-    font-size: 18px;
+
+  .static-map {
+    height: 250px;
   }
 }
 
@@ -987,15 +817,11 @@ onMounted(() => {
   }
 
   .price {
-    font-size: 36px;
+    font-size: 32px;
   }
-  
-  .address-main {
-    font-size: 20px;
-  }
-  
-  .property-title h2 {
-    font-size: 22px;
+
+  .static-map {
+    height: 300px;
   }
 }
 

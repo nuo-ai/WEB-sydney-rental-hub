@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Detail Mobile View Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #fff;
+            max-width: 375px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+        
+        /* Mobile Navigation */
+        .mobile-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+        }
+        
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Image Section */
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        .property-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-counter {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .image-indicators {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+        }
+        
+        .indicator-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+        
+        .indicator-dot.active {
+            background: white;
+            width: 8px;
+            height: 8px;
+        }
+        
+        /* Core Info Section */
+        .core-info-section {
+            padding: 16px;
+            background: white;
+        }
+        
+        .availability-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #00875a;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        
+        .price-section {
+            margin-bottom: 8px;
+        }
+        
+        .price-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111;
+            margin: 0;
+        }
+        
+        .price-period {
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .address-section {
+            margin-bottom: 16px;
+        }
+        
+        .property-address {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        .property-specs {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-top: 1px solid #e8e8e8;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .spec-item i {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        /* Footer */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #e8e8e8;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .footer-btn {
+            flex: 1;
+            height: 44px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #e4002b;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Image Section -->
+    <div class="image-container">
+        <!-- Mobile Navigation -->
+        <div class="mobile-header">
+            <button class="nav-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="nav-actions">
+                <button class="nav-btn">
+                    <i class="far fa-star"></i>
+                </button>
+                <button class="nav-btn">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+        </div>
+        
+        <img src="https://rimh2.domainstatic.com.au/6pIBBqBadSppZG-0k-n30BDpf44=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/4864459_1_1_250620_105109-w800-h600" 
+             alt="Property" 
+             class="property-image">
+        
+        <div class="image-counter">
+            <span>1 of 9</span>
+        </div>
+        
+        <div class="image-indicators">
+            <span class="indicator-dot active"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+            <span class="indicator-dot"></span>
+        </div>
+    </div>
+    
+    <!-- Core Info Section -->
+    <div class="core-info-section">
+        <!-- Available Status -->
+        <div class="availability-badge">
+            <i class="far fa-check-circle"></i>
+            <span>Available now</span>
+        </div>
+        
+        <!-- Price -->
+        <div class="price-section">
+            <h1 class="price-amount">$760 <span class="price-period">per week</span></h1>
+        </div>
+        
+        <!-- Address -->
+        <div class="address-section">
+            <p class="property-address">101/6 Lachlan Street, Waterloo NSW 2017</p>
+        </div>
+        
+        <!-- Property Specs -->
+        <div class="property-specs">
+            <div class="spec-item">
+                <i class="fas fa-bed"></i>
+                <span>1</span>
+            </div>
+            <div class="spec-item">
+                <i class="fas fa-bath"></i>
+                <span>1</span>
+            </div>
+            <div class="spec-item">
+                <i class="fas fa-car"></i>
+                <span>1</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sticky Footer -->
+    <footer class="sticky-footer">
+        <button class="footer-btn">Enquire</button>
+        <button class="footer-btn">Inspect</button>
+    </footer>
+    
+    <div style="height: 100px;"></div>
+</body>
+</html>

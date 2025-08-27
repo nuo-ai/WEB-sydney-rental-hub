@@ -140,6 +140,7 @@ desktop.ini
 logs
 dev-debug.log
 # Environment variables
+.env.figma
 # Editor directories and files
 .idea
 .vscode
