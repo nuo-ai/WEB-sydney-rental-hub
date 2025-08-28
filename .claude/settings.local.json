@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(C:\\Users\\nuoai\\AppData\\Roaming\\Claude/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
