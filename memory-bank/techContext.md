@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-08-23 (记录Vue 3重构成功)
+**最后更新**: 2025-01-28 (记录通勤查询功能技术实现)
 
 ---
 
@@ -35,6 +35,7 @@
 - **异步任务**: **Celery** + **Redis** 
 - **缓存**: **Redis** 缓存系统（15分钟TTL）
 - **安全**: API Key + JWT + 限流 完整方案
+- **地图API**: **Google Maps API** (Directions, Places, Geocoding)
 
 ### 1.4. 部署 (多版本并存)
 - **Vue版本**: **localhost:5173** (开发环境)
@@ -399,3 +400,241 @@ export const usePropertiesStore = defineStore('properties', {
 - **边框标准**: 全站统一1px边框，替代混合的1px/2px边框
 - **间距标准**: 12px组件间距，24px卡片间距
 - **宽度标准**: 580px房源卡片，520px搜索框，48px按钮
+
+---
+
+## 8. 通勤查询功能技术实现 (2025-01-28)
+
+### 8.1. 模态框系统架构
+
+**🎯 全屏模态框设计**:
+```vue
+<!-- AuthModal.vue - 全屏认证模态框 -->
+<template>
+  <div class="modal-overlay">
+    <div class="modal-container">
+      <button class="close-btn">×</button>
+      <h2>{{ isLogin ? 'Login' : 'Create Account' }}</h2>
+      <!-- 注册/登录表单 -->
+    </div>
+  </div>
+</template>
+
+<style>
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+.modal-container {
+  position: fixed;
+  inset: 0;
+  background: white;
+  overflow-y: auto;
+}
+</style>
+```
+
+### 8.2. 状态管理架构
+
+**📦 Pinia Store设计**:
+```javascript
+// stores/auth.js - 认证和用户地址管理
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    isAuthenticated: false,
+    user: null,
+    token: null,
+    savedAddresses: []
+  }),
+  
+  actions: {
+    async saveUserAddress(address) {
+      // 地址验证
+      if (!address.latitude || !address.longitude) {
+        throw new Error('Location must have coordinates')
+      }
+      
+      const newAddress = {
+        id: Date.now().toString(),
+        ...address,
+        createdAt: new Date().toISOString()
+      }
+      
+      this.savedAddresses.push(newAddress)
+      localStorage.setItem('userAddresses', JSON.stringify(this.savedAddresses))
+      return newAddress
+    }
+  }
+})
+
+// stores/commute.js - 通勤计算和缓存
+export const useCommuteStore = defineStore('commute', {
+  state: () => ({
+    currentProperty: null,
+    selectedMode: 'DRIVING',
+    calculationCache: new Map(),
+    cacheExpiry: 15 * 60 * 1000 // 15分钟
+  }),
+  
+  actions: {
+    async calculateCommute(destination, mode) {
+      const cacheKey = `${origin}-${destination.id}-${mode}`
+      
+      // 检查缓存
+      const cached = this.getFromCache(cacheKey)
+      if (cached) return cached
+      
+      // API调用
+      const result = await transportAPI.getDirections(origin, destination.address, mode)
+      
+      // 缓存结果
+      this.setCache(cacheKey, result)
+      return result
+    }
+  }
+})
+```
+
+### 8.3. 组件通信模式
+
+**🔄 事件驱动架构**:
+```javascript
+// PropertyDetail.vue -> AuthModal -> CommuteTimes
+const handleSeeTravelTimes = () => {
+  const testMode = true // 测试模式开关
+  
+  if (testMode || authStore.isAuthenticated) {
+    // 直接跳转
+    router.push({
+      name: 'CommuteTimes',
+      query: { propertyId, address, suburb, lat, lng }
+    })
+  } else {
+    // 显示认证模态框
+    showAuthModal.value = true
+  }
+}
+
+// 模态框链式导航
+// AddLocationModal -> NameLocationModal
+const handleAddressSelected = (address) => {
+  showAddModal.value = false
+  selectedAddress.value = address
+  showNameModal.value = true // 链式打开下一个模态框
+}
+```
+
+### 8.4. 地址数据预设
+
+**📍 澳洲常用地址**:
+```javascript
+// 预设地址数据
+const PRESET_LOCATIONS = [
+  {
+    id: 'usyd',
+    name: 'University of Sydney (USYD)',
+    formatted_address: 'Camperdown NSW 2006, Australia',
+    geometry: {
+      location: { lat: -33.8886, lng: 151.1873 }
+    }
+  },
+  {
+    id: 'unsw',
+    name: 'University of New South Wales (UNSW)',
+    formatted_address: 'Kensington NSW 2052, Australia',
+    geometry: {
+      location: { lat: -33.9173, lng: 151.2313 }
+    }
+  },
+  // ... 更多预设地址
+]
+```
+
+### 8.5. 测试模式实现
+
+**🧪 开发环境优化**:
+```javascript
+// CommuteTimes.vue - 测试模式
+onMounted(() => {
+  const testMode = true // 设置为 false 启用登录验证
+  
+  if (!testMode && !authStore.isAuthenticated) {
+    ElMessage.warning('Please login to access this feature')
+    router.push('/')
+    return
+  }
+  
+  // 测试模式下设置模拟用户
+  if (testMode && !authStore.isAuthenticated) {
+    authStore.user = { id: 'test', name: 'Test User', email: 'test@example.com' }
+    authStore.token = 'test-token'
+  }
+})
+```
+
+### 8.6. 技术决策总结
+
+**📊 架构选择理由**:
+
+1. **全屏模态框**：
+   - 移动端优先，避免复杂的层级管理
+   - 更好的焦点管理和键盘导航
+   - 符合现代移动应用UX模式
+
+2. **前端地址缓存**：
+   - localStorage持久化，提升用户体验
+   - 减少API调用，优化性能
+   - 离线场景部分可用
+
+3. **15分钟缓存策略**：
+   - 平衡数据新鲜度和性能
+   - 避免重复计算相同路线
+   - Map结构高效查询
+
+4. **测试模式**：
+   - 加速开发迭代
+   - 无需后端即可验证UI流程
+   - 便于UI/UX测试
+
+### 8.7. 待实现技术项
+
+**🚧 后续技术工作**:
+
+1. **Google Places API集成**：
+   ```javascript
+   // 需要实现真实的地址自动完成
+   const placesService = new google.maps.places.AutocompleteService()
+   const predictions = await placesService.getPlacePredictions({
+     input: searchQuery,
+     componentRestrictions: { country: 'au' }
+   })
+   ```
+
+2. **JWT认证实现**：
+   ```javascript
+   // 后端需要实现JWT生成和验证
+   // 前端需要在API请求中携带token
+   apiClient.interceptors.request.use(config => {
+     const token = authStore.token
+     if (token) {
+       config.headers.Authorization = `Bearer ${token}`
+     }
+     return config
+   })
+   ```
+
+3. **后端地址持久化API**：
+   ```python
+   # 需要实现的后端端点
+   @app.post("/api/user/addresses")
+   async def save_user_address(address: AddressModel, user: User = Depends(get_current_user)):
+       # 保存到数据库
+       pass
+   
+   @app.get("/api/user/addresses")
+   async def get_user_addresses(user: User = Depends(get_current_user)):
+       # 从数据库获取
+       pass
+   ```

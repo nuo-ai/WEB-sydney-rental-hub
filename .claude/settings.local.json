@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(C:\\Users\\nuoai\\AppData\\Roaming\\Claude/**)"
+      "Read(C:\\Users\\nuoai\\AppData\\Roaming\\Claude/**)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

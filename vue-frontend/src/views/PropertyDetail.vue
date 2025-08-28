@@ -155,11 +155,14 @@
               <span>位置信息暂不可用</span>
             </div>
 
-            <!-- See travel times link -->
-            <a href="#commute" class="travel-times-link">
-              <el-icon><Guide /></el-icon>
-              See travel times
-            </a>
+            <!-- See travel times button -->
+            <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
+              <i class="fas fa-map-marker-alt travel-icon"></i>
+              <div class="travel-btn-content">
+                <span class="travel-btn-title">See travel times</span>
+                <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
+              </div>
+            </button>
           </div>
         </section>
 
@@ -220,6 +223,13 @@
         </el-button>
       </footer>
     </template>
+    
+    <!-- Auth Modal -->
+    <AuthModal 
+      v-if="showAuthModal"
+      v-model="showAuthModal"
+      @success="handleAuthSuccess"
+    />
   </div>
 </template>
 
@@ -227,6 +237,7 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
+import { useAuthStore } from '@/stores/auth'
 import { 
   ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture, 
   Location, House, Ticket, Van, MoreFilled, Guide,
@@ -236,10 +247,12 @@ import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
 import MarkdownContent from '@/components/MarkdownContent.vue'
 import CommuteCalculator from '@/components/CommuteCalculator.vue'
+import AuthModal from '@/components/modals/AuthModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const propertiesStore = usePropertiesStore()
+const authStore = useAuthStore()
 
 const propertyId = route.params.id
 
@@ -248,6 +261,7 @@ const currentImageIndex = ref(0)
 const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
 const showStaticMap = ref(false)
+const showAuthModal = ref(false)
 
 // 计算属性
 const property = computed(() => propertiesStore.currentProperty)
@@ -411,6 +425,34 @@ const formatInspectionTime = (inspection) => {
 const handleStaticMapError = () => {
   console.error('Static map failed to load')
   showStaticMap.value = false
+}
+
+const handleSeeTravelTimes = () => {
+  // 测试模式：直接跳转，不需要登录
+  const testMode = true // 设置为 false 启用登录验证
+  
+  if (testMode || authStore.isAuthenticated) {
+    // 如果是测试模式或已登录，直接跳转到通勤页面
+    router.push({
+      name: 'CommuteTimes',
+      query: {
+        propertyId: propertyId,
+        address: property.value.address,
+        suburb: property.value.suburb,
+        lat: property.value.latitude,
+        lng: property.value.longitude
+      }
+    })
+  } else {
+    // 如果未登录，显示登录/注册模态框
+    showAuthModal.value = true
+  }
+}
+
+const handleAuthSuccess = () => {
+  showAuthModal.value = false
+  // 登录成功后跳转到通勤页面
+  handleSeeTravelTimes()
 }
 
 
@@ -707,6 +749,59 @@ onMounted(() => {
 
 .inspection-badge i {
   font-size: 14px;
+}
+
+/* See travel times button - 符合设计稿 */
+.see-travel-times-btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 16px;
+  background: white;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.see-travel-times-btn:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  border-color: #d0d0d0;
+}
+
+.see-travel-times-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.see-travel-times-btn .travel-icon {
+  font-size: 20px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.travel-btn-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.travel-btn-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+
+.travel-btn-subtitle {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.3;
 }
 
 /* Location Section */

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Sydney Rental Hub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #FF5824, #FF7851);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #FF5824;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+        .content p {
+            font-size: 16px;
+            margin: 0 0 20px 0;
+            color: #555;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF5824, #FF7851);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .feature-card {
+            background-color: #FFF3F0;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #FFE4DD;
+        }
+        .feature-card h3 {
+            color: #FF5824;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .feature-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer a {
+            color: #FF5824;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Welcome to Sydney Rental Hub!</h1>
+        </div>
+        
+        <div class="content">
+            <h2>Hello {{user_name}}!</h2>
+            
+            <p>Your email has been successfully verified! Welcome to Sydney's premier rental platform where finding your perfect home is just a few clicks away.</p>
+            
+            <div style="text-align: center;">
+                <a href="{{app_url}}" class="cta-button">
+                    🏠 Start Exploring Properties
+                </a>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔍 Smart Search</h3>
+                    <p>Filter by location, price, and features to find your ideal home</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🚇 Commute Calculator</h3>
+                    <p>Check travel times to UTS, UNSW, USYD, and other key locations</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💾 Save Favorites</h3>
+                    <p>Bookmark properties you love and get notified of price changes</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏠 Premium Services</h3>
+                    <p>Property inspections, legal advice, and moving assistance</p>
+                </div>
+            </div>
+            
+            <p><strong>Quick Tips to Get Started:</strong></p>
+            <ol style="color: #555;">
+                <li>Complete your profile to get personalized recommendations</li>
+                <li>Set up search alerts for properties in your preferred areas</li>
+                <li>Use the commute calculator to find properties near your university</li>
+                <li>Book property inspections directly through our platform</li>
+            </ol>
+            
+            <p>Have questions? Our team is here to help at <a href="mailto:support@sydneyrentalhub.com">support@sydneyrentalhub.com</a></p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 Sydney Rental Hub. All rights reserved.</p>
+            <p>
+                <a href="{{app_url}}">Visit Website</a> | 
+                <a href="{{app_url}}/privacy">Privacy Policy</a> | 
+                <a href="{{app_url}}/terms">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

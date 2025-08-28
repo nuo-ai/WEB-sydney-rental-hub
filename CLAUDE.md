@@ -56,9 +56,17 @@ redis-cli FLUSHDB    # 清除缓存
 ```
 vue-frontend/
 ├── src/
-│   ├── components/        # 可复用组件（PropertyCard, SearchBar, FilterPanel 等）
-│   ├── views/            # 页面组件（HomeView, PropertyDetail, Favorites 等）
+│   ├── components/        # 可复用组件
+│   │   ├── commute/      # 通勤相关组件（TransportModes, LocationCard）
+│   │   ├── modals/       # 模态框组件（AuthModal, AddLocationModal, NameLocationModal）
+│   │   └── [其他组件]    # PropertyCard, SearchBar, FilterPanel 等
+│   ├── views/            # 页面组件
+│   │   ├── CommuteTimes.vue  # 通勤查询页面
+│   │   └── [其他页面]        # HomeView, PropertyDetail, Favorites 等
 │   ├── stores/           # Pinia 状态管理
+│   │   ├── auth.js       # 用户认证和地址管理
+│   │   ├── commute.js    # 通勤计算和缓存
+│   │   └── properties.js # 房源数据管理
 │   ├── services/         # API 服务层
 │   ├── router/           # Vue Router 配置
 │   └── style.css         # 全局样式（JUWO 品牌主题）
@@ -103,19 +111,29 @@ backend/
 - **间距**: 12px 组件间距，24px 卡片间距
 - **宽度**: 580px 房源卡片，520px 搜索框，48px 按钮
 
-## 当前状态
+## 当前状态（2025-01-28 更新）
 
 ### 服务运行状态
 - Vue 前端: `http://localhost:5173` ✅
 - Python 后端: `http://localhost:8000` ✅
 - 数据库: Supabase 云数据库 (AWS 悉尼区域) ✅
 - Redis 缓存: 15 分钟 TTL ✅
+- JWT 认证: 完整实现 ✅
+- 邮件服务: 双模式支持 ✅
+- Google Places API: 集成完成 ✅
+
+### 最新功能实现
+- **JWT 认证系统**: 注册/登录/令牌刷新/邮箱验证
+- **邮件服务**: 开发模式控制台输出，生产模式 SMTP
+- **Google Places API**: 地址搜索/自动补全/地理编码
+- **用户地址管理**: 后端持久化存储，多地址支持
 
 ### 数据统计
 - 房源总数: 约 2045 条
 - 覆盖区域: 35 个悉尼地区
 - API 响应时间: < 500ms
 - 前端加载时间: < 2 秒
+- 预设地址: 8 个悉尼常用地点
 
 ## 开发规范
 
@@ -142,6 +160,21 @@ curl -s http://localhost:5173/api/properties
 curl -s http://localhost:8000/api/properties?page_size=1
 ```
 
+## 核心功能
+
+### 通勤查询功能
+- **入口**: PropertyDetail 页面的 "See travel times" 按钮
+- **流程**: 认证检查 → 通勤页面 → 地址搜索 → 标签分类 → 结果展示
+- **测试模式**: 在 `PropertyDetail.vue` 和 `CommuteTimes.vue` 中设置 `testMode = true` 可跳过登录
+- **预设地址**: USYD, UNSW, UTS, Central Station 等澳洲常用地点
+- **交通方式**: 支持驾车(DRIVING)、公交(TRANSIT)、步行(WALKING)三种模式
+- **缓存策略**: 通勤结果缓存15分钟，存储在 Pinia store 中
+
+### 模态框交互
+- **AuthModal**: 注册/登录，支持邮箱验证流程
+- **AddLocationModal**: 地址搜索，集成 Google Places API（待实现）
+- **NameLocationModal**: 地址分类（Work/School/Home/Other）
+
 ## 注意事项
 
 1. **修改代码前必读**：
@@ -153,13 +186,27 @@ curl -s http://localhost:8000/api/properties?page_size=1
    - 浏览器控制台 -> Network -> XHR 查看 API 调用
    - Vue DevTools -> Pinia 标签查看状态
    - 使用 curl 测试后端 API
+   - 模态框问题：检查 `v-model` 和事件触发
 
 3. **性能优化**：
    - 图片使用懒加载
    - 路由组件使用动态导入
    - API 响应启用 Redis 缓存
+   - 通勤结果本地缓存避免重复计算
+   - Google Places Session Token 优化
 
 4. **安全注意**：
    - 不要提交敏感信息（API keys, tokens）
    - 使用 DOMPurify 处理用户输入
-   - API 请求需要包含认证头（开发中）
+   - JWT 认证已实现，testMode 用于开发
+   - Google Maps API key 需要域名限制
+
+5. **开发模式配置**：
+   - `testMode = true` 跳过认证（前端）
+   - `EMAIL_DEV_MODE = true` 邮件打印到控制台
+   - `VITE_GOOGLE_PLACES_DEV_MODE = true` 使用模拟地址数据
+   
+6. **相关文档**：
+   - `AUTHENTICATION_GUIDE.md` - JWT 认证使用指南
+   - `GOOGLE_PLACES_GUIDE.md` - Google Places API 集成指南
+   - `memory-bank/*.md` - 项目架构和进展文档

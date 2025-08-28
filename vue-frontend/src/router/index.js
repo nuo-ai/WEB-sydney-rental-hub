@@ -45,6 +45,12 @@ const router = createRouter({
       name: 'compare',
       component: () => import('../views/CompareView.vue'),
     },
+    {
+      path: '/commute',
+      name: 'CommuteTimes',
+      component: () => import('../views/CommuteTimes.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 

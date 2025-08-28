@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Sydney Rental Hub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #FF5824, #FF7851);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #FF5824;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+        .content p {
+            font-size: 16px;
+            margin: 0 0 20px 0;
+            color: #555;
+        }
+        .verification-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF5824, #FF7851);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
+        }
+        .verification-button:hover {
+            transform: translateY(-2px);
+        }
+        .verification-code {
+            background-color: #FFF3F0;
+            border: 2px dashed #FF5824;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .verification-code h3 {
+            margin: 0 0 10px 0;
+            color: #FF5824;
+            font-size: 18px;
+        }
+        .code {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #FF5824;
+            font-family: 'Courier New', monospace;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer a {
+            color: #FF5824;
+            text-decoration: none;
+        }
+        .security-note {
+            background-color: #FFF9E6;
+            border-left: 4px solid #FFC107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .security-note p {
+            margin: 0;
+            font-size: 14px;
+            color: #856404;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 0;
+            }
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .content h2 {
+                font-size: 20px;
+            }
+            .verification-button {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .code {
+                font-size: 24px;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Sydney Rental Hub</h1>
+            <p>Your trusted rental platform in Sydney</p>
+        </div>
+        
+        <div class="content">
+            <h2>Welcome aboard, {{user_name}}! 🎉</h2>
+            
+            <p>Thank you for joining Sydney Rental Hub! We're excited to help you find your perfect home in Sydney.</p>
+            
+            <p>To complete your registration and start exploring amazing rental properties, please verify your email address by clicking the button below:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{verification_url}}" class="verification-button">
+                    ✓ Verify Email Address
+                </a>
+            </div>
+            
+            <p><strong>Can't click the button?</strong> Copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace;">
+                {{verification_url}}
+            </p>
+            
+            <div class="verification-code">
+                <h3>Or use this verification code:</h3>
+                <div class="code">{{verification_code}}</div>
+            </div>
+            
+            <div class="security-note">
+                <p><strong>🔒 Security Note:</strong> This verification link expires in 24 hours. If you didn't create an account with Sydney Rental Hub, please ignore this email.</p>
+            </div>
+            
+            <p>Once verified, you'll be able to:</p>
+            <ul style="color: #555;">
+                <li>🔍 Search thousands of rental properties</li>
+                <li>🚇 Calculate commute times to universities</li>
+                <li>💾 Save your favorite properties</li>
+                <li>📧 Get instant notifications for new listings</li>
+                <li>🏠 Access our premium services</li>
+            </ul>
+            
+            <p>Need help? Our support team is here for you at <a href="mailto:support@sydneyrentalhub.com">support@sydneyrentalhub.com</a></p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 Sydney Rental Hub. All rights reserved.</p>
+            <p>
+                <a href="{{app_url}}">Visit Website</a> | 
+                <a href="{{app_url}}/privacy">Privacy Policy</a> | 
+                <a href="{{app_url}}/terms">Terms of Service</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 12px;">
+                Sydney Rental Hub<br>
+                Level 10, 123 George Street<br>
+                Sydney NSW 2000, Australia
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -30,6 +30,7 @@ from enum import Enum
 
 # 从我们的模块导入
 from api.graphql_schema import schema as gql_schema # Renamed to avoid conflict with strawberry.Schema
+from api.auth_routes import router as auth_router # Import auth routes
 import db as db_module # Import the module itself
 from db import init_db_pool, close_db_pool, get_db_conn_dependency # Import specific functions
 
@@ -440,6 +441,8 @@ graphql_app_router = GraphQLRouter(
     context_getter=get_graphql_context, # Pass our custom context getter
     graphql_ide="graphiql" # Enable GraphiQL interface
 )
+# Include routers
+app.include_router(auth_router, tags=["Authentication"])
 app.include_router(graphql_app_router, prefix="/graphql", tags=["GraphQL"])
 
 
@@ -521,6 +524,80 @@ async def test_db(db: Any = Depends(get_db_conn_dependency)): # Kept async as it
         "db_type": str(type(db)),
         "has_cursor": hasattr(db, "cursor")
     }
+
+@app.get("/api/auth/test", tags=["Authentication"])
+async def test_auth_system(db: Any = Depends(get_db_conn_dependency)):
+    """Test endpoint to verify authentication system is working"""
+    try:
+        from crud.auth_crud import AuthCRUD
+        
+        # Test database tables exist
+        with db.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_name IN ('users', 'user_addresses')")
+            table_count = cursor.fetchone()[0]
+        
+        # Initialize tables if they don't exist
+        if table_count < 2:
+            AuthCRUD.init_auth_tables(db)
+            
+        return {
+            "status": "ok", 
+            "message": "Authentication system is ready",
+            "tables_initialized": True,
+            "endpoints_available": [
+                "/api/auth/register",
+                "/api/auth/login", 
+                "/api/auth/verify-email",
+                "/api/auth/refresh",
+                "/api/auth/me",
+                "/api/auth/addresses"
+            ]
+        }
+    except Exception as e:
+        logger.error(f"Auth test error: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/email/test", tags=["Email"])
+async def test_email_service():
+    """Test email service configuration"""
+    try:
+        from services.email_service import test_email_service
+        result = await test_email_service()
+        return result
+    except Exception as e:
+        logger.error(f"Email test error: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.post("/api/email/test-send", tags=["Email"])
+async def test_send_email(
+    email: str = "test@example.com",
+    name: str = "Test User"
+):
+    """Test sending a verification email (development only)"""
+    try:
+        from services.email_service import send_verification_email
+        from config.email_config import get_email_config
+        
+        config = get_email_config()
+        if not config.development_mode:
+            return {"status": "error", "message": "Test email sending only available in development mode"}
+        
+        # Generate a test token
+        import secrets
+        test_token = secrets.token_urlsafe(32)
+        
+        success = await send_verification_email(email, name, test_token)
+        
+        return {
+            "status": "success" if success else "error",
+            "message": "Test email sent successfully" if success else "Failed to send test email",
+            "email": email,
+            "development_mode": config.development_mode,
+            "test_token": test_token[:8] + "..." if success else None
+        }
+    except Exception as e:
+        logger.error(f"Test send email error: {e}")
+        return {"status": "error", "message": str(e)}
 
 # ============== AI聊天系统 ==============
 
