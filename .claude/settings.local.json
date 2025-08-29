@@ -11,7 +11,8 @@
       "Bash(grep:*)",
       "Bash(git commit:*)",
       "Bash(time curl:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(pip install:*)"
     ],
     "deny": [],
     "ask": []
