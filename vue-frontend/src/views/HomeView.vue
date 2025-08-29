@@ -214,6 +214,8 @@ const handlePageChange = async (page) => {
 }
 
 const goToPropertyDetail = (property) => {
+  // 将当前房源数据存储到store，这样详情页可以立即显示
+  propertiesStore.currentProperty = property
   router.push({ name: 'PropertyDetail', params: { id: property.listing_id } })
 }
 

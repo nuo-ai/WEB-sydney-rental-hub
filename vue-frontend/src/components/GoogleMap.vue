@@ -1,8 +1,23 @@
 <template>
   <div class="google-map-container">
-    <div ref="mapRef" class="google-map" :id="mapId">
+    <!-- 如果地图加载失败，显示静态地图作为备用 -->
+    <div v-if="mapError" class="map-fallback">
+      <img 
+        :src="staticMapUrl" 
+        :alt="markerTitle"
+        class="static-map"
+        @error="handleStaticMapError"
+      />
+      <div class="map-error-info">
+        <el-icon><Location /></el-icon>
+        <span>{{ markerTitle }}</span>
+      </div>
+    </div>
+    
+    <!-- 正常的Google地图 -->
+    <div v-else ref="mapRef" class="google-map" :id="mapId">
       <!-- 加载占位符 -->
-      <div v-if="!mapLoaded" class="map-loading">
+      <div v-if="!mapLoaded && !mapError" class="map-loading">
         <el-icon class="is-loading" :size="24"><Loading /></el-icon>
         <span>Loading map...</span>
       </div>
@@ -11,8 +26,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { Loading } from '@element-plus/icons-vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
+import { Loading, Location } from '@element-plus/icons-vue'
 
 const props = defineProps({
   latitude: {
@@ -44,10 +59,27 @@ const props = defineProps({
 const mapRef = ref(null)
 const mapId = `map-${Math.random().toString(36).substr(2, 9)}`
 const mapLoaded = ref(false)
+const mapError = ref(null)
 let map = null
 let marker = null
 let googleMapsLoaded = false
 let isInitializing = false
+let isDestroyed = false // 跟踪组件是否已销毁
+
+// 静态地图URL（作为备用）
+const staticMapUrl = computed(() => {
+  const size = '600x300'
+  const zoom = props.zoom
+  const center = `${props.latitude},${props.longitude}`
+  const marker = `markers=color:red%7C${center}`
+  // 使用免费的OpenStreetMap静态地图服务
+  return `https://maps.googleapis.com/maps/api/staticmap?center=${center}&zoom=${zoom}&size=${size}&${marker}&key=${GOOGLE_MAPS_API_KEY}`
+})
+
+// 处理静态地图加载失败
+const handleStaticMapError = () => {
+  console.log('静态地图加载失败，使用占位图')
+}
 
 // Check if Google Maps is already loaded
 const isGoogleMapsLoaded = () => {
@@ -97,7 +129,7 @@ const loadGoogleMaps = () => {
 // Initialize the map
 const initMap = async () => {
   // Prevent multiple initializations
-  if (isInitializing || mapLoaded.value) {
+  if (isInitializing || mapLoaded.value || isDestroyed) {
     return
   }
   
@@ -144,17 +176,23 @@ const initMap = async () => {
       console.log('Marker added to map')
     }
     
-    mapLoaded.value = true
+    // 检查组件是否还存在
+    if (!isDestroyed) {
+      mapLoaded.value = true
+    }
   } catch (error) {
     console.error('Error initializing Google Map:', error)
+    mapError.value = '地图暂时无法加载'
   } finally {
-    isInitializing = false
+    if (!isDestroyed) {
+      isInitializing = false
+    }
   }
 }
 
 // Update map center when coordinates change
 watch(() => [props.latitude, props.longitude], ([newLat, newLng]) => {
-  if (map && googleMapsLoaded) {
+  if (map && googleMapsLoaded && !isDestroyed) {
     const newCenter = { lat: newLat, lng: newLng }
     map.setCenter(newCenter)
     
@@ -169,11 +207,13 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  isDestroyed = true
   if (marker) {
     marker.setMap(null)
     marker = null
   }
   map = null
+  mapLoaded.value = false
 })
 </script>
 
@@ -205,5 +245,39 @@ onUnmounted(() => {
 
 .map-loading span {
   font-size: 14px;
+}
+
+/* 备用地图样式 */
+.map-fallback {
+  width: 100%;
+  height: v-bind(height);
+  background-color: #f5f5f5;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.static-map {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.map-error-info {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

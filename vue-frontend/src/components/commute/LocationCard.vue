@@ -82,9 +82,14 @@ const calculateCommute = async () => {
     if (cached) {
       commuteData.value = cached
     } else {
-      // 调用API
+      // 准备API调用参数
       const origin = `${props.from.lat},${props.from.lng}`
       const destination = props.location.address
+      
+      // 确保location有坐标信息（用于本地估算）
+      if (!props.location.latitude || !props.location.longitude) {
+        console.warn('Location missing coordinates:', props.location)
+      }
       
       const result = await transportAPI.getDirections(origin, destination, props.mode)
       

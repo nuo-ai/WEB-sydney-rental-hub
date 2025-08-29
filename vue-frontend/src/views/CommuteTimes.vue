@@ -10,12 +10,13 @@
     
     <!-- 地图区域 -->
     <section class="map-section">
-      <GoogleMap 
+      <SimpleMap 
         v-if="propertyCoordinates"
         :latitude="propertyCoordinates.lat"
         :longitude="propertyCoordinates.lng"
         :height="'40vh'"
         :zoom="13"
+        :marker-title="fullAddress"
       />
       <div v-else class="map-placeholder">
         <el-icon :size="32"><Location /></el-icon>
@@ -87,7 +88,7 @@ import { useCommuteStore } from '@/stores/commute'
 import { Location } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
-import GoogleMap from '@/components/GoogleMap.vue'
+import SimpleMap from '@/components/SimpleMap.vue'
 import TransportModes from '@/components/commute/TransportModes.vue'
 import LocationCard from '@/components/commute/LocationCard.vue'
 import AddLocationModal from '@/components/modals/AddLocationModal.vue'

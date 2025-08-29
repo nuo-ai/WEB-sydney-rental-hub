@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-01-28 夜间 (测试模式localStorage实现)
+**最后更新**: 2025-01-29 深夜 (性能优化与地图替代方案)
 
 ---
 
@@ -35,7 +35,7 @@
 - **异步任务**: **Celery** + **Redis** 
 - **缓存**: **Redis** 缓存系统（15分钟TTL）
 - **安全**: API Key + JWT + 限流 完整方案
-- **地图API**: **Google Maps API** (Directions, Places, Geocoding)
+- **地图服务**: **OpenStreetMap** (免费地图) + **本地通勤计算** (Haversine算法)
 
 ### 1.4. 部署 (多版本并存)
 - **Vue版本**: **localhost:5173** (开发环境)
@@ -54,7 +54,9 @@ vue-frontend/
 │   │   ├── PropertyCard.vue     # 房源卡片 (580px标准)
 │   │   ├── SearchBar.vue        # 搜索栏 (自动补全)
 │   │   ├── FilterPanel.vue      # 筛选面板 (抽屉式)
-│   │   └── Navigation.vue       # 导航组件 (响应式)
+│   │   ├── Navigation.vue       # 导航组件 (响应式)
+│   │   ├── SimpleMap.vue        # OpenStreetMap组件 (免费地图)
+│   │   └── GoogleMap.vue        # Google Maps组件 (需计费)
 │   ├── views/               # 页面组件
 │   │   ├── Home.vue            # 首页 (房源列表)
 │   │   ├── Favorites.vue       # 收藏页
@@ -740,3 +742,143 @@ async saveUserAddress(address) {
    - 代码结构与生产一致
    - 切换标志即可启用API
    - 无需重构代码
+
+---
+
+## 10. 性能优化与地图替代方案 (2025-01-29 深夜)
+
+### 10.1. 性能瓶颈分析与解决
+
+**问题诊断**：
+```javascript
+// 性能瓶颈：冗余的300条数据预加载
+async fetchProperties() {
+  // 移除了导致30-50秒延迟的代码
+  // await this.fetchInitialProperties() // ❌ 删除
+  
+  // 直接使用分页加载
+  const data = await propertiesAPI.getListWithPagination()
+  // 加载时间：2-5秒 ✅
+}
+```
+
+**缓存策略实现**：
+```javascript
+// 5分钟API响应缓存
+const cache = new Map()
+const CACHE_DURATION = 5 * 60 * 1000
+
+function getCachedOrFetch(key, fetchFn) {
+  const cached = cache.get(key)
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data
+  }
+  const data = await fetchFn()
+  cache.set(key, { data, timestamp: Date.now() })
+  return data
+}
+```
+
+### 10.2. 详情页数据复用策略
+
+**问题**：点击房源卡片后8.6秒才显示详情
+**解决方案**：从列表页传递数据，避免重复请求
+
+```javascript
+// stores/properties.js
+async fetchPropertyDetail(id) {
+  // ID类型兼容处理
+  const idStr = String(id)
+  
+  // 优先使用已有数据
+  const existingProperty = 
+    this.filteredProperties.find(p => String(p.listing_id) === idStr) ||
+    this.allProperties.find(p => String(p.listing_id) === idStr) ||
+    this.currentProperty
+  
+  if (existingProperty) {
+    this.currentProperty = existingProperty
+    // 后台补充完整信息
+    this.fetchFullDetails(id)
+    return existingProperty // 立即返回
+  }
+}
+```
+
+### 10.3. OpenStreetMap免费地图方案
+
+**组件实现**：
+```vue
+<!-- SimpleMap.vue -->
+<template>
+  <iframe
+    :src="openStreetMapUrl"
+    class="map-iframe"
+    :title="markerTitle"
+  />
+</template>
+
+<script setup>
+// 计算边界框实现地图缩放
+function calculateBoundingBox(lat, lng, zoom) {
+  const latDelta = 180 / Math.pow(2, zoom)
+  const lngDelta = 360 / Math.pow(2, zoom)
+  
+  return `${lng - lngDelta/2},${lat - latDelta/2},${lng + lngDelta/2},${lat + latDelta/2}`
+}
+
+const openStreetMapUrl = computed(() => {
+  const bbox = calculateBoundingBox(props.latitude, props.longitude, props.zoom)
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${props.latitude},${props.longitude}`
+})
+</script>
+```
+
+### 10.4. 本地通勤计算算法
+
+**Haversine公式实现**：
+```javascript
+// 计算两点间地理距离
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371 // 地球半径（公里）
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
+
+// 悉尼市区交通速度模型
+const speeds = {
+  DRIVING: 30,    // 30 km/h（考虑拥堵）
+  TRANSIT: 25,    // 25 km/h（含换乘）
+  WALKING: 5      // 5 km/h
+}
+
+// 路线弯曲系数
+const routeFactors = {
+  DRIVING: 1.4,
+  TRANSIT: 1.3,
+  WALKING: 1.2
+}
+```
+
+### 10.5. 技术决策总结
+
+1. **性能优化成果**：
+   - 列表加载：30-50秒 → 2-5秒（10倍提升）
+   - 详情页：8.6秒 → 即时显示
+   - API缓存：5分钟有效期，减少重复请求
+
+2. **成本优化**：
+   - Google Maps → OpenStreetMap（零成本）
+   - Google Directions API → 本地计算（零成本）
+   - 预设常用地址减少API调用
+
+3. **用户体验提升**：
+   - 即时响应，无需等待
+   - 离线可用的通勤估算
+   - 地图始终可显示

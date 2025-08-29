@@ -1,0 +1,76 @@
+properties.js:119 📡 调用API获取房源数据... Object
+properties.js:125 ✅ 数据加载完成，耗时: 16ms
+properties.js:158 📁 已缓存 100 条基础数据用于搜索建议
+rimh2.domainstatic.com.au/KKpjfbt8hnnvGPj9phgoVj0_xuk=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_8_1_240611_051153-w1488-h837:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/4wfpKojkIfQ5UcLtJeh1j7WqP6o=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_7_1_240611_051153-w800-h600:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/JBx2Te7nPK7_4x3Kui6f2TXTEgQ=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_4_1_250805_021114-w1920-h1080:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/DelQTp2a0BOehN48NaAy0LyO1gQ=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_6_1_240611_051153-w837-h1488:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/k7mah4qwPRFNJrmdpIoT-8D-ETg=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_9_1_240611_051153-w1488-h837:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/n_WHMIICA7rK8pj5yRQmI9ksFbU=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_3_1_250805_021117-w1860-h1046:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/u_NrYsbyVVGoeUd9BzZgSH4NrX0=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_5_1_250805_021114-w800-h1422:1  Failed to load resource: the server responded with a status of 404 ()
+rimh2.domainstatic.com.au/Vxpv6MsPV2qbWhqIggD0s0bkt6A=/fit-in/1920x1080/filters:format(jpeg):quality(80):no_upscale()/9070832_2_1_250805_021117-w800-h600:1  Failed to load resource: the server responded with a status of 404 ()
+properties.js:119 📡 调用API获取房源数据... Object
+properties.js:125 ✅ 数据加载完成，耗时: 8621ms
+GoogleMap.vue:108 Initializing map with coords: -33.9243555 151.1892084
+properties.js:175 📦 使用已有的房源数据
+api.js:142 📡 获取房源详情: 12151396
+js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1414 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+Zca @ js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1414
+GoogleMap.vue:135 Creating map with options: Object
+js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1335 As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
+（匿名） @ js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1335
+GoogleMap.vue:145 Marker added to map
+chunk-SMV7IH7P.js?v=4a5bcb3e:2148 [Vue warn]: Unhandled error during execution of component update 
+  at <GoogleMap latitude=-33.9243555 longitude=151.1892084 zoom=15  ... > 
+  at <PropertyDetail id="12151396" class="main-view" onUpdateNavVisibility=fn<handleNavVisibility>  ... > 
+  at <RouterView class="main-view" onUpdateNavVisibility=fn<handleNavVisibility> > 
+  at <App>
+warn$1 @ chunk-SMV7IH7P.js?v=4a5bcb3e:2148
+chunk-SMV7IH7P.js?v=4a5bcb3e:10604 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'insertBefore')
+    at insert (chunk-SMV7IH7P.js?v=4a5bcb3e:10604:12)
+    at processCommentNode (chunk-SMV7IH7P.js?v=4a5bcb3e:6917:7)
+    at patch (chunk-SMV7IH7P.js?v=4a5bcb3e:6818:9)
+    at patchBlockChildren (chunk-SMV7IH7P.js?v=4a5bcb3e:7210:7)
+    at patchElement (chunk-SMV7IH7P.js?v=4a5bcb3e:7128:7)
+    at processElement (chunk-SMV7IH7P.js?v=4a5bcb3e:6987:7)
+    at patch (chunk-SMV7IH7P.js?v=4a5bcb3e:6842:11)
+    at ReactiveEffect.componentUpdateFn [as fn] (chunk-SMV7IH7P.js?v=4a5bcb3e:7566:9)
+    at ReactiveEffect.run (chunk-SMV7IH7P.js?v=4a5bcb3e:505:19)
+    at ReactiveEffect.runIfDirty (chunk-SMV7IH7P.js?v=4a5bcb3e:543:12)
+js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1308 Google Maps JavaScript API error: BillingNotEnabledMapError
+https://developers.google.com/maps/documentation/javascript/error-messages#billing-not-enabled-map-error
+（匿名） @ js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1308
+PropertyDetail.vue:430 Static map failed to load
+handleStaticMapError @ PropertyDetail.vue:430
+api.js:148 ✅ 详情加载完成，耗时: 8511ms
+GoogleMap.vue:108 Initializing map with coords: -33.9243555 151.1892084
+auth.js:164 ✅ Loaded 2 saved addresses from localStorage (test mode)
+pinia.js?v=4a5bcb3e:4616 🍍 "commute" store installed 🆕
+GoogleMap.vue:135 Creating map with options: Object
+GoogleMap.vue:145 Marker added to map
+chunk-SMV7IH7P.js?v=4a5bcb3e:2148 [Vue warn]: Unhandled error during execution of component update 
+  at <GoogleMap key=0 latitude=-33.9243555 longitude=151.1892084  ... > 
+  at <CommuteTimes class="main-view" onUpdateNavVisibility=fn<handleNavVisibility> onVnodeUnmounted=fn<onVnodeUnmounted>  ... > 
+  at <RouterView class="main-view" onUpdateNavVisibility=fn<handleNavVisibility> > 
+  at <App>
+warn$1 @ chunk-SMV7IH7P.js?v=4a5bcb3e:2148
+chunk-SMV7IH7P.js?v=4a5bcb3e:10604 Uncaught (in promise) TypeError: Cannot read properties of null (reading 'insertBefore')
+    at insert (chunk-SMV7IH7P.js?v=4a5bcb3e:10604:12)
+    at processCommentNode (chunk-SMV7IH7P.js?v=4a5bcb3e:6917:7)
+    at patch (chunk-SMV7IH7P.js?v=4a5bcb3e:6818:9)
+    at patchBlockChildren (chunk-SMV7IH7P.js?v=4a5bcb3e:7210:7)
+    at patchElement (chunk-SMV7IH7P.js?v=4a5bcb3e:7128:7)
+    at processElement (chunk-SMV7IH7P.js?v=4a5bcb3e:6987:7)
+    at patch (chunk-SMV7IH7P.js?v=4a5bcb3e:6842:11)
+    at ReactiveEffect.componentUpdateFn [as fn] (chunk-SMV7IH7P.js?v=4a5bcb3e:7566:9)
+    at ReactiveEffect.run (chunk-SMV7IH7P.js?v=4a5bcb3e:505:19)
+    at ReactiveEffect.runIfDirty (chunk-SMV7IH7P.js?v=4a5bcb3e:543:12)
+js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1308 Google Maps JavaScript API error: BillingNotEnabledMapError
+https://developers.google.com/maps/documentation/javascript/error-messages#billing-not-enabled-map-error
+（匿名） @ js?key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU&libraries=places:1308
+LocationCard.vue:104 Failed to calculate commute: Error: REQUEST_DENIED
+    at calculateCommute (LocationCard.vue:92:15)
+calculateCommute @ LocationCard.vue:104
+LocationCard.vue:104 Failed to calculate commute: Error: REQUEST_DENIED
+    at calculateCommute (LocationCard.vue:92:15)
+calculateCommute @ LocationCard.vue:104

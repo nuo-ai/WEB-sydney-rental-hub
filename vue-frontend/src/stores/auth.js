@@ -159,7 +159,41 @@ export const useAuthStore = defineStore('auth', {
     async loadUserAddresses() {
       // In test mode, load from localStorage
       if (this.testMode) {
-        const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+        let addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+        
+        // 如果没有保存的地址，添加一些悉尼常用地点作为示例
+        if (addresses.length === 0) {
+          const presetAddresses = [
+            {
+              id: 'preset-1',
+              address: 'University of Sydney, Camperdown NSW 2006',
+              label: 'School',
+              latitude: -33.8888,
+              longitude: 151.1873,
+              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o'
+            },
+            {
+              id: 'preset-2',
+              address: 'Central Station, Sydney NSW 2000',
+              label: 'Transit',
+              latitude: -33.8830,
+              longitude: 151.2067,
+              placeId: 'ChIJN1t_tDeuEmsRGYPVA4xwBA8'
+            },
+            {
+              id: 'preset-3',
+              address: 'Sydney CBD, Sydney NSW 2000',
+              label: 'Work',
+              latitude: -33.8688,
+              longitude: 151.2093,
+              placeId: 'ChIJP3Sa8ziYEmsRUKgyFmh9AQM'
+            }
+          ]
+          addresses = presetAddresses
+          localStorage.setItem('juwo-addresses', JSON.stringify(presetAddresses))
+          console.log('📍 Added preset Sydney locations for testing')
+        }
+        
         this.savedAddresses = addresses
         console.log(`✅ Loaded ${this.savedAddresses.length} saved addresses from localStorage (test mode)`)
         return

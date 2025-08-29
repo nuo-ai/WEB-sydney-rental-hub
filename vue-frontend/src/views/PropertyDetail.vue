@@ -1,26 +1,12 @@
 <template>
   <div class="property-detail-page">
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading-state">
-      <el-skeleton animated>
-        <template #template>
-          <div class="skeleton-image"></div>
-          <div class="skeleton-content">
-            <el-skeleton-item variant="h1" />
-            <el-skeleton-item variant="text" />
-            <el-skeleton-item variant="text" />
-          </div>
-        </template>
-      </el-skeleton>
-    </div>
-
-    <!-- 错误状态 -->
-    <div v-else-if="error" class="error-state">
-      <el-alert :title="error" type="error" show-icon />
-    </div>
-
-    <!-- 房源详情内容 -->
-    <template v-else-if="property">
+    <!-- 优先显示已有数据，即使还在加载更多信息 -->
+    <template v-if="property">
+      <!-- 加载提示（在有数据时显示为小提示） -->
+      <div v-if="loading" class="loading-indicator">
+        <el-icon class="is-loading" :size="16"><Loading /></el-icon>
+        <span>正在加载更多信息...</span>
+      </div>
       <!-- 顶部图片区域 -->
       <header class="image-header">
         <!-- 导航栏 -->
@@ -52,6 +38,7 @@
             :initial-index="currentImageIndex"
             preview-teleported
             fit="cover"
+            lazy
             @click="handleImageClick"
           />
           <div v-else class="no-image">
@@ -132,9 +119,9 @@
         <section class="location-section">
           <h2 class="section-title">Location</h2>
           <div class="map-wrapper">
-            <!-- 尝试加载Google Maps，如果失败则显示静态地图 -->
+            <!-- 优先使用SimpleMap，避免Google Maps API问题 -->
             <div v-if="property.latitude && property.longitude" class="map-container">
-              <GoogleMap 
+              <SimpleMap 
                 :latitude="property.latitude"
                 :longitude="property.longitude"
                 :zoom="15"
@@ -223,6 +210,25 @@
       </footer>
     </template>
     
+    <!-- 骨架屏（仅在没有数据且正在加载时显示） -->
+    <div v-else-if="loading && !property" class="loading-state">
+      <el-skeleton animated>
+        <template #template>
+          <div class="skeleton-image"></div>
+          <div class="skeleton-content">
+            <el-skeleton-item variant="h1" />
+            <el-skeleton-item variant="text" />
+            <el-skeleton-item variant="text" />
+          </div>
+        </template>
+      </el-skeleton>
+    </div>
+    
+    <!-- 错误状态 -->
+    <div v-else-if="error && !property" class="error-state">
+      <el-alert :title="error" type="error" show-icon />
+    </div>
+    
     <!-- Auth Modal -->
     <AuthModal 
       v-if="showAuthModal"
@@ -240,10 +246,11 @@ import { useAuthStore } from '@/stores/auth'
 import { 
   ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture, 
   Location, House, Ticket, Van, MoreFilled, Guide,
-  HomeFilled, Setting, Grid, Sunny
+  HomeFilled, Setting, Grid, Sunny, Loading
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
+import SimpleMap from '@/components/SimpleMap.vue'
 import MarkdownContent from '@/components/MarkdownContent.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 
@@ -454,8 +461,23 @@ const handleAuthSuccess = () => {
 }
 
 
-onMounted(() => {
-  propertiesStore.fetchPropertyDetail(propertyId)
+// 预加载下一张图片
+const preloadNextImage = () => {
+  if (images.value.length > 1) {
+    const nextIndex = (currentImageIndex.value + 1) % images.value.length
+    const img = new Image()
+    img.src = images.value[nextIndex]
+  }
+}
+
+onMounted(async () => {
+  // 开始加载数据
+  await propertiesStore.fetchPropertyDetail(propertyId)
+  
+  // 预加载下一张图片
+  if (property.value) {
+    preloadNextImage()
+  }
   propertiesStore.logHistory(propertyId)
   
   // 3秒后显示静态地图作为后备方案
@@ -478,6 +500,23 @@ onMounted(() => {
   padding: 24px;
   max-width: 640px;
   margin: 0 auto;
+}
+
+/* 加载指示器（小提示） */
+.loading-indicator {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+  font-size: 14px;
+  color: #666;
 }
 
 .skeleton-image {

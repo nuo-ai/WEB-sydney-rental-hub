@@ -103,46 +103,26 @@ export const usePropertiesStore = defineStore('properties', {
   },
 
   actions: {
-    // 获取房源列表
+    // 获取房源列表 - 优化版，直接使用服务端分页
     async fetchProperties(params = {}) {
       this.loading = true
       this.error = null
       
       try {
-        // 如果有筛选参数，直接调用API，不加载allProperties
-        const hasFilters = params.suburb || params.minPrice || params.maxPrice || 
-                          params.bedrooms || params.bathrooms || params.parking
-        
-        if (!hasFilters && this.allProperties.length === 0) {
-          // 只在没有筛选条件且没有数据时才加载基础数据
-          try {
-            // 分批加载数据，避免超过后端限制
-            const firstBatch = await propertyAPI.getList({ page_size: 100 })
-            const secondBatch = await propertyAPI.getList({ page_size: 100, page: 2 })
-            const thirdBatch = await propertyAPI.getList({ page_size: 100, page: 3 })
-            
-            // 合并所有数据
-            this.allProperties = [...firstBatch, ...secondBatch, ...thirdBatch]
-          } catch (error) {
-            console.warn('⚠️ 获取全量数据失败:', error)
-            // 如果失败，至少尝试加载一些数据
-            try {
-              const fallbackData = await propertyAPI.getList({ page_size: 100 })
-              this.allProperties = fallbackData
-            } catch (fallbackError) {
-              console.error('❌ 数据加载完全失败:', fallbackError)
-            }
-          }
-        }
-        
-        // 添加分页参数
+        // 直接使用服务端分页API，不再预加载全部数据
         const paginationParams = {
           page: this.currentPage,
           page_size: this.pageSize,
           ...params
         }
         
+        console.log('📡 调用API获取房源数据...', paginationParams)
+        const startTime = Date.now()
+        
         const response = await propertyAPI.getListWithPagination(paginationParams)
+        
+        const loadTime = Date.now() - startTime
+        console.log(`✅ 数据加载完成，耗时: ${loadTime}ms`)
         
         // 更新数据
         this.filteredProperties = response.data || []
@@ -155,6 +135,12 @@ export const usePropertiesStore = defineStore('properties', {
           this.hasPrev = response.pagination.has_prev
         }
         
+        // 如果需要本地搜索建议，只加载一次基础数据
+        if (this.allProperties.length === 0 && !params.suburb) {
+          // 异步加载基础数据，不阻塞主流程
+          this.loadBaseDataAsync()
+        }
+        
       } catch (error) {
         this.error = error.message || '获取房源数据失败'
         console.error('❌ 房源数据加载失败:', error)
@@ -162,9 +148,37 @@ export const usePropertiesStore = defineStore('properties', {
         this.loading = false
       }
     },
+    
+    // 异步加载基础数据（用于搜索建议）
+    async loadBaseDataAsync() {
+      try {
+        // 只加载第一批100条数据用于搜索建议
+        const baseData = await propertyAPI.getList({ page_size: 100 })
+        this.allProperties = baseData
+        console.log(`📁 已缓存 ${baseData.length} 条基础数据用于搜索建议`)
+      } catch (error) {
+        console.warn('⚠️ 加载基础数据失败，搜索建议功能可能受影响:', error)
+      }
+    },
 
-    // 获取房源详情
+    // 获取房源详情 - 优化版
     async fetchPropertyDetail(id) {
+      // 统一转换为字符串进行比较（解决类型不匹配问题）
+      const idStr = String(id)
+      
+      // 先检查是否已有数据（从列表页或缓存）
+      const existingProperty = this.filteredProperties.find(p => String(p.listing_id) === idStr) ||
+                              this.allProperties.find(p => String(p.listing_id) === idStr) ||
+                              (this.currentProperty && String(this.currentProperty.listing_id) === idStr ? this.currentProperty : null)
+      
+      if (existingProperty) {
+        console.log('📦 使用已有的房源数据')
+        this.currentProperty = existingProperty
+        // 仍然异步获取完整详情（可能有更多信息）
+        this.fetchFullDetailAsync(id)
+        return
+      }
+      
       this.loading = true
       this.error = null
       
@@ -177,6 +191,19 @@ export const usePropertiesStore = defineStore('properties', {
         console.error('❌ 房源详情加载失败:', error)
       } finally {
         this.loading = false
+      }
+    },
+    
+    // 异步获取完整详情
+    async fetchFullDetailAsync(id) {
+      try {
+        const fullProperty = await propertyAPI.getDetail(id)
+        // 如果当前房源ID没变，更新详情
+        if (this.currentProperty && this.currentProperty.listing_id === id) {
+          this.currentProperty = { ...this.currentProperty, ...fullProperty }
+        }
+      } catch (error) {
+        console.warn('⚠️ 异步获取完整详情失败:', error)
       }
     },
 
