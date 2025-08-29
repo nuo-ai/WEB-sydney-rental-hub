@@ -1075,29 +1075,133 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
 
 @app.get("/api/properties", tags=["Properties"], response_model=APIResponse[List[Dict]])
 @cache(expire=900) # Cache for 15 minutes
-async def get_properties(pagination: PaginationParams = Depends(), db: Any = Depends(get_db_conn_dependency)):
+async def get_properties(
+    pagination: PaginationParams = Depends(), 
+    db: Any = Depends(get_db_conn_dependency),
+    # Filter parameters
+    suburb: Optional[str] = None,
+    property_type: Optional[str] = None,
+    bedrooms: Optional[str] = None,  # Can be comma-separated like "1,2,3"
+    bathrooms: Optional[str] = None,  # Can be comma-separated like "1,2"
+    parking: Optional[str] = None,  # Can be comma-separated like "0,1,2"
+    minPrice: Optional[int] = None,
+    maxPrice: Optional[int] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    isFurnished: Optional[bool] = None
+):
     """
-    Get a paginated list of properties.
+    Get a paginated list of properties with optional filters.
     Supports both page-based and cursor-based pagination.
     """
-    # For now, we will just paginate all properties. Filtering can be added later.
+    # Build the base query with filters
     base_query = "SELECT * FROM properties"
     count_query = "SELECT COUNT(*) FROM properties"
+    
+    # Build WHERE clause conditions
+    conditions = []
+    params = []
+    
+    # Add suburb filter
+    if suburb:
+        conditions.append("suburb ILIKE %s")
+        params.append(f"%{suburb}%")
+    
+    # Add property type filter
+    if property_type:
+        conditions.append("property_type ILIKE %s")
+        params.append(f"%{property_type}%")
+    
+    # Add bedrooms filter (handle comma-separated values)
+    if bedrooms:
+        bedroom_values = bedrooms.split(',')
+        bedroom_conditions = []
+        for value in bedroom_values:
+            value = value.strip()
+            if value == '4+':
+                bedroom_conditions.append("bedrooms >= 4")
+            elif value.isdigit():
+                bedroom_conditions.append(f"bedrooms = {int(value)}")
+        if bedroom_conditions:
+            conditions.append(f"({' OR '.join(bedroom_conditions)})")
+    
+    # Add bathrooms filter (handle comma-separated values)
+    if bathrooms:
+        bathroom_values = bathrooms.split(',')
+        bathroom_conditions = []
+        for value in bathroom_values:
+            value = value.strip()
+            if value == '3+':
+                bathroom_conditions.append("bathrooms >= 3")
+            elif value.isdigit():
+                bathroom_conditions.append(f"bathrooms = {int(value)}")
+        if bathroom_conditions:
+            conditions.append(f"({' OR '.join(bathroom_conditions)})")
+    
+    # Add parking filter (handle comma-separated values)
+    if parking:
+        parking_values = parking.split(',')
+        parking_conditions = []
+        for value in parking_values:
+            value = value.strip()
+            if value == '2+':
+                parking_conditions.append("parking_spaces >= 2")
+            elif value.isdigit():
+                parking_conditions.append(f"parking_spaces = {int(value)}")
+        if parking_conditions:
+            conditions.append(f"({' OR '.join(parking_conditions)})")
+    
+    # Add price range filters
+    if minPrice is not None:
+        conditions.append("rent_pw >= %s")
+        params.append(minPrice)
+    
+    if maxPrice is not None:
+        conditions.append("rent_pw <= %s")
+        params.append(maxPrice)
+    
+    # Add date filters
+    if date_from:
+        conditions.append("available_date >= %s")
+        params.append(date_from)
+    
+    if date_to:
+        conditions.append("available_date <= %s")
+        params.append(date_to)
+    
+    # Add furnished filter
+    if isFurnished is not None:
+        conditions.append("is_furnished = %s")
+        params.append(isFurnished)
+    
+    # Build WHERE clause
+    where_clause = ""
+    if conditions:
+        where_clause = " WHERE " + " AND ".join(conditions)
+    
+    # Update queries with WHERE clause
+    base_query += where_clause
+    count_query += where_clause
     
     # Simple cursor implementation based on listing_id
     # A more robust implementation would handle sorting
     if pagination.cursor:
         try:
             cursor_val = int(decode_cursor(pagination.cursor))
-            query = f"{base_query} WHERE listing_id > %s ORDER BY listing_id ASC"
-            params = (cursor_val,)
+            # Add cursor condition to existing WHERE clause
+            if where_clause:
+                query = f"{base_query} AND listing_id > %s ORDER BY listing_id ASC"
+            else:
+                query = f"{base_query} WHERE listing_id > %s ORDER BY listing_id ASC"
+            # Append cursor value to existing params
+            cursor_params = params + [cursor_val]
         except (ValueError, TypeError):
             raise HTTPException(status_code=400, detail="Invalid cursor")
 
         def _db_call_cursor():
             with db.cursor() as cur:
                 # Fetch one more than page_size to check for has_next
-                cur.execute(f"{query} LIMIT %s", params + (pagination.page_size + 1,))
+                cur.execute(f"{query} LIMIT %s", cursor_params + [pagination.page_size + 1])
                 items = cur.fetchall()
                 columns = [desc[0] for desc in cur.description]
                 return items, columns
@@ -1130,5 +1234,5 @@ async def get_properties(pagination: PaginationParams = Depends(), db: Any = Dep
     else:
         # Page-based pagination
         query = f"{base_query} ORDER BY listing_id ASC"
-        items, pagination_info = await paginate_query(db, query, count_query, (), pagination)
+        items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
         return success_response(data=items, pagination=pagination_info)

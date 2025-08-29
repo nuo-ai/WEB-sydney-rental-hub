@@ -8,7 +8,8 @@
       "Bash(npx playwright install:*)",
       "Bash(npx playwright test:*)",
       "Bash(curl:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

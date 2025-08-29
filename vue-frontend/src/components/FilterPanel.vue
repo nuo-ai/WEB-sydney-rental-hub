@@ -175,7 +175,6 @@ const localFilteredCount = ref(0)
 
 // 选项数据
 const bedroomOptions = [
-  { value: 'any', label: 'Any' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },
@@ -235,10 +234,6 @@ const hasAppliedFilters = computed(() => {
 
 // 相邻多选逻辑
 const isBedroomSelected = (value) => {
-  if (value === 'any') {
-    // Any 按钮在没有任何选择时显示为选中
-    return filters.value.bedrooms.length === 0
-  }
   return filters.value.bedrooms.includes(value)
 }
 
@@ -259,166 +254,85 @@ const isParkingSelected = (value) => {
 }
 
 // 相邻选择验证
-const getNumericValue = (value) => {
-  if (value === 'any') return -1
-  if (value.includes('+')) return parseInt(value)
-  return parseInt(value)
-}
-
-const areAdjacent = (arr, newValue) => {
-  if (arr.length === 0) return true
-  if (arr.includes('any')) return newValue === 'any'
-  if (newValue === 'any') return arr.length === 0
-  
-  const numericValues = arr.map(getNumericValue).filter(v => v >= 0)
-  const newNumeric = getNumericValue(newValue)
-  
-  if (newNumeric < 0) return false
-  
-  // 检查是否相邻
-  const allValues = [...numericValues, newNumeric].sort((a, b) => a - b)
-  
-  for (let i = 1; i < allValues.length; i++) {
-    if (allValues[i] - allValues[i-1] > 1) {
-      return false
-    }
-  }
-  
-  return true // 允许选择多个相邻值
-}
+// 注：已改为单选逻辑，不再需要相邻检查
 
 // 事件处理
 const toggleBedroom = (value) => {
-  const currentBedrooms = [...filters.value.bedrooms]
-  const index = currentBedrooms.indexOf(value)
-  
-  if (value === 'any') {
-    // 点击 Any 时，清空所有选择
+  // 单选逻辑：如果已选中则取消，否则选中
+  if (filters.value.bedrooms.includes(value)) {
     filters.value.bedrooms = []
-    updateFilteredCount()
-    return
-  }
-  
-  if (index > -1) {
-    // 移除选择
-    currentBedrooms.splice(index, 1)
   } else {
-    // 添加选择
-    if (currentBedrooms.includes('any')) {
-      // 如果已选 any，替换为新选择
-      filters.value.bedrooms = [value]
-      updateFilteredCount()
-      return
-    }
-    
-    if (areAdjacent(currentBedrooms, value)) {
-      currentBedrooms.push(value)
-    } else {
-      // 不相邻，替换选择
-      filters.value.bedrooms = [value]
-      updateFilteredCount()
-      return
-    }
+    filters.value.bedrooms = [value]
   }
-  
-  filters.value.bedrooms = currentBedrooms
   updateFilteredCount()
 }
 
 const toggleBathroom = (value) => {
-  const currentBathrooms = [...filters.value.bathrooms]
-  const index = currentBathrooms.indexOf(value)
-  
+  // 单选逻辑：如果已选中则取消，否则选中
   if (value === 'any') {
-    // 点击 Any 时，清空所有选择
     filters.value.bathrooms = []
-    updateFilteredCount()
-    return
-  }
-  
-  if (index > -1) {
-    currentBathrooms.splice(index, 1)
+  } else if (filters.value.bathrooms.includes(value)) {
+    filters.value.bathrooms = []
   } else {
-    if (currentBathrooms.includes('any')) {
-      filters.value.bathrooms = [value]
-      updateFilteredCount()
-      return
-    }
-    
-    if (areAdjacent(currentBathrooms, value)) {
-      currentBathrooms.push(value)
-    } else {
-      filters.value.bathrooms = [value]
-      updateFilteredCount()
-      return
-    }
+    filters.value.bathrooms = [value]
   }
-  
-  filters.value.bathrooms = currentBathrooms
   updateFilteredCount()
 }
 
 const toggleParking = (value) => {
-  const currentParking = [...filters.value.parking]
-  const index = currentParking.indexOf(value)
-  
+  // 单选逻辑：如果已选中则取消，否则选中
   if (value === 'any') {
-    // 点击 Any 时，清空所有选择
     filters.value.parking = []
-    updateFilteredCount()
-    return
-  }
-  
-  if (index > -1) {
-    currentParking.splice(index, 1)
+  } else if (filters.value.parking.includes(value)) {
+    filters.value.parking = []
   } else {
-    if (currentParking.includes('any')) {
-      filters.value.parking = [value]
-      updateFilteredCount()
-      return
-    }
-    
-    if (areAdjacent(currentParking, value)) {
-      currentParking.push(value)
-    } else {
-      filters.value.parking = [value]
-      updateFilteredCount()
-      return
-    }
+    filters.value.parking = [value]
   }
-  
-  filters.value.parking = currentParking
   updateFilteredCount()
 }
 
 // 实时更新筛选数量（不立即应用到store）
-const updateFilteredCount = () => {
-  // 检查是否选择了所有选项
-  const allBedroomOptions = ['1', '2', '3', '4+']
-  const isAllBedroomsSelected = filters.value.bedrooms.length === 4 && 
-    allBedroomOptions.every(option => filters.value.bedrooms.includes(option))
+const updateFilteredCount = async () => {
+  // 准备筛选参数，与后端API保持一致
+  const filterParams = {
+    minPrice: filters.value.priceRange[0] > 0 ? filters.value.priceRange[0] : null,
+    maxPrice: filters.value.priceRange[1] < 5000 ? filters.value.priceRange[1] : null,
+    bedrooms: filters.value.bedrooms.length > 0 ? filters.value.bedrooms.join(',') : null,
+    bathrooms: filters.value.bathrooms.length > 0 ? filters.value.bathrooms.join(',') : null,
+    parking: filters.value.parking.length > 0 ? filters.value.parking.join(',') : null,
+    date_from: filters.value.startDate,
+    date_to: filters.value.endDate,
+    isFurnished: filters.value.isFurnished || null
+  }
   
-  const allBathroomOptions = ['1', '2', '3+']
-  const isAllBathroomsSelected = filters.value.bathrooms.length === 3 &&
-    allBathroomOptions.every(option => filters.value.bathrooms.includes(option))
-    
-  const allParkingOptions = ['0', '1', '2+']
-  const isAllParkingSelected = filters.value.parking.length === 3 &&
-    allParkingOptions.every(option => filters.value.parking.includes(option))
+  // 移除 null 值
+  Object.keys(filterParams).forEach(key => {
+    if (filterParams[key] === null || filterParams[key] === '') {
+      delete filterParams[key]
+    }
+  })
   
-  // 如果没有应用任何筛选条件，或者选择了所有选项，返回总数
-  if (!hasAppliedFilters.value || 
-      (isAllBedroomsSelected && filters.value.priceRange[0] === 0 && filters.value.priceRange[1] === 5000 &&
-       (filters.value.bathrooms.length === 0 || isAllBathroomsSelected) &&
-       (filters.value.parking.length === 0 || isAllParkingSelected) &&
-       !filters.value.isFurnished &&
-       !filters.value.startDate && !filters.value.endDate)) {
+  // 如果没有任何筛选条件，显示总数
+  if (Object.keys(filterParams).length === 0) {
     localFilteredCount.value = 3456
     return
   }
   
-  // 使用估算值（暂时不调用API避免频繁请求）
-  calculateLocalCount()
+  try {
+    // 调用API获取实际的筛选结果数量
+    const response = await fetch(`/api/properties?page=1&page_size=1&${new URLSearchParams(filterParams)}`)
+    const data = await response.json()
+    if (data.status === 'success' && data.pagination) {
+      localFilteredCount.value = data.pagination.total
+    } else {
+      // 如果API调用失败，使用估算
+      calculateLocalCount()
+    }
+  } catch (error) {
+    console.error('获取筛选计数失败:', error)
+    // 使用估算作为备用方案
+    calculateLocalCount()
+  }
 }
 
 // 检查是否选择了所有选项
@@ -511,34 +425,16 @@ const closePanel = () => {
 
 const applyFiltersToStore = async () => {
   try {
-    // 检查是否选择了所有卧室选项
-    const allBedroomOptions = ['1', '2', '3', '4+']
-    const isAllBedroomsSelected = allBedroomOptions.every(option => 
-      filters.value.bedrooms.includes(option)
-    )
-    
-    // 检查是否选择了所有浴室选项
-    const allBathroomOptions = ['1', '2', '3+']
-    const isAllBathroomsSelected = allBathroomOptions.every(option => 
-      filters.value.bathrooms.includes(option)
-    )
-    
-    // 检查是否选择了所有车位选项
-    const allParkingOptions = ['0', '1', '2+']
-    const isAllParkingSelected = allParkingOptions.every(option => 
-      filters.value.parking.includes(option)
-    )
-    
+    // 准备筛选参数，直接传递选中的值
     const filterParams = {
       minPrice: filters.value.priceRange[0] > 0 ? filters.value.priceRange[0] : null,
       maxPrice: filters.value.priceRange[1] < 5000 ? filters.value.priceRange[1] : null,
-      // 如果选择了所有选项，等同于不筛选
-      bedrooms: (filters.value.bedrooms.length === 0 || isAllBedroomsSelected) ? null : filters.value.bedrooms.join(','),
-      bathrooms: (filters.value.bathrooms.length === 0 || isAllBathroomsSelected) ? null : filters.value.bathrooms.join(','),
-      parking: (filters.value.parking.length === 0 || isAllParkingSelected) ? null : filters.value.parking.join(','),
+      bedrooms: filters.value.bedrooms.length > 0 ? filters.value.bedrooms.join(',') : null,
+      bathrooms: filters.value.bathrooms.length > 0 ? filters.value.bathrooms.join(',') : null,
+      parking: filters.value.parking.length > 0 ? filters.value.parking.join(',') : null,
       date_from: filters.value.startDate,
       date_to: filters.value.endDate,
-      isFurnished: filters.value.isFurnished
+      isFurnished: filters.value.isFurnished || null
     }
     
     await propertiesStore.applyFilters(filterParams)
