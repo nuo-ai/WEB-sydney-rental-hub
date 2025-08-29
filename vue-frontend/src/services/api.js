@@ -148,6 +148,55 @@ export const userAPI = {
   }
 }
 
+// 位置/区域API服务
+export const locationAPI = {
+  // 获取所有区域（初始化搜索建议）
+  async getAllLocations() {
+    try {
+      const response = await apiClient.get('/locations/all')
+      if (response.data.status === 'success') {
+        return response.data.data
+      }
+      throw new Error(response.data.error?.message || '获取区域数据失败')
+    } catch (error) {
+      console.error('❌ 获取区域数据失败:', error)
+      return []
+    }
+  },
+
+  // 搜索区域建议
+  async getSuggestions(query, limit = 20) {
+    try {
+      const response = await apiClient.get('/locations/suggestions', {
+        params: { q: query, limit }
+      })
+      if (response.data.status === 'success') {
+        return response.data.data
+      }
+      throw new Error(response.data.error?.message || '搜索失败')
+    } catch (error) {
+      console.error('❌ 搜索区域失败:', error)
+      return []
+    }
+  },
+
+  // 获取相邻区域推荐
+  async getNearbySuburbs(suburb, limit = 6) {
+    try {
+      const response = await apiClient.get('/locations/nearby', {
+        params: { suburb, limit }
+      })
+      if (response.data.status === 'success') {
+        return response.data.data
+      }
+      throw new Error(response.data.error?.message || '获取相邻区域失败')
+    } catch (error) {
+      console.error('❌ 获取相邻区域失败:', error)
+      return { current: suburb, nearby: [] }
+    }
+  }
+}
+
 // 交通API服务
 export const transportAPI = {
   // 获取通勤路线

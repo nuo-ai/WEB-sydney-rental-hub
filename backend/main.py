@@ -1236,3 +1236,314 @@ async def get_properties(
         query = f"{base_query} ORDER BY listing_id ASC"
         items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
         return success_response(data=items, pagination=pagination_info)
+
+
+# ========================================
+# Location/Search Suggestions API
+# ========================================
+
+@app.get("/api/locations/suggestions", tags=["Locations"])
+@cache(expire=3600)  # Cache for 1 hour
+async def get_location_suggestions(
+    q: Optional[str] = Query(None, description="Search query"),
+    limit: int = Query(20, ge=1, le=100),
+    db: Any = Depends(get_db_conn_dependency)
+):
+    """
+    Get location suggestions for search autocomplete.
+    Returns suburbs and postcodes with property counts.
+    """
+    try:
+        if q and len(q.strip()) > 0:
+            # Search with query
+            search_term = q.strip().lower()
+            
+            query = """
+            SELECT 
+                suburb,
+                REPLACE(COALESCE(postcode, '0'), '.0', '') as clean_postcode,
+                COUNT(*) as property_count
+            FROM properties
+            WHERE suburb IS NOT NULL
+                AND (
+                    LOWER(suburb) LIKE %s
+                    OR REPLACE(postcode, '.0', '') LIKE %s
+                )
+            GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
+            ORDER BY 
+                CASE 
+                    WHEN LOWER(suburb) = %s THEN 1
+                    WHEN LOWER(suburb) LIKE %s THEN 2
+                    ELSE 3
+                END,
+                property_count DESC
+            LIMIT %s
+            """
+            
+            def _db_call():
+                with db.cursor() as cur:
+                    cur.execute(query, (
+                        f'%{search_term}%',
+                        f'{search_term}%',
+                        search_term,
+                        f'{search_term}%',
+                        limit
+                    ))
+                    results = cur.fetchall()
+                    return results
+            
+            results = await asyncio.to_thread(_db_call)
+            
+            # Format results
+            suggestions = []
+            for row in results:
+                suburb = row[0]
+                postcode = row[1]
+                count = row[2]
+                
+                suggestions.append({
+                    "id": f"{suburb}_{postcode}",
+                    "type": "suburb",
+                    "name": suburb,
+                    "postcode": postcode,
+                    "fullName": f"{suburb}, NSW, {postcode}",
+                    "count": count
+                })
+            
+            return success_response(data=suggestions)
+        
+        else:
+            # No query - return all locations
+            query = """
+            SELECT 
+                suburb,
+                REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
+                COUNT(*) as property_count
+            FROM properties
+            WHERE suburb IS NOT NULL
+            GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
+            ORDER BY property_count DESC
+            LIMIT %s
+            """
+            
+            def _db_call():
+                with db.cursor() as cur:
+                    cur.execute(query, (limit,))
+                    results = cur.fetchall()
+                    return results
+            
+            results = await asyncio.to_thread(_db_call)
+            
+            # Format results
+            suggestions = []
+            for row in results:
+                suburb = row[0]
+                postcode = row[1]
+                count = row[2]
+                
+                suggestions.append({
+                    "id": f"{suburb}_{postcode}",
+                    "type": "suburb",
+                    "name": suburb,
+                    "postcode": postcode,
+                    "fullName": f"{suburb}, NSW, {postcode}",
+                    "count": count
+                })
+            
+            return success_response(data=suggestions)
+            
+    except Exception as e:
+        logger.error(f"Error getting location suggestions: {str(e)}")
+        return error_response(f"Failed to get location suggestions: {str(e)}")
+
+
+@app.get("/api/locations/all", tags=["Locations"])
+@cache(expire=3600)  # Cache for 1 hour
+async def get_all_locations(
+    db: Any = Depends(get_db_conn_dependency)
+):
+    """
+    Get all unique locations with property counts.
+    Used for initializing search suggestions.
+    """
+    try:
+        query = """
+        SELECT 
+            suburb,
+            REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
+            COUNT(*) as property_count
+        FROM properties
+        WHERE suburb IS NOT NULL
+        GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
+        ORDER BY property_count DESC
+        """
+        
+        def _db_call():
+            with db.cursor() as cur:
+                cur.execute(query)
+                results = cur.fetchall()
+                return results
+        
+        results = await asyncio.to_thread(_db_call)
+        
+        # Format results for both suburb and postcode lookups
+        locations = []
+        postcode_map = {}
+        
+        for row in results:
+            suburb = row[0]
+            postcode = row[1]
+            count = row[2]
+            
+            # Add suburb entry
+            locations.append({
+                "id": f"{suburb}_{postcode}",
+                "type": "suburb",
+                "name": suburb,
+                "postcode": postcode,
+                "fullName": f"{suburb}, NSW, {postcode}",
+                "count": count
+            })
+            
+            # Aggregate by postcode
+            if postcode not in postcode_map:
+                postcode_map[postcode] = {
+                    "id": f"postcode_{postcode}",
+                    "type": "postcode",
+                    "name": postcode,
+                    "suburbs": [],
+                    "fullName": f"{postcode}",
+                    "count": 0
+                }
+            postcode_map[postcode]["suburbs"].append(suburb)
+            postcode_map[postcode]["count"] += count
+        
+        # Update postcode fullNames with suburb list
+        for postcode_data in postcode_map.values():
+            suburbs_str = ", ".join(postcode_data["suburbs"][:3])  # Show first 3 suburbs
+            if len(postcode_data["suburbs"]) > 3:
+                suburbs_str += f" +{len(postcode_data['suburbs']) - 3} more"
+            postcode_data["fullName"] = f"{postcode_data['name']} ({suburbs_str})"
+            locations.append(postcode_data)
+        
+        # Sort by count
+        locations.sort(key=lambda x: x["count"], reverse=True)
+        
+        return success_response(data=locations)
+        
+    except Exception as e:
+        logger.error(f"Error getting all locations: {str(e)}")
+        return error_response(f"Failed to get locations: {str(e)}")
+
+
+@app.get("/api/locations/nearby", tags=["Locations"])
+@cache(expire=3600)  # Cache for 1 hour
+async def get_nearby_suburbs(
+    suburb: str = Query(..., description="Suburb name"),
+    limit: int = Query(6, ge=1, le=20),
+    db: Any = Depends(get_db_conn_dependency)
+):
+    """
+    Get nearby suburbs based on the selected suburb.
+    Returns suggested suburbs that users might also be interested in.
+    """
+    # Define nearby suburbs mapping (Sydney area)
+    nearby_mapping = {
+        "Sydney": ["Haymarket", "Surry Hills", "Pyrmont", "Ultimo", "The Rocks", "Darling Harbour"],
+        "Ultimo": ["Sydney", "Chippendale", "Pyrmont", "Glebe", "Surry Hills", "Camperdown"],
+        "Chippendale": ["Ultimo", "Redfern", "Darlington", "Glebe", "Newtown", "Camperdown"],
+        "Surry Hills": ["Sydney", "Darlinghurst", "Paddington", "Redfern", "Moore Park", "Elizabeth Bay"],
+        "Redfern": ["Chippendale", "Surry Hills", "Waterloo", "Alexandria", "Eveleigh", "Darlington"],
+        "Newtown": ["Erskineville", "Enmore", "Stanmore", "Camperdown", "Marrickville", "St Peters"],
+        "Glebe": ["Ultimo", "Forest Lodge", "Annandale", "Camperdown", "Leichhardt", "Pyrmont"],
+        "Pyrmont": ["Sydney", "Ultimo", "Glebe", "Balmain", "Rozelle", "Barangaroo"],
+        "Waterloo": ["Redfern", "Alexandria", "Zetland", "Rosebery", "Surry Hills", "Moore Park"],
+        "Alexandria": ["Waterloo", "Redfern", "Erskineville", "Beaconsfield", "Rosebery", "Mascot"],
+        "Zetland": ["Waterloo", "Rosebery", "Kensington", "Alexandria", "Beaconsfield", "Green Square"],
+        "Rosebery": ["Zetland", "Waterloo", "Alexandria", "Mascot", "Beaconsfield", "Eastlakes"],
+        "Mascot": ["Rosebery", "Alexandria", "Botany", "Eastlakes", "Pagewood", "Wolli Creek"],
+        "Randwick": ["Kensington", "Kingsford", "Coogee", "Clovelly", "Centennial Park", "Queens Park"],
+        "Kensington": ["Randwick", "Kingsford", "Zetland", "Centennial Park", "Moore Park", "Rosebery"],
+        "Kingsford": ["Randwick", "Kensington", "Maroubra", "Daceyville", "Eastlakes", "Coogee"],
+        "Maroubra": ["Kingsford", "Pagewood", "Hillsdale", "Malabar", "Coogee", "South Coogee"],
+        "Hurstville": ["Penshurst", "Allawah", "Mortdale", "Beverley Park", "Peakhurst", "Oatley"],
+        "Burwood": ["Strathfield", "Croydon", "Ashfield", "Five Dock", "Concord", "Homebush"],
+        "Campsie": ["Canterbury", "Belmore", "Lakemba", "Ashbury", "Clemton Park", "Earlwood"],
+        "Parramatta": ["Westmead", "Harris Park", "North Parramatta", "Rosehill", "Granville", "Rydalmere"],
+        "Chatswood": ["Artarmon", "Willoughby", "Lane Cove", "Roseville", "Lindfield", "North Willoughby"],
+        "North Sydney": ["Milsons Point", "Kirribilli", "Neutral Bay", "Waverton", "McMahons Point", "Crows Nest"],
+        "Bondi": ["Bondi Beach", "North Bondi", "Tamarama", "Bellevue Hill", "Waverley", "Bondi Junction"],
+        "Coogee": ["Randwick", "South Coogee", "Clovelly", "Maroubra", "Kingsford", "Bronte"]
+    }
+    
+    try:
+        # Get nearby suburbs from mapping
+        nearby_suburbs = nearby_mapping.get(suburb, [])[:limit]
+        
+        if not nearby_suburbs:
+            # If no mapping found, return popular suburbs as fallback
+            query = """
+            SELECT 
+                suburb,
+                REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
+                COUNT(*) as property_count
+            FROM properties
+            WHERE suburb IS NOT NULL AND suburb != %s
+            GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
+            ORDER BY property_count DESC
+            LIMIT %s
+            """
+            
+            def _db_call():
+                with db.cursor() as cur:
+                    cur.execute(query, (suburb, limit))
+                    results = cur.fetchall()
+                    return results
+            
+            results = await asyncio.to_thread(_db_call)
+        else:
+            # Get data for nearby suburbs
+            placeholders = ','.join(['%s'] * len(nearby_suburbs))
+            query = f"""
+            SELECT 
+                suburb,
+                REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
+                COUNT(*) as property_count
+            FROM properties
+            WHERE suburb IN ({placeholders})
+            GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
+            ORDER BY property_count DESC
+            """
+            
+            def _db_call():
+                with db.cursor() as cur:
+                    cur.execute(query, nearby_suburbs)
+                    results = cur.fetchall()
+                    return results
+            
+            results = await asyncio.to_thread(_db_call)
+        
+        # Format results
+        suggestions = []
+        for row in results:
+            suburb_name = row[0]
+            postcode = row[1]
+            count = row[2]
+            
+            suggestions.append({
+                "id": f"{suburb_name}_{postcode}",
+                "type": "suburb",
+                "name": suburb_name,
+                "postcode": postcode,
+                "fullName": f"{suburb_name}, NSW, {postcode}",
+                "count": count
+            })
+        
+        return success_response(data={
+            "current": suburb,
+            "nearby": suggestions
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting nearby suburbs: {str(e)}")
+        return error_response(f"Failed to get nearby suburbs: {str(e)}")

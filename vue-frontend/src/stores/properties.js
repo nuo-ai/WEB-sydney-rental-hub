@@ -109,8 +109,12 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
       
       try {
-        // 始终确保先有足够的数据用于筛选
-        if (this.allProperties.length === 0) {
+        // 如果有筛选参数，直接调用API，不加载allProperties
+        const hasFilters = params.suburb || params.minPrice || params.maxPrice || 
+                          params.bedrooms || params.bathrooms || params.parking
+        
+        if (!hasFilters && this.allProperties.length === 0) {
+          // 只在没有筛选条件且没有数据时才加载基础数据
           try {
             // 分批加载数据，避免超过后端限制
             const firstBatch = await propertyAPI.getList({ page_size: 100 })

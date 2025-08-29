@@ -163,9 +163,20 @@ const handleSearch = () => {
   // 搜索逻辑已在SearchBar组件中处理，这里主要是响应搜索事件
 }
 
-const handleLocationSelected = () => {
-  // 应用筛选
-  applyCurrentFilters()
+const handleLocationSelected = async (location) => {
+  // 当选择区域后，调用API进行服务端筛选
+  if (location) {
+    // 构建筛选参数
+    const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
+    
+    try {
+      await propertiesStore.fetchProperties({
+        suburb: selectedSuburbs.join(',')
+      })
+    } catch (error) {
+      console.error('筛选房源失败:', error)
+    }
+  }
 }
 
 const handleToggleFullPanel = (show) => {
