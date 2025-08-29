@@ -1190,18 +1190,50 @@ async def get_properties(
         params.append(maxPrice)
     
     # Add date filters
-    if date_from:
-        conditions.append("available_date >= %s")
-        params.append(date_from)
+    # 处理空出日期筛选逻辑：
+    # - NULL表示"Available now"（立即可入住）
+    # - date_from到date_to：筛选在这个时间段内空出的房源
+    # - 如果时间段包含今天或过去，NULL（Available now）应该被包含
+    from datetime import datetime
+    today = datetime.now().date()
     
-    if date_to:
-        conditions.append("available_date <= %s")
+    if date_from and date_to:
+        # 用户选择了时间范围：找在这个时间段内空出的房源
+        # 如果date_from <= 今天，包含Available now的房源
+        if datetime.strptime(date_from, '%Y-%m-%d').date() <= today:
+            conditions.append(
+                "(available_date IS NULL OR (available_date >= %s AND available_date <= %s))"
+            )
+        else:
+            # 未来的时间段，不包含Available now
+            conditions.append(
+                "(available_date >= %s AND available_date <= %s)"
+            )
+        params.append(date_from)
+        params.append(date_to)
+    elif date_from:
+        # 只有开始日期：找从这个日期之后空出的房源
+        if datetime.strptime(date_from, '%Y-%m-%d').date() <= today:
+            conditions.append(
+                "(available_date IS NULL OR available_date >= %s)"
+            )
+        else:
+            conditions.append("available_date >= %s")
+        params.append(date_from)
+    elif date_to:
+        # 只有结束日期：找在这个日期之前空出的房源
+        conditions.append(
+            "(available_date IS NULL OR available_date <= %s)"
+        )
         params.append(date_to)
     
-    # Add furnished filter
+    # Add furnished filter - is_furnished field is a string ("yes"/"no"/"unknown")
     if isFurnished is not None:
-        conditions.append("is_furnished = %s")
-        params.append(isFurnished)
+        if isFurnished:
+            conditions.append("is_furnished = 'yes'")
+        else:
+            # When not furnished, include both 'no' and 'unknown'
+            conditions.append("(is_furnished = 'no' OR is_furnished = 'unknown')")
     
     # Build WHERE clause
     where_clause = ""

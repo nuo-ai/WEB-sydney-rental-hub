@@ -173,6 +173,16 @@ const filters = ref({
 // 本地计算的筛选结果数量
 const localFilteredCount = ref(0)
 
+// 辅助函数：格式化日期为YYYY-MM-DD
+const formatDateToYYYYMMDD = (date) => {
+  if (!date) return null
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 // 选项数据
 const bedroomOptions = [
   { value: '1', label: '1' },
@@ -300,8 +310,8 @@ const updateFilteredCount = async () => {
     bedrooms: filters.value.bedrooms.length > 0 ? filters.value.bedrooms.join(',') : null,
     bathrooms: filters.value.bathrooms.length > 0 ? filters.value.bathrooms.join(',') : null,
     parking: filters.value.parking.length > 0 ? filters.value.parking.join(',') : null,
-    date_from: filters.value.startDate,
-    date_to: filters.value.endDate,
+    date_from: filters.value.startDate ? formatDateToYYYYMMDD(filters.value.startDate) : null,
+    date_to: filters.value.endDate ? formatDateToYYYYMMDD(filters.value.endDate) : null,
     isFurnished: filters.value.isFurnished || null
   }
   
@@ -348,11 +358,18 @@ const isAllOptionsSelected = (selectedValues, allOptions) => {
 
 // 本地计算备用方案 - 基于总数进行估算
 const calculateLocalCount = () => {
-  // 始终基于总数 3456 进行估算，而不是本地数据
-  const totalProperties = 3456
+  // 基于区域筛选后的总数进行估算
+  let totalProperties = 3456
   
-  // 如果没有筛选条件
-  if (!hasAppliedFilters.value) {
+  // 如果有选中区域，使用区域筛选后的基数
+  const selectedSuburbs = propertiesStore.selectedLocations
+  if (selectedSuburbs.length > 0) {
+    // 使用当前store中的totalCount（如果有）或估算值
+    totalProperties = propertiesStore.totalCount || Math.floor(3456 * (selectedSuburbs.length / 10))
+  }
+  
+  // 如果没有其他筛选条件（除了区域）
+  if (!hasAppliedFilters.value && selectedSuburbs.length === 0) {
     localFilteredCount.value = totalProperties
     return
   }
@@ -438,8 +455,8 @@ const applyFiltersToStore = async () => {
       bedrooms: filters.value.bedrooms.length > 0 ? filters.value.bedrooms.join(',') : null,
       bathrooms: filters.value.bathrooms.length > 0 ? filters.value.bathrooms.join(',') : null,
       parking: filters.value.parking.length > 0 ? filters.value.parking.join(',') : null,
-      date_from: filters.value.startDate,
-      date_to: filters.value.endDate,
+      date_from: filters.value.startDate ? formatDateToYYYYMMDD(filters.value.startDate) : null,
+      date_to: filters.value.endDate ? formatDateToYYYYMMDD(filters.value.endDate) : null,
       isFurnished: filters.value.isFurnished || null
     }
     
