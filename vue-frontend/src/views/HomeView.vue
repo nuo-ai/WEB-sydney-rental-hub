@@ -116,6 +116,7 @@
 
     <!-- 筛选面板 -->
     <FilterPanel 
+      ref="filterPanelRef"
       v-model="showFilterPanel"
       @filtersChanged="handleFiltersChanged"
     />
@@ -147,6 +148,7 @@ const searchBarElement = ref(null)
 const lastScrollY = ref(0)
 const isNavHidden = ref(false)
 const windowWidth = ref(window.innerWidth)
+const filterPanelRef = ref(null)  // 添加FilterPanel组件的引用
 
 // 定义事件发射器
 const emit = defineEmits(['updateNavVisibility'])
@@ -170,8 +172,20 @@ const handleToggleFullPanel = (show) => {
   showFilterPanel.value = show
 }
 
-const handleQuickFiltersChanged = () => {
-  // 快速筛选逻辑已在FilterTabs组件中处理
+const handleQuickFiltersChanged = (filterParams) => {
+  // 同步快速筛选数据到FilterPanel
+  if (filterPanelRef.value) {
+    // 转换格式以同步到FilterPanel
+    const syncData = {
+      priceRange: filterParams.minPrice !== null || filterParams.maxPrice !== null
+        ? [filterParams.minPrice || 0, filterParams.maxPrice || 5000]
+        : [0, 5000],
+      bedrooms: filterParams.bedrooms === 'any' ? [] : filterParams.bedrooms.split(','),
+      bathrooms: filterParams.bathrooms === 'any' ? [] : filterParams.bathrooms?.split(',') || [],
+      parking: filterParams.parking === 'any' ? [] : filterParams.parking?.split(',') || []
+    }
+    filterPanelRef.value.setFilters(syncData)
+  }
 }
 
 const handleFiltersChanged = () => {
@@ -317,7 +331,10 @@ const initSearchBarHeight = async () => {
 
 // 生命周期
 onMounted(async () => {
-  loadProperties()
+  // 只在没有数据时才加载，避免覆盖筛选结果
+  if (propertiesStore.filteredProperties.length === 0) {
+    loadProperties()
+  }
   await initSearchBarHeight()
   lastScrollY.value = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })

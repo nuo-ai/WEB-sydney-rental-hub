@@ -16,7 +16,7 @@
       <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'area' }">
         <button 
           class="filter-tab"
-          @click="toggleDropdown('area')"
+          @click.stop="toggleDropdown('area')"
         >
           <span class="chinese-text">区域</span>
           <i class="fa-solid fa-chevron-down"></i>
@@ -44,7 +44,7 @@
       <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'bedrooms' }">
         <button 
           class="filter-tab"
-          @click="toggleDropdown('bedrooms')"
+          @click.stop="toggleDropdown('bedrooms')"
         >
           <span class="chinese-text">卧室</span>
           <i class="fa-solid fa-chevron-down"></i>
@@ -72,7 +72,7 @@
       <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'price' }">
         <button 
           class="filter-tab"
-          @click="toggleDropdown('price')"
+          @click.stop="toggleDropdown('price')"
         >
           <span class="chinese-text">价格</span>
           <i class="fa-solid fa-chevron-down"></i>
@@ -115,7 +115,7 @@
       <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'availability' }">
         <button 
           class="filter-tab"
-          @click="toggleDropdown('availability')"
+          @click.stop="toggleDropdown('availability')"
         >
           <span class="chinese-text">空出时间</span>
           <i class="fa-solid fa-chevron-down"></i>
@@ -154,6 +154,10 @@ const props = defineProps({
   filterPanelOpen: {
     type: Boolean,
     default: false
+  },
+  currentFilters: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -227,6 +231,10 @@ const toggleDropdown = (dropdown) => {
   if (activeDropdown.value === dropdown) {
     closeDropdown()
   } else {
+    // 确保关闭主筛选面板
+    if (props.filterPanelOpen) {
+      emit('toggleFullPanel', false)
+    }
     activeDropdown.value = dropdown
   }
 }
@@ -253,6 +261,10 @@ const toggleBedroom = (value) => {
     const index = selectedBedrooms.value.indexOf(value)
     if (index > -1) {
       selectedBedrooms.value.splice(index, 1)
+      // 如果没有选中任何项，设置为'any'
+      if (selectedBedrooms.value.length === 0) {
+        selectedBedrooms.value = ['any']
+      }
     } else {
       // 移除'any'选项，添加具体选项
       selectedBedrooms.value = selectedBedrooms.value.filter(v => v !== 'any')
@@ -298,6 +310,11 @@ const applyFilters = () => {
 onMounted(() => {
   // 点击外部关闭下拉
   document.addEventListener('click', handleClickOutside)
+  
+  // 同步初始筛选状态
+  if (props.currentFilters) {
+    syncFiltersFromPanel(props.currentFilters)
+  }
 })
 
 onUnmounted(() => {
@@ -309,6 +326,30 @@ const handleClickOutside = (event) => {
     closeDropdown()
   }
 }
+
+// 同步来自FilterPanel的筛选状态
+const syncFiltersFromPanel = (filters) => {
+  if (filters.areas) {
+    selectedAreas.value = Array.isArray(filters.areas) ? filters.areas : []
+  }
+  if (filters.bedrooms) {
+    selectedBedrooms.value = filters.bedrooms === 'any' ? ['any'] : filters.bedrooms.split(',')
+  }
+  if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+    customPriceRange.value = [
+      filters.minPrice || 0,
+      filters.maxPrice || 5000
+    ]
+  }
+  if (filters.availability) {
+    selectedAvailability.value = filters.availability
+  }
+}
+
+// 暴露方法给父组件
+defineExpose({
+  syncFiltersFromPanel
+})
 </script>
 
 <style scoped>
@@ -343,13 +384,26 @@ const handleClickOutside = (event) => {
 /* 移动端保持原有样式 */
 @media (max-width: 768px) {
   .filter-tabs-container {
-    max-width: 580px;
+    width: 100%;
+    max-width: 100%;
     margin-bottom: 16px;
+    padding: 0 16px;
+    box-sizing: border-box;
   }
   
   .filter-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
+    padding-bottom: 4px; /* 为滚动条留空间 */
+  }
+  
+  /* 移动端下拉框调整 */
+  .quick-filter-dropdown {
+    position: fixed;  /* 移动端使用fixed定位 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 340px;
   }
 }
 
@@ -426,11 +480,12 @@ const handleClickOutside = (event) => {
   border: 1px solid var(--color-border-default);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 1000;
+  z-index: 10001;  /* 提高z-index以确保在FilterPanel之上 */
   min-width: 220px;
   max-width: 280px;
   padding: 16px;
   margin-top: 4px;
+  pointer-events: auto;  /* 确保可以接收点击事件 */
 }
 
 .dropdown-header {
@@ -544,8 +599,9 @@ const handleClickOutside = (event) => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: 10000;  /* 提高以配合dropdown */
   background: transparent;
+  pointer-events: auto;
 }
 
 /* 响应式设计 */

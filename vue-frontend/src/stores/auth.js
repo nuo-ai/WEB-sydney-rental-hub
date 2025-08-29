@@ -157,6 +157,14 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async loadUserAddresses() {
+      // In test mode, load from localStorage
+      if (this.testMode) {
+        const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+        this.savedAddresses = addresses
+        console.log(`✅ Loaded ${this.savedAddresses.length} saved addresses from localStorage (test mode)`)
+        return
+      }
+      
       if (!this.token) {
         this.savedAddresses = []
         return
@@ -185,6 +193,26 @@ export const useAuthStore = defineStore('auth', {
           throw new Error('Invalid address data: missing coordinates')
         }
         
+        // In test mode, save to localStorage instead of API
+        if (this.testMode) {
+          const savedAddress = {
+            id: Date.now().toString(),
+            ...address,
+            createdAt: new Date().toISOString()
+          }
+          
+          this.savedAddresses.push(savedAddress)
+          
+          // Save to localStorage
+          const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+          addresses.push(savedAddress)
+          localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
+          
+          console.log(`✅ Address saved locally (test mode): ${savedAddress.label}`)
+          return savedAddress
+        }
+        
+        // Production mode - call API
         const response = await apiClient.post('/auth/addresses', {
           address: address.address,
           label: address.label,
@@ -206,6 +234,26 @@ export const useAuthStore = defineStore('auth', {
 
     async removeUserAddress(addressId) {
       try {
+        // In test mode, remove from localStorage
+        if (this.testMode) {
+          const index = this.savedAddresses.findIndex(a => a.id === addressId)
+          if (index > -1) {
+            const removed = this.savedAddresses.splice(index, 1)[0]
+            
+            // Update localStorage
+            const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+            const localIndex = addresses.findIndex(a => a.id === addressId)
+            if (localIndex > -1) {
+              addresses.splice(localIndex, 1)
+              localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
+            }
+            
+            console.log(`✅ Address removed locally (test mode): ${removed.label}`)
+          }
+          return
+        }
+        
+        // Production mode - call API
         await apiClient.delete(`/auth/addresses/${addressId}`)
         
         // 从本地状态移除

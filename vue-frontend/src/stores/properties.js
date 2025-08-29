@@ -109,6 +109,28 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
       
       try {
+        // 始终确保先有足够的数据用于筛选
+        if (this.allProperties.length === 0) {
+          try {
+            // 分批加载数据，避免超过后端限制
+            const firstBatch = await propertyAPI.getList({ page_size: 100 })
+            const secondBatch = await propertyAPI.getList({ page_size: 100, page: 2 })
+            const thirdBatch = await propertyAPI.getList({ page_size: 100, page: 3 })
+            
+            // 合并所有数据
+            this.allProperties = [...firstBatch, ...secondBatch, ...thirdBatch]
+          } catch (error) {
+            console.warn('⚠️ 获取全量数据失败:', error)
+            // 如果失败，至少尝试加载一些数据
+            try {
+              const fallbackData = await propertyAPI.getList({ page_size: 100 })
+              this.allProperties = fallbackData
+            } catch (fallbackError) {
+              console.error('❌ 数据加载完全失败:', fallbackError)
+            }
+          }
+        }
+        
         // 添加分页参数
         const paginationParams = {
           page: this.currentPage,
@@ -127,13 +149,6 @@ export const usePropertiesStore = defineStore('properties', {
           this.totalPages = response.pagination.pages
           this.hasNext = response.pagination.has_next
           this.hasPrev = response.pagination.has_prev
-        }
-        
-        // 如果是第一页，也更新allProperties用于搜索建议
-        if (this.currentPage === 1 && !params.search && !params.suburb) {
-          // 获取所有数据用于位置建议（只在首次加载时）
-          const allData = await propertyAPI.getList({ page_size: 100 })
-          this.allProperties = allData
         }
         
       } catch (error) {
@@ -182,7 +197,85 @@ export const usePropertiesStore = defineStore('properties', {
     },
 
     // 应用筛选条件
-    applyFilters(filters) {
+    async applyFilters(filters) {
+      console.log('🔍 applyFilters 被调用, 参数:', filters)
+      this.loading = true
+      this.error = null
+      
+      try {
+        // 直接使用API进行服务端筛选
+        const filterParams = {
+          page: 1,
+          page_size: 20,
+          ...filters
+        }
+        
+        // 移除null和空值
+        Object.keys(filterParams).forEach(key => {
+          if (filterParams[key] === null || filterParams[key] === undefined || filterParams[key] === '') {
+            delete filterParams[key]
+          }
+        })
+        
+        console.log('📡 发送API请求, 参数:', filterParams)
+        const response = await propertyAPI.getListWithPagination(filterParams)
+        console.log('✅ API响应:', response)
+        
+        // 更新数据
+        this.filteredProperties = response.data || []
+        
+        // 更新分页信息
+        if (response.pagination) {
+          this.totalCount = response.pagination.total
+          this.totalPages = response.pagination.pages
+          this.hasNext = response.pagination.has_next
+          this.hasPrev = response.pagination.has_prev
+          console.log('📊 总数更新为:', this.totalCount)
+        }
+        
+        this.currentPage = 1 // 重置到第一页
+        
+      } catch (error) {
+        console.error('❌ 筛选失败 - 退回到本地筛选:', error)
+        this.error = error.message || '筛选失败'
+        // 备用方案：使用本地筛选
+        await this.applyLocalFilters(filters)
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 本地筛选备用方案
+    async applyLocalFilters(filters) {
+      // 确保有数据可以筛选
+      if (this.allProperties.length === 0) {
+        // 如果没有数据，先加载数据
+        this.loading = true
+        try {
+          // 分批加载，避免 422 错误
+          const batches = await Promise.all([
+            propertyAPI.getList({ page_size: 100, page: 1 }),
+            propertyAPI.getList({ page_size: 100, page: 2 }),
+            propertyAPI.getList({ page_size: 100, page: 3 })
+          ])
+          
+          // 合并所有批次的数据
+          this.allProperties = batches.flat()
+        } catch (error) {
+          console.error('❌ 加载筛选数据失败:', error)
+          // 降级到更小的数据量
+          try {
+            const fallbackData = await propertyAPI.getList({ page_size: 50 })
+            this.allProperties = fallbackData
+          } catch (fallbackError) {
+            this.error = '加载数据失败，请重试'
+            return
+          }
+        } finally {
+          this.loading = false
+        }
+      }
+      
       // 更新store中的筛选状态，确保单一数据源
       if (filters.areas) {
         // 将字符串数组转换为符合预期的对象数组
@@ -235,49 +328,83 @@ export const usePropertiesStore = defineStore('properties', {
         )
       }
       
-      // 卧室筛选
-      if (filters.bedrooms && filters.bedrooms !== 'any') {
-        if (filters.bedrooms === 'studio/1') {
-          filtered = filtered.filter(property => 
-            property.bedrooms === 0 || property.bedrooms === 1
-          )
-        } else if (String(filters.bedrooms).includes('+')) {
-          const minBeds = parseInt(filters.bedrooms)
-          filtered = filtered.filter(property => 
-            property.bedrooms && property.bedrooms >= minBeds
-          )
-        } else {
-          filtered = filtered.filter(property => 
-            property.bedrooms === parseInt(filters.bedrooms)
-          )
+      // 卧室筛选 - 处理多选
+      if (filters.bedrooms && filters.bedrooms !== '') {
+        const bedroomValues = typeof filters.bedrooms === 'string' 
+          ? filters.bedrooms.split(',').filter(v => v && v !== '')
+          : []
+        
+        // 检查是否选择了所有卧室选项（等同于不筛选）
+        const allBedroomOptions = ['1', '2', '3', '4+']
+        const isAllSelected = allBedroomOptions.every(opt => bedroomValues.includes(opt))
+        
+        if (bedroomValues.length > 0 && !isAllSelected) {
+          filtered = filtered.filter(property => {
+            const beds = property.bedrooms || 0
+            
+            return bedroomValues.some(value => {
+              if (value === 'studio/1') {
+                return beds === 0 || beds === 1
+              } else if (value.includes('+')) {
+                const minBeds = parseInt(value)
+                return beds >= minBeds
+              } else {
+                return beds === parseInt(value)
+              }
+            })
+          })
         }
       }
       
-      // 浴室筛选
-      if (filters.bathrooms && filters.bathrooms !== 'any') {
-        if (String(filters.bathrooms).includes('+')) {
-          const minBaths = parseInt(filters.bathrooms)
-          filtered = filtered.filter(property => 
-            property.bathrooms && property.bathrooms >= minBaths
-          )
-        } else {
-          filtered = filtered.filter(property => 
-            property.bathrooms === parseInt(filters.bathrooms)
-          )
+      // 浴室筛选 - 处理多选
+      if (filters.bathrooms && filters.bathrooms !== '') {
+        const bathroomValues = typeof filters.bathrooms === 'string'
+          ? filters.bathrooms.split(',').filter(v => v && v !== '')
+          : []
+        
+        // 检查是否选择了所有浴室选项（等同于不筛选）
+        const allBathroomOptions = ['1', '2', '3+']
+        const isAllSelected = allBathroomOptions.every(opt => bathroomValues.includes(opt))
+        
+        if (bathroomValues.length > 0 && !isAllSelected) {
+          filtered = filtered.filter(property => {
+            const baths = property.bathrooms || 0
+            
+            return bathroomValues.some(value => {
+              if (value.includes('+')) {
+                const minBaths = parseInt(value)
+                return baths >= minBaths
+              } else {
+                return baths === parseInt(value)
+              }
+            })
+          })
         }
       }
       
-      // 车位筛选
-      if (filters.parking && filters.parking !== 'any') {
-        if (String(filters.parking).includes('+')) {
-          const minParking = parseInt(filters.parking)
-          filtered = filtered.filter(property => 
-            property.parking_spaces && property.parking_spaces >= minParking
-          )
-        } else {
-          filtered = filtered.filter(property => 
-            property.parking_spaces === parseInt(filters.parking)
-          )
+      // 车位筛选 - 处理多选
+      if (filters.parking && filters.parking !== '') {
+        const parkingValues = typeof filters.parking === 'string'
+          ? filters.parking.split(',').filter(v => v && v !== '')
+          : []
+        
+        // 检查是否选择了所有车位选项（等同于不筛选）
+        const allParkingOptions = ['0', '1', '2+']
+        const isAllSelected = allParkingOptions.every(opt => parkingValues.includes(opt))
+        
+        if (parkingValues.length > 0 && !isAllSelected) {
+          filtered = filtered.filter(property => {
+            const parking = property.parking_spaces || 0
+            
+            return parkingValues.some(value => {
+              if (value.includes('+')) {
+                const minParking = parseInt(value)
+                return parking >= minParking
+              } else {
+                return parking === parseInt(value)
+              }
+            })
+          })
         }
       }
       
@@ -307,8 +434,9 @@ export const usePropertiesStore = defineStore('properties', {
         filtered = filtered.filter(property => property.is_furnished === true)
       }
       
-      this.filteredProperties = filtered
-      this.totalCount = filtered.length
+      // 仅作为本地备用时使用
+      this.filteredProperties = filtered.slice(0, 20) // 只显示前20条
+      this.totalCount = filtered.length // 本地筛选的总数
       this.currentPage = 1 // 重置到第一页
       
     },
@@ -370,6 +498,21 @@ export const usePropertiesStore = defineStore('properties', {
       localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
       
     },
+    
+    // 获取筛选后的结果数量
+    async getFilteredCount(params = {}) {
+      try {
+        const response = await propertyAPI.getListWithPagination({
+          ...params,
+          page_size: 1,  // 只需要获取总数
+          page: 1
+        })
+        return response.pagination?.total || 0
+      } catch (error) {
+        console.error('获取筛选数量失败:', error)
+        return 0
+      }
+    },
 
     // 设置当前页并重新获取数据
     async setCurrentPage(page) {
@@ -407,13 +550,17 @@ export const usePropertiesStore = defineStore('properties', {
     },
 
     // 重置筛选条件
-    resetFilters() {
+    async resetFilters() {
+      // 确保有数据
+      if (this.allProperties.length === 0) {
+        await this.fetchProperties()
+      }
+      
       this.filteredProperties = [...this.allProperties]
       this.searchQuery = ''
       this.selectedLocations = []
       this.currentPage = 1
       this.totalCount = this.allProperties.length
-      
     },
 
     // 记录浏览历史

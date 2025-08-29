@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -47,6 +47,7 @@ const mapLoaded = ref(false)
 let map = null
 let marker = null
 let googleMapsLoaded = false
+let isInitializing = false
 
 // Check if Google Maps is already loaded
 const isGoogleMapsLoaded = () => {
@@ -95,12 +96,23 @@ const loadGoogleMaps = () => {
 
 // Initialize the map
 const initMap = async () => {
+  // Prevent multiple initializations
+  if (isInitializing || mapLoaded.value) {
+    return
+  }
+  
+  isInitializing = true
+  
   try {
     console.log('Initializing map with coords:', props.latitude, props.longitude)
     await loadGoogleMaps()
     
+    // Wait for DOM to be ready
+    await nextTick()
+    
     if (!mapRef.value) {
       console.error('Map ref not found')
+      isInitializing = false
       return
     }
     
@@ -135,6 +147,8 @@ const initMap = async () => {
     mapLoaded.value = true
   } catch (error) {
     console.error('Error initializing Google Map:', error)
+  } finally {
+    isInitializing = false
   }
 }
 

@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-01-28 (记录通勤查询功能技术实现)
+**最后更新**: 2025-01-28 夜间 (测试模式localStorage实现)
 
 ---
 
@@ -638,3 +638,105 @@ onMounted(() => {
        # 从数据库获取
        pass
    ```
+
+## 9. 测试模式与LocalStorage实现 (2025-01-28 夜间)
+
+### 9.1. 测试模式架构
+
+**🎯 智能存储切换**:
+```javascript
+// stores/auth.js - 测试模式检测
+testMode: () => {
+  return localStorage.getItem('auth-testMode') === 'true' || 
+         import.meta.env.VITE_AUTH_TEST_MODE === 'true'
+}
+```
+
+### 9.2. LocalStorage数据结构
+
+**📦 地址存储格式**:
+```javascript
+// localStorage key: juwo-addresses
+[
+  {
+    id: "1706454123456",           // 时间戳ID
+    address: "University of Sydney",
+    label: "School",
+    placeId: "ChIJR1234...",
+    latitude: -33.8886,
+    longitude: 151.1873,
+    createdAt: "2025-01-28T12:00:00Z"
+  }
+]
+```
+
+### 9.3. CRUD操作实现
+
+**✅ 保存地址（测试模式）**:
+```javascript
+async saveUserAddress(address) {
+  if (this.testMode) {
+    const savedAddress = {
+      id: Date.now().toString(),
+      ...address,
+      createdAt: new Date().toISOString()
+    }
+    
+    this.savedAddresses.push(savedAddress)
+    
+    const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+    addresses.push(savedAddress)
+    localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
+    
+    return savedAddress
+  }
+  // 生产模式调用API...
+}
+```
+
+### 9.4. UI组件优化
+
+**🎨 Figma设计实现**:
+```css
+/* See travel times按钮 */
+.see-travel-times-btn {
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.travel-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  background: #f0f0f0;
+  border-radius: 50%;
+}
+
+.travel-icon-wrapper i {
+  color: #FF5824; /* JUWO品牌色 */
+}
+```
+
+### 9.5. 技术决策优势
+
+**📊 测试模式优势**:
+
+1. **零依赖开发**：
+   - 无需后端API即可完整测试
+   - 无需数据库连接
+   - 无需认证服务
+
+2. **数据持久化**：
+   - 浏览器级别数据保存
+   - 跨页面刷新保持
+   - 支持导出/导入
+
+3. **快速迭代**：
+   - 即时看到功能效果
+   - 无网络延迟
+   - 便于UI/UX测试
+
+4. **平滑过渡**：
+   - 代码结构与生产一致
+   - 切换标志即可启用API
+   - 无需重构代码

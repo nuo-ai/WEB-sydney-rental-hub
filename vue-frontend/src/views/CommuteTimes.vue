@@ -203,6 +203,11 @@ onMounted(() => {
   // 测试模式：跳过登录检查
   const testMode = true // 设置为 false 启用登录验证
   
+  // Enable test mode in localStorage
+  if (testMode) {
+    localStorage.setItem('auth-testMode', 'true')
+  }
+  
   // 检查是否登录
   if (!testMode && !authStore.isAuthenticated) {
     ElMessage.warning('Please login to access this feature')

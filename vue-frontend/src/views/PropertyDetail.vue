@@ -157,7 +157,9 @@
 
             <!-- See travel times button -->
             <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
-              <i class="fas fa-map-marker-alt travel-icon"></i>
+              <div class="travel-icon-wrapper">
+                <i class="fas fa-location-dot"></i>
+              </div>
               <div class="travel-btn-content">
                 <span class="travel-btn-title">See travel times</span>
                 <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
@@ -207,10 +209,7 @@
           </button>
         </section>
 
-        <!-- 通勤计算器 -->
-        <section v-if="property && property.latitude && property.longitude" class="commute-section" id="commute">
-          <CommuteCalculator :property="property" />
-        </section>
+        <!-- 通勤计算器 - 已移至独立页面 -->
       </main>
 
       <!-- 底部固定操作栏 -->
@@ -246,7 +245,6 @@ import {
 import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
 import MarkdownContent from '@/components/MarkdownContent.vue'
-import CommuteCalculator from '@/components/CommuteCalculator.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 
 const route = useRoute()
@@ -751,57 +749,68 @@ onMounted(() => {
   font-size: 14px;
 }
 
-/* See travel times button - 符合设计稿 */
+/* See travel times button - 符合 Figma 设计稿 */
 .see-travel-times-btn {
   width: 100%;
-  padding: 16px;
+  padding: 14px 16px;
   margin-top: 16px;
-  background: white;
-  border: 1px solid #e3e3e3;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   text-align: left;
 }
 
 .see-travel-times-btn:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-  border-color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fafafa;
 }
 
 .see-travel-times-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.see-travel-times-btn .travel-icon {
-  font-size: 20px;
-  color: #666;
+.travel-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  background: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+}
+
+.travel-icon-wrapper i {
+  font-size: 18px;
+  color: #FF5824;
 }
 
 .travel-btn-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .travel-btn-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  color: #333;
-  display: block;
+  color: #1a1a1a;
+  letter-spacing: -0.2px;
 }
 
 .travel-btn-subtitle {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.3;
+  font-size: 13px;
+  color: #888;
+  line-height: 1.4;
+  letter-spacing: -0.1px;
 }
 
 /* Location Section */

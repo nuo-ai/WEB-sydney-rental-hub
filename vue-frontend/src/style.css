@@ -620,3 +620,30 @@ html, body {
 .slide-up {
   animation: slideUp 0.3s ease-out;
 }
+
+/* Element Plus 日期选择器弹出层 z-index 修复 */
+.el-picker-panel {
+  z-index: 10002 !important;
+}
+
+.el-date-picker {
+  z-index: 10002 !important;
+}
+
+.el-popper {
+  z-index: 10002 !important;
+}
+
+.el-popper.is-light {
+  z-index: 10002 !important;
+}
+
+/* 确保所有 Element Plus 弹出层在筛选面板之上 */
+.el-overlay {
+  z-index: 10001 !important;
+}
+
+/* 日期选择器的弹出框 */
+body > .el-popper {
+  z-index: 10002 !important;
+}
