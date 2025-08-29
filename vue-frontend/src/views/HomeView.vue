@@ -87,19 +87,30 @@
             </el-button>
           </div>
 
-          <!-- 房源网格 -->
-          <div v-else class="properties-grid">
-            <PropertyCard
-              v-for="property in displayedProperties"
-              :key="property.listing_id"
-              :property="property"
-              @click="goToPropertyDetail"
-              @contact="handleContactProperty"
+          <!-- 房源列表容器 -->
+          <div v-else class="properties-container">
+            <!-- 虚拟滚动：数据量超过50条时启用，避免DOM节点过多导致的性能问题 -->
+            <VirtualPropertyList
+              v-if="useVirtualScroll"
+              :properties="displayedProperties"
+              @property-click="goToPropertyDetail"
+              @contact-property="handleContactProperty"
             />
+            
+            <!-- 普通网格：小数据量保持原有交互体验，避免滚动条跳动 -->
+            <div v-else class="properties-grid">
+              <PropertyCard
+                v-for="property in displayedProperties"
+                :key="property.listing_id"
+                :property="property"
+                @click="goToPropertyDetail"
+                @contact="handleContactProperty"
+              />
+            </div>
           </div>
 
-          <!-- 分页组件 -->
-          <div v-if="propertiesStore.totalPages > 1" class="pagination-container">
+          <!-- 分页组件：虚拟滚动启用时隐藏，两种导航方式互斥避免用户困惑 -->
+          <div v-if="!useVirtualScroll && propertiesStore.totalPages > 1" class="pagination-container">
             <el-pagination
               :current-page="propertiesStore.currentPage"
               :page-size="propertiesStore.pageSize"
@@ -129,6 +140,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
+import VirtualPropertyList from '@/components/VirtualPropertyList.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
@@ -156,6 +168,13 @@ const emit = defineEmits(['updateNavVisibility'])
 // 计算属性
 const displayedProperties = computed(() => {
   return propertiesStore.paginatedProperties
+})
+
+// 虚拟滚动控制：localStorage开关便于A/B测试和问题快速回滚
+const VIRTUAL_SCROLL_THRESHOLD = 50
+const useVirtualScroll = computed(() => {
+  const enableVirtual = localStorage.getItem('enableVirtualScroll') !== 'false'
+  return enableVirtual && displayedProperties.value.length > VIRTUAL_SCROLL_THRESHOLD
 })
 
 // 方法

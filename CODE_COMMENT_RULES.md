@@ -1,5 +1,8 @@
 # 代码注释规则
 
+## ⚠️ Claude必须严格遵守
+**Claude在编写代码时必须100%遵循这些规则，不得违反**
+
 ## 核心原则
 **代码应该自文档化，注释只在代码无法自我解释时补充上下文**
 
@@ -79,5 +82,39 @@ let rentDifference;
 - 中文注释：确保说明清晰的业务逻辑
 - 英文注释：仅用于通用技术说明
 
+## Claude的自查清单
+在提交代码前，Claude必须自查：
+- [ ] 是否有解释"什么"的废话注释？删除！
+- [ ] 是否有步骤编号注释（1、2、3）？删除！
+- [ ] 是否解释了"为什么"做技术决策？保留！
+- [ ] 是否说明了业务逻辑和特殊规则？保留！
+- [ ] 变量命名是否清晰到不需要注释？
+
 ## 记住
 **如果需要大量注释才能解释代码，首先考虑重构代码使其更清晰**
+
+## 违规示例（Claude不应该写的）
+```javascript
+// ❌ 错误：步骤编号
+// 1. 导入组件
+import Component from './Component.vue'
+
+// ❌ 错误：解释显而易见的代码
+// 设置loading为true
+loading = true
+
+// ❌ 错误：用注释代替好的命名
+let d; // 租金差额
+```
+
+## 正确示例（Claude应该写的）
+```javascript
+// 虚拟滚动阈值50条：低于此数量性能影响可忽略
+const VIRTUAL_SCROLL_THRESHOLD = 50
+
+// localStorage开关：便于A/B测试和问题快速回滚
+const enableVirtual = localStorage.getItem('enableVirtualScroll') !== 'false'
+
+// 澳洲租房周租转月租使用4.33倍率（52周/12月）
+const monthlyRent = weeklyRent * 4.33
+```
