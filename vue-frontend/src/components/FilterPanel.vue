@@ -305,6 +305,12 @@ const updateFilteredCount = async () => {
     isFurnished: filters.value.isFurnished || null
   }
   
+  // 添加已选择的区域
+  const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
+  if (selectedSuburbs.length > 0) {
+    filterParams.suburb = selectedSuburbs.join(',')
+  }
+  
   // 移除 null 值
   Object.keys(filterParams).forEach(key => {
     if (filterParams[key] === null || filterParams[key] === '') {
@@ -312,7 +318,7 @@ const updateFilteredCount = async () => {
     }
   })
   
-  // 如果没有任何筛选条件，显示总数
+  // 如果没有任何筛选条件（包括区域），显示总数
   if (Object.keys(filterParams).length === 0) {
     localFilteredCount.value = 3456
     return
@@ -437,6 +443,12 @@ const applyFiltersToStore = async () => {
       isFurnished: filters.value.isFurnished || null
     }
     
+    // 添加已选择的区域
+    const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
+    if (selectedSuburbs.length > 0) {
+      filterParams.suburb = selectedSuburbs.join(',')
+    }
+    
     await propertiesStore.applyFilters(filterParams)
     emit('filtersChanged', filterParams)
   } catch (error) {
@@ -462,11 +474,12 @@ const resetFilters = () => {
     isFurnished: false
   }
   
-  // 重置本地计数为总数
-  localFilteredCount.value = propertiesStore.totalCount || 3456
-  
-  // 更新显示
-  updateFilteredCount()
+  // 如果有选中的区域，基于区域更新计数；否则显示总数
+  if (propertiesStore.selectedLocations.length > 0) {
+    updateFilteredCount()
+  } else {
+    localFilteredCount.value = propertiesStore.totalCount || 3456
+  }
 }
 
 // 初始化 - 默认不选中任何选项
@@ -505,8 +518,12 @@ watch(visible, (newValue) => {
 
 // 初始化时设置默认计数
 onMounted(() => {
-  // 默认显示总数
-  localFilteredCount.value = propertiesStore.totalCount || 3456
+  // 如果有选中的区域，更新计数；否则显示总数
+  if (propertiesStore.selectedLocations.length > 0) {
+    updateFilteredCount()
+  } else {
+    localFilteredCount.value = propertiesStore.totalCount || 3456
+  }
 })
 </script>
 
