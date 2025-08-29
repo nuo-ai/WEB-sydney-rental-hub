@@ -123,6 +123,7 @@ export const usePropertiesStore = defineStore('properties', {
         
         const loadTime = Date.now() - startTime
         console.log(`✅ 数据加载完成，耗时: ${loadTime}ms`)
+        console.log(`📊 API返回: ${response.data?.length || 0}条数据, 总计${response.pagination?.total || 0}条`)
         
         // 更新数据
         this.filteredProperties = response.data || []

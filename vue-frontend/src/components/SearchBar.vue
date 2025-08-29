@@ -269,7 +269,9 @@ const selectLocation = async (location) => {
 
 const removeLocation = async (locationId) => {
   propertiesStore.removeSelectedLocation(locationId)
-  emit('locationSelected', null)
+  
+  // 触发重新搜索，传递一个特殊标记表示是移除操作
+  emit('locationSelected', { removed: true })
   
   // 重新加载相邻区域建议
   await loadNearbySuggestions()

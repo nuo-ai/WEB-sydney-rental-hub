@@ -1120,10 +1120,21 @@ async def get_properties(
     conditions = []
     params = []
     
-    # Add suburb filter
+    # Add suburb filter - support multiple suburbs (comma-separated)
     if suburb:
-        conditions.append("suburb ILIKE %s")
-        params.append(f"%{suburb}%")
+        # Split by comma and trim whitespace
+        suburbs = [s.strip() for s in suburb.split(',')]
+        if len(suburbs) == 1:
+            # Single suburb - use ILIKE for partial matching
+            conditions.append("suburb ILIKE %s")
+            params.append(f"%{suburbs[0]}%")
+        else:
+            # Multiple suburbs - use ILIKE with OR for case-insensitive matching
+            suburb_conditions = []
+            for sub in suburbs:
+                suburb_conditions.append("suburb ILIKE %s")
+                params.append(f"%{sub}%")
+            conditions.append(f"({' OR '.join(suburb_conditions)})")
     
     # Add property type filter
     if property_type:
