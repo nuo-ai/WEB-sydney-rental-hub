@@ -109,10 +109,10 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
       
       try {
-        // 直接使用服务端分页API，不再预加载全部数据
+        // 合并分页参数，优先使用传入的参数
         const paginationParams = {
-          page: this.currentPage,
-          page_size: this.pageSize,
+          page: params.page || this.currentPage,
+          page_size: params.page_size || this.pageSize,
           ...params
         }
         
@@ -135,11 +135,11 @@ export const usePropertiesStore = defineStore('properties', {
           this.hasPrev = response.pagination.has_prev
         }
         
-        // 如果需要本地搜索建议，只加载一次基础数据
-        if (this.allProperties.length === 0 && !params.suburb) {
-          // 异步加载基础数据，不阻塞主流程
-          this.loadBaseDataAsync()
-        }
+        // 暂时禁用自动加载基础数据，提升首次加载速度
+        // 仅在用户真正使用搜索功能时才加载
+        // if (this.allProperties.length === 0 && !params.suburb) {
+        //   this.loadBaseDataAsync()
+        // }
         
       } catch (error) {
         this.error = error.message || '获取房源数据失败'
@@ -550,8 +550,8 @@ export const usePropertiesStore = defineStore('properties', {
       if (page < 1 || page > this.totalPages) return
       
       this.currentPage = page
-      // 重新获取当前页数据
-      await this.fetchProperties()
+      // 重新获取当前页数据，传递页码参数
+      await this.fetchProperties({ page: this.currentPage })
     },
     
     // 下一页

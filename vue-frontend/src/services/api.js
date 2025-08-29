@@ -15,7 +15,7 @@ const apiClient = axios.create({
 
 // 简单的内存缓存
 const cache = new Map()
-const CACHE_DURATION = 5 * 60 * 1000 // 5分钟缓存
+const CACHE_DURATION = 15 * 60 * 1000 // 15分钟缓存，与后端保持一致
 
 const getCacheKey = (url, params) => {
   return `${url}:${JSON.stringify(params)}`

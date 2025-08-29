@@ -250,12 +250,21 @@ async def lifespan(app: FastAPI):
     app.state.db_pool_initialized = True
     logger.info("Database pool initialization completed.")
     
-    # Initialize Redis Cache with global reference
-    # Assuming Redis is running on localhost. In production, use env variables.
-    redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
-    app.state.redis = redis  # Store redis client in app state for cache invalidation
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    logger.info("FastAPI Cache initialized with Redis backend.")
+    # Initialize Redis Cache with fallback to in-memory cache
+    try:
+        redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
+        # Test Redis connection
+        await redis.ping()
+        app.state.redis = redis  # Store redis client in app state for cache invalidation
+        FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+        logger.info("FastAPI Cache initialized with Redis backend.")
+    except Exception as e:
+        logger.warning(f"Redis not available: {e}. Using in-memory cache as fallback.")
+        # 使用内存缓存作为降级方案
+        from fastapi_cache.backends.inmemory import InMemoryBackend
+        FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
+        app.state.redis = None
+        logger.info("FastAPI Cache initialized with InMemory backend (fallback).")
 
     yield
     # Shutdown
@@ -1094,8 +1103,17 @@ async def get_properties(
     Get a paginated list of properties with optional filters.
     Supports both page-based and cursor-based pagination.
     """
-    # Build the base query with filters
-    base_query = "SELECT * FROM properties"
+    # Build the base query with filters - 只选择列表页需要的字段，减少数据传输
+    # 排除大字段如 description 和 property_features，提升性能
+    base_query = """SELECT 
+        listing_id, property_url, address, suburb, state, postcode, 
+        property_type, rent_pw, bond, bedrooms, bathrooms, parking_spaces,
+        available_date, inspection_times, agency_name, agent_name,
+        property_headline, latitude, longitude, images, cover_image,
+        is_active, status, created_at, last_updated,
+        has_air_conditioning, is_furnished, has_balcony, has_dishwasher,
+        has_laundry, has_parking, has_pool, has_gym
+    FROM properties"""
     count_query = "SELECT COUNT(*) FROM properties"
     
     # Build WHERE clause conditions
