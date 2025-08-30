@@ -10,34 +10,28 @@
 经过Vue 3重构和像素级UI优化，项目现已拥有**现代化的双前端架构 + 精致视觉系统**：
 
 ### 1.1. 新前端 - Vue 3生态 (主力版本) ✅
-- **框架**: **Vue 3 + Composition API** 
+
+- **框架**: **Vue 3 + Composition API**
 - **UI库**: **Element Plus** (企业级组件库)
 - **构建**: **Vite** (快速构建工具)
 - **状态**: **Pinia** (现代化状态管理)
 - **路由**: **Vue Router** (SPA路由)
 - **HTTP**: **Axios** (API客户端)
 - **样式**: **CSS3 + CSS Variables** (JUWO品牌主题)
-- **图标**: **Font Awesome + Element Plus Icons**
+- **图标**: Font Awesome
 - **开发**: **ESLint + Prettier** (代码质量)
-
-### 1.2. 传统前端 - Vanilla JS版本 (备用/参考)
-- **框架**: **Vanilla JavaScript (ES6 模块化)** + **HTML5** + **CSS3**
-- **样式**: **TailwindCSS** (CDN 版本)
-- **地图**: **Google Maps JavaScript API** (完整集成)
-- **UI 增强**: 自定义 **UIEnhancer** 系统，支持多种 UI 模式切换
-- **滑块控件**: **noUiSlider** (高级价格范围选择)
-- **图标**: **Font Awesome** 6.x
-
-### 1.3. 后端 (企业级云架构)
+- 
+- 1.3. 后端 (企业级云架构)
 - **框架**: **Python (FastAPI)** + **Strawberry GraphQL**
 - **数据库**: **Supabase云数据库 (PostgreSQL + PostGIS)** - AWS悉尼区域
 - **数据源**: 2000+条房源数据存储在Supabase
-- **异步任务**: **Celery** + **Redis** 
+- **异步任务**: **Celery** + **Redis**
 - **缓存**: **Redis** 缓存系统（15分钟TTL）
 - **安全**: API Key + JWT + 限流 完整方案
 - **地图服务**: **OpenStreetMap** (免费地图) + **本地通勤计算** (Haversine算法)
 
 ### 1.4. 部署 (多版本并存)
+
 - **Vue版本**: **localhost:5173** (开发环境)
 - **传统版本**: **Netlify** (生产环境)
 - **后端**: 通过 `scripts/run_backend.py` 在 `localhost:8000`
@@ -47,6 +41,7 @@
 ## 2. Vue 3项目技术架构详解
 
 ### 2.1. 项目结构设计
+
 ```
 vue-frontend/
 ├── src/
@@ -77,6 +72,7 @@ vue-frontend/
 ```
 
 ### 2.2. JUWO品牌技术实现
+
 ```css
 /* JUWO主品牌色系统 */
 :root {
@@ -93,6 +89,7 @@ vue-frontend/
 ```
 
 ### 2.3. API集成架构
+
 ```javascript
 // CORS代理解决方案
 // vite.config.js
@@ -119,6 +116,7 @@ const apiClient = axios.create({
 ## 3. 本地开发环境设置 (Vue版本)
 
 ### 3.1. Vue项目开发环境
+
 ```bash
 # Vue项目启动
 cd vue-frontend
@@ -131,7 +129,9 @@ python scripts/run_backend.py  # 启动后端 (localhost:8000)
 ```
 
 ### 3.2. 开发服务检查
+
 **Vue前端检查**:
+
 ```bash
 # 检查Vue应用
 curl -s http://localhost:5173/
@@ -141,12 +141,14 @@ curl -s http://localhost:5173/api/properties
 ```
 
 **后端服务检查**:
+
 ```bash
 # 检查后端直接访问
 curl -s http://localhost:8000/api/properties?page_size=1
 ```
 
 ### 3.3. 当前运行状态
+
 - **Vue应用**: `localhost:5173` - 正常运行 ✅
 - **后端API**: `localhost:8000` - Python FastAPI运行中 ✅
 - **代理配置**: Vite CORS代理 - 配置完成 ✅
@@ -157,6 +159,7 @@ curl -s http://localhost:8000/api/properties?page_size=1
 ## 4. Vue技术栈优势分析
 
 ### 4.1. Vue 3 Composition API
+
 ```javascript
 // 现代化的组件开发模式
 <script setup>
@@ -180,6 +183,7 @@ const handleSearch = (query) => {
 ```
 
 ### 4.2. Element Plus组件生态
+
 ```vue
 <!-- 高质量的UI组件库 -->
 <el-drawer v-model="visible" title="筛选条件">
@@ -189,6 +193,7 @@ const handleSearch = (query) => {
 ```
 
 ### 4.3. Pinia状态管理
+
 ```javascript
 // 现代化的状态管理
 export const usePropertiesStore = defineStore('properties', {
@@ -218,18 +223,21 @@ export const usePropertiesStore = defineStore('properties', {
 ## 5. 性能和用户体验优化
 
 ### 5.1. Vue 3性能优化
+
 - **虚拟DOM**: Vue 3优化的虚拟DOM diff算法
 - **Tree Shaking**: Vite构建时自动移除未使用代码
 - **组件懒加载**: 路由级别的代码分割
 - **响应式优化**: Proxy-based响应式系统
 
 ### 5.2. Element Plus优化
+
 - **按需引入**: 只加载使用的组件
 - **主题定制**: CSS变量实现JUWO品牌主题
 - **无障碍支持**: 内置的ARIA支持
 - **国际化**: 中文本地化支持
 
 ### 5.3. 实际性能指标
+
 - **页面加载**: 初始加载 < 2秒
 - **搜索响应**: 自动补全 < 100ms
 - **筛选切换**: 实时响应 < 50ms
@@ -242,6 +250,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 6.1. 像素级CSS实现
 
 **🎨 精确设计系统技术实现**:
+
 ```css
 /* 统一6px圆角系统 */
 .property-card {
@@ -275,6 +284,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 6.2. 布局系统技术革新
 
 **📐 完美对齐系统**:
+
 ```css
 /* 垂直对齐基准系统 */
 .container {
@@ -300,6 +310,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 6.3. 组件简化技术策略
 
 **🔧 PropertyCard组件优化**:
+
 ```vue
 <!-- 简化前：复杂的多功能卡片 -->
 <template>
@@ -331,6 +342,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 6.4. CSS架构清理
 
 **🧹 样式系统优化**:
+
 ```css
 /* 移除的冗余样式 */
 .property-amenities { /* 删除 */ }
@@ -357,6 +369,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 7.1. CSS冲突解决
 
 **🔧 解决的技术问题**:
+
 ```css
 /* 问题1: 全局CSS中的居中规则冲突 */
 /* 原始代码 (style.css) */
@@ -390,6 +403,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 7.2. 组件架构优化
 
 **📦 代码结构改善**:
+
 - **删除无用代码**: 移除propertyFeatures计算属性和handleContact方法
 - **样式简化**: 删除30%的CSS规则，保留核心样式
 - **性能提升**: 减少DOM节点数量，提升渲染性能
@@ -398,6 +412,7 @@ export const usePropertiesStore = defineStore('properties', {
 ### 7.3. 设计一致性实现
 
 **🎯 设计系统标准化**:
+
 - **圆角标准**: 全站统一6px圆角，替代混合的8px/12px/16px
 - **边框标准**: 全站统一1px边框，替代混合的1px/2px边框
 - **间距标准**: 12px组件间距，24px卡片间距
@@ -410,11 +425,13 @@ export const usePropertiesStore = defineStore('properties', {
 ### 8.1. 收藏数据独立存储
 
 **🎯 问题诊断**:
+
 - allProperties为空导致favoriteProperties无法工作
 - 性能优化后禁用了loadBaseDataAsync
 - 收藏功能依赖全量数据不合理
 
 **💡 解决方案**:
+
 ```javascript
 // stores/properties.js - 独立的收藏数据管理
 state: () => ({
@@ -441,12 +458,12 @@ actions: {
       this.favoritePropertiesData = []
       return
     }
-    
+  
     // 批量获取收藏房源
     const promises = this.favoriteIds.map(id => 
       propertyAPI.getDetail(id).catch(err => null)
     )
-    
+  
     const results = await Promise.all(promises)
     this.favoritePropertiesData = results.filter(p => p !== null)
   }
@@ -456,10 +473,12 @@ actions: {
 ### 8.2. CSS全局样式冲突解决
 
 **🎯 问题**:
+
 - style.css中的.favorite-btn使用position: absolute
 - 导致星星按钮脱离文档流跑到页面右上角
 
 **💡 解决**:
+
 ```css
 /* style.css - 移除全局absolute定位 */
 /* 收藏按钮 - 移除全局absolute定位，让组件自己控制 */
@@ -473,6 +492,7 @@ actions: {
 ### 8.1. 模态框系统架构
 
 **🎯 全屏模态框设计**:
+
 ```vue
 <!-- AuthModal.vue - 全屏认证模态框 -->
 <template>
@@ -504,6 +524,7 @@ actions: {
 ### 8.2. 状态管理架构
 
 **📦 Pinia Store设计**:
+
 ```javascript
 // stores/auth.js - 认证和用户地址管理
 export const useAuthStore = defineStore('auth', {
@@ -520,13 +541,13 @@ export const useAuthStore = defineStore('auth', {
       if (!address.latitude || !address.longitude) {
         throw new Error('Location must have coordinates')
       }
-      
+  
       const newAddress = {
         id: Date.now().toString(),
         ...address,
         createdAt: new Date().toISOString()
       }
-      
+  
       this.savedAddresses.push(newAddress)
       localStorage.setItem('userAddresses', JSON.stringify(this.savedAddresses))
       return newAddress
@@ -546,14 +567,14 @@ export const useCommuteStore = defineStore('commute', {
   actions: {
     async calculateCommute(destination, mode) {
       const cacheKey = `${origin}-${destination.id}-${mode}`
-      
+  
       // 检查缓存
       const cached = this.getFromCache(cacheKey)
       if (cached) return cached
-      
+  
       // API调用
       const result = await transportAPI.getDirections(origin, destination.address, mode)
-      
+  
       // 缓存结果
       this.setCache(cacheKey, result)
       return result
@@ -565,6 +586,7 @@ export const useCommuteStore = defineStore('commute', {
 ### 8.3. 组件通信模式
 
 **🔄 事件驱动架构**:
+
 ```javascript
 // PropertyDetail.vue -> AuthModal -> CommuteTimes
 const handleSeeTravelTimes = () => {
@@ -594,6 +616,7 @@ const handleAddressSelected = (address) => {
 ### 8.4. 地址数据预设
 
 **📍 澳洲常用地址**:
+
 ```javascript
 // 预设地址数据
 const PRESET_LOCATIONS = [
@@ -620,6 +643,7 @@ const PRESET_LOCATIONS = [
 ### 8.5. 测试模式实现
 
 **🧪 开发环境优化**:
+
 ```javascript
 // CommuteTimes.vue - 测试模式
 onMounted(() => {
@@ -644,21 +668,22 @@ onMounted(() => {
 **📊 架构选择理由**:
 
 1. **全屏模态框**：
+
    - 移动端优先，避免复杂的层级管理
    - 更好的焦点管理和键盘导航
    - 符合现代移动应用UX模式
-
 2. **前端地址缓存**：
+
    - localStorage持久化，提升用户体验
    - 减少API调用，优化性能
    - 离线场景部分可用
-
 3. **15分钟缓存策略**：
+
    - 平衡数据新鲜度和性能
    - 避免重复计算相同路线
    - Map结构高效查询
-
 4. **测试模式**：
+
    - 加速开发迭代
    - 无需后端即可验证UI流程
    - 便于UI/UX测试
@@ -668,6 +693,7 @@ onMounted(() => {
 **🚧 后续技术工作**:
 
 1. **Google Places API集成**：
+
    ```javascript
    // 需要实现真实的地址自动完成
    const placesService = new google.maps.places.AutocompleteService()
@@ -676,8 +702,8 @@ onMounted(() => {
      componentRestrictions: { country: 'au' }
    })
    ```
-
 2. **JWT认证实现**：
+
    ```javascript
    // 后端需要实现JWT生成和验证
    // 前端需要在API请求中携带token
@@ -689,15 +715,15 @@ onMounted(() => {
      return config
    })
    ```
-
 3. **后端地址持久化API**：
+
    ```python
    # 需要实现的后端端点
    @app.post("/api/user/addresses")
    async def save_user_address(address: AddressModel, user: User = Depends(get_current_user)):
        # 保存到数据库
        pass
-   
+
    @app.get("/api/user/addresses")
    async def get_user_addresses(user: User = Depends(get_current_user)):
        # 从数据库获取
@@ -709,6 +735,7 @@ onMounted(() => {
 ### 9.1. 测试模式架构
 
 **🎯 智能存储切换**:
+
 ```javascript
 // stores/auth.js - 测试模式检测
 testMode: () => {
@@ -720,6 +747,7 @@ testMode: () => {
 ### 9.2. LocalStorage数据结构
 
 **📦 地址存储格式**:
+
 ```javascript
 // localStorage key: juwo-addresses
 [
@@ -738,6 +766,7 @@ testMode: () => {
 ### 9.3. CRUD操作实现
 
 **✅ 保存地址（测试模式）**:
+
 ```javascript
 async saveUserAddress(address) {
   if (this.testMode) {
@@ -746,13 +775,13 @@ async saveUserAddress(address) {
       ...address,
       createdAt: new Date().toISOString()
     }
-    
+  
     this.savedAddresses.push(savedAddress)
-    
+  
     const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
     addresses.push(savedAddress)
     localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
-    
+  
     return savedAddress
   }
   // 生产模式调用API...
@@ -762,6 +791,7 @@ async saveUserAddress(address) {
 ### 9.4. UI组件优化
 
 **🎨 Figma设计实现**:
+
 ```css
 /* See travel times按钮 */
 .see-travel-times-btn {
@@ -787,21 +817,22 @@ async saveUserAddress(address) {
 **📊 测试模式优势**:
 
 1. **零依赖开发**：
+
    - 无需后端API即可完整测试
    - 无需数据库连接
    - 无需认证服务
-
 2. **数据持久化**：
+
    - 浏览器级别数据保存
    - 跨页面刷新保持
    - 支持导出/导入
-
 3. **快速迭代**：
+
    - 即时看到功能效果
    - 无网络延迟
    - 便于UI/UX测试
-
 4. **平滑过渡**：
+
    - 代码结构与生产一致
    - 切换标志即可启用API
    - 无需重构代码
@@ -813,6 +844,7 @@ async saveUserAddress(address) {
 ### 10.1. 性能瓶颈分析与解决
 
 **问题诊断**：
+
 ```javascript
 // 性能瓶颈：冗余的300条数据预加载
 async fetchProperties() {
@@ -826,6 +858,7 @@ async fetchProperties() {
 ```
 
 **缓存策略实现**：
+
 ```javascript
 // 5分钟API响应缓存
 const cache = new Map()
@@ -871,6 +904,7 @@ async fetchPropertyDetail(id) {
 ### 10.3. OpenStreetMap免费地图方案
 
 **组件实现**：
+
 ```vue
 <!-- SimpleMap.vue -->
 <template>
@@ -900,6 +934,7 @@ const openStreetMapUrl = computed(() => {
 ### 10.4. 本地通勤计算算法
 
 **Haversine公式实现**：
+
 ```javascript
 // 计算两点间地理距离
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -932,16 +967,17 @@ const routeFactors = {
 ### 10.5. 技术决策总结
 
 1. **性能优化成果**：
+
    - 列表加载：30-50秒 → 2-5秒（10倍提升）
    - 详情页：8.6秒 → 即时显示
    - API缓存：5分钟有效期，减少重复请求
-
 2. **成本优化**：
+
    - Google Maps → OpenStreetMap（零成本）
    - Google Directions API → 本地计算（零成本）
    - 预设常用地址减少API调用
-
 3. **用户体验提升**：
+
    - 即时响应，无需等待
    - 离线可用的通勤估算
    - 地图始终可显示
