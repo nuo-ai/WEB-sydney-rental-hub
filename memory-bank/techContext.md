@@ -405,7 +405,70 @@ export const usePropertiesStore = defineStore('properties', {
 
 ---
 
-## 8. 通勤查询功能技术实现 (2025-01-28)
+## 8. 收藏功能技术架构改进 (2025-08-30)
+
+### 8.1. 收藏数据独立存储
+
+**🎯 问题诊断**:
+- allProperties为空导致favoriteProperties无法工作
+- 性能优化后禁用了loadBaseDataAsync
+- 收藏功能依赖全量数据不合理
+
+**💡 解决方案**:
+```javascript
+// stores/properties.js - 独立的收藏数据管理
+state: () => ({
+  favoriteIds: JSON.parse(localStorage.getItem('juwo-favorites') || '[]'),
+  favoritePropertiesData: [],  // 新增：独立存储收藏房源数据
+})
+
+getters: {
+  favoriteProperties: (state) => {
+    // 优先使用独立数据
+    if (state.favoritePropertiesData.length > 0) {
+      return state.favoritePropertiesData
+    }
+    // 兼容旧逻辑
+    return state.allProperties.filter(property => 
+      state.favoriteIds.includes(String(property.listing_id))
+    )
+  }
+}
+
+actions: {
+  async fetchFavoriteProperties() {
+    if (this.favoriteIds.length === 0) {
+      this.favoritePropertiesData = []
+      return
+    }
+    
+    // 批量获取收藏房源
+    const promises = this.favoriteIds.map(id => 
+      propertyAPI.getDetail(id).catch(err => null)
+    )
+    
+    const results = await Promise.all(promises)
+    this.favoritePropertiesData = results.filter(p => p !== null)
+  }
+}
+```
+
+### 8.2. CSS全局样式冲突解决
+
+**🎯 问题**:
+- style.css中的.favorite-btn使用position: absolute
+- 导致星星按钮脱离文档流跑到页面右上角
+
+**💡 解决**:
+```css
+/* style.css - 移除全局absolute定位 */
+/* 收藏按钮 - 移除全局absolute定位，让组件自己控制 */
+/* .favorite-btn 样式已移至PropertyCard组件内部 */
+```
+
+---
+
+## 9. 通勤查询功能技术实现 (2025-01-28)
 
 ### 8.1. 模态框系统架构
 

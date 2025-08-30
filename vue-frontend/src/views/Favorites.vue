@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
@@ -51,6 +51,11 @@ const router = useRouter()
 
 // 状态管理
 const propertiesStore = usePropertiesStore()
+
+// 页面加载时获取收藏的房源数据
+onMounted(async () => {
+  await propertiesStore.fetchFavoriteProperties()
+})
 
 // 计算属性
 const favoriteProperties = computed(() => {

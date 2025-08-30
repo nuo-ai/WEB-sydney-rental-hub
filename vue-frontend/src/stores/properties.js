@@ -28,6 +28,7 @@ export const usePropertiesStore = defineStore('properties', {
     
     // 收藏状态 (localStorage作为临时方案)
     favoriteIds: JSON.parse(localStorage.getItem('juwo-favorites') || '[]'),
+    favoritePropertiesData: [],
     
     // 历史记录
     viewHistory: JSON.parse(localStorage.getItem('juwo-history') || '[]'),
@@ -49,6 +50,11 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 获取收藏房源列表
     favoriteProperties: (state) => {
+      // 优先从专门的收藏数据中获取
+      if (state.favoritePropertiesData.length > 0) {
+        return state.favoritePropertiesData
+      }
+      // 兼容旧逻辑：从allProperties中过滤
       return state.allProperties.filter(property => 
         state.favoriteIds.includes(String(property.listing_id))
       )
@@ -513,13 +519,45 @@ export const usePropertiesStore = defineStore('properties', {
       
       if (index > -1) {
         this.favoriteIds.splice(index, 1)
+        // 从收藏数据中移除
+        this.favoritePropertiesData = this.favoritePropertiesData.filter(
+          p => String(p.listing_id) !== id
+        )
       } else {
         this.favoriteIds.push(id)
+        // 如果当前有该房源数据，添加到收藏数据中
+        const property = this.filteredProperties.find(p => String(p.listing_id) === id) ||
+                        this.allProperties.find(p => String(p.listing_id) === id)
+        if (property && !this.favoritePropertiesData.find(p => String(p.listing_id) === id)) {
+          this.favoritePropertiesData.push(property)
+        }
       }
       
       // 保存到localStorage
       localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
+    },
+    
+    // 获取收藏的房源数据
+    async fetchFavoriteProperties() {
+      if (this.favoriteIds.length === 0) {
+        this.favoritePropertiesData = []
+        return
+      }
       
+      try {
+        // 批量获取收藏的房源
+        const promises = this.favoriteIds.map(id => 
+          propertyAPI.getDetail(id).catch(err => {
+            console.warn(`获取收藏房源 ${id} 失败:`, err)
+            return null
+          })
+        )
+        
+        const results = await Promise.all(promises)
+        this.favoritePropertiesData = results.filter(p => p !== null)
+      } catch (error) {
+        console.error('获取收藏房源失败:', error)
+      }
     },
     
     // 获取筛选后的结果数量

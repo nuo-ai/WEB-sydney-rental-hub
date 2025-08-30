@@ -258,32 +258,8 @@ html, body {
   border-radius: 4px;
 }
 
-/* 收藏按钮 */
-.favorite-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.favorite-btn:hover {
-  background: white;
-  transform: scale(1.05);
-}
-
-.favorite-btn.is-favorite i {
-  color: var(--juwo-primary);
-}
+/* 收藏按钮 - 移除全局absolute定位，让组件自己控制 */
+/* .favorite-btn 样式已移至PropertyCard组件内部 */
 
 /* 房源内容区域 */
 .property-content {
