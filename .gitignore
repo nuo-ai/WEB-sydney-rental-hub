@@ -141,6 +141,9 @@ logs
 dev-debug.log
 # Environment variables
 .env.figma
+
+# Claude configuration (contains API keys)
+.claude.json
 # Editor directories and files
 .idea
 .vscode

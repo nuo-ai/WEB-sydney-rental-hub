@@ -16,7 +16,8 @@
       "Bash(npx figma-developer-mcp:*)",
       "Bash(npm view:*)",
       "Bash(npx:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(git filter-branch:*)"
     ],
     "deny": [],
     "ask": []
