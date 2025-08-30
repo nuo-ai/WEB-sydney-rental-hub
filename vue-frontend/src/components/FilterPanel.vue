@@ -426,13 +426,11 @@ const handlePriceChange = () => {
 }
 
 const handleStartDateChange = (date) => {
-  console.log('📅 开始日期变化:', date)
   filters.value.startDate = date
   nextTick(() => updateFilteredCount())
 }
 
 const handleEndDateChange = (date) => {
-  console.log('📅 结束日期变化:', date)
   filters.value.endDate = date
   nextTick(() => updateFilteredCount())
 }

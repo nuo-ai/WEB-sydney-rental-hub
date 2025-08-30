@@ -356,7 +356,9 @@ const shareProperty = () => {
       title: property.value.address,
       text: `${property.value.address} - $${property.value.rent_pw}/week`,
       url: window.location.href
-    }).catch(err => console.log('分享失败:', err))
+    }).catch(() => {
+      // 用户取消分享或分享失败
+    })
   } else {
     navigator.clipboard.writeText(window.location.href)
       .then(() => ElMessage.success('链接已复制到剪贴板'))

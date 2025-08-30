@@ -35,20 +35,7 @@
         {{ currentImageIndex + 1 }} / {{ validImages.length }}
       </div>
       
-      <!-- 收藏按钮 -->
-      <button 
-        class="favorite-btn"
-        :class="{ 'is-favorite': isFavorite }"
-        @click.stop="toggleFavorite"
-      >
-        <i :class="favoriteIconClass"></i>
-      </button>
-      <button 
-        class="compare-btn"
-        @click.stop="toggleCompare"
-      >
-        <i class="fa-solid fa-exchange-alt"></i>
-      </button>
+      <!-- 移除图片上的按钮 -->
       
       <!-- 新房源标签 -->
       <div v-if="isNewProperty" class="property-status-tag">
@@ -58,10 +45,42 @@
     
     <!-- 房源内容区域 -->
     <div class="property-content" @click="handleCardClick">
-      <!-- 价格显示 - 保持英文格式 -->
-      <div class="property-price english-text">
-        {{ formatPrice(property.rent_pw) }}
-        <span class="price-unit">per week</span>
+      <!-- 价格和操作按钮行 -->
+      <div class="property-header">
+        <div class="property-price english-text">
+          {{ formatPrice(property.rent_pw) }}
+          <span class="price-unit">per week</span>
+        </div>
+        <div class="property-actions">
+          <!-- 收藏按钮 -->
+          <button 
+            class="action-btn favorite-btn"
+            :class="{ 'is-favorite': isFavorite }"
+            @click.stop="toggleFavorite"
+            title="Save"
+          >
+            <i :class="favoriteIconClass"></i>
+          </button>
+          <!-- 更多选项按钮 -->
+          <el-dropdown trigger="click" @command="handleMoreAction">
+            <button class="action-btn more-btn" @click.stop>
+              <i class="fa-solid fa-ellipsis"></i>
+            </button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="share">
+                  <i class="fa-solid fa-share"></i>
+                  <span style="margin-left: 8px">Share</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="hide">
+                  <i class="fa-solid fa-eye-slash"></i>
+                  <span style="margin-left: 8px">Hide</span>
+                  <div style="font-size: 12px; color: #999; margin-left: 24px">Remove from results</div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </div>
       
       <!-- 地址信息 - 两行显示，保持英文 -->
@@ -105,6 +124,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
+import { ElMessage } from 'element-plus'
 
 // 组件属性
 const props = defineProps({
@@ -228,6 +248,20 @@ const toggleFavorite = () => {
 const toggleCompare = () => {
   propertiesStore.toggleCompare(props.property.listing_id)
 }
+
+// 处理更多操作菜单
+const handleMoreAction = (command) => {
+  if (command === 'share') {
+    // 实现分享功能
+    const shareUrl = `${window.location.origin}/property/${props.property.listing_id}`
+    navigator.clipboard.writeText(shareUrl)
+    ElMessage.success('链接已复制到剪贴板')
+  } else if (command === 'hide') {
+    // 实现隐藏功能
+    propertiesStore.hideProperty(props.property.listing_id)
+    ElMessage.info('已从搜索结果中移除')
+  }
+}
 </script>
 
 <style scoped>
@@ -265,103 +299,139 @@ const toggleCompare = () => {
   display: block;
 }
 
-/* Element Plus轮播样式定制 */
+/* Element Plus轮播样式定制 - 去除圆圈，垂直居中 */
 .property-carousel :deep(.el-carousel__container) {
   height: 386px;
 }
 
+/* 轮播箭头 - 无背景，直接显示箭头 */
 .property-carousel :deep(.el-carousel__arrow) {
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 14px;
+  background: transparent !important;
+  color: white !important;
+  width: 40px !important;
+  height: 60px !important;
+  font-size: 24px !important;
+  opacity: 0.7;
+  transition: opacity 0.3s ease !important;
+  border: none !important;
+  box-shadow: none !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
+/* 左箭头位置 */
+.property-carousel :deep(.el-carousel__arrow--left) {
+  left: 10px !important;
+}
+
+/* 右箭头位置 */
+.property-carousel :deep(.el-carousel__arrow--right) {
+  right: 10px !important;
+}
+
+/* 鼠标悬停在图片区域时箭头更明显 */
+.property-image-container:hover .property-carousel :deep(.el-carousel__arrow) {
+  opacity: 1;
+}
+
+/* 鼠标悬停在箭头上时 */
 .property-carousel :deep(.el-carousel__arrow):hover {
-  background: white;
+  background: transparent !important;
+  color: white !important;
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1) !important;
 }
 
-/* 图片计数器 */
+/* 移除Element Plus的点击效果 */
+.property-carousel :deep(.el-carousel__arrow):focus,
+.property-carousel :deep(.el-carousel__arrow):active {
+  background: transparent !important;
+  color: white !important;
+  outline: none !important;
+}
+
+/* 图片计数器 - 更简洁 */
 .image-counter {
   position: absolute;
   bottom: 12px;
   left: 12px;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.6);
   color: white;
   font-size: 11px;
-  font-weight: 500;
-  padding: 4px 8px;
+  font-weight: 400;
+  padding: 3px 8px;
   border-radius: 4px;
   z-index: 10;
 }
 
-/* 收藏按钮 */
-.favorite-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.9);
+/* 房源头部区域 - 价格和操作按钮 */
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+/* 操作按钮容器 */
+.property-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px; /* 按钮更紧凑 */
+}
+
+/* 通用操作按钮样式 */
+.action-btn {
+  background: transparent;
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
-  color: #666;
+  color: #9B9B9B;
+  padding: 0;
 }
 
-.favorite-btn:hover {
-  background: white;
-  transform: scale(1.05);
+.action-btn:hover {
+  color: #6B6B6B;
+}
+
+.action-btn:focus,
+.action-btn:active {
+  outline: none;
+  background: transparent;
+}
+
+/* 收藏按钮样式 */
+.favorite-btn {
+  font-size: 18px;
 }
 
 .favorite-btn.is-favorite i {
-  color: var(--juwo-primary);
+  color: #FF5824;
 }
 
-.compare-btn {
-  position: absolute;
-  top: 50px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
-  color: #666;
+/* 更多选项按钮 */
+.more-btn {
+  font-size: 20px;
 }
 
-.compare-btn:hover {
-  background: white;
-  transform: scale(1.05);
-}
-
-/* 新房源标签 */
+/* 新房源标签 - 更优雅 */
 .property-status-tag {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: #22c55e;
+  background: #22C55E;
   color: white;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
   border-radius: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   z-index: 10;
 }
 

@@ -263,9 +263,9 @@ onMounted(async () => {
   // Pre-load Google Maps API
   try {
     await placesService.loadGoogleMaps()
-    console.log('Google Places API loaded successfully')
+    // Google Places API加载成功
   } catch (error) {
-    console.log('Google Places API not loaded - using development mode')
+    // Google Places API未加载 - 使用开发模式
   }
 })
 </script>

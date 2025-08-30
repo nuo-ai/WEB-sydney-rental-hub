@@ -24,7 +24,6 @@ const getCacheKey = (url, params) => {
 const getCachedData = (key) => {
   const cached = cache.get(key)
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    console.log('📦 使用缓存数据')
     return cached.data
   }
   return null
@@ -135,17 +134,14 @@ export const propertyAPI = {
       const cacheKey = getCacheKey(`/properties/${id}`, {})
       const cachedData = getCachedData(cacheKey)
       if (cachedData) {
-        console.log('📦 使用缓存的详情数据')
         return cachedData
       }
       
-      console.log(`📡 获取房源详情: ${id}`)
       const startTime = Date.now()
       
       const response = await apiClient.get(`/properties/${id}`)
       
       const loadTime = Date.now() - startTime
-      console.log(`✅ 详情加载完成，耗时: ${loadTime}ms`)
       
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`)
@@ -211,7 +207,6 @@ export const userAPI = {
   // 联系我们
   async contactUs(payload) {
     // TODO: 实现后端联系API
-    console.log('发送联系请求:', payload)
     // 模拟成功响应
     return { success: true, message: '您的请求已发送' }
   }
@@ -362,11 +357,9 @@ export const transportAPI = {
           );
           
           const result = estimateCommute(distance, mode);
-          console.log(`📍 估算通勤时间 (${mode}):`, result);
           return result;
         } else {
           // 如果找不到坐标，返回默认估算
-          console.log('⚠️ 无法找到目标地址坐标，使用默认估算');
           const defaultEstimates = {
             DRIVING: { duration: '15-30 min', distance: '10-20 km' },
             TRANSIT: { duration: '25-45 min', distance: '10-20 km' },

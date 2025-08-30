@@ -32,7 +32,7 @@ class PlacesService {
       
       // Development mode - don't load real API
       if (this.devMode || !this.apiKey) {
-        console.log('[Places Service] Running in development mode - using mock data')
+        // 开发模式：使用模拟数据避免Google API调用
         this.isLoaded = true
         resolve(true)
         return

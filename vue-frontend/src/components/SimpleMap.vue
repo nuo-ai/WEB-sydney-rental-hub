@@ -85,7 +85,7 @@ const formattedCoordinates = computed(() => {
 
 // 处理iframe加载错误
 const handleIframeError = () => {
-  console.log('OpenStreetMap加载失败，切换到静态模式')
+  // OpenStreetMap加载失败，切换到静态模式
   useStaticImage.value = true
 }
 </script>

@@ -185,11 +185,6 @@ const handleSearch = () => {
 const handleLocationSelected = async (location) => {
   // 当选择或移除区域后，调用API进行服务端筛选
   const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
-  console.log('🏠 handleLocationSelected被调用:', { 
-    location, 
-    selectedSuburbs,
-    selectedCount: selectedSuburbs.length 
-  })
   
   try {
     if (selectedSuburbs.length > 0) {
@@ -197,11 +192,9 @@ const handleLocationSelected = async (location) => {
       const params = {
         suburb: selectedSuburbs.join(',')
       }
-      console.log('🔍 发送筛选请求:', params)
       await propertiesStore.fetchProperties(params)
     } else {
       // 没有选中的区域，加载所有房源
-      console.log('📂 加载所有房源')
       await propertiesStore.fetchProperties()
     }
   } catch (error) {

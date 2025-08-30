@@ -67,7 +67,6 @@ export const useAuthStore = defineStore('auth', {
         
         if (response.data.status === 'success') {
           this.tempToken = response.data.temp_token
-          console.log(`✅ Registration successful. Verification email sent to ${email}`)
           return true
         } else {
           throw new Error(response.data.message || 'Registration failed')
@@ -106,7 +105,6 @@ export const useAuthStore = defineStore('auth', {
           // 加载用户地址
           await this.loadUserAddresses()
           
-          console.log(`✅ Login successful: ${user.email}`)
           return true
         } else {
           throw new Error('No access token received')
@@ -128,7 +126,6 @@ export const useAuthStore = defineStore('auth', {
         
         if (response.data.status === 'success') {
           this.tempToken = null
-          console.log('✅ Email verified successfully')
           return true
         }
         return false
@@ -145,7 +142,6 @@ export const useAuthStore = defineStore('auth', {
         
         if (response.data.status === 'success') {
           this.tempToken = response.data.temp_token
-          console.log(`✅ Verification email resent to ${email}`)
           return true
         }
         return false
@@ -191,11 +187,9 @@ export const useAuthStore = defineStore('auth', {
           ]
           addresses = presetAddresses
           localStorage.setItem('juwo-addresses', JSON.stringify(presetAddresses))
-          console.log('📍 Added preset Sydney locations for testing')
         }
         
         this.savedAddresses = addresses
-        console.log(`✅ Loaded ${this.savedAddresses.length} saved addresses from localStorage (test mode)`)
         return
       }
       
@@ -207,7 +201,6 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await apiClient.get('/auth/addresses')
         this.savedAddresses = response.data || []
-        console.log(`✅ Loaded ${this.savedAddresses.length} saved addresses`)
       } catch (error) {
         console.error('Failed to load user addresses:', error)
         this.savedAddresses = []
@@ -242,7 +235,6 @@ export const useAuthStore = defineStore('auth', {
           addresses.push(savedAddress)
           localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
           
-          console.log(`✅ Address saved locally (test mode): ${savedAddress.label}`)
           return savedAddress
         }
         
@@ -257,7 +249,6 @@ export const useAuthStore = defineStore('auth', {
         
         const savedAddress = response.data
         this.savedAddresses.push(savedAddress)
-        console.log(`✅ Address saved: ${savedAddress.label}`)
         return savedAddress
       } catch (error) {
         console.error('Failed to save address:', error)
@@ -282,7 +273,6 @@ export const useAuthStore = defineStore('auth', {
               localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
             }
             
-            console.log(`✅ Address removed locally (test mode): ${removed.label}`)
           }
           return
         }
@@ -294,7 +284,6 @@ export const useAuthStore = defineStore('auth', {
         const index = this.savedAddresses.findIndex(a => a.id === addressId)
         if (index > -1) {
           const removed = this.savedAddresses.splice(index, 1)[0]
-          console.log(`✅ Address removed: ${removed.label}`)
         }
       } catch (error) {
         console.error('Failed to remove address:', error)
@@ -323,7 +312,6 @@ export const useAuthStore = defineStore('auth', {
           localStorage.setItem('juwo-refresh-token', refresh_token)
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
           
-          console.log('✅ Token refreshed successfully')
           return true
         }
       } catch (error) {
@@ -350,12 +338,10 @@ export const useAuthStore = defineStore('auth', {
     // Test mode helpers
     enableTestMode() {
       localStorage.setItem('auth-testMode', 'true')
-      console.log('🧪 Test mode enabled - authentication bypassed')
     },
     
     disableTestMode() {
       localStorage.removeItem('auth-testMode')
-      console.log('🔒 Test mode disabled - authentication required')
     },
   },
 })

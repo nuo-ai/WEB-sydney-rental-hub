@@ -124,7 +124,7 @@ watch(visible, (newVal) => {
 
 // 方法
 const handleBack = () => {
-  console.log('Back button clicked')
+  // 返回按钮被点击
   visible.value = false
   emit('update:modelValue', false)
   // 触发back事件，让父组件决定如何处理
@@ -132,7 +132,7 @@ const handleBack = () => {
 }
 
 const handleSkip = () => {
-  console.log('Skip button clicked')
+  // 跳过按钮被点击
   // Skip时默认使用Other标签
   const data = {
     address: props.address,
@@ -147,7 +147,7 @@ const handleSkip = () => {
 const handleConfirm = () => {
   if (!selectedLabel.value) return
   
-  console.log('Confirm button clicked with label:', selectedLabel.value)
+  // 确认按钮被点击
   emit('confirm', {
     address: props.address,
     label: selectedLabel.value

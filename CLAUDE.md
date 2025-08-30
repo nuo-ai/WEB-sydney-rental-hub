@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 当用户提供 Figma 原型图时，请务必 100% 按照原型图的所有内容进行编码，不要自行改动
 - 任务结束后，不要去尝试打开前后端服务器，它们一直在本地运行（http://localhost:5173/）
 - **代码注释必须严格遵循 `CODE_COMMENT_RULES.md`**：只解释"为什么"，不解释"什么"
+- **开发规则必须严格遵循 `DEVELOPMENT_RULES.md`**：包括TODO管理、提交规则、决策流程等
 
 ## 项目概述
 

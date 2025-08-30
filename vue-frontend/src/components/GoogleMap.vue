@@ -78,7 +78,7 @@ const staticMapUrl = computed(() => {
 
 // 处理静态地图加载失败
 const handleStaticMapError = () => {
-  console.log('静态地图加载失败，使用占位图')
+  // 静态地图加载失败，使用占位图
 }
 
 // Check if Google Maps is already loaded
@@ -136,7 +136,7 @@ const initMap = async () => {
   isInitializing = true
   
   try {
-    console.log('Initializing map with coords:', props.latitude, props.longitude)
+    // 初始化地图
     await loadGoogleMaps()
     
     // Wait for DOM to be ready
@@ -163,7 +163,7 @@ const initMap = async () => {
       ]
     }
     
-    console.log('Creating map with options:', mapOptions)
+    // 创建地图
     map = new google.maps.Map(mapRef.value, mapOptions)
     
     if (props.showMarker) {
@@ -173,7 +173,7 @@ const initMap = async () => {
         title: props.markerTitle,
         animation: google.maps.Animation.DROP
       })
-      console.log('Marker added to map')
+      // 添加标记到地图
     }
     
     // 检查组件是否还存在

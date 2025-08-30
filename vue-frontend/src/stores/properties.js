@@ -116,14 +116,11 @@ export const usePropertiesStore = defineStore('properties', {
           ...params
         }
         
-        console.log('📡 调用API获取房源数据...', paginationParams)
         const startTime = Date.now()
         
         const response = await propertyAPI.getListWithPagination(paginationParams)
         
         const loadTime = Date.now() - startTime
-        console.log(`✅ 数据加载完成，耗时: ${loadTime}ms`)
-        console.log(`📊 API返回: ${response.data?.length || 0}条数据, 总计${response.pagination?.total || 0}条`)
         
         // 更新数据
         this.filteredProperties = response.data || []
@@ -156,7 +153,6 @@ export const usePropertiesStore = defineStore('properties', {
         // 只加载第一批100条数据用于搜索建议
         const baseData = await propertyAPI.getList({ page_size: 100 })
         this.allProperties = baseData
-        console.log(`📁 已缓存 ${baseData.length} 条基础数据用于搜索建议`)
       } catch (error) {
         console.warn('⚠️ 加载基础数据失败，搜索建议功能可能受影响:', error)
       }
@@ -173,7 +169,6 @@ export const usePropertiesStore = defineStore('properties', {
                               (this.currentProperty && String(this.currentProperty.listing_id) === idStr ? this.currentProperty : null)
       
       if (existingProperty) {
-        console.log('📦 使用已有的房源数据')
         this.currentProperty = existingProperty
         // 仍然异步获取完整详情（可能有更多信息）
         this.fetchFullDetailAsync(id)
@@ -230,7 +225,6 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 应用筛选条件
     async applyFilters(filters) {
-      console.log('🔍 applyFilters 被调用, 参数:', filters)
       this.loading = true
       this.error = null
       
@@ -249,9 +243,7 @@ export const usePropertiesStore = defineStore('properties', {
           }
         })
         
-        console.log('📡 发送API请求, 参数:', filterParams)
         const response = await propertyAPI.getListWithPagination(filterParams)
-        console.log('✅ API响应:', response)
         
         // 更新数据
         this.filteredProperties = response.data || []
@@ -262,7 +254,6 @@ export const usePropertiesStore = defineStore('properties', {
           this.totalPages = response.pagination.pages
           this.hasNext = response.pagination.has_next
           this.hasPrev = response.pagination.has_prev
-          console.log('📊 总数更新为:', this.totalCount)
         }
         
         this.currentPage = 1 // 重置到第一页
@@ -604,6 +595,25 @@ export const usePropertiesStore = defineStore('properties', {
       // 最多只保留50条
       this.viewHistory = history.slice(0, 50)
       localStorage.setItem('juwo-history', JSON.stringify(this.viewHistory))
+    },
+
+    // 隐藏房源（从搜索结果移除）
+    hideProperty(propertyId) {
+      const id = String(propertyId)
+      // 添加到隐藏列表
+      if (!this.hiddenIds) {
+        this.hiddenIds = []
+      }
+      if (!this.hiddenIds.includes(id)) {
+        this.hiddenIds.push(id)
+        localStorage.setItem('juwo-hidden', JSON.stringify(this.hiddenIds))
+      }
+      
+      // 从当前显示列表中移除
+      this.filteredProperties = this.filteredProperties.filter(
+        property => String(property.listing_id) !== id
+      )
+      this.totalCount = Math.max(0, this.totalCount - 1)
     },
 
     // 切换对比状态
