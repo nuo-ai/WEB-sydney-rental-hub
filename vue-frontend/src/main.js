@@ -6,7 +6,12 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import App from './App.vue'
 import router from './router'
-import './style.css'
+
+// 导入设计系统样式（按顺序）
+import './styles/design-tokens.css'  // 设计令牌
+import './styles/base-components.css' // 基础组件
+import './style.css'                  // 全局样式
+
 import { useAuthStore } from './stores/auth'
 
 const app = createApp(App)

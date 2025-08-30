@@ -12,7 +12,11 @@
       "Bash(git commit:*)",
       "Bash(time curl:*)",
       "Bash(node:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(npx figma-developer-mcp:*)",
+      "Bash(npm view:*)",
+      "Bash(npx:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []
