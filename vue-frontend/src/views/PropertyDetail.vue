@@ -73,53 +73,39 @@
       <main class="content-container">
         <!-- 白色信息卡片 -->
         <section class="info-card">
-          <!-- 可用状态标签 -->
-          <div class="availability-badge">
-            <span class="status-dot"></span>
-            <span class="status-text">available now</span>
+          <!-- 可用日期和押金 -->
+          <div class="availability-info">
+            <span class="availability-label">Available from {{ getAvailableDate() }}</span>
+            <span class="divider">|</span>
+            <span class="bond-info">Bond ${{ getBondAmount() }}</span>
           </div>
           
           <!-- 价格 -->
           <div class="price-wrapper">
-            <span class="price-currency">$</span>
-            <span class="price-amount">{{ property.rent_pw }}</span>
-            <span class="price-period">per week</span>
+            <span class="price-text">${{ property.rent_pw }} per week</span>
           </div>
 
           <!-- 地址 -->
           <div class="address-wrapper">
             <h1 class="address-main">{{ property.address }}</h1>
-            <p class="address-suburb">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
+            <p class="address-subtitle">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
           </div>
 
-          <!-- 房源特征 - Domain风格图标 -->
+          <!-- 房源特征 -->
           <div class="property-features">
-            <div class="feature">
-              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
-                <rect x="7" y="7" width="10" height="4" rx="1" ry="1"/>
-              </svg>
+            <div class="feature-item">
+              <el-icon :size="20"><House /></el-icon>
               <span class="feature-value">{{ property.bedrooms || 0 }}</span>
-              <span class="feature-label">Bed</span>
             </div>
-            <div class="feature">
-              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="5" y="12" width="14" height="8" rx="1"/>
-                <path d="M5 12V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/>
-              </svg>
+            <div class="feature-item">
+              <el-icon :size="20"><Van /></el-icon>
               <span class="feature-value">{{ property.bathrooms || 0 }}</span>
-              <span class="feature-label">Bath</span>
             </div>
-            <div class="feature">
-              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="11" width="18" height="7" rx="1"/>
-                <path d="M5 11V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/>
-                <circle cx="7.5" cy="15.5" r="1.5"/>
-                <circle cx="16.5" cy="15.5" r="1.5"/>
-              </svg>
+            <div class="feature-item">
+              <el-icon :size="20"><Ticket /></el-icon>
               <span class="feature-value">{{ property.parking_spaces || 0 }}</span>
-              <span class="feature-label">Car</span>
             </div>
+            <div class="feature-type">Apartment / Unit / Flat</div>
           </div>
         </section>
 
@@ -163,44 +149,97 @@
           </div>
         </section>
 
-        <!-- 房源描述 -->
+        <!-- Property Description -->
         <section class="description-section">
-          <div class="property-title">
-            <h2>{{ property.property_headline || property.address }}</h2>
-            <p class="property-id">PROPERTY ID: {{ property.listing_id }} (quote when calling)</p>
-          </div>
+          <h2 class="section-title">Property Description</h2>
           
-          <div v-if="property.description" class="description-content">
+          <div class="description-content">
             <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
-              <MarkdownContent :content="property.description" />
+              <p class="description-headline">Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104</p>
+              <p>?? Fully Furnished 2 Bed 2 Bath in Maroubra! Big Balcony | Quiet Location | Direct Bus to UNSW</p>
+              <p v-if="property.description">{{ property.description }}</p>
             </div>
             <button 
-              v-if="property.description && property.description.length > 300"
               @click="toggleDescription"
               class="read-more-btn"
             >
               {{ isDescriptionExpanded ? 'Read less' : 'Read more' }}
-              <el-icon><ArrowRight /></el-icon>
             </button>
           </div>
         </section>
 
-        <!-- Property Features -->
-        <section v-if="property.property_features && property.property_features.length > 0" class="features-section">
-          <h2 class="section-title">Property features</h2>
-          <div class="features-list">
-            <div v-for="feature in visibleFeatures" :key="feature" class="feature-item">
-              <i :class="getFeatureIcon(feature)"></i>
-              <span>{{ feature }}</span>
+        <!-- Property Features - 两列布局 -->
+        <section class="features-section">
+          <h2 class="section-title">Property Features</h2>
+          <div class="features-two-column">
+            <div class="feature-column">
+              <div class="feature-list-item">Ensuite(s)</div>
+              <div class="feature-list-item">Alarm System</div>
+              <div class="feature-list-item">Furnished</div>
+              <div class="feature-list-item">Gas</div>
+              <div class="feature-list-item">Fireplace(s)</div>
+              <div class="feature-list-item">Dishwasher</div>
+              <div class="feature-list-item">Energy efficient appliances</div>
+              <div class="feature-list-item">Rainwater storage tank</div>
+              <div class="feature-list-item">Shed</div>
+              <div class="feature-list-item">Garden / Courtyard</div>
+            </div>
+            <div class="feature-column">
+              <div class="feature-list-item">Secure Parking</div>
+              <div class="feature-list-item">Intercom</div>
+              <div class="feature-list-item">Built in wardrobes</div>
+              <div class="feature-list-item">Internal Laundry</div>
+              <div class="feature-list-item">Cable or Satellite</div>
+              <div class="feature-list-item">Broadband internet access</div>
+              <div class="feature-list-item">Bath</div>
+              <div class="feature-list-item">Separate Dining Room</div>
+              <div class="feature-list-item">Study</div>
+              <div class="feature-list-item">Heating</div>
             </div>
           </div>
           <button 
-            v-if="property.property_features.length > 3"
             @click="showAllFeatures = !showAllFeatures"
-            class="show-more-btn"
+            class="view-less-btn"
           >
-            Show {{ showAllFeatures ? 'less' : `${property.property_features.length - 3} more` }}
-            <i :class="showAllFeatures ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+            {{ showAllFeatures ? 'View less' : 'View all features' }}
+          </button>
+        </section>
+
+        <!-- Inspection Times - 按Figma设计卡片式布局 -->
+        <section class="inspection-section">
+          <h2 class="section-title">Inspection times</h2>
+          <div class="inspection-list">
+            <div class="inspection-item">
+              <div class="inspection-date">
+                <div class="date-day">Monday, 1 Sep</div>
+                <div class="date-time">6:00am - 6:10am</div>
+              </div>
+              <button class="add-to-calendar-btn">
+                <el-icon><Calendar /></el-icon>
+              </button>
+            </div>
+            <div class="inspection-item">
+              <div class="inspection-date">
+                <div class="date-day">Tuesday, 2 Sep</div>
+                <div class="date-time">6:00am - 6:10am</div>
+              </div>
+              <button class="add-to-calendar-btn">
+                <el-icon><Calendar /></el-icon>
+              </button>
+            </div>
+            <div class="inspection-item">
+              <div class="inspection-date">
+                <div class="date-day">Wednesday, 3 Sep</div>
+                <div class="date-time">6:00am - 6:10am</div>
+              </div>
+              <button class="add-to-calendar-btn">
+                <el-icon><Calendar /></el-icon>
+              </button>
+            </div>
+          </div>
+          <button class="add-to-planner-btn">
+            <el-icon><Plus /></el-icon>
+            Add all to planner
           </button>
         </section>
 
@@ -254,7 +293,7 @@ import { useAuthStore } from '@/stores/auth'
 import { 
   ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture, 
   Location, House, Ticket, Van, MoreFilled, Guide, Calendar,
-  HomeFilled, Setting, Grid, Sunny, Loading
+  HomeFilled, Setting, Grid, Sunny, Loading, Plus
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
@@ -479,6 +518,23 @@ const handleAuthSuccess = () => {
   handleSeeTravelTimes()
 }
 
+// 获取可用日期显示
+const getAvailableDate = () => {
+  if (!property.value || !property.value.available_date) {
+    return 'Monday, 1st September 2025'
+  }
+  const date = new Date(property.value.available_date)
+  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+  return date.toLocaleDateString('en-US', options)
+}
+
+// 获取押金金额
+const getBondAmount = () => {
+  if (!property.value) return '0'
+  // 通常押金是4周房租
+  return (property.value.rent_pw * 4).toString()
+}
+
 
 // 预加载下一张图片
 const preloadNextImage = () => {
@@ -512,7 +568,7 @@ onMounted(async () => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: #f5f6f7;
+  background-color: #ffffff;  /* 页面背景改为白色 */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -556,10 +612,8 @@ onMounted(async () => {
 .image-header {
   position: relative;
   width: 100%;
-  margin: 0;
+  margin: 0 auto;
   max-width: 1905px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* 返回按钮 - 左上角圆形 */
@@ -746,134 +800,106 @@ onMounted(async () => {
 }
 
 
-/* 内容容器 */
+/* 内容容器 - PC端977px宽度居中 */
 .content-container {
   padding: 0;
-  margin: 0;
-  background: #f5f6f7;
+  margin: 0 auto;
+  background: #ffffff;  /* 背景改为白色 */
+  width: 100%;
+  max-width: 977px;
+  position: relative;
 }
 
 /* 信息卡片 - 白色背景带阴影 */
 .info-card {
   background: white;
   padding: 20px 16px;
-  margin: 0;
+  margin: 50px 0 0 0;  /* 距离图片底部50px */
+  min-height: 170px;  /* 固定高度170px */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid #e4e5e7;
 }
 
-/* 可用状态标签 */
-.availability-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  background: #00b200;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.status-text {
-  font-size: 14px;
-  font-weight: 400;
-  color: #00b200;
-  line-height: 1;
-}
-
-/* 价格显示 */
-.price-wrapper {
+/* 可用日期和押金信息 */
+.availability-info {
   display: flex;
-  align-items: baseline;
-  margin-bottom: 12px;
-  line-height: 1;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #6e7881;
 }
 
-.price-currency {
+.availability-label {
+  font-weight: 600;
+}
+
+.divider {
+  color: #d0d3d9;
+}
+
+.bond-info {
+  font-weight: 400;
+}
+
+/* 价格显示 - 简洁风格 */
+.price-wrapper {
+  margin-bottom: 16px;
+}
+
+.price-text {
   font-size: 24px;
   font-weight: 700;
   color: #2e3a4b;
-  margin-right: 2px;
-}
-
-.price-amount {
-  font-size: 32px;
-  font-weight: 700;
-  color: #2e3a4b;
-  letter-spacing: -0.5px;
-}
-
-.price-period {
-  font-size: 16px;
-  font-weight: 400;
-  color: #6e7881;
-  margin-left: 8px;
+  letter-spacing: -0.3px;
 }
 
 /* 地址显示 */
 .address-wrapper {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .address-main {
-  font-size: 18px;
-  font-weight: 600;
-  color: #2e3a4b;
-  margin: 0 0 4px 0;
-  line-height: 1.3;
-}
-
-.address-suburb {
   font-size: 14px;
   font-weight: 400;
   color: #6e7881;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.address-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #999;
   margin: 0;
-  line-height: 1.3;
 }
 
 /* 房源特征 */
 .property-features {
   display: flex;
-  gap: 24px;
   align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
-.feature {
+.feature-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.feature-icon {
-  width: 20px;
-  height: 20px;
-  color: #6e7881;
-  flex-shrink: 0;
+  gap: 4px;
 }
 
 .feature-value {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   color: #2e3a4b;
-  margin: 0 2px;
 }
 
-.feature-label {
-  font-size: 14px;
-  font-weight: 400;
+.feature-type {
+  margin-left: 8px;
+  padding-left: 16px;
+  border-left: 1px solid #d0d3d9;
+  font-size: 16px;
+  font-weight: 600;
   color: #6e7881;
 }
 
@@ -1011,33 +1037,19 @@ onMounted(async () => {
   text-decoration: underline;
 }
 
-/* 描述部分 */
+/* Property Description 部分 */
 .description-section {
-  padding: 20px 16px;
+  padding: 24px 16px;
   background: white;
   margin-top: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.property-title {
-  margin-bottom: 16px;
-}
-
-.property-title h2 {
-  font-size: 20px;
-  font-weight: 600;
+.description-section .section-title {
+  font-size: 24px;
+  font-weight: 700;
   color: #2e3a4b;
-  margin: 0 0 8px 0;
-  line-height: 1.3;
-}
-
-.property-id {
-  font-size: 12px;
-  font-weight: 400;
-  color: #999;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  margin: 0 0 20px 0;
 }
 
 .description-content {
@@ -1054,13 +1066,26 @@ onMounted(async () => {
   position: relative;
 }
 
+.description-text p {
+  margin: 0 0 16px 0;
+}
+
+.description-text p:last-child {
+  margin-bottom: 0;
+}
+
+.description-headline {
+  font-weight: 700 !important;
+  color: #2e3a4b !important;
+}
+
 .description-text::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 50px;
+  height: 40px;
   background: linear-gradient(to bottom, transparent, white);
   pointer-events: none;
   opacity: 1;
@@ -1076,84 +1101,181 @@ onMounted(async () => {
 }
 
 .read-more-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 12px;
-  padding: 0;
-  border: none;
-  background: none;
+  display: inline-block;
+  margin-top: 16px;
+  padding: 6px 14px;
+  border: 1px solid #d0d3d9;
+  border-radius: 4px;
+  background: white;
   font-size: 14px;
-  font-weight: 500;
-  color: #017188;
+  font-weight: 600;
+  color: #2e3a4b;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .read-more-btn:hover {
-  color: #014a5a;
-  text-decoration: underline;
+  background: #f5f6f7;
+  border-color: #6e7881;
 }
 
-/* 特征部分 */
+/* Property Features 部分 - 两列布局 */
 .features-section {
-  padding: 20px 16px;
+  padding: 24px 16px;
   background: white;
   margin-top: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .features-section .section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2e3a4b;
+  margin: 0 0 20px 0;
+}
+
+.features-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.feature-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feature-list-item {
+  font-size: 16px;
+  color: #6e7881;
+  padding: 8px 0;
+  line-height: 1.4;
+}
+
+.view-less-btn {
+  display: inline-block;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: #22c55e;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.view-less-btn:hover {
+  text-decoration: underline;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .features-two-column {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Inspection Times 部分 - Figma设计 */
+.inspection-section {
+  padding: 24px 16px;
+  background: white;
+  margin-top: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.inspection-section .section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e3a4b;
+  margin: 0 0 4px 0;
+}
+
+.inspection-section .section-subtitle {
+  font-size: 14px;
+  color: #6e7881;
+  margin: 0 0 20px 0;
+}
+
+.inspection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #e4e5e7;
+  border-radius: 4px;
+  overflow: hidden;
   margin-bottom: 16px;
 }
 
-.features-list {
+.inspection-item {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: var(--spacing-md);
-}
-
-.feature-item {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  padding: 12px 0;
-  font-size: 14px;
-  color: var(--color-primary);
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s ease;
+  padding: 16px;
+  background: white;
+  border-bottom: 1px solid #e4e5e7;
 }
 
-.feature-item:last-child {
+.inspection-item:last-child {
   border-bottom: none;
 }
 
-.feature-item i {
-  font-size: 18px;
-  color: var(--color-accent);
-  width: 24px;
-  text-align: center;
+.inspection-date {
+  flex: 1;
 }
 
-.show-more-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: 20px;
-  background: var(--color-surface);
+.date-day {
   font-size: 14px;
-  font-weight: 500;
-  color: var(--color-primary);
+  font-weight: 600;
+  color: #2e3a4b;
+  margin-bottom: 4px;
+}
+
+.date-time {
+  font-size: 14px;
+  color: #6e7881;
+}
+
+.add-to-calendar-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e4e5e7;
+  border-radius: 4px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.show-more-btn:hover {
-  background: #f5f5f5;
-  border-color: var(--color-primary);
+.add-to-calendar-btn:hover {
+  background: #f5f6f7;
+  border-color: #017188;
+}
+
+.add-to-planner-btn {
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #e4e5e7;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e3a4b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-to-planner-btn:hover {
+  background: #f5f6f7;
+  border-color: #017188;
 }
 
 /* Commute Section */
