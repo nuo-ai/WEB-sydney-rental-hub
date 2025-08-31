@@ -169,24 +169,26 @@ export const usePropertiesStore = defineStore('properties', {
       // 统一转换为字符串进行比较（解决类型不匹配问题）
       const idStr = String(id)
       
-      // 先检查是否已有数据（从列表页或缓存）
-      const existingProperty = this.filteredProperties.find(p => String(p.listing_id) === idStr) ||
-                              this.allProperties.find(p => String(p.listing_id) === idStr) ||
-                              (this.currentProperty && String(this.currentProperty.listing_id) === idStr ? this.currentProperty : null)
-      
-      if (existingProperty) {
-        this.currentProperty = existingProperty
-        // 仍然异步获取完整详情（可能有更多信息）
-        this.fetchFullDetailAsync(id)
-        return
-      }
-      
+      // 设置加载状态
       this.loading = true
       this.error = null
       
       try {
-        const property = await propertyAPI.getDetail(id)
-        this.currentProperty = property
+        // 先检查是否已有基础数据（从列表页或缓存）
+        const existingProperty = this.filteredProperties.find(p => String(p.listing_id) === idStr) ||
+                                this.allProperties.find(p => String(p.listing_id) === idStr) ||
+                                (this.currentProperty && String(this.currentProperty.listing_id) === idStr ? this.currentProperty : null)
+        
+        // 如果有基础数据，先显示，避免白屏
+        if (existingProperty) {
+          this.currentProperty = existingProperty
+        }
+        
+        // 始终从API获取完整详情（包含description和features）
+        const fullProperty = await propertyAPI.getDetail(id)
+        
+        // 更新为完整数据
+        this.currentProperty = fullProperty
         
       } catch (error) {
         this.error = error.message || '获取房源详情失败'
@@ -196,18 +198,6 @@ export const usePropertiesStore = defineStore('properties', {
       }
     },
     
-    // 异步获取完整详情
-    async fetchFullDetailAsync(id) {
-      try {
-        const fullProperty = await propertyAPI.getDetail(id)
-        // 如果当前房源ID没变，更新详情
-        if (this.currentProperty && this.currentProperty.listing_id === id) {
-          this.currentProperty = { ...this.currentProperty, ...fullProperty }
-        }
-      } catch (error) {
-        console.warn('⚠️ 异步获取完整详情失败:', error)
-      }
-    },
 
     // 搜索房源
     async searchProperties(query, filters = {}) {
