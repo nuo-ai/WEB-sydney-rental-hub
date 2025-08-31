@@ -75,16 +75,16 @@
           
           <!-- 价格 -->
           <div class="price-section">
-            <h1 class="price">
-              <span class="price-symbol">$</span>{{ property.rent_pw }}
-              <span class="price-unit">per week</span>
-            </h1>
+            <div style="font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 25px; font-weight: 700; color: #3C475B; line-height: 30px; display: flex; align-items: baseline; gap: 2px; margin: 0;">
+              <span style="font-size: 25px; color: #3C475B;">$</span>{{ property.rent_pw }}
+              <span style="font-size: 14px; color: #3C475B; margin-left: 6px; font-weight: 400;">per week</span>
+            </div>
           </div>
 
           <!-- 地址 -->
           <div class="address-section">
-            <h2 class="address-main">{{ property.address }}</h2>
-            <p class="address-suburb">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
+            <div style="font-size: 16px; font-weight: 600; color: #3C475B; margin: 0 0 4px 0; line-height: 1.4;">{{ property.address }}</div>
+            <div style="font-size: 14px; color: #6e7881; margin: 0 0 16px 0; line-height: 1.4;">{{ property.suburb }}, NSW {{ property.postcode || '' }}</div>
           </div>
 
           <!-- 房源规格 -->
