@@ -1160,7 +1160,8 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
         "latitude": prop.latitude,
         "longitude": prop.longitude,
         "geom_wkt": prop.geom_wkt,
-        "description": prop.description  # Add description field
+        "description": prop.description,  # Add description field
+        "property_headline": prop.property_headline  # 添加房源标题字段
     }
     
     return success_response(data=prop_dict)

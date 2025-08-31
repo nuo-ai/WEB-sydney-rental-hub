@@ -158,7 +158,7 @@
         <!-- 房源描述 -->
         <section class="description-section">
           <div class="property-title">
-            <h2>{{ property.address }}</h2>
+            <h2>{{ property.property_headline || property.address }}</h2>
             <p class="property-id">PROPERTY ID: {{ property.listing_id }} (quote when calling)</p>
           </div>
           

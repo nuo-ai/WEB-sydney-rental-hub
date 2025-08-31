@@ -52,3 +52,4 @@ class Property:
     furnishing_status: Optional[str] = None
     air_conditioning_type: Optional[str] = None
     description: Optional[str] = None # <-- This was missing
+    property_headline: Optional[str] = None # 房源标题，如"RENOVATED, SPACIOUS & CLOSE TO TRAIN & SHOPS!"
