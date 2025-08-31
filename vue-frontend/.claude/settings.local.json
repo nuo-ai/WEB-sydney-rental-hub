@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\scripts/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend\\api/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend/**)",
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\database/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
