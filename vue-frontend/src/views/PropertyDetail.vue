@@ -7,26 +7,9 @@
         <el-icon class="is-loading" :size="16"><Loading /></el-icon>
         <span>正在加载更多信息...</span>
       </div>
-      <!-- 顶部图片区域 -->
+      <!-- 图片展示区域 - Domain风格 -->
       <header class="image-header">
-        <!-- 导航栏 -->
-        <nav class="nav-bar">
-          <button @click="goBack" class="nav-btn">
-            <el-icon><ArrowLeft /></el-icon>
-          </button>
-          <div class="nav-actions">
-            <button @click="toggleFavorite" class="nav-btn">
-              <el-icon>
-                <component :is="isFavorite ? 'StarFilled' : 'Star'" />
-              </el-icon>
-            </button>
-            <button @click="shareProperty" class="nav-btn">
-              <el-icon><Share /></el-icon>
-            </button>
-          </div>
-        </nav>
-
-        <!-- 图片展示 -->
+        <!-- 图片容器 -->
         <div class="image-container">
           <el-image
             v-if="images.length > 0"
@@ -46,6 +29,34 @@
             <span>暂无图片</span>
           </div>
 
+          <!-- 返回按钮 - 左上角 -->
+          <button @click="goBack" class="back-btn">
+            <el-icon :size="20"><ArrowLeft /></el-icon>
+          </button>
+
+          <!-- Share和Save按钮 - 右上角 -->
+          <div class="image-actions">
+            <button @click="shareProperty" class="image-action-btn">
+              <el-icon :size="20"><Share /></el-icon>
+              <span>Share</span>
+            </button>
+            <div class="action-divider"></div>
+            <button @click="toggleFavorite" class="image-action-btn">
+              <el-icon :size="20">
+                <component :is="isFavorite ? 'StarFilled' : 'Star'" />
+              </el-icon>
+              <span>Save</span>
+            </button>
+          </div>
+
+          <!-- Photos按钮和Inspect按钮 - 左下角 -->
+          <div class="image-bottom-controls">
+            <button @click="handleInspections" class="inspect-btn-overlay">
+              <el-icon :size="18"><Calendar /></el-icon>
+              <span>Inspect {{ nextInspectionTime }}</span>
+            </button>
+          </div>
+
           <!-- 图片指示器 -->
           <div v-if="images.length > 1" class="image-indicators">
             <span 
@@ -58,59 +69,56 @@
         </div>
       </header>
 
-      <!-- 主体内容 -->
+      <!-- 主体内容 - Domain风格卡片布局 -->
       <main class="content-container">
-        <!-- 价格和地址信息 -->
-        <section class="info-section">
-          <!-- 可用状态 -->
-          <div class="status-line">
-            <div class="status-indicator">
-              <span class="status-dot"></span>
-              <span class="status-text">Available {{ availabilityText }}</span>
-            </div>
-            <button class="more-btn">
-              <i class="fas fa-ellipsis-h"></i>
-            </button>
+        <!-- 白色信息卡片 -->
+        <section class="info-card">
+          <!-- 可用状态标签 -->
+          <div class="availability-badge">
+            <span class="status-dot"></span>
+            <span class="status-text">available now</span>
           </div>
           
           <!-- 价格 -->
-          <div class="price-section">
-            <div style="font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 25px; font-weight: 700; color: #3C475B; line-height: 30px; display: flex; align-items: baseline; gap: 2px; margin: 0;">
-              <span style="font-size: 25px; color: #3C475B;">$</span>{{ property.rent_pw }}
-              <span style="font-size: 14px; color: #3C475B; margin-left: 6px; font-weight: 400;">per week</span>
-            </div>
+          <div class="price-wrapper">
+            <span class="price-currency">$</span>
+            <span class="price-amount">{{ property.rent_pw }}</span>
+            <span class="price-period">per week</span>
           </div>
 
           <!-- 地址 -->
-          <div class="address-section">
-            <div style="font-size: 16px; font-weight: 600; color: #3C475B; margin: 0 0 4px 0; line-height: 1.4;">{{ property.address }}</div>
-            <div style="font-size: 14px; color: #6e7881; margin: 0 0 16px 0; line-height: 1.4;">{{ property.suburb }}, NSW {{ property.postcode || '' }}</div>
+          <div class="address-wrapper">
+            <h1 class="address-main">{{ property.address }}</h1>
+            <p class="address-suburb">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
           </div>
 
-          <!-- 房源规格 -->
-          <div class="specs-section">
-            <div class="spec-item">
-              <i class="fas fa-bed"></i>
-              <span class="spec-value">{{ property.bedrooms || 0 }}</span>
-              <span class="spec-label">Bed</span>
+          <!-- 房源特征 - Domain风格图标 -->
+          <div class="property-features">
+            <div class="feature">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
+                <rect x="7" y="7" width="10" height="4" rx="1" ry="1"/>
+              </svg>
+              <span class="feature-value">{{ property.bedrooms || 0 }}</span>
+              <span class="feature-label">Bed</span>
             </div>
-            <div class="spec-item">
-              <i class="fas fa-bath"></i>
-              <span class="spec-value">{{ property.bathrooms || 0 }}</span>
-              <span class="spec-label">Bath</span>
+            <div class="feature">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="12" width="14" height="8" rx="1"/>
+                <path d="M5 12V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/>
+              </svg>
+              <span class="feature-value">{{ property.bathrooms || 0 }}</span>
+              <span class="feature-label">Bath</span>
             </div>
-            <div class="spec-item">
-              <i class="fas fa-car"></i>
-              <span class="spec-value">{{ property.parking_spaces || 0 }}</span>
-              <span class="spec-label">Car</span>
-            </div>
-          </div>
-
-          <!-- 看房时间 -->
-          <div v-if="inspectionTimes.length > 0" class="inspection-section">
-            <div class="inspection-badge">
-              <i class="far fa-calendar"></i>
-              Inspection: {{ formatInspectionTime(inspectionTimes[0]) }}
+            <div class="feature">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="7" rx="1"/>
+                <path d="M5 11V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"/>
+                <circle cx="7.5" cy="15.5" r="1.5"/>
+                <circle cx="16.5" cy="15.5" r="1.5"/>
+              </svg>
+              <span class="feature-value">{{ property.parking_spaces || 0 }}</span>
+              <span class="feature-label">Car</span>
             </div>
           </div>
         </section>
@@ -245,7 +253,7 @@ import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
 import { 
   ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture, 
-  Location, House, Ticket, Van, MoreFilled, Guide,
+  Location, House, Ticket, Van, MoreFilled, Guide, Calendar,
   HomeFilled, Setting, Grid, Sunny, Loading
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -317,6 +325,15 @@ const inspectionTimes = computed(() => {
   }
   
   return []
+})
+
+const nextInspectionTime = computed(() => {
+  if (inspectionTimes.value.length > 0) {
+    const inspection = inspectionTimes.value[0]
+    // 简化显示格式，例如 "Mon 6am"
+    return inspection.time || 'Soon'
+  }
+  return ''
 })
 
 const visibleFeatures = computed(() => {
@@ -490,94 +507,165 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Domain.com.au 像素级还原样式 */
+@import '@/assets/design-tokens.css';
+
 .property-detail-page {
   min-height: 100vh;
-  background-color: var(--bg-base);
-  padding-bottom: calc(var(--space-4) * 5); /* 80px - Space for fixed footer */
+  background-color: #f5f6f7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Loading & Error States */
+/* 加载和错误状态 */
 .loading-state,
 .error-state {
-  padding: var(--space-6);
-  max-width: var(--max-width-md);
+  padding: 24px;
+  max-width: 768px;
   margin: 0 auto;
 }
 
-/* 加载指示器（小提示） */
+/* 加载指示器 */
 .loading-indicator {
   position: fixed;
-  top: calc(var(--space-4) * 5); /* 80px */
-  right: var(--space-5);
+  top: 80px;
+  right: 16px;
   background: rgba(255, 255, 255, 0.95);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-sm);
+  padding: 8px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  z-index: var(--z-sticky);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
+  gap: 8px;
+  z-index: 20;
+  font-size: 14px;
+  color: #6e7881;
 }
 
 .skeleton-image {
-  height: calc(var(--space-8) * 10); /* 300px */
-  background: var(--bg-secondary);
-  margin-bottom: var(--space-6);
+  height: 280px;
+  background: #e8e8e8;
+  margin-bottom: 0;
 }
 
 .skeleton-content {
-  padding: 0 var(--space-4);
+  padding: 20px 16px;
+  background: white;
 }
 
-/* Header Image Section */
+/* 图片区域 - Domain 精确尺寸 */
 .image-header {
   position: relative;
   width: 100%;
+  margin: 0;
+  max-width: 1905px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.nav-bar {
+/* 返回按钮 - 左上角圆形 */
+.back-btn {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-4);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: var(--z-dropdown);
-  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
-}
-
-.nav-btn {
-  width: calc(var(--space-4) * 2.5); /* 40px */
-  height: calc(var(--space-4) * 2.5); /* 40px */
-  border-radius: var(--radius-full);
+  top: 16px;
+  left: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.95);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition-transform);
-  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  color: #2e3a4b;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
-.nav-btn:active {
-  transform: scale(0.95);
+.back-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.nav-actions {
+/* Share和Save按钮组 - 右上角 */
+.image-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
   display: flex;
-  gap: var(--space-3);
+  background: #fefefe;
+  border: 1px solid #cfd1d7;
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.image-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: #808296;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.image-action-btn:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.image-action-btn span {
+  font-size: 14px;
+  color: #808296;
+}
+
+.action-divider {
+  width: 1px;
+  height: 42px;
+  background: #cfd1d7;
+}
+
+/* 底部控制按钮 - 左下角 */
+.image-bottom-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+}
+
+.inspect-btn-overlay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #ffffff;
+  border: 1px solid #d0d3d9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6e7086;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.inspect-btn-overlay:hover {
+  background: #f8f8f8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
 .image-container {
   position: relative;
   width: 100%;
-  height: calc(var(--space-8) * 10); /* 300px */
-  background: var(--bg-secondary);
+  height: 280px; /* 移动端高度 */
+  background: #e8e8e8;
   overflow: hidden;
 }
 
@@ -588,72 +676,106 @@ onMounted(async () => {
   cursor: pointer;
 }
 
+/* 平板尺寸 */
+@media (min-width: 768px) {
+  .image-container {
+    height: 400px;
+  }
+}
+
+/* 桌面尺寸 - Domain 精确规格 */
+@media (min-width: 1200px) {
+  .image-container {
+    height: 592px; /* Domain 桌面端精确高度 */
+  }
+  
+  .property-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 保持图片比例 */
+    object-position: center;
+    background: #000; /* 黑色背景填充空白区域 */
+  }
+}
+
+/* 超大屏幕 */
+@media (min-width: 1905px) {
+  .image-header {
+    border-radius: 0; /* 确保无圆角 */
+  }
+  
+  .image-container {
+    max-width: 1680px; /* 图片最大宽度 */
+    margin: 0 auto;
+  }
+}
+
 .no-image {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--text-tertiary);
-  gap: var(--space-2);
+  color: #999;
+  gap: 8px;
+  font-size: 14px;
 }
 
 .image-indicators {
   position: absolute;
-  bottom: var(--space-4);
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: var(--space-1-5);
+  gap: 4px;
 }
 
 .indicator {
-  width: var(--space-1-5);
-  height: var(--space-1-5);
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.5);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  transition: var(--transition-all);
+  transition: all 0.2s ease;
 }
 
 .indicator.active {
-  width: var(--space-5);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.9);
+  width: 24px;
+  border-radius: 3px;
+  background: white;
 }
 
-/* Content Container */
+
+/* 内容容器 */
 .content-container {
-  max-width: var(--max-width-md);
-  margin: 0 auto;
-  padding: 0 var(--space-4);
+  padding: 0;
+  margin: 0;
+  background: #f5f6f7;
 }
 
-/* Info Section */
-.info-section {
-  padding: var(--space-5) 0;
-  border-bottom: 1px solid var(--border-light);
+/* 信息卡片 - 白色背景带阴影 */
+.info-card {
+  background: white;
+  padding: 20px 16px;
+  margin: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid #e4e5e7;
 }
 
-.status-line {
-  display: flex;
-  justify-content: space-between;
+/* 可用状态标签 */
+.availability-badge {
+  display: inline-flex;
   align-items: center;
-  margin-bottom: var(--space-4);
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .status-dot {
-  width: var(--space-2);
-  height: var(--space-2);
-  background: var(--status-success);
-  border-radius: var(--radius-full);
-  animation: pulse 2s infinite;
+  width: 8px;
+  height: 8px;
+  background: #00b200;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -666,129 +788,95 @@ onMounted(async () => {
 }
 
 .status-text {
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-  color: var(--status-success);
-  text-transform: lowercase;
+  font-size: 14px;
+  font-weight: 400;
+  color: #00b200;
+  line-height: 1;
 }
 
-.more-btn {
-  width: var(--space-8);
-  height: var(--space-8);
-  border-radius: var(--radius-full);
-  border: none;
-  background: transparent;
-  color: var(--text-tertiary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-all);
-}
-
-.more-btn:hover {
-  background: var(--bg-secondary);
-}
-
-/* Price Section */
-.price-section {
-  margin-bottom: var(--space-2);
-}
-
-.price {
-  font-size: var(--text-3xl);
-  font-weight: var(--font-bold);
-  color: var(--text-primary);
-  margin: 0;
-  line-height: 1.2;
+/* 价格显示 */
+.price-wrapper {
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  margin-bottom: 12px;
+  line-height: 1;
 }
 
-.price-symbol {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--text-secondary);
+.price-currency {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2e3a4b;
+  margin-right: 2px;
 }
 
-.price-unit {
-  font-size: var(--text-sm);
-  font-weight: var(--font-normal);
-  color: var(--text-secondary);
-  margin-left: var(--space-2);
+.price-amount {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2e3a4b;
+  letter-spacing: -0.5px;
 }
 
-/* Address Section */
-.address-section {
-  margin-bottom: var(--space-5);
+.price-period {
+  font-size: 16px;
+  font-weight: 400;
+  color: #6e7881;
+  margin-left: 8px;
+}
+
+/* 地址显示 */
+.address-wrapper {
+  margin-bottom: 20px;
 }
 
 .address-main {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
-  margin: 0 0 var(--space-1) 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e3a4b;
+  margin: 0 0 4px 0;
   line-height: 1.3;
 }
 
 .address-suburb {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 400;
+  color: #6e7881;
   margin: 0;
   line-height: 1.3;
 }
 
-/* Specs Section */
-.specs-section {
+/* 房源特征 */
+.property-features {
   display: flex;
-  gap: var(--space-8);
-  margin-bottom: var(--space-5);
+  gap: 24px;
+  align-items: center;
 }
 
-.spec-item {
+.feature {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  position: relative;
+  gap: 6px;
 }
 
-.spec-item i {
-  font-size: var(--text-lg);
-  color: var(--text-tertiary);
+.feature-icon {
+  width: 20px;
+  height: 20px;
+  color: #6e7881;
+  flex-shrink: 0;
 }
 
-.spec-value {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
+.feature-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2e3a4b;
+  margin: 0 2px;
 }
 
-.spec-label {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
-  margin-left: 2px;
+.feature-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6e7881;
 }
 
-.inspection-section {
-  margin-top: var(--space-3);
-}
-
-.inspection-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1-5);
-  padding: var(--space-2) var(--space-3-5);
-  background: var(--warning-light);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-  color: var(--warning-dark);
-}
-
-.inspection-badge i {
-  font-size: var(--text-sm);
-}
 
 /* See travel times button - 符合 Figma 设计稿 */
 .see-travel-times-btn {
@@ -854,17 +942,19 @@ onMounted(async () => {
   letter-spacing: -0.1px;
 }
 
-/* Location Section */
+/* 位置部分 */
 .location-section {
-  padding: var(--space-6) 0;
-  border-bottom: 1px solid var(--border-default);
+  padding: 20px 16px;
+  background: white;
+  margin-top: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .section-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
-  margin: 0 0 var(--space-4) 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e3a4b;
+  margin: 0 0 16px 0;
 }
 
 .map-wrapper {
@@ -874,10 +964,11 @@ onMounted(async () => {
 .map-container {
   position: relative;
   width: 100%;
-  height: 250px;
-  border-radius: var(--radius-md);
+  height: 200px;
+  border-radius: 8px;
   overflow: hidden;
-  background: var(--bg-secondary);
+  background: #e8e8e8;
+  margin-bottom: 12px;
 }
 
 .static-map-image {
@@ -899,10 +990,10 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--bg-secondary);
+  background: #f5f5f5;
   border-radius: var(--radius-md);
-  color: var(--text-tertiary);
-  gap: var(--space-2);
+  color: var(--color-secondary);
+  gap: var(--spacing-sm);
 }
 
 .travel-times-link {
@@ -920,31 +1011,33 @@ onMounted(async () => {
   text-decoration: underline;
 }
 
-/* Description Section */
+/* 描述部分 */
 .description-section {
-  padding: var(--space-6) 0;
-  border-bottom: 1px solid var(--border-light);
+  padding: 20px 16px;
+  background: white;
+  margin-top: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .property-title {
-  margin-bottom: var(--space-4);
+  margin-bottom: 16px;
 }
 
 .property-title h2 {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
-  margin: 0 0 var(--space-1-5) 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2e3a4b;
+  margin: 0 0 8px 0;
   line-height: 1.3;
 }
 
 .property-id {
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 400;
+  color: #999;
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .description-content {
@@ -952,9 +1045,12 @@ onMounted(async () => {
 }
 
 .description-text {
-  max-height: 150px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #6e7881;
+  max-height: 120px;
   overflow: hidden;
-  transition: max-height 0.5s ease;
+  transition: max-height 0.3s ease;
   position: relative;
 }
 
@@ -964,7 +1060,7 @@ onMounted(async () => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 40px;
+  height: 50px;
   background: linear-gradient(to bottom, transparent, white);
   pointer-events: none;
   opacity: 1;
@@ -982,48 +1078,51 @@ onMounted(async () => {
 .read-more-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  margin-top: var(--space-2-5);
+  gap: 4px;
+  margin-top: 12px;
   padding: 0;
   border: none;
   background: none;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--link-color);
+  font-size: 14px;
+  font-weight: 500;
+  color: #017188;
   cursor: pointer;
-  transition: var(--transition-colors);
+  transition: color 0.2s ease;
 }
 
 .read-more-btn:hover {
-  color: var(--link-hover);
+  color: #014a5a;
+  text-decoration: underline;
 }
 
-/* Features Section */
+/* 特征部分 */
 .features-section {
-  padding: var(--space-6) 0;
-  border-bottom: 1px solid var(--border-light);
+  padding: 20px 16px;
+  background: white;
+  margin-top: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .features-section .section-title {
-  margin-bottom: var(--space-5);
+  margin-bottom: 16px;
 }
 
 .features-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3-5);
-  margin-bottom: var(--space-4);
+  gap: 14px;
+  margin-bottom: var(--spacing-md);
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3-5);
-  padding: var(--space-3) 0;
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--bg-hover);
-  transition: var(--transition-bg);
+  gap: 14px;
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--color-primary);
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s ease;
 }
 
 .feature-item:last-child {
@@ -1031,28 +1130,30 @@ onMounted(async () => {
 }
 
 .feature-item i {
-  font-size: var(--text-lg);
-  color: var(--link-color);
-  width: var(--space-6);
+  font-size: 18px;
+  color: var(--color-accent);
+  width: 24px;
   text-align: center;
 }
 
 .show-more-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1-5);
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-full);
-  background: var(--bg-base);
-  font-size: var(--text-sm);
-  color: var(--text-primary);
+  gap: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
   cursor: pointer;
-  transition: var(--transition-all);
+  transition: all 0.2s ease;
 }
 
 .show-more-btn:hover {
-  background: var(--bg-secondary);
+  background: #f5f5f5;
+  border-color: var(--color-primary);
 }
 
 /* Commute Section */
@@ -1060,70 +1161,74 @@ onMounted(async () => {
   padding: var(--space-6) 0;
 }
 
-/* Fixed Footer */
+/* 底部操作栏 */
 .action-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: var(--space-4);
-  background: var(--bg-base);
-  border-top: 1px solid var(--border-default);
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid #e4e5e7;
   display: flex;
-  gap: var(--space-4);
-  z-index: var(--z-sticky);
-  box-shadow: var(--shadow-up);
+  gap: 12px;
+  z-index: 100;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .action-btn {
   flex: 1;
-  height: var(--space-12);
-  border-radius: var(--radius-full);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
+  height: 48px;
+  border-radius: 24px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: var(--transition-all);
+  transition: all 0.2s ease;
 }
 
 .enquire-btn {
-  background: var(--link-color);
+  background: var(--color-accent);
   color: white;
 }
 
 .enquire-btn:hover {
-  background: var(--link-hover);
+  background: #005a6b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 124, 140, 0.3);
 }
 
 .inspect-btn {
-  background: var(--brand-primary);
+  background: #f97f4e; /* Domain橙色 */
   color: white;
 }
 
 .inspect-btn:hover {
-  background: var(--brand-primary-hover);
+  background: #e86a3a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(249, 127, 78, 0.3);
 }
 
-/* Responsive Design */
+/* Responsive Design - Domain响应式 */
 @media (min-width: 768px) {
   .image-container {
     height: 400px;
   }
 
   .content-container {
-    padding: 0 var(--space-6);
+    padding: 0 var(--spacing-lg);
   }
 
   .price {
-    font-size: var(--text-4xl);
+    font-size: 36px;
   }
   
   .address-main {
-    font-size: var(--text-lg);
+    font-size: 18px;
   }
   
   .spec-value {
-    font-size: var(--text-lg);
+    font-size: 18px;
   }
 }
 
@@ -1133,15 +1238,15 @@ onMounted(async () => {
   }
 
   .price {
-    font-size: var(--text-5xl);
+    font-size: 42px;
   }
   
   .address-main {
-    font-size: var(--text-xl);
+    font-size: 20px;
   }
   
   .property-title h2 {
-    font-size: var(--text-2xl);
+    font-size: 28px;
   }
 }
 

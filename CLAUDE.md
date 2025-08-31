@@ -59,3 +59,7 @@ python scripts/run_backend.py     # http://localhost:8000
 
 ---
 *保持简洁，专注当下，每日 /clear*
+- 1. 先查看Figma设计文件，了解清楚设计意图
+  2. 不清楚的地方先问用户
+  3. 确认清楚后再写代码
+- 详情页PC Figma 设计连接： https://www.figma.com/design/rE2gttYDZqtspCs8P6TrmP/JUWO---Apartment-Rent-App-UI-Kit?node-id=1749-8798&m=dev 移动端： https://www.figma.com/design/rE2gttYDZqtspCs8P6TrmP/JUWO---Apartment-Rent-App-UI-Kit?node-id=1749-8947&t=AHtsq4Ik3hPPX002-4

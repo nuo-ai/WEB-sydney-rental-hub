@@ -25,7 +25,10 @@
       "mcp__playwright__browser_snapshot",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_evaluate",
-      "mcp__playwright__browser_wait_for"
+      "mcp__playwright__browser_wait_for",
+      "mcp__figma-atc6yv-93__FIGMA_EXECUTE_TOOL",
+      "mcp__figma-atc6yv-93__FIGMA_CHECK_ACTIVE_CONNECTION",
+      "mcp__figma-atc6yv-93__FIGMA_SEARCH_TOOLS"
     ],
     "deny": [],
     "ask": []
