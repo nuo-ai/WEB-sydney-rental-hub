@@ -17,7 +17,12 @@
       "Bash(npm view:*)",
       "Bash(npx:*)",
       "Bash(powershell:*)",
-      "Bash(git filter-branch:*)"
+      "Bash(git filter-branch:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:www.anthropic.com)",
+      "Bash(find:*)",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_snapshot"
     ],
     "deny": [],
     "ask": []
