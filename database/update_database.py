@@ -171,37 +171,52 @@ class PropertyDataProcessor:
         return df
         
     def get_existing_listings(self) -> Set[int]:
-        """获取数据库中所有活跃房源的listing_id"""
-        query = "SELECT listing_id FROM properties WHERE is_active = TRUE"
+        """获取数据库中所有房源的listing_id（不区分活跃状态）
+        
+        修正：获取所有房源，而不仅仅是活跃房源
+        这样可以正确处理房源重新上架的情况
+        """
+        query = "SELECT listing_id FROM properties"  # 移除 WHERE is_active = TRUE
         
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             existing_ids = {row[0] for row in cursor.fetchall()}
             
-        logger.info(f"Found {len(existing_ids)} existing active listings in database")
+        logger.info(f"Found {len(existing_ids)} total listings in database")
         return existing_ids
         
     def identify_data_changes(self, new_df: pd.DataFrame, existing_ids: Set[int]) -> Dict[str, List]:
-        """识别数据变化：新增、更新、下架"""
+        """识别数据变化：新增、更新、需要激活、需要下架
+        
+        核心逻辑：
+        - 爬虫爬到的房源 = 活跃（is_active = TRUE）
+        - 爬虫没爬到的房源 = 不活跃（is_active = FALSE）
+        """
         new_ids = set(new_df['listing_id'].astype(int))
         
         # 新增房源：在新数据中有，但数据库中没有
         new_listings = new_ids - existing_ids
         
-        # 更新房源：在新数据和数据库中都有
+        # 更新房源：在新数据和数据库中都有（需要更新内容并设置为活跃）
         update_listings = new_ids & existing_ids
         
-        # 下架房源：在数据库中有，但新数据中没有
+        # 需要激活的房源：所有本次爬取到的已存在房源都应该是活跃的
+        # （包括之前被标记为inactive但这次又出现的房源）
+        activate_listings = update_listings  # 所有更新的房源都要确保是活跃的
+        
+        # 需要下架的房源：在数据库中有，但新数据中没有
         inactive_listings = existing_ids - new_ids
         
         logger.info(f"Data analysis complete:")
         logger.info(f"  - New listings: {len(new_listings)}")
         logger.info(f"  - Listings to update: {len(update_listings)}")
+        logger.info(f"  - Listings to activate: {len(activate_listings)}")
         logger.info(f"  - Listings to mark inactive: {len(inactive_listings)}")
         
         return {
             'new': list(new_listings),
             'update': list(update_listings),
+            'activate': list(activate_listings),
             'inactive': list(inactive_listings)
         }
         
@@ -255,7 +270,7 @@ class PropertyDataProcessor:
                 raise
                 
     def update_existing_listings(self, new_df: pd.DataFrame, update_listing_ids: List[int]) -> int:
-        """更新现有房源"""
+        """更新现有房源并确保标记为活跃"""
         if not update_listing_ids:
             logger.info("No listings to update")
             return 0
@@ -263,7 +278,7 @@ class PropertyDataProcessor:
         update_records = new_df[new_df['listing_id'].isin(update_listing_ids)]
         updated_count = 0
         
-        # 构建更新查询 - 更新所有字段并设置 last_seen_at
+        # 构建更新查询 - 更新所有字段，设置 last_seen_at，并确保 is_active = TRUE
         update_query = """
         UPDATE properties SET
             property_url = %s, address = %s, suburb = %s, state = %s, postcode = %s,
@@ -276,7 +291,7 @@ class PropertyDataProcessor:
             has_security_system = %s, has_storage = %s, has_study_room = %s, has_garden = %s,
             latitude = %s, longitude = %s, images = %s, property_features = %s,
             agent_profile_url = %s, agent_logo_url = %s, enquiry_form_action = %s,
-            geom = %s, bedroom_display = %s, last_seen_at = %s
+            geom = %s, bedroom_display = %s, last_seen_at = %s, is_active = TRUE
         WHERE listing_id = %s
         """
         
@@ -319,15 +334,24 @@ class PropertyDataProcessor:
                 raise
                 
     def mark_inactive_listings(self, inactive_listing_ids: List[int]) -> int:
-        """标记下架房源为不活跃"""
+        """标记下架房源为不活跃
+        
+        关键修复：该方法现在会标记所有不在本次爬取中的房源为inactive
+        """
         if not inactive_listing_ids:
             logger.info("No listings to mark as inactive")
             return 0
             
+        # 修复：移除 AND is_active = TRUE 条件，确保所有房源都能被标记
         update_query = """
         UPDATE properties 
-        SET is_active = FALSE, last_updated = %s
-        WHERE listing_id = ANY(%s) AND is_active = TRUE
+        SET is_active = FALSE, 
+            last_updated = %s,
+            status = CASE 
+                WHEN status IN ('new', 'updated', 'relisted') THEN 'off-market'
+                ELSE status
+            END
+        WHERE listing_id = ANY(%s)
         """
         
         with self.connection.cursor() as cursor:
@@ -335,7 +359,7 @@ class PropertyDataProcessor:
                 cursor.execute(update_query, (self.current_timestamp, inactive_listing_ids))
                 affected_rows = cursor.rowcount
                 self.connection.commit()
-                logger.info(f"Successfully marked {affected_rows} listings as inactive")
+                logger.info(f"Successfully marked {affected_rows} listings as inactive (off-market)")
                 return affected_rows
             except psycopg2.Error as e:
                 self.connection.rollback()
@@ -412,6 +436,7 @@ class PropertyDataProcessor:
             changes = self.identify_data_changes(new_df, existing_ids)
             
             # 6. 执行数据库更新
+            # 注意：更新操作会同时将房源标记为活跃
             new_count = self.insert_new_listings(new_df, changes['new'])
             update_count = self.update_existing_listings(new_df, changes['update'])
             inactive_count = self.mark_inactive_listings(changes['inactive'])

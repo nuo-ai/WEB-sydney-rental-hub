@@ -1,0 +1,1660 @@
+╭──────────────────────────────────────────────────────────╮
+│ ✻ Welcome to Claude Code!                                │
+│                                                          │
+│   /help for help, /status for your current setup         │
+│                                                          │
+│   cwd: /mnt/c/Users/nuoai/Desktop/WEB-sydney-rental-hub  │
+╰──────────────────────────────────────────────────────────╯
+
+> /todos 
+  ⎿  No todos currently tracked
+
+> database\CLAUDE.md 我们现在讨论数据库，我的数据库就我的项目而言，真的符合行业最佳实践吗？
+
+● 我来帮你审查数据库设计是否符合行业最佳实践。让我先查看数据库相关文件，了解当前的架构设计。
+
+● Read(database/CLAUDE.md)
+  ⎿  Read 60 lines (ctrl+r to expand)
+
+● Read(database/setup_database.sql)
+  ⎿  Read 74 lines (ctrl+r to expand)
+
+● Search(pattern: "database/*.sql")
+  ⎿  Found 6 files (ctrl+r to expand)
+
+● Read(database/optimize_indexes.sql)
+  ⎿  Read 225 lines (ctrl+r to expand)
+
+● Read(backend/models/property_models.py)
+  ⎿  Read 56 lines (ctrl+r to expand)
+  ⎿  backend/CLAUDE.md
+
+● Read(backend/models/user_models.py)
+  ⎿  Read 111 lines (ctrl+r to expand)
+
+● Read(database/setup_transport_stops_table.sql)
+  ⎿  Read 53 lines (ctrl+r to expand)
+
+● 数据库设计审查报告
+
+  基于对你的数据库设计的分析，整体上符合行业最佳实践，但有一些可以改进的地方：
+
+  ✅ 做得好的地方
+
+  1. 表结构设计合理
+    - 使用BIGINT作为listing_id主键，适合大数据量
+    - 字段类型选择恰当（JSONB存储图片和特征，PostGIS处理地理数据）
+    - 有完善的时间戳字段和触发器自动更新
+  2. 索引策略优秀
+    - 复合索引设计考虑了实际查询场景
+    - 使用CONCURRENTLY创建索引，不影响生产环境
+    - 包含覆盖索引(INCLUDE)减少回表查询
+    - 空间索引使用GIST，部分索引优化NULL值查询
+  3. 性能优化到位
+    - ETL增量更新机制，避免全量替换
+    - 使用is_active软删除，保留历史数据
+    - 索引命中率高，查询性能提升5-8倍
+
+  ⚠️ 需要改进的地方
+
+  1. 缺少外键约束
+    - transport_stops和properties之间没有关系定义
+    - 建议添加user_properties关联表管理用户收藏
+  2. 数据类型可优化
+    - is_furnished使用BOOLEAN但实际存储'yes'/'no'字符串，应统一
+    - 考虑使用ENUM类型管理property_type、status等固定选项
+  3. 缺少分区策略
+    - 3456条数据量不大，但未来增长需考虑按suburb或时间分区
+    - 建议规划数据归档策略
+  4. 安全性增强
+    - 缺少行级安全策略(RLS)
+    - 建议添加审计日志表记录数据变更
+    - 敏感字段（agent_email、agent_phone）未加密
+  5. 备份恢复机制
+    - 未见备份策略文档
+    - 建议实现point-in-time恢复
+
+  🔧 具体改进建议
+
+  1. 添加数据完整性约束
+  ALTER TABLE properties
+  ADD CONSTRAINT chk_rent_positive CHECK (rent_pw > 0);
+  ADD CONSTRAINT chk_coordinates CHECK (
+    latitude BETWEEN -90 AND 90 AND
+    longitude BETWEEN -180 AND 180
+  );
+  2. 统一布尔值处理
+  -- 将字符串'yes'/'no'迁移为真正的布尔值
+  UPDATE properties
+  SET is_furnished = CASE
+    WHEN is_furnished::text = 'yes' THEN TRUE
+    ELSE FALSE
+  END;
+  3. 添加监控视图
+  CREATE VIEW v_database_health AS
+  SELECT
+    (SELECT COUNT(*) FROM properties WHERE is_active) as active_properties,
+    (SELECT COUNT(*) FROM properties WHERE created_at > NOW() - INTERVAL '24 hours') as new_today,
+    pg_database_size(current_database()) as db_size;
+  4. 实现连接池配置
+    - 建议使用pgbouncer或在应用层配置连接池
+    - 当前psycopg2同步连接可能成为瓶颈
+
+  总体评分：8/10 - 基础扎实，性能优化到位，需要在数据完整性和安全性方面加强。
+
+> 关于有无家具的判断，目前是怎么实现的？
+
+● 让我查看一下家具判断的具体实现逻辑。
+
+● Read(database/update_database.py)
+  ⎿  Read 100 lines (ctrl+r to expand)
+
+● Search(pattern: "is_furnished|furnished", path: "database/update_database.py", output_mode:
+        "content")
+  ⎿  Found 23 lines (ctrl+r to expand)
+
+● Read(crawler/v5_furniture.py)
+  ⎿  Read 150 lines (ctrl+r to expand)
+  ⎿  crawler/CLAUDE.md
+
+● Search(pattern: "is_furnished|furnished", path: "crawler/v5_furniture.py", output_mode: "content")
+  ⎿  Found 5 lines (ctrl+r to expand)
+
+● Read(crawler/enhanced_feature_extractor.py)
+  ⎿  Read 150 lines (ctrl+r to expand)
+
+● Search(pattern: "def extract_furniture|furnished", path: "crawler/enhanced_feature_extractor.py",
+        output_mode: "content")
+  ⎿  Found 174 lines (ctrl+r to expand)
+
+● Search(pattern: "is_furnished|furnished", path: "vue-frontend", glob: "**/*.vue")
+  ⎿  Found 3 files (ctrl+r to expand)
+
+● Search(pattern: "is_furnished|furnished", path: "vue-frontend/src/views/PropertyDetail.vue",
+        output_mode: "content")
+  ⎿  Found 5 lines (ctrl+r to expand)
+
+● Search(pattern: "is_furnished|furnished", path: "vue-frontend/src/components/FilterPanel.vue",
+        output_mode: "content")
+  ⎿  Found 21 lines (ctrl+r to expand)
+
+● 家具状态判断的实现分析
+
+  目前系统中家具状态（is_furnished）的判断存在数据类型不一致的问题：
+
+  📊 当前实现流程
+
+  1. 爬虫阶段 (crawler/enhanced_feature_extractor.py)
+    - 使用两级判断逻辑：
+        - 优先从property_features列表中查找
+      - 其次从description描述中查找
+    - 返回字符串类型：'yes'/'no'/'unknown'
+    - 特殊处理：'partly furnished'映射为'yes'
+  2. 数据库存储 (database/setup_database.sql)
+    - 字段定义：is_furnished BOOLEAN
+    - 期望存储布尔值（TRUE/FALSE）
+    - 问题：实际存储的是字符串'yes'/'no'/'unknown'
+  3. 数据更新 (database/update_database.py)
+    - 将is_furnished列入布尔值列表处理
+    - 但爬虫输出的是字符串，导致类型不匹配
+  4. 前端显示
+    - FilterPanel只有开关（显示带家具/不限）
+    - PropertyDetail通过property_features显示
+    - 没有直接使用is_furnished字段
+
+  ⚠️ 核心问题
+
+  1. 类型不一致
+    - 爬虫输出：字符串 'yes'/'no'/'unknown'
+    - 数据库定义：BOOLEAN
+    - 实际存储：可能是字符串（取决于PostgreSQL的类型转换）
+  2. 三态vs二态
+    - 爬虫支持三态（包括unknown）
+    - 数据库只支持二态（TRUE/FALSE）
+    - 丢失了"未知"状态的信息
+  3. 数据转换缺失
+    - update_database.py没有将字符串转换为布尔值
+    - 依赖数据库的隐式转换，可能导致问题
+
+  🔧 改进建议
+
+  1. 统一数据类型（推荐）
+  # 在update_database.py中添加转换逻辑
+  def convert_furnished_status(value):
+      if value == 'yes':
+          return True
+      elif value == 'no':
+          return False
+      else:
+          return None  # unknown映射为NULL
+  2. 或改用ENUM类型
+  CREATE TYPE furnished_status AS ENUM ('furnished', 'unfurnished', 'partly_furnished',
+  'unknown');
+  ALTER TABLE properties ALTER COLUMN is_furnished TYPE furnished_status;
+  3. 添加数据验证
+    - 在ETL过程中验证数据类型
+    - 记录转换失败的情况
+    - 定期审计数据一致性
+
+  当前的实现虽然能工作，但存在数据类型不一致的隐患，建议尽快修复以避免未来的问题。
+
+> 你觉得这种判断逻辑放在爬虫，合适吗？
+
+● 我认为不太合适，这种判断逻辑不应该放在爬虫阶段。让我分析一下原因：
+
+● 为什么不应该放在爬虫阶段
+
+  🚫 当前架构的问题
+
+  1. 违反单一职责原则
+    - 爬虫的职责应该是数据采集，而非业务判断
+    - 混合了数据获取和数据解释两个关注点
+  2. 业务逻辑分散
+    - 家具判断规则在爬虫代码里
+    - 如果规则变化，需要修改爬虫并重新爬取
+    - 无法对历史数据应用新规则
+  3. 数据完整性受损
+    - 原始数据被处理成'yes/no/unknown'
+    - 丢失了原始的property_features和description
+    - 无法回溯或重新判断
+  4. 难以测试和维护
+    - 业务逻辑和IO操作耦合
+    - 需要实际爬取才能测试判断逻辑
+    - 不同数据源可能需要不同判断规则
+
+● ✅ 更好的架构方案
+
+  方案1：数据库层处理（推荐）
+
+  -- 存储原始数据
+  properties表：
+  - property_features JSONB  -- 原始特征列表
+  - description TEXT         -- 原始描述
+  - is_furnished BOOLEAN     -- 计算字段
+
+  -- 使用生成列或触发器自动计算
+  ALTER TABLE properties
+  ADD COLUMN is_furnished BOOLEAN
+  GENERATED ALWAYS AS (
+    CASE
+      WHEN property_features::text ILIKE '%furnished%'
+        AND property_features::text NOT ILIKE '%unfurnished%' THEN TRUE
+      WHEN description ILIKE '%furnished%'
+        AND description NOT ILIKE '%unfurnished%' THEN TRUE
+      ELSE FALSE
+    END
+  ) STORED;
+
+  优点：
+  - 数据和逻辑在一起，保证一致性
+  - 可以随时调整规则并重新计算
+  - 查询性能好（索引支持）
+
+  方案2：ETL阶段处理
+
+  # database/update_database.py
+  def process_furnishing_status(row):
+      """在数据导入时判断家具状态"""
+      features = json.loads(row.get('property_features', '[]'))
+      description = row.get('description', '')
+
+      # 业务规则集中管理
+      if any('furnished' in f.lower() for f in features):
+          if not any('unfurnished' in f.lower() for f in features):
+              return True
+      # ... 更多规则
+      return None
+
+  优点：
+  - 逻辑集中，易于管理
+  - 保留原始数据
+  - 可以批量重新处理
+
+  方案3：API层处理
+
+  # backend/services/property_service.py
+  class PropertyService:
+      @staticmethod
+      def enrich_property_data(property_data):
+          """在API返回时动态计算"""
+          property_data['is_furnished'] = PropertyService.check_furnished(
+              property_data.get('property_features'),
+              property_data.get('description')
+          )
+          return property_data
+
+  优点：
+  - 规则变化不需要重新处理数据
+  - 可以根据用户偏好调整判断逻辑
+  - 支持A/B测试不同规则
+
+● 🎯 我的建议
+
+  短期改进（最小改动）：
+  1. 爬虫只保存原始数据（property_features和description）
+  2. 在ETL阶段（update_database.py）添加判断逻辑
+  3. 数据库存储计算结果和原始数据
+
+  长期优化（最佳实践）：
+  1. 建立规则引擎系统
+  2. 支持可配置的判断规则
+  3. 保留数据溯源能力
+  4. 支持规则版本管理
+
+  # 理想的架构
+  爬虫 → 原始数据 → 规则引擎 → 结构化数据 → API → 前端
+           ↓             ↓           ↓
+      (property_     (判断规则)   (is_furnished
+       features,                    等字段)
+       description)
+
+  这样的架构更符合数据工程最佳实践：
+  - Raw Data Lake：保存原始数据
+  - Transformation Layer：业务规则转换
+  - Serving Layer：提供处理后的数据
+
+  你的直觉是对的，判断逻辑确实不应该放在爬虫里！
+
+# 不使用鼓励的语气， 实话实说，不做糖衣炮弹。
+  ⎿  Noted.
+
+> 房源除了上架、下架、更新，还有其他什么状态？
+
+● Search(pattern: "status|STATUS|Status", path: "database", glob: "*.sql", output_mode: "content")
+  ⎿  Found 16 lines (ctrl+r to expand)
+
+● Search(pattern: "is_active|status", path: "backend", glob: "**/*.py")
+  ⎿  Found 8 files (ctrl+r to expand)
+
+● 房源状态分析
+
+  你的系统目前只有基础的状态管理：
+  - is_active (BOOLEAN) - 上架/下架
+  - status (TEXT) - 预留字段但未使用
+  - status_changed_at - 状态变更时间
+
+  实际上房源还有这些重要状态：
+
+  租赁进程状态
+
+  - 申请中 (Under Application) - 有人提交申请
+  - 已出租 (Leased/Rented) - 签约完成
+  - 保留中 (On Hold/Reserved) - 房东暂时保留
+  - 待定金 (Deposit Pending) - 等待定金支付
+
+  展示状态
+
+  - 即将上线 (Coming Soon) - 预告但不能申请
+  - 开放看房 (Open for Inspection) - 可预约看房
+  - 仅预约 (By Appointment Only) - 需单独预约
+
+  特殊状态
+
+  - 已撤回 (Withdrawn) - 房东主动撤回
+  - 已过期 (Expired) - 超时自动下架
+  - 审核中 (Under Review) - 信息审核
+  - 维护中 (Under Maintenance) - 房屋维修
+
+  你缺失的关键设计
+
+  1. 状态机不完整
+    - 没有定义状态转换规则
+    - 缺少状态历史记录
+    - 无法追踪状态变更原因
+  2. 业务流程断层
+    - 无法区分"下架"原因（已租/撤回/过期）
+    - 不知道房源处于哪个租赁阶段
+    - 无法为用户提供准确信息
+  3. 数据分析盲区
+    - 无法统计平均出租时长
+    - 不知道撤回率
+    - 无法分析市场供需
+
+  实话说，当前的状态管理太简陋，只适合MVP演示，离生产环境差距很大。
+
+# 务实至上。 直奔主题
+  ⎿  Noted.
+
+> 请我一个综合的优化建议
+
+● 数据库综合优化方案
+
+  第一阶段：立即修复（1-2天）
+
+  1. 统一数据类型
+
+  -- 修复is_furnished类型不一致问题
+  ALTER TABLE properties
+  ADD COLUMN is_furnished_new BOOLEAN;
+
+  UPDATE properties
+  SET is_furnished_new = CASE
+    WHEN is_furnished::text IN ('yes', '1', 'true', 'TRUE') THEN TRUE
+    WHEN is_furnished::text IN ('no', '0', 'false', 'FALSE') THEN FALSE
+    ELSE NULL
+  END;
+
+  ALTER TABLE properties DROP COLUMN is_furnished;
+  ALTER TABLE properties RENAME COLUMN is_furnished_new TO is_furnished;
+
+  2. 添加房源状态枚举
+
+  CREATE TYPE property_status AS ENUM (
+    'active',      -- 在线可租
+    'pending',     -- 审核中
+    'leased',      -- 已出租
+    'withdrawn',   -- 已撤回
+    'expired'      -- 已过期
+  );
+
+  ALTER TABLE properties
+  ALTER COLUMN status TYPE property_status USING status::property_status;
+
+  第二阶段：核心改进（3-5天）
+
+  3. 重构数据流程
+
+  # database/etl_pipeline.py
+  class PropertyETL:
+      def process(self, raw_data):
+          # 第一步：保存原始数据
+          self.save_raw_data(raw_data)
+
+          # 第二步：数据清洗
+          cleaned = self.clean_data(raw_data)
+
+          # 第三步：特征提取（从原始数据中提取，不在爬虫做）
+          features = self.extract_features(cleaned['property_features'],
+                                          cleaned['description'])
+
+          # 第四步：入库
+          self.save_to_db(cleaned, features)
+
+  4. 添加状态历史表
+
+  CREATE TABLE property_status_history (
+    id SERIAL PRIMARY KEY,
+    listing_id BIGINT REFERENCES properties(listing_id),
+    old_status property_status,
+    new_status property_status,
+    change_reason TEXT,
+    changed_at TIMESTAMP DEFAULT NOW(),
+    changed_by VARCHAR(100)
+  );
+
+  CREATE INDEX idx_status_history_listing ON property_status_history(listing_id);
+
+  第三阶段：性能优化（1周）
+
+  5. 优化索引策略
+
+  -- 删除冗余索引
+  DROP INDEX IF EXISTS properties_suburb_idx;
+  DROP INDEX IF EXISTS properties_bedrooms_idx;
+
+  -- 创建复合索引替代
+  CREATE INDEX idx_search_main ON properties(
+    is_active,
+    status,
+    suburb,
+    rent_pw,
+    bedrooms
+  ) WHERE is_active = TRUE;
+
+  -- 添加JSONB索引
+  CREATE INDEX idx_property_features_gin ON properties
+  USING gin(property_features);
+
+  6. 实现数据分区
+
+  -- 按月分区历史数据
+  CREATE TABLE properties_archive (LIKE properties)
+  PARTITION BY RANGE (created_at);
+
+  CREATE TABLE properties_archive_2025_01
+  PARTITION OF properties_archive
+  FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+
+  实施优先级
+
+  1. 马上做：
+    - 修复is_furnished类型问题
+    - 添加状态枚举
+  2. 本周内：
+    - 移动特征提取逻辑到ETL
+    - 实现状态历史记录
+  3. 下周：
+    - 优化索引
+    - 考虑数据分区
+
+  预期效果
+
+  - 查询性能提升3-5倍
+  - 数据一致性100%
+  - 支持完整业务流程
+  - 可追溯状态变更
+
+> 现在最严重的问题：1. 前端的房源不能反应真正的房源上架、下架、何时上架、有无开放时间。原因：我每次
+  抓取的数据一定是最新的状态，每次2000-3000 
+  条以内，但是前端有4000多套房源，显然很多下架的房源也在其中。2. 
+  家具的判断我不知道是否准确，所以有或无没有置信度，我也不敢用；3. 
+  数据库中的这些字段不应放在爬虫数据中，比如：cover_image
+  image_1    
+  image_2    
+  image_3    
+  image_4    
+  furnishing_status    
+  air_conditioning_type    
+  has_air_conditioning        
+  has_laundry    
+  has_dishwasher    
+  has_gas_cooking    
+  has_intercom    
+  has_study    
+  has_balcony
+
+● Read(database/update_database.py)
+  ⎿  Read 50 lines (ctrl+r to expand)
+
+● 紧急修复方案
+
+  问题1：房源下架状态不准（最严重）
+
+  根本原因：mark_inactive_listings逻辑有缺陷，只要房源不在最新CSV就标记为inactive，但爬虫可能只爬
+  了部分区域。
+
+  立即修复：
+  # database/update_database.py - 修改第321行的方法
+  def mark_inactive_listings(self, inactive_listing_ids: List[int], source_suburbs: List[str]) -> 
+  int:
+      """只标记相同区域的房源为下架"""
+      update_query = """
+      UPDATE properties 
+      SET is_active = FALSE, last_updated = %s
+      WHERE listing_id = ANY(%s) 
+      AND is_active = TRUE
+      AND suburb = ANY(%s)  -- 关键：只更新相同区域
+      """
+      cursor.execute(update_query, (self.current_timestamp, inactive_listing_ids, source_suburbs))
+
+  清理脏数据：
+  -- 立即执行：重置所有房源状态
+  UPDATE properties
+  SET is_active = TRUE
+  WHERE last_seen_at > NOW() - INTERVAL '7 days';
+
+  -- 真正下架的：7天未见
+  UPDATE properties
+  SET is_active = FALSE
+  WHERE last_seen_at < NOW() - INTERVAL '7 days';
+
+  问题2：分离爬虫数据和计算字段
+
+  创建两个表：
+  -- 原始爬虫数据表
+  CREATE TABLE raw_property_data (
+      listing_id BIGINT PRIMARY KEY,
+      property_features JSONB,
+      description TEXT,
+      images JSONB,
+      crawled_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- 计算字段视图
+  CREATE MATERIALIZED VIEW property_features_computed AS
+  SELECT
+      listing_id,
+      -- 家具判断带置信度
+      CASE
+          WHEN property_features::text ILIKE '%furnished%' THEN 0.9
+          WHEN description ILIKE '%fully furnished%' THEN 0.8
+          WHEN description ILIKE '%furnished%' THEN 0.6
+          ELSE 0.0
+      END as furnished_confidence,
+
+      -- 提取图片
+      images->0 as cover_image,
+      images->1 as image_1,
+      images->2 as image_2
+  FROM raw_property_data;
+
+  -- 定期刷新
+  REFRESH MATERIALIZED VIEW property_features_computed;
+
+  问题3：家具判断置信度
+
+  新的数据结构：
+  # 返回置信度而不是yes/no
+  def extract_furnished_with_confidence(features, description):
+      confidence = 0.0
+      source = None
+
+      if 'Furnished' in features:
+          confidence = 0.95
+          source = 'official_features'
+      elif 'Unfurnished' in features:
+          confidence = 0.05
+          source = 'official_features'
+      elif 'fully furnished' in description.lower():
+          confidence = 0.8
+          source = 'description'
+      elif 'furnished' in description.lower():
+          confidence = 0.6
+          source = 'description'
+      else:
+          confidence = 0.5  # 未知
+          source = 'unknown'
+
+      return {
+          'is_furnished': confidence > 0.7,  # 阈值判断
+          'confidence': confidence,
+          'source': source
+      }
+
+  立即执行步骤
+
+  1. 今天：
+  # 修复下架逻辑
+  # 清理错误数据
+  psql -c "UPDATE properties SET is_active = TRUE WHERE last_seen_at > NOW() - INTERVAL '7 days'"
+  2. 明天：
+    - 分离raw_data表
+    - 爬虫只写原始数据
+    - ETL计算衍生字段
+  3. 本周：
+    - 实现置信度系统
+    - 前端显示置信度
+    - 用户可筛选高置信度房源
+
+  这样能立即解决4000套房源显示问题，家具判断也有了可信度指标。
+
+> 修复下架逻辑-具体的判断依据是什么？一步步应该怎么修复？
+
+● Read(database/update_database.py)
+  ⎿  Read 50 lines (ctrl+r to expand)
+
+● Read(crawler/config/url.txt)
+  ⎿  Read 37 lines (ctrl+r to expand)
+
+● 下架逻辑修复方案
+
+  问题根源
+
+  当前逻辑的致命缺陷：
+  1. 爬虫每次只爬部分区域（如36个suburb）
+  2. 但identify_data_changes比较的是全部数据库房源 vs 本次爬取房源
+  3. 导致其他区域的房源被误判为"下架"
+
+  举例：
+  - 数据库有4000套房源（所有区域）
+  - 本次爬取2000套（仅36个区域）
+  - 系统错误地将其他2000套标记为下架
+
+  正确的判断依据
+
+  房源真正下架的标志：
+  1. 同一区域内不再出现
+  2. 连续多次爬取都没有
+  3. last_seen_at超过阈值（如7天）
+
+  修复步骤
+
+  步骤1：修改update_database.py
+
+● Write(database/fix_inactive_logic.py)
+  ⎿  User rejected write to database/fix_inactive_logic.py
+        1 +  #!/usr/bin/env python
+        2 +  # -*- coding: utf-8 -*-
+        3 +  """
+        4 +  修复房源下架逻辑
+        5 +  只标记同一区域内消失的房源为下架
+        6 +  """
+        7 +  
+        8 +  import pandas as pd
+        9 +  from typing import Set, List, Dict
+       10 +  
+       11 +  def identify_data_changes_fixed(new_df: pd.DataFrame, connection) -> Dict[str, 
+          + List]:
+       12 +      """
+       13 +      修复后的数据变化识别逻辑
+       14 +      只在相同区域内比较房源状态
+       15 +      """
+       16 +      # 获取本次爬取的区域列表
+       17 +      crawled_suburbs = new_df['suburb'].unique().tolist()
+       18 +      print(f"本次爬取的区域: {crawled_suburbs}")
+       19 +      
+       20 +      # 只获取相同区域的现有房源
+       21 +      query = """
+       22 +      SELECT listing_id 
+       23 +      FROM properties 
+       24 +      WHERE is_active = TRUE 
+       25 +      AND suburb = ANY(%s)
+       26 +      """
+       27 +      
+       28 +      with connection.cursor() as cursor:
+       29 +          cursor.execute(query, (crawled_suburbs,))
+       30 +          existing_ids_in_same_suburbs = {row[0] for row in cursor.fetchall()}
+       31 +      
+       32 +      print(f"相同区域内的现有活跃房源: {len(existing_ids_in_same_suburbs)}")
+       33 +      
+       34 +      new_ids = set(new_df['listing_id'].astype(int))
+       35 +      
+       36 +      # 新增房源：在新数据中有，但数据库中没有
+       37 +      new_listings = new_ids - existing_ids_in_same_suburbs
+       38 +      
+       39 +      # 更新房源：在新数据和数据库中都有
+       40 +      update_listings = new_ids & existing_ids_in_same_suburbs
+       41 +      
+       42 +      # 下架房源：仅在相同区域内，数据库有但新数据没有
+       43 +      inactive_listings = existing_ids_in_same_suburbs - new_ids
+       44 +      
+       45 +      print(f"数据分析结果:")
+       46 +      print(f"  - 新增房源: {len(new_listings)}")
+       47 +      print(f"  - 更新房源: {len(update_listings)}")
+       48 +      print(f"  - 下架房源（仅同区域）: {len(inactive_listings)}")
+       49 +      
+       50 +      return {
+       51 +          'new': list(new_listings),
+       52 +          'update': list(update_listings),
+       53 +          'inactive': list(inactive_listings),
+       54 +          'crawled_suburbs': crawled_suburbs  # 传递区域信息
+       55 +      }
+       56 +  
+       57 +  def mark_inactive_listings_fixed(inactive_listing_ids: List[int], 
+       58 +                                  crawled_suburbs: List[str], 
+       59 +                                  connection) -> int:
+       60 +      """
+       61 +      修复后的标记下架方法
+       62 +      只标记相同区域内的房源
+       63 +      """
+       64 +      if not inactive_listing_ids:
+       65 +          print("没有需要标记为下架的房源")
+       66 +          return 0
+       67 +      
+       68 +      # 双重保险：再次确认只更新相同区域
+       69 +      update_query = """
+       70 +      UPDATE properties 
+       71 +      SET is_active = FALSE, 
+       72 +          last_updated = NOW(),
+       73 +          status = 'inactive'
+       74 +      WHERE listing_id = ANY(%s) 
+       75 +      AND suburb = ANY(%s)
+       76 +      AND is_active = TRUE
+       77 +      """
+       78 +      
+       79 +      with connection.cursor() as cursor:
+       80 +          cursor.execute(update_query, (inactive_listing_ids, crawled_suburbs))
+       81 +          affected_rows = cursor.rowcount
+       82 +          connection.commit()
+       83 +          print(f"成功标记 {affected_rows} 个房源为下架")
+       84 +          return affected_rows
+       85 +  
+       86 +  # 使用示例
+       87 +  if __name__ == "__main__":
+       88 +      print("""
+       89 +      修复方案说明:
+       90 +      1. 只比较相同区域内的房源
+       91 +      2. 不影响其他区域的房源状态
+       92 +      3. 使用last_seen_at字段追踪房源最后出现时间
+       93 +      """)
+       94   \ No newline at end of file
+
+> 更新房源：在新数据和数据库中都有                                                         │ │
+  │ │     update_listings = new_ids & existing_ids_in_same_suburbs 的逻辑是什么？
+
+● 更新逻辑解释
+
+  update_listings = new_ids & existing_ids_in_same_suburbs 使用的是集合交集运算：
+
+  具体含义：
+
+  # new_ids: 本次爬取到的房源ID集合
+  # existing_ids_in_same_suburbs: 数据库中相同区域的活跃房源ID集合
+  # & 运算符: 取两个集合的交集
+
+  update_listings = new_ids & existing_ids_in_same_suburbs
+
+  举例说明：
+
+  # 假设爬取Zetland区域
+  new_ids = {101, 102, 103, 104}  # 本次爬到4套房
+
+  # 数据库中Zetland区域的活跃房源
+  existing_ids_in_same_suburbs = {101, 102, 105, 106}  # 数据库有4套
+
+  # 交集运算
+  update_listings = {101, 102}  # 两边都有的房源
+
+  # 这意味着：
+  # - 房源101和102需要更新（价格、描述等可能变了）
+  # - 房源103和104是新房源（需要插入）
+  # - 房源105和106已下架（爬不到了）
+
+  三种情况的判断：
+
+  1. 新增：new_ids - existing_ids = 只在新数据中有
+  2. 更新：new_ids & existing_ids = 两边都有
+  3. 下架：existing_ids - new_ids = 只在数据库中有
+
+  这个逻辑本身没问题，问题在于existing_ids的范围——应该限制在相同区域内。
+
+> 更新：new_ids & existing_ids = 两边都有 
+  ==这里面有严重的逻辑漏洞。所谓更新就是信息更新，对吗？比如价格、headline、Description 
+  以及其他字段内容发生了变化，这才是更新吧？两边都有，非常正常，一套房需要最慢1个月到数个月才会租出
+  去，我每套爬取3次，每次都会在，怎么算是更新呢？
+
+● 你说得对，这里有严重的逻辑问题。
+
+  真正的"更新"定义
+
+  当前错误逻辑
+
+  update_listings = new_ids & existing_ids  # 错：只要ID重复就算"更新"
+
+  正确的更新判断
+
+  def identify_real_updates(new_df, existing_data):
+      """只有数据真正变化才算更新"""
+      real_updates = []
+
+      for listing_id in (new_ids & existing_ids):
+          new_row = new_df[new_df['listing_id'] == listing_id]
+          old_row = existing_data[listing_id]
+
+          # 检查关键字段是否变化
+          if (new_row['rent_pw'] != old_row['rent_pw'] or
+              new_row['available_date'] != old_row['available_date'] or
+              new_row['property_headline'] != old_row['property_headline'] or
+              new_row['inspection_times'] != old_row['inspection_times']):
+              real_updates.append(listing_id)
+
+      return real_updates
+
+  更好的状态管理
+
+  -- 添加字段追踪变化
+  ALTER TABLE properties ADD COLUMN IF NOT EXISTS
+      data_hash VARCHAR(64),  -- 数据指纹
+      last_changed_at TIMESTAMP,  -- 真正变化的时间
+      change_count INT DEFAULT 0;  -- 变化次数
+
+  -- 计算数据指纹
+  UPDATE properties SET data_hash = MD5(
+      CONCAT(rent_pw, available_date, property_headline, inspection_times)
+  );
+
+  优化后的ETL流程
+
+  def process_listing(new_data, existing_data):
+      new_hash = calculate_hash(new_data)
+
+      if not existing_data:
+          # 新房源
+          action = "INSERT"
+
+      elif new_hash != existing_data['data_hash']:
+          # 真正的更新
+          action = "UPDATE"
+          log_changes(new_data, existing_data)  # 记录变化内容
+
+      else:
+          # 仅更新last_seen_at
+          action = "TOUCH"
+          update_last_seen_only(listing_id)
+
+      return action
+
+  统计意义
+
+  这样能得到有价值的数据：
+  - 每天真正更新的房源数（价格调整等）
+  - 房源平均在线时长
+  - 价格变化趋势
+  - 看房时间更新频率
+
+  现在的逻辑把"存在"当成"更新"，完全没有业务价值。每次爬取可能显示"更新2000条"，实际可能只有50条真
+  正改变了。
+
+> 在爬虫层面，做这样的判断容易实现吗？稳定吗？合适吗？
+
+● 不合适，在爬虫层面做这种判断是错误的设计。
+
+  为什么不应该在爬虫做
+
+  1. 爬虫无法获取旧数据
+
+  # 爬虫只能看到当前网页
+  def crawl_property():
+      new_data = parse_html(response)
+      # 爬虫不知道数据库里的旧数据
+      # 无法判断是否真的"更新"
+
+  2. 违反职责分离
+
+  爬虫职责：获取原始数据
+  ETL职责：对比和处理数据
+  数据库职责：存储和版本管理
+
+  3. 性能和稳定性问题
+
+  - 爬虫需要查询数据库（增加复杂度）
+  - 网络爬取+数据库查询混合（容易超时）
+  - 爬虫重启会丢失状态
+
+  正确的架构
+
+  # 1. 爬虫：只管爬
+  def crawler():
+      data = scrape_website()
+      save_to_csv(data)  # 原始数据
+
+  # 2. ETL：负责对比
+  def etl_pipeline():
+      new_data = read_csv()
+      old_data = query_database()
+
+      for record in new_data:
+          if record not in old_data:
+              insert_new(record)
+          elif has_changed(record, old_data):
+              update_with_diff(record)
+          else:
+              update_last_seen_only(record)
+
+  # 3. 数据库：触发器记录变化
+  CREATE TRIGGER track_changes
+  BEFORE UPDATE ON properties
+  FOR EACH ROW
+  WHEN (OLD.rent_pw != NEW.rent_pw OR
+        OLD.available_date != NEW.available_date)
+  EXECUTE FUNCTION log_property_changes();
+
+  实际案例
+
+  Domain.com.au的爬虫每次返回相同格式的数据，但：
+  - 价格可能没变
+  - 描述可能没变
+  - 图片顺序可能变了（不算真更新）
+  - HTML结构可能微调（不算真更新）
+
+  让爬虫判断这些，会导致：
+  1. 爬虫代码臃肿
+  2. 难以维护
+  3. 无法追溯历史
+
+  建议
+
+  爬虫：保持简单，只爬数据
+  ETL：在update_database.py中做对比
+  数据库：用触发器和历史表记录真实变化
+
+  这样每层职责清晰，系统才稳定可维护。
+
+> 请重新规划，我同意后，再制定TODOs
+
+● 数据架构重新规划
+
+  核心原则
+
+  1. 爬虫只负责采集：输出原始数据，不做任何判断
+  2. ETL负责处理：数据清洗、对比、特征提取
+  3. 数据库分层存储：原始数据、处理数据、历史记录分开
+
+  具体方案
+
+  1. 数据表重构
+
+  -- 原始爬虫数据（不做处理）
+  raw_crawl_data (
+      crawl_id,
+      listing_id,
+      crawl_time,
+      raw_json  -- 完整HTML解析结果
+  )
+
+  -- 主表（处理后的数据）
+  properties (
+      listing_id,
+      -- 只存核心字段
+      rent_pw,
+      suburb,
+      bedrooms,
+      -- 计算字段
+      is_furnished_computed,  -- ETL计算
+      furnished_confidence,   -- 置信度
+      -- 状态管理
+      first_seen_at,
+      last_seen_at,
+      last_changed_at,  -- 真正变化时间
+      data_hash  -- 用于对比
+  )
+
+  -- 变更历史
+  property_changes (
+      listing_id,
+      field_name,
+      old_value,
+      new_value,
+      changed_at
+  )
+
+  2. ETL流程重构
+
+  # database/etl_service.py
+  class PropertyETL:
+      def process_batch(self, csv_file):
+          # 1. 存原始数据
+          self.save_raw_data(csv_file)
+
+          # 2. 对比识别变化
+          changes = self.detect_changes()
+
+          # 3. 分类处理
+          for listing in changes['new']:
+              self.insert_property(listing)
+
+          for listing in changes['updated']:
+              self.update_property(listing)
+              self.log_changes(listing)
+
+          for listing in changes['unchanged']:
+              self.touch_last_seen(listing)
+
+          # 4. 标记下架（基于suburb）
+          self.mark_inactive_in_suburbs()
+
+  3. 下架逻辑修正
+
+  def mark_inactive_in_suburbs(self, crawled_suburbs):
+      """
+      只在爬取过的区域内判断下架
+      + 时间阈值（防止临时下架）
+      """
+      sql = """
+      UPDATE properties 
+      SET status = 'inactive'
+      WHERE suburb IN (%s)
+      AND last_seen_at < NOW() - INTERVAL '7 days'
+      AND status = 'active'
+      """
+
+  4. 特征提取独立服务
+
+  # services/feature_extractor.py
+  class FeatureExtractor:
+      def compute_furnished_status(self, property_features, description):
+          """返回置信度，不是yes/no"""
+          return {
+              'is_furnished': confidence > 0.7,
+              'confidence': confidence,
+              'source': 'features' or 'description',
+              'last_computed': datetime.now()
+          }
+
+  5. 前端数据服务
+
+  # API返回处理后的数据
+  @app.get("/properties")
+  def get_properties():
+      # 只返回活跃 + 最近7天下架的
+      # 带上置信度让用户筛选
+      return {
+          'listing_id': 123,
+          'features': {
+              'furnished': {
+                  'value': True,
+                  'confidence': 0.85
+              }
+          }
+      }
+
+  实施步骤
+
+  1. 第一步：修复下架逻辑（最紧急）
+  2. 第二步：分离原始数据和处理数据
+  3. 第三步：实现变更检测
+  4. 第四步：添加置信度系统
+  5. 第五步：优化前端展示
+
+  预期效果
+
+  - 房源状态准确（不会误标下架）
+  - 数据可追溯（保留原始数据）
+  - 特征可信（有置信度）
+  - 性能更好（分层处理）
+
+  你觉得这个方案如何？同意的话我来制定具体的TODOs。
+
+> 先做第一步
+
+● 第一步：修复下架逻辑
+
+  当前问题分析
+
+● Read(database/update_database.py)
+  ⎿  Read 30 lines (ctrl+r to expand)
+
+● Write(database/fix_inactive_status.sql)
+  ⎿  User rejected write to database/fix_inactive_status.sql
+        1 +  -- ============================================================================
+        2 +  -- 修复房源下架状态错误的脚本
+        3 +  -- 问题：爬虫只爬部分区域，但标记了所有区域的房源为下架
+        4 +  -- 解决：基于last_seen_at时间判断真实状态
+        5 +  -- ============================================================================
+        6 +  
+        7 +  -- 步骤1：查看当前错误数据的规模
+        8 +  SELECT 
+        9 +      is_active,
+       10 +      COUNT(*) as count,
+       11 +      MIN(last_seen_at) as oldest_seen,
+       12 +      MAX(last_seen_at) as newest_seen
+       13 +  FROM properties
+       14 +  GROUP BY is_active;
+       15 +  
+       16 +  -- 步骤2：修复错误标记为下架的房源
+       17 +  -- 规则：7天内见过的房源应该是活跃的
+       18 +  UPDATE properties 
+       19 +  SET 
+       20 +      is_active = TRUE,
+       21 +      status = 'active',
+       22 +      last_updated = NOW()
+       23 +  WHERE 
+       24 +      is_active = FALSE 
+       25 +      AND last_seen_at > NOW() - INTERVAL '7 days';
+       26 +  
+       27 +  -- 查看修复了多少条
+       28 +  -- 应该会恢复大量被误标为下架的房源
+       29 +  
+       30 +  -- 步骤3：真正下架的房源
+       31 +  -- 规则：超过14天没见过的确实应该下架
+       32 +  UPDATE properties 
+       33 +  SET 
+       34 +      is_active = FALSE,
+       35 +      status = 'inactive',
+       36 +      last_updated = NOW()
+       37 +  WHERE 
+       38 +      is_active = TRUE 
+       39 +      AND last_seen_at < NOW() - INTERVAL '14 days';
+       40 +  
+       41 +  -- 步骤4：添加数据一致性检查
+       42 +  -- 确保last_seen_at不为空
+       43 +  UPDATE properties 
+       44 +  SET last_seen_at = last_updated 
+       45 +  WHERE last_seen_at IS NULL;
+       46 +  
+       47 +  -- 步骤5：查看修复后的结果
+       48 +  SELECT 
+       49 +      suburb,
+       50 +      COUNT(*) FILTER (WHERE is_active = TRUE) as active_count,
+       51 +      COUNT(*) FILTER (WHERE is_active = FALSE) as inactive_count,
+       52 +      COUNT(*) as total_count
+       53 +  FROM properties
+       54 +  GROUP BY suburb
+       55 +  ORDER BY total_count DESC
+       56 +  LIMIT 20;
+       57 +  
+       58 +  -- 步骤6：验证数据合理性
+       59 +  -- 活跃房源应该在2000-3000之间（符合爬虫数据量）
+       60 +  SELECT 
+       61 +      COUNT(*) as active_properties,
+       62 +      COUNT(DISTINCT suburb) as active_suburbs
+       63 +  FROM properties
+       64 +  WHERE is_active = TRUE;
+       65 +  
+       66 +  -- ============================================================================
+       67 +  -- 注意事项：
+       68 +  -- 1. 执行前先备份数据库
+       69 +  -- 2. 在测试环境验证后再在生产环境执行
+       70 +  -- 3. 执行后检查前端显示是否正常
+       71 +  -- ============================================================================
+       72   \ No newline at end of file
+
+> 你的下架逻辑不对==再好好想想
+
+✻ Thinking…
+
+  用户说我的下架逻辑不对，让我再想想。
+
+  让我重新分析一下问题：
+
+  1. 爬虫每次爬取特定的区域列表（比如36个suburbs）
+  2. 每次爬取得到2000-3000条数据
+  3. 数据库里有4000多条数据（包含所有历史数据）
+
+  关键问题：
+  - 不能简单地用"7天没见过"来判断下架，因为有些区域可能根本没爬
+  - 不能用"新数据里没有"来判断下架，因为新数据只包含部分区域
+
+  正确的逻辑应该是：
+  1. 一个房源是否下架，只能在它所属的区域被爬取时才能判断
+  2. 如果Zetland被爬取了，那么Zetland区域内：
+    - 在新数据中的房源 = 仍然在线
+    - 不在新数据中的房源 = 可能下架了
+  3. 但如果Chatswood没被爬取，就不能判断Chatswood的房源状态
+
+  所以关键是：
+  - 需要知道本次爬取了哪些区域
+  - 只能更新被爬取区域的房源状态
+  - 其他区域的房源状态保持不变
+
+  另外，"下架"的判断还需要考虑：
+  - 可能是真的下架（已出租）
+  - 可能是临时下架（房东暂停）
+  - 可能是爬虫漏爬（网络问题等）
+
+  - 需要谨慎判断房源状态，避免错误下架
+
+  我意识到下架判断不能草率进行。必须建立多重验证机制，确保只有经过严格检查的房源才会被标记为下架。这意
+  味着单次未抓取不能作为下架依据，而要通过多次连续未出现或有明确下架标记来确定。这样可以最大程度减少误
+  判，保证数据的准确性。
+
+✻ Thinking…
+
+  让我重新思考下架逻辑：
+
+  关键点：
+  1. 爬虫每次只爬特定区域（url.txt里的36个区域）
+  2. 只有当某个区域被爬取时，才能判断该区域房源的状态
+  3. 未被爬取的区域，房源状态应该保持不变
+
+  正确的下架判断：
+  - 前提：某个suburb被爬取了
+  - 该suburb内原本active的房源，如果不在新数据中，才可能是下架
+  - 但还需要考虑：
+    - 可能是分页问题（爬虫可能没爬全）
+    - 可能是临时网络问题
+    - 需要多次确认才能真正标记为下架
+
+  所以需要：
+  1. 记录每个suburb的爬取历史
+  2. 记录每个房源在其suburb被爬取时的出现情况
+  3. 连续N次（比如3次）在其suburb被爬取时都没出现，才标记为下架
+
+● 你说得对，我重新想想。
+
+  正确的下架逻辑
+
+  核心问题：只有当某个区域被爬取时，才能判断该区域内房源的状态
+
+  关键认识
+
+  1. 爬虫是分区域的
+    - 每次只爬url.txt中的36个区域
+    - 其他区域根本没被爬，不能判断状态
+  2. 不能用简单的时间判断
+    - "7天没见"不对，因为可能该区域7天都没爬
+    - "14天没见"也不对，同样原因
+  3. 需要追踪爬取历史
+
+  正确的逻辑
+
+  def determine_property_status(property, crawl_history):
+      """
+      只有当房源所在区域被爬取时，才能判断其状态
+      """
+      suburb = property['suburb']
+      listing_id = property['listing_id']
+
+      # 检查该区域最近是否被爬取过
+      recent_crawls = get_suburb_crawl_history(suburb, days=7)
+
+      if not recent_crawls:
+          # 该区域最近没被爬取，保持原状态
+          return property['current_status']
+
+      # 该区域被爬取了，检查房源是否出现
+      appearances = count_appearances(listing_id, recent_crawls)
+
+      if appearances == 0 and len(recent_crawls) >= 3:
+          # 连续3次爬取都没出现，才标记为下架
+          return 'inactive'
+      elif appearances > 0:
+          # 出现过，确认在线
+          return 'active'
+      else:
+          # 爬取次数不够，保持原状态
+          return property['current_status']
+
+  需要的数据结构
+
+  -- 记录每次爬取的区域和时间
+  CREATE TABLE crawl_history (
+      crawl_id SERIAL PRIMARY KEY,
+      crawl_time TIMESTAMP,
+      suburbs TEXT[],  -- 本次爬取的区域列表
+      total_properties INT
+  );
+
+  -- 记录房源出现历史
+  CREATE TABLE property_appearances (
+      listing_id BIGINT,
+      crawl_id INT,
+      appeared BOOLEAN,
+      FOREIGN KEY (crawl_id) REFERENCES crawl_history(crawl_id)
+  );
+
+  实施步骤
+
+  1. 记录爬取范围：每次爬虫运行时记录爬了哪些区域
+  2. 只更新爬取区域：只改变被爬取区域内房源的状态
+  3. 多次确认机制：连续N次未出现才下架
+  4. 保持其他区域不变：未爬取的区域维持原状态
+
+  这样才能避免误判。
+
+> 1. 我的爬取链接只会增加，不会减少，基本上不会增减的；2. 只要库存的房源在，但新爬取的结果不在，就应
+  当被认定为下架。前端无需显示，前端只需显示最新爬取的房源即可。--这个逻辑你认为对吗？
+
+● 你的逻辑是对的，我之前想复杂了。
+
+  简化后的正确逻辑
+
+  核心原则
+
+  1. 爬取范围固定：36个区域的URL列表基本不变
+  2. 下架判断简单：数据库有 + 新爬取没有 = 下架
+  3. 前端只显示活跃房源：is_active = TRUE
+
+  正确的实现
+
+  def identify_data_changes(self, new_df: pd.DataFrame, existing_ids: Set[int]) -> Dict[str, 
+  List]:
+      """
+      简单明确的逻辑：
+      - 新爬取有的 = 活跃
+      - 新爬取没有的 = 下架
+      """
+      new_ids = set(new_df['listing_id'].astype(int))
+
+      # 新增：爬取有，数据库没有
+      new_listings = new_ids - existing_ids
+
+      # 更新：都有（但这里只是标记需要更新last_seen_at）
+      update_listings = new_ids & existing_ids
+
+      # 下架：数据库有，爬取没有
+      inactive_listings = existing_ids - new_ids
+
+      return {
+          'new': list(new_listings),
+          'update': list(update_listings),
+          'inactive': list(inactive_listings)
+      }
+
+  数据库清理
+
+  -- 第一步：把所有房源标记为下架
+  UPDATE properties SET is_active = FALSE;
+
+  -- 第二步：根据最新爬取结果激活存在的房源
+  -- （这步在update_database.py中执行）
+
+  前端查询
+
+  -- 前端只查询活跃房源
+  SELECT * FROM properties
+  WHERE is_active = TRUE;
+  -- 应该正好是最新爬取的2000-3000套
+
+  立即执行
+
+  1. 清理现有数据
+  psql -c "UPDATE properties SET is_active = FALSE WHERE is_active = TRUE;"
+
+  2. 重新运行爬虫和ETL
+  python crawler/v5_furniture.py
+  python database/update_database.py
+
+  3. 验证结果
+  SELECT COUNT(*) FROM properties WHERE is_active = TRUE;
+  -- 应该是2000-3000左右
+
+  这样最简单直接，前端显示的就是最新可租的房源。
+
+> 下架的房源你打算怎么管理呢？房产行业的最佳实践又是怎样管理房源的各个状态的呢？
+
+● 房产行业的房源状态管理最佳实践
+
+  行业标准状态分类
+
+  Domain.com.au / REA 的状态管理：
+  1. Active (活跃)
+     - For Rent (可租)
+     - Open for Inspection (开放看房)
+
+  2. Under Application (申请中)
+     - Applications Pending (申请待审)
+     - Reference Checking (核查推荐人)
+
+  3. Leased (已出租)
+     - Deposit Taken (已收定金)
+     - Lease Signed (已签约)
+
+  4. Off Market (下架)
+     - Withdrawn (撤回) - 房东主动
+     - Expired (过期) - 超时自动
+     - Leased (已租) - 成功出租
+
+  下架房源的管理策略
+
+  1. 软删除 + 状态细分
+
+  CREATE TYPE listing_status AS ENUM (
+      'active',           -- 在线可租
+      'under_application', -- 申请处理中
+      'deposit_taken',    -- 已收定金
+      'leased',          -- 已出租
+      'withdrawn',       -- 房东撤回
+      'expired',         -- 过期下架
+      'suspended'        -- 暂时下架
+  );
+
+  -- 不删除数据，只改状态
+  UPDATE properties
+  SET
+      status = 'leased',
+      status_changed_at = NOW(),
+      lease_date = NOW()
+  WHERE listing_id = ?;
+
+  2. 历史数据价值
+
+  -- 保留下架房源用于：
+  -- 1. 市场分析（平均出租时长）
+  SELECT AVG(lease_date - first_seen_at) as avg_days_on_market
+  FROM properties
+  WHERE status = 'leased';
+
+  -- 2. 价格趋势（同一房源的历史价格）
+  SELECT listing_id, rent_pw, first_seen_at
+  FROM property_history
+  WHERE address = '123 Main St'
+  ORDER BY first_seen_at;
+
+  -- 3. 回头客（房源重新上架）
+  -- 同一地址6个月后重新出现
+
+  推荐的状态管理方案
+
+  数据架构
+
+  -- 主表：当前状态
+  properties (
+      listing_id,
+      status,          -- 细分状态
+      is_active,       -- 快速筛选标志
+      first_seen_at,   -- 首次发现
+      last_seen_at,    -- 最后见到
+      status_changed_at, -- 状态变更时间
+      days_on_market   -- 在线天数
+  )
+
+  -- 历史表：状态变迁
+  property_status_history (
+      listing_id,
+      from_status,
+      to_status,
+      changed_at,
+      reason,          -- 'crawl_not_found', 'manual', 'auto_expire'
+      data_snapshot    -- 当时的数据快照
+  )
+
+  -- 归档表：长期存储
+  property_archive (
+      -- 超过6个月的下架房源移到这里
+      -- 用于历史分析，不影响主表性能
+  )
+
+  状态转换规则
+
+  def update_property_status(listing_id, new_crawl_data):
+      current = get_current_status(listing_id)
+
+      if listing_id not in new_crawl_data:
+          # 爬虫未发现
+          if current == 'active':
+              # 第一次未发现，标记为可能下架
+              update_status('likely_withdrawn', 'crawl_not_found')
+          elif current == 'likely_withdrawn':
+              # 连续未发现，确认下架
+              update_status('withdrawn', 'confirmed_by_crawl')
+      else:
+          # 爬虫发现
+          if current in ['withdrawn', 'expired']:
+              # 重新上架
+              update_status('active', 'relisted')
+              create_new_listing_cycle()  # 新的租赁周期
+
+  业务价值
+
+  1. 租赁周期分析
+    - 哪些区域房源出租快
+    - 什么价位最受欢迎
+    - 季节性趋势
+  2. 定价策略
+    - 降价房源追踪
+    - 长期未租的原因分析
+  3. 用户体验
+    - "这套房3天前刚下架"
+    - "类似房源的历史租金"
+    - "该地址上次出租用了15天"
+
+  实施建议
+
+  短期：保留所有数据，用status字段细分
+  中期：实现状态历史表，追踪变化
+  长期：建立数据仓库，支持商业分析
+
+  这样的设计让下架房源成为有价值的数据资产，而不是垃圾数据。
+
+> 加入计划中。重新给我计划
+
+● 数据库优化完整计划
+
+  🔴 立即修复（今天）
+
+  1. 清理错误的下架数据
+
+  -- 重置所有房源状态，准备重新判断
+  UPDATE properties SET is_active = FALSE;
+
+  -- 根据最新爬取数据更新
+  -- 在运行update_database.py时会自动设置正确状态
+
+  2. 修复update_database.py逻辑
+
+  # 简化逻辑：爬到的就是活跃，没爬到的就是下架
+  def identify_changes(self, new_df, existing_ids):
+      new_ids = set(new_df['listing_id'])
+      return {
+          'new': new_ids - existing_ids,
+          'update': new_ids & existing_ids,  # 只更新last_seen_at
+          'inactive': existing_ids - new_ids
+      }
+
+  🟡 短期改进（本周）
+
+  3. 实现房源状态枚举
+
+  CREATE TYPE property_status AS ENUM (
+      'active',
+      'under_application',
+      'leased',
+      'withdrawn',
+      'expired'
+  );
+
+  ALTER TABLE properties
+  ADD COLUMN status_new property_status DEFAULT 'active';
+
+  4. 分离数据存储
+
+  -- 原始爬虫数据
+  CREATE TABLE raw_property_data (
+      listing_id BIGINT,
+      crawl_date DATE,
+      raw_features JSONB,  -- 原始property_features
+      raw_description TEXT,
+      PRIMARY KEY (listing_id, crawl_date)
+  );
+
+  -- 移除计算字段
+  ALTER TABLE properties
+  DROP COLUMN cover_image,
+  DROP COLUMN image_1,
+  DROP COLUMN image_2,
+  DROP COLUMN furnishing_status,
+  DROP COLUMN air_conditioning_type;
+
+  5. 添加置信度系统
+
+  -- 特征置信度表
+  CREATE TABLE property_features_confidence (
+      listing_id BIGINT PRIMARY KEY,
+      is_furnished BOOLEAN,
+      furnished_confidence FLOAT,  -- 0.0-1.0
+      furnished_source VARCHAR(50), -- 'features'/'description'
+      computed_at TIMESTAMP
+  );
+
+  🟢 中期优化（2周内）
+
+  6. 状态历史追踪
+
+  CREATE TABLE property_status_history (
+      id SERIAL PRIMARY KEY,
+      listing_id BIGINT,
+      old_status property_status,
+      new_status property_status,
+      changed_at TIMESTAMP,
+      change_reason VARCHAR(100),
+      days_on_market INT
+  );
+
+  -- 触发器自动记录
+  CREATE TRIGGER track_status_changes
+  AFTER UPDATE ON properties
+  FOR EACH ROW
+  WHEN (OLD.status IS DISTINCT FROM NEW.status)
+  EXECUTE FUNCTION log_status_change();
+
+  7. 变更检测机制
+
+  # ETL中添加数据指纹
+  def calculate_data_hash(row):
+      key_fields = ['rent_pw', 'available_date', 'inspection_times']
+      return hashlib.md5(''.join(str(row[f]) for f in key_fields)).hexdigest()
+
+  # 只在hash变化时更新
+  if new_hash != old_hash:
+      update_property(row)
+      log_change(listing_id, old_hash, new_hash)
+
+  🔵 长期规划（1个月）
+
+  8. 数据仓库架构
+
+  -- 事实表：租赁事件
+  CREATE TABLE fact_rental_events (
+      event_id SERIAL,
+      listing_id BIGINT,
+      event_type VARCHAR(50),
+      event_date DATE,
+      rent_amount INT,
+      days_on_market INT
+  );
+
+  -- 维度表：区域
+  CREATE TABLE dim_suburbs (
+      suburb_id SERIAL,
+      suburb_name VARCHAR(100),
+      postcode VARCHAR(10),
+      avg_rent DECIMAL
+  );
+
+  -- 分析视图
+  CREATE MATERIALIZED VIEW rental_analytics AS
+  SELECT
+      suburb,
+      AVG(days_on_market) as avg_rental_time,
+      AVG(rent_pw) as avg_rent,
+      COUNT(*) FILTER (WHERE status = 'leased') as total_leased
+  FROM properties
+  GROUP BY suburb;
+
+  执行顺序
+
+  1. 今天: 修复下架逻辑（步骤1-2）
+  2. 本周: 状态枚举 + 数据分离（步骤3-5）
+  3. 下周: 历史追踪 + 变更检测（步骤6-7）
+  4. 月底: 数据仓库（步骤8）
+
+  预期成果
+
+  - 立即：前端显示正确的2000-3000套活跃房源
+  - 本周：家具判断有置信度，用户可筛选
+  - 两周：完整的状态管理和历史追踪
+  - 一月：商业分析能力（租赁趋势、市场洞察）
+
+  这个计划循序渐进，先解决紧急问题，再逐步完善系统。
+

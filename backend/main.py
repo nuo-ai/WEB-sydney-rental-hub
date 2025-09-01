@@ -1205,6 +1205,9 @@ async def get_properties(
     conditions = []
     params = []
     
+    # 始终只返回活跃的房源（关键修复：过滤已下架房源）
+    conditions.append("is_active = TRUE")
+    
     # Add suburb filter - support multiple suburbs (comma-separated)
     if suburb:
         # Split by comma and trim whitespace
@@ -1328,6 +1331,7 @@ async def get_properties(
     # Update queries with WHERE clause
     base_query += where_clause
     count_query += where_clause
+    
     
     # Simple cursor implementation based on listing_id
     # A more robust implementation would handle sorting

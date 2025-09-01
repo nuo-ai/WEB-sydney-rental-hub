@@ -266,198 +266,9 @@ export const usePropertiesStore = defineStore('properties', {
     
     // 本地筛选备用方案
     async applyLocalFilters(filters) {
-      // 确保有数据可以筛选
-      if (this.allProperties.length === 0) {
-        // 如果没有数据，先加载数据
-        this.loading = true
-        try {
-          // 分批加载，避免 422 错误
-          const batches = await Promise.all([
-            propertyAPI.getList({ page_size: 100, page: 1 }),
-            propertyAPI.getList({ page_size: 100, page: 2 }),
-            propertyAPI.getList({ page_size: 100, page: 3 })
-          ])
-          
-          // 合并所有批次的数据
-          this.allProperties = batches.flat()
-        } catch (error) {
-          console.error('❌ 加载筛选数据失败:', error)
-          // 降级到更小的数据量
-          try {
-            const fallbackData = await propertyAPI.getList({ page_size: 50 })
-            this.allProperties = fallbackData
-          } catch (fallbackError) {
-            this.error = '加载数据失败，请重试'
-            return
-          }
-        } finally {
-          this.loading = false
-        }
-      }
-      
-      // 更新store中的筛选状态，确保单一数据源
-      if (filters.areas) {
-        // 将字符串数组转换为符合预期的对象数组
-        this.selectedLocations = filters.areas.map(area => ({
-          id: area,
-          type: 'suburb', // 假设快速筛选只处理suburb
-          name: area
-        }));
-      }
-
-      let filtered = [...this.allProperties]
-      
-      // 区域筛选 (使用更新后的state)
-      if (this.selectedLocations.length > 0) {
-        filtered = filtered.filter(property => {
-          return this.selectedLocations.some(location => {
-            if (location.type === 'suburb') {
-              return property.suburb && 
-                property.suburb.toLowerCase() === location.name.toLowerCase()
-            } else if (location.type === 'postcode') {
-              const propertyPostcode = property.postcode ? 
-                Math.floor(property.postcode).toString() : ''
-              return propertyPostcode === location.name
-            }
-            return false
-          })
-        })
-      }
-      
-      // 文本搜索
-      if (this.searchQuery) {
-        const searchTerm = this.searchQuery.toLowerCase()
-        filtered = filtered.filter(property =>
-          (property.address || '').toLowerCase().includes(searchTerm) ||
-          (property.suburb || '').toLowerCase().includes(searchTerm) ||
-          (property.postcode || '').toString().includes(searchTerm)
-        )
-      }
-      
-      // 价格筛选
-      if (filters.minPrice !== null && filters.minPrice !== undefined) {
-        filtered = filtered.filter(property => 
-          property.rent_pw && parseInt(property.rent_pw) >= filters.minPrice
-        )
-      }
-      
-      if (filters.maxPrice !== null && filters.maxPrice !== undefined) {
-        filtered = filtered.filter(property => 
-          property.rent_pw && parseInt(property.rent_pw) <= filters.maxPrice
-        )
-      }
-      
-      // 卧室筛选 - 处理多选
-      if (filters.bedrooms && filters.bedrooms !== '') {
-        const bedroomValues = typeof filters.bedrooms === 'string' 
-          ? filters.bedrooms.split(',').filter(v => v && v !== '')
-          : []
-        
-        // 检查是否选择了所有卧室选项（等同于不筛选）
-        const allBedroomOptions = ['1', '2', '3', '4+']
-        const isAllSelected = allBedroomOptions.every(opt => bedroomValues.includes(opt))
-        
-        if (bedroomValues.length > 0 && !isAllSelected) {
-          filtered = filtered.filter(property => {
-            const beds = property.bedrooms || 0
-            
-            return bedroomValues.some(value => {
-              if (value === 'studio/1') {
-                return beds === 0 || beds === 1
-              } else if (value.includes('+')) {
-                const minBeds = parseInt(value)
-                return beds >= minBeds
-              } else {
-                return beds === parseInt(value)
-              }
-            })
-          })
-        }
-      }
-      
-      // 浴室筛选 - 处理多选
-      if (filters.bathrooms && filters.bathrooms !== '') {
-        const bathroomValues = typeof filters.bathrooms === 'string'
-          ? filters.bathrooms.split(',').filter(v => v && v !== '')
-          : []
-        
-        // 检查是否选择了所有浴室选项（等同于不筛选）
-        const allBathroomOptions = ['1', '2', '3+']
-        const isAllSelected = allBathroomOptions.every(opt => bathroomValues.includes(opt))
-        
-        if (bathroomValues.length > 0 && !isAllSelected) {
-          filtered = filtered.filter(property => {
-            const baths = property.bathrooms || 0
-            
-            return bathroomValues.some(value => {
-              if (value.includes('+')) {
-                const minBaths = parseInt(value)
-                return baths >= minBaths
-              } else {
-                return baths === parseInt(value)
-              }
-            })
-          })
-        }
-      }
-      
-      // 车位筛选 - 处理多选
-      if (filters.parking && filters.parking !== '') {
-        const parkingValues = typeof filters.parking === 'string'
-          ? filters.parking.split(',').filter(v => v && v !== '')
-          : []
-        
-        // 检查是否选择了所有车位选项（等同于不筛选）
-        const allParkingOptions = ['0', '1', '2+']
-        const isAllSelected = allParkingOptions.every(opt => parkingValues.includes(opt))
-        
-        if (parkingValues.length > 0 && !isAllSelected) {
-          filtered = filtered.filter(property => {
-            const parking = property.parking_spaces || 0
-            
-            return parkingValues.some(value => {
-              if (value.includes('+')) {
-                const minParking = parseInt(value)
-                return parking >= minParking
-              } else {
-                return parking === parseInt(value)
-              }
-            })
-          })
-        }
-      }
-      
-      // 入住日期筛选
-      if (filters.date_from) {
-        const startDate = new Date(filters.date_from)
-        startDate.setHours(0, 0, 0, 0) // 标准化到当天的开始
-        filtered = filtered.filter(property => {
-          if (!property.available_date) return true // 如果房源没有可用日期，暂时不筛选掉
-          const propertyDate = new Date(property.available_date)
-          return propertyDate >= startDate
-        })
-      }
-
-      if (filters.date_to) {
-        const endDate = new Date(filters.date_to)
-        endDate.setHours(23, 59, 59, 999) // 标准化到当天的结束
-        filtered = filtered.filter(property => {
-          if (!property.available_date) return false // 如果没有可用日期，则不符合结束日期筛选
-          const propertyDate = new Date(property.available_date)
-          return propertyDate <= endDate
-        })
-      }
-      
-      // 家具筛选
-      if (filters.isFurnished) {
-        filtered = filtered.filter(property => property.is_furnished === true)
-      }
-      
-      // 仅作为本地备用时使用
-      this.filteredProperties = filtered.slice(0, 20) // 只显示前20条
-      this.totalCount = filtered.length // 本地筛选的总数
-      this.currentPage = 1 // 重置到第一页
-      
+      // 不再使用本地数据，直接调用API筛选
+      // 这样可以确保数据始终是最新的，并且遵守is_active过滤
+      return this.applyFilters(filters)
     },
 
     // 设置搜索查询
@@ -602,16 +413,13 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 重置筛选条件
     async resetFilters() {
-      // 确保有数据
-      if (this.allProperties.length === 0) {
-        await this.fetchProperties()
-      }
-      
-      this.filteredProperties = [...this.allProperties]
+      // 清空筛选条件并重新从API加载数据
       this.searchQuery = ''
       this.selectedLocations = []
       this.currentPage = 1
-      this.totalCount = this.allProperties.length
+      
+      // 重新获取未筛选的数据
+      await this.fetchProperties()
     },
 
     // 记录浏览历史

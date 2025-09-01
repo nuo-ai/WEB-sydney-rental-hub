@@ -127,6 +127,10 @@ def get_all_properties_from_db(
     count_select_clause = "SELECT COUNT(*) FROM properties"
     
     conditions = []
+    
+    # 始终只返回活跃的房源（修复：GraphQL也需要过滤下架房源）
+    conditions.append("is_active = TRUE")
+    
     # Build conditions and params for both data and count queries
     # Ensure params_data and params_count are populated identically for the WHERE clause
     if suburb:

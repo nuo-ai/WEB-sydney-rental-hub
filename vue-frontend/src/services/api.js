@@ -41,6 +41,17 @@ const setCachedData = (key, data) => {
   }
 }
 
+// 清除所有缓存（用于调试或强制刷新）
+const clearAllCache = () => {
+  cache.clear()
+  console.log('API缓存已清除')
+}
+
+// 暴露到window对象方便调试
+if (typeof window !== 'undefined') {
+  window.clearAPICache = clearAllCache
+}
+
 // 请求拦截器
 apiClient.interceptors.request.use(
   (config) => {
@@ -392,5 +403,6 @@ export const transportAPI = {
   }
 };
 
-// 导出默认API客户端
+// 导出API客户端和工具函数
+export { clearAllCache }
 export default apiClient

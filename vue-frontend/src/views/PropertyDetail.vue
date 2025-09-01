@@ -125,7 +125,7 @@
               <!-- 静态地图作为后备 -->
               <img 
                 v-if="showStaticMap"
-                :src="`https://maps.googleapis.com/maps/api/staticmap?center=${property.latitude},${property.longitude}&zoom=15&size=600x250&markers=color:red%7C${property.latitude},${property.longitude}&key=AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU`"
+                :src="staticMapUrl"
                 alt="Property Location"
                 class="static-map-image"
                 @error="handleStaticMapError"
@@ -385,6 +385,22 @@ const visibleFeatures = computed(() => {
 const mapHeight = computed(() => {
   // Responsive map height - 使用固定值而不是动态计算
   return '250px'
+})
+
+// 生成静态地图 URL（使用环境变量中的 API 密钥）
+const staticMapUrl = computed(() => {
+  if (!property.value) return ''
+  
+  // 从环境变量获取 API 密钥（安全实践：不硬编码密钥）
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+  
+  if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
+    console.warn('Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file')
+    return ''
+  }
+  
+  const { latitude, longitude } = property.value
+  return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x250&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`
 })
 
 // 方法

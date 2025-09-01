@@ -72,8 +72,16 @@ const staticMapUrl = computed(() => {
   const zoom = props.zoom
   const center = `${props.latitude},${props.longitude}`
   const marker = `markers=color:red%7C${center}`
-  // 使用免费的OpenStreetMap静态地图服务
-  return `https://maps.googleapis.com/maps/api/staticmap?center=${center}&zoom=${zoom}&size=${size}&${marker}&key=${GOOGLE_MAPS_API_KEY}`
+  
+  // 从环境变量获取 API 密钥（安全实践）
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+  
+  if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
+    console.warn('Google Maps API key not configured')
+    return ''
+  }
+  
+  return `https://maps.googleapis.com/maps/api/staticmap?center=${center}&zoom=${zoom}&size=${size}&${marker}&key=${apiKey}`
 })
 
 // 处理静态地图加载失败
@@ -104,7 +112,15 @@ const loadGoogleMaps = () => {
     // Create a new promise for loading
     window.googleMapsLoadPromise = new Promise((resolveLoad, rejectLoad) => {
       const script = document.createElement('script')
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDR-IqWUXtp64-Pfp09FwGvFHnbKjMNuqU'
+      // 从环境变量获取 API 密钥（不再使用硬编码的后备密钥）
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+      
+      if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
+        console.error('Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file')
+        rejectLoad(new Error('API key not configured'))
+        return
+      }
+      
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
       script.async = true
       script.defer = true

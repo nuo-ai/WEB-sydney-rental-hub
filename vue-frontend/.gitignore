@@ -14,6 +14,12 @@ dist-ssr
 coverage
 *.local
 
+# Environment files (包含敏感信息)
+.env
+.env.local
+.env.production
+.env.development
+
 /cypress/videos/
 /cypress/screenshots/
 

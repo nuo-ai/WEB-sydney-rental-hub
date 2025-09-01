@@ -10,7 +10,7 @@ https://www.domain.com.au/rent/glebe-nsw-2037/apartment/?price=300-2500&excluded
 https://www.domain.com.au/rent/redfern-nsw-2016/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/camperdown-nsw-2050/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/forest-lodge-nsw-2037/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
-#https://www.domain.com.au/rent/surry-hills-nsw-2010/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
+https://www.domain.com.au/rent/surry-hills-nsw-2010/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/newtown-nsw-2042/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/erskineville-nsw-2043/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/darlington-nsw-2008/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
@@ -34,3 +34,5 @@ https://www.domain.com.au/rent/wolli-creek-nsw-2205/apartment/?price=300-2500&ex
 https://www.domain.com.au/rent/burwood-nsw-2134/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/hurstville-nsw-2220/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=price-asc
 https://www.domain.com.au/rent/parramatta-nsw-2150/apartment/?price=300-2500&excludedeposittaken=1&ssubs=0&sort=dateupdated-desc
+
+
