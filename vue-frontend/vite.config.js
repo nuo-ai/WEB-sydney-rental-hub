@@ -22,7 +22,7 @@ export default defineConfig({
     host: true, // 监听所有地址
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://172.31.16.1:8000',  // 使用 Windows 主机 IP
         changeOrigin: true,
         secure: false
       }

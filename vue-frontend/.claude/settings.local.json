@@ -9,7 +9,11 @@
       "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend/**)",
       "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend\\api/**)",
       "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend/**)",
-      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\database/**)"
+      "Read(C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\database/**)",
+      "Read(/mnt/c/Users/nuoai/Desktop/WEB-sydney-rental-hub/**)",
+      "Read(/mnt/c/Users/nuoai/Desktop/WEB-sydney-rental-hub/**)",
+      "Read(/mnt/c/Users/nuoai/Desktop/WEB-sydney-rental-hub/backend/**)",
+      "Read(/mnt/c/Users/nuoai/Desktop/WEB-sydney-rental-hub/scripts/**)"
     ],
     "deny": [],
     "ask": []

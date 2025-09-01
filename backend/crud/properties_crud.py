@@ -3,6 +3,7 @@ import os
 import datetime
 from dotenv import load_dotenv
 import logging
+from db import get_db_connection, release_db_connection  # 使用共享的连接池
 from typing import List, Optional, Dict, Any, Tuple
 import strawberry # Required for strawberry.ID if used in type hints here, or Property type
 from models.property_models import Property # Adjusted import path
@@ -46,29 +47,7 @@ def _map_row_to_property_info_for_commute(prop: Property) -> PropertyInfoForComm
         images=prop.images
     )
 
-def get_db_connection():
-    """Establishes a connection to the PostgreSQL database."""
-    try:
-        # Try DATABASE_URL first (for cloud databases like Supabase)
-        database_url = os.getenv("DATABASE_URL")
-        if database_url:
-            logging.info("Using DATABASE_URL for connection")
-            conn = psycopg2.connect(database_url)
-        else:
-            # Fallback to individual environment variables
-            logging.info("Using individual DB environment variables")
-            conn = psycopg2.connect(
-                dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USER"),
-                password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT")
-            )
-        logging.info("Database connection successful.")
-        return conn
-    except psycopg2.Error as e:
-        logging.error(f"Error connecting to the database in CRUD: {e}")
-        raise
+# 已移除本地的 get_db_connection，使用 db.py 中的连接池版本
 
 def get_all_properties_from_db(
     suburb: Optional[str] = None,
@@ -268,7 +247,7 @@ def get_all_properties_from_db(
         return {"items": [], "totalCount": 0}
     finally:
         if conn:
-            conn.close()
+            release_db_connection(conn)
     return {"items": properties_list, "totalCount": total_count}
 
 def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
@@ -319,7 +298,7 @@ def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
         logging.error(f"Error fetching property by ID {listing_id}: {e}")
     finally:
         if conn:
-            conn.close()
+            release_db_connection(conn)
     return prop
 
 def get_properties_near_location_from_db(
@@ -415,7 +394,7 @@ def get_properties_near_location_from_db(
         return {"items": [], "totalCount": 0}
     finally:
         if conn:
-            conn.close()
+            release_db_connection(conn)
     return {"items": properties_list, "totalCount": total_count}
 
 # New function starts here
@@ -656,6 +635,6 @@ def fetch_university_commute_profile_data(
         return None
     finally:
         if conn:
-            conn.close()
+            release_db_connection(conn)
             
     return profile_result
