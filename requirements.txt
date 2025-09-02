@@ -37,3 +37,4 @@ httpx
 
 # Task Queue
 celery
+asyncpg

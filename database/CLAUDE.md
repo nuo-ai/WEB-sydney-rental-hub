@@ -24,7 +24,7 @@ python auto_optimize_indexes.py
 ## 架构说明
 
 ### 数据流程
-1. **数据源**: 爬虫生成的CSV文件 (位于 `../dist/output/*_results.csv`)
+1. **数据源**: 爬虫生成的CSV文件 (位于 `../crawler/output/*.csv`)
 2. **ETL处理**: `update_database.py` 负责增量更新
    - 识别新增房源并插入
    - 更新已存在房源的信息

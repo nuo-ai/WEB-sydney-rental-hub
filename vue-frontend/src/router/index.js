@@ -16,6 +16,12 @@ const router = createRouter({
       props: true
     },
     {
+      path: '/details-new/:id',
+      name: 'PropertyDetailNew',
+      component: () => import('../views/PropertyDetailNew.vue'),
+      props: true
+    },
+    {
       path: '/favorites',
       name: 'favorites',
       component: () => import('../views/Favorites.vue'),

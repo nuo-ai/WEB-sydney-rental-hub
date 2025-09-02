@@ -579,13 +579,20 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Domain.com.au 像素级还原样式 */
+/* Domain.com.au 像素级还原样式 - 基于Figma精确设计 */
 @import '@/assets/design-tokens.css';
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: #ffffff;  /* 页面背景改为白色 */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f0f2f5;  /* PC端灰色背景 */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* PC端背景 */
+@media (min-width: 1200px) {
+  .property-detail-page {
+    background: linear-gradient(to bottom, #000 0%, #000 600px, #f0f2f5 600px, #f0f2f5 100%);
+  }
 }
 
 /* 加载和错误状态 */
@@ -624,12 +631,12 @@ onMounted(async () => {
   background: white;
 }
 
-/* 图片区域 - Domain 精确尺寸 */
+/* 图片区域 - Figma 精确尺寸 */
 .image-header {
   position: relative;
   width: 100%;
   margin: 0 auto;
-  max-width: 1905px;
+  background: #000;
 }
 
 /* 返回按钮 - 左上角圆形 */
@@ -753,29 +760,37 @@ onMounted(async () => {
   }
 }
 
-/* 桌面尺寸 - Domain 精确规格 */
+/* 桌面尺寸 - Figma 精确规格 */
 @media (min-width: 1200px) {
   .image-container {
-    height: 592px; /* Domain 桌面端精确高度 */
+    height: 600px; /* 调整高度 */
+    max-width: 100%;
+    margin: 0;
   }
   
   .property-image {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* 保持图片比例 */
+    object-fit: cover;
     object-position: center;
-    background: #000; /* 黑色背景填充空白区域 */
   }
 }
 
-/* 超大屏幕 */
-@media (min-width: 1905px) {
+/* 超大屏幕 - 1920px设计稿 */
+@media (min-width: 1920px) {
   .image-header {
-    border-radius: 0; /* 确保无圆角 */
+    max-width: 1920px;
+    margin: 0 auto;
   }
   
   .image-container {
-    max-width: 1680px; /* 图片最大宽度 */
+    width: 100%;
+    max-width: 1920px;
+  }
+  
+  .content-container {
+    max-width: 1683px;
+    padding: 0;
     margin: 0 auto;
   }
 }
@@ -816,24 +831,48 @@ onMounted(async () => {
 }
 
 
-/* 内容容器 - PC端977px宽度居中 */
+/* 内容容器 - PC端1683px宽度居中 */
 .content-container {
-  padding: 0;
+  padding: 0 16px;
   margin: 0 auto;
-  background: #ffffff;  /* 背景改为白色 */
+  background: transparent;
   width: 100%;
-  max-width: 977px;
   position: relative;
+}
+
+/* PC端主内容区域 - 完全改变布局 */
+@media (min-width: 1200px) {
+  .content-container {
+    max-width: 1200px;
+    padding: 60px 0;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+  }
 }
 
 /* 信息卡片 - 白色背景带阴影 */
 .info-card {
   background: white;
-  padding: 20px 16px;
-  margin: 50px 0 0 0;  /* 距离图片底部50px */
-  min-height: 170px;  /* 固定高度170px */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border-bottom: 1px solid #e4e5e7;
+  padding: 24px 20px;
+  margin: 20px 0;
+  min-height: 180px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+}
+
+/* PC端信息卡片 - 巨大变化 */
+@media (min-width: 1200px) {
+  .info-card {
+    width: 100%;
+    margin: -100px 0 40px 0;
+    padding: 40px 48px;
+    background: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-radius: 16px;
+    position: relative;
+    z-index: 10;
+  }
 }
 
 /* 可用日期和押金信息 */
@@ -858,65 +897,115 @@ onMounted(async () => {
   font-weight: 400;
 }
 
-/* 价格显示 - 简洁风格 */
+/* 价格显示 - Figma精确样式 */
 .price-wrapper {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .price-text {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: #2e3a4b;
-  letter-spacing: -0.3px;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* PC端价格 - 超大字体 */
+@media (min-width: 1200px) {
+  .price-wrapper {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e4e5e7;
+  }
+  
+  .price-text {
+    font-size: 48px;
+    font-weight: 800;
+    color: #000;
+  }
 }
 
 /* 地址显示 */
 .address-wrapper {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .address-main {
-  font-size: 14px;
-  font-weight: 400;
-  color: #6e7881;
-  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e3a4b;
+  margin: 0 0 8px 0;
   line-height: 1.4;
+  font-family: 'Inter', sans-serif;
 }
 
 .address-subtitle {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
-  color: #999;
+  color: #6e7881;
   margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* PC端地址 */
+@media (min-width: 1200px) {
+  .address-main {
+    font-size: 22px;
+  }
+  
+  .address-subtitle {
+    font-size: 18px;
+  }
 }
 
 /* 房源特征 */
 .property-features {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 20px;
+  margin-bottom: 0;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+}
+
+.feature-item .el-icon {
+  color: #6e7881;
 }
 
 .feature-value {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #2e3a4b;
+  font-family: 'Inter', sans-serif;
 }
 
 .feature-type {
-  margin-left: 8px;
-  padding-left: 16px;
+  margin-left: 12px;
+  padding-left: 20px;
   border-left: 1px solid #d0d3d9;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #6e7881;
+  font-family: 'Inter', sans-serif;
+}
+
+/* PC端特征 */
+@media (min-width: 1200px) {
+  .property-features {
+    gap: 24px;
+  }
+  
+  .feature-value {
+    font-size: 20px;
+  }
+  
+  .feature-type {
+    font-size: 20px;
+  }
 }
 
 
@@ -986,17 +1075,39 @@ onMounted(async () => {
 
 /* 位置部分 */
 .location-section {
-  padding: 20px 16px;
+  padding: 24px 20px;
   background: white;
-  margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* PC端位置部分 - 大改 */
+@media (min-width: 1200px) {
+  .location-section {
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 40px 48px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .section-title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: #2e3a4b;
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* PC端标题 */
+@media (min-width: 1200px) {
+  .section-title {
+    font-size: 24px;
+    margin: 0 0 24px 0;
+  }
 }
 
 .map-wrapper {
@@ -1006,11 +1117,19 @@ onMounted(async () => {
 .map-container {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 250px;
   border-radius: 8px;
   overflow: hidden;
   background: #e8e8e8;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+/* PC端地图容器 */
+@media (min-width: 1200px) {
+  .map-container {
+    height: 360px; /* Figma地图高度 */
+    border-radius: 12px;
+  }
 }
 
 .static-map-image {
@@ -1055,17 +1174,31 @@ onMounted(async () => {
 
 /* Property Description 部分 */
 .description-section {
-  padding: 24px 16px;
+  padding: 24px 20px;
   background: white;
-  margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* PC端描述部分 - 大改 */
+@media (min-width: 1200px) {
+  .description-section {
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 40px 48px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .description-section .section-title {
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 700;
-  color: #2e3a4b;
-  margin: 0 0 20px 0;
+  color: #60606D;
+  margin: 0 0 24px 0;
+  font-family: 'Inter', sans-serif;
 }
 
 .description-content {
@@ -1137,10 +1270,23 @@ onMounted(async () => {
 
 /* Property Features 部分 - 两列布局 */
 .features-section {
-  padding: 24px 16px;
+  padding: 24px 20px;
   background: white;
-  margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* PC端特性部分 - 大改 */
+@media (min-width: 1200px) {
+  .features-section {
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 40px 48px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .features-section .section-title {
@@ -1153,8 +1299,15 @@ onMounted(async () => {
 .features-two-column {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 20px;
+  gap: 60px;
+  margin-bottom: 24px;
+}
+
+/* PC端特性列表 */
+@media (min-width: 1200px) {
+  .features-two-column {
+    gap: 100px;
+  }
 }
 
 .feature-column {
@@ -1164,10 +1317,12 @@ onMounted(async () => {
 }
 
 .feature-list-item {
-  font-size: 16px;
-  color: #6e7881;
-  padding: 8px 0;
-  line-height: 1.4;
+  font-size: 15px;
+  color: #7F8194;
+  padding: 10px 0;
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
 }
 
 .view-less-btn {
@@ -1196,17 +1351,31 @@ onMounted(async () => {
 
 /* Inspection Times 部分 - Figma设计 */
 .inspection-section {
-  padding: 24px 16px;
+  padding: 24px 20px;
   background: white;
-  margin-top: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin: 20px 0 80px 0;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* PC端检查时间部分 - 大改 */
+@media (min-width: 1200px) {
+  .inspection-section {
+    width: 100%;
+    margin: 0 0 80px 0;
+    padding: 40px 48px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
 }
 
 .inspection-section .section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #2e3a4b;
-  margin: 0 0 4px 0;
+  font-size: 23px;
+  font-weight: 700;
+  color: #4C5267;
+  margin: 0 0 24px 0;
+  font-family: 'Inter', sans-serif;
 }
 
 .inspection-section .section-subtitle {
@@ -1219,19 +1388,36 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid #e4e5e7;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+/* PC端检查列表 - 网格布局 */
+@media (min-width: 1200px) {
+  .inspection-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
 }
 
 .inspection-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  padding: 20px;
   background: white;
-  border-bottom: 1px solid #e4e5e7;
+  border: 1px solid #D0D3D9;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* PC端检查项 */
+@media (min-width: 1200px) {
+  .inspection-item {
+    height: 72px;
+    padding: 16px 20px;
+    margin-bottom: 0;
+  }
 }
 
 .inspection-item:last-child {
@@ -1243,15 +1429,18 @@ onMounted(async () => {
 }
 
 .date-day {
-  font-size: 14px;
-  font-weight: 600;
-  color: #2e3a4b;
+  font-size: 15px;
+  font-weight: 700;
+  color: #6E7385;
   margin-bottom: 4px;
+  font-family: 'Inter', sans-serif;
 }
 
 .date-time {
-  font-size: 14px;
-  color: #6e7881;
+  font-size: 15px;
+  color: #7F8194;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
 }
 
 .add-to-calendar-btn {
@@ -1274,19 +1463,29 @@ onMounted(async () => {
 
 .add-to-planner-btn {
   width: 100%;
+  max-width: 305px;
+  height: 72px;
   padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   background: white;
-  border: 1px solid #e4e5e7;
+  border: 1px solid #D0D3D9;
   border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2e3a4b;
+  font-size: 15px;
+  font-weight: 700;
+  color: #6E7285;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+/* PC端添加到计划按钮 */
+@media (min-width: 1200px) {
+  .add-to-planner-btn {
+    margin: 20px auto 0;
+  }
 }
 
 .add-to-planner-btn:hover {
@@ -1312,6 +1511,13 @@ onMounted(async () => {
   gap: 12px;
   z-index: 100;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* PC端隐藏底部操作栏 */
+@media (min-width: 1200px) {
+  .action-footer {
+    display: none;
+  }
 }
 
 .action-btn {

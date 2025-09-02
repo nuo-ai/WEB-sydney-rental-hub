@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-Sydney Rental Hub（悉尼租房平台）- 为海外留学生提供高效的悉尼租房解决方案。
+JUWO 桔屋找房（澳洲留学生租房平台）- 为海外留学生提供高效的悉尼租房解决方案。
 
 技术栈：
+
 - **前端**: Vue 3 + Element Plus + Pinia + Vite
 - **后端**: FastAPI + PostgreSQL (Supabase)
 - **部署**: 本地开发环境
@@ -14,6 +15,7 @@ Sydney Rental Hub（悉尼租房平台）- 为海外留学生提供高效的悉�
 ## 开发命令
 
 ### 前端开发
+
 ```bash
 # 启动开发服务器 (http://localhost:5173)
 npm run dev
@@ -29,6 +31,7 @@ npm run format
 ```
 
 ### 后端开发
+
 ```bash
 # 启动后端API服务器 (http://localhost:8000)
 python ../scripts/run_backend.py
@@ -40,6 +43,7 @@ cd ../backend && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ## 核心架构
 
 ### 前端架构
+
 ```
 src/
 ├── views/              # 页面组件
@@ -56,6 +60,7 @@ src/
 ```
 
 ### 后端架构
+
 ```
 backend/
 ├── main.py           # FastAPI应用入口（JWT认证、分页、缓存）
@@ -66,6 +71,7 @@ backend/
 ```
 
 ### 数据流
+
 1. **列表页加载**: HomeView -> properties.fetchProperties() -> API服务端分页 -> 虚拟滚动展示
 2. **详情页加载**: PropertyDetail -> properties.fetchPropertyDetail() -> 优先显示缓存 -> API获取完整数据
 3. **筛选流程**: FilterPanel -> applyFilters() -> 服务端筛选 -> 更新列表
@@ -73,30 +79,35 @@ backend/
 ## 关键特性
 
 ### 性能优化
+
 - **虚拟滚动**: 使用 @tanstack/vue-virtual 处理大量房源列表
 - **服务端分页**: 默认每页20条，支持动态调整
 - **智能缓存**: 详情页优先展示已有数据，避免白屏
 - **API代理**: 开发环境自动代理到后端服务
 
 ### 状态管理 (Pinia)
+
 - **filteredProperties**: 当前页房源数据（服务端分页结果）
 - **currentProperty**: 当前查看的房源详情
 - **favoriteIds**: 收藏列表（localStorage临时存储）
 - **分页状态**: currentPage, pageSize, totalCount, hasNext/hasPrev
 
 ### API规范
+
 - 统一响应格式: `{ status, data, pagination, error }`
 - 分页参数: `page`, `page_size`
 - 筛选参数: `suburb`, `min_price`, `max_price`, `bedrooms`, `property_type`
 
 ## 开发规范
 
-### 代码风格
+### 代码注释
+
 - 使用中文注释，解释"为什么"而非"什么"
 - 遵循现有代码风格，不做大规模重构
 - 保持组件简洁，单一职责
 
 ### 提交前检查
+
 ```bash
 # 运行代码检查
 npm run lint
@@ -106,6 +117,7 @@ npm run format
 ```
 
 ### 调试技巧
+
 - Vue DevTools 已集成，可查看组件状态和Pinia store
 - 后端API文档: http://localhost:8000/docs
 - 网络请求通过 /api 代理到后端

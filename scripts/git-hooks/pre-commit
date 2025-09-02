@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "🔎 Pre-commit checks: lint + typecheck"
+
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$PROJECT_ROOT"
+
+# 1) Frontend ESLint (reuses existing script logic)
+if [ -d "vue-frontend" ]; then
+  echo "• Frontend: ESLint"
+  (cd vue-frontend && npm run -s lint)
+fi
+
+# 2) TypeScript typecheck for MCP server (no emit)
+if [ -d "mcp-server" ]; then
+  echo "• MCP Server: TypeScript typecheck"
+  if [ -f "mcp-server/node_modules/typescript/bin/tsc" ]; then
+    (cd mcp-server && node node_modules/typescript/bin/tsc --noEmit)
+  else
+    # Fallback to normal build if local tsc not found
+    (cd mcp-server && npm run -s build)
+  fi
+fi
+
+# 3) Python syntax check (fast, no dependencies)
+echo "• Python: syntax check (compileall)"
+python -m compileall -q backend scripts database crawler || {
+  echo "❌ Python syntax errors detected";
+  exit 1;
+}
+
+# 4) Extra local checks (if you maintain scripts/pre-commit.sh)
+if [ -f "scripts/pre-commit.sh" ]; then
+  echo "• Running extra repo checks (scripts/pre-commit.sh)"
+  bash scripts/pre-commit.sh || {
+    echo "❌ scripts/pre-commit.sh failed";
+    exit 1;
+  }
+fi
+
+echo "✅ All pre-commit checks passed"
