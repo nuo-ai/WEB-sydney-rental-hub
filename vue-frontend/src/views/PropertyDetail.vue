@@ -551,7 +551,7 @@ onMounted(async () => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: #ffffff;  /* 统一为白色背景 */
+  background-color: var(--color-bg-page);  /* 统一与全局页面背景 */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -681,14 +681,14 @@ onMounted(async () => {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #ffffff;
-  border: 1px solid #d0d3d9;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
   font-weight: 500;
-  color: #6e7086;
+  color: var(--color-text-secondary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
@@ -749,8 +749,8 @@ onMounted(async () => {
   }
 
   .content-container {
-    max-width: 1683px;
-    padding: 0;
+    max-width: 1200px;
+    padding: 0 32px;
     margin: 0 auto;
   }
 }
@@ -804,7 +804,7 @@ onMounted(async () => {
 @media (min-width: 1200px) {
   .content-container {
     max-width: 1200px;
-    padding: 60px 0;
+    padding: 60px 32px;
     margin: 0 auto;
     position: relative;
     z-index: 5;
@@ -979,14 +979,14 @@ onMounted(async () => {
   padding: var(--space-3-5) var(--space-4);
   margin-top: var(--space-4);
   background: var(--bg-base);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--color-border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
   display: flex;
   align-items: center;
   gap: var(--space-3-5);
   cursor: pointer;
-  transition: var(--transition-all);
+  transition: all 0.2s ease;
   text-align: left;
 }
 
@@ -1062,7 +1062,7 @@ onMounted(async () => {
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #2e3a4b;
+  color: var(--color-text-primary);
   margin: 0 0 20px 0;
   font-family: 'Inter', sans-serif;
 }
@@ -1162,7 +1162,7 @@ onMounted(async () => {
 .description-section .section-title {
   font-size: 23px;
   font-weight: 700;
-  color: #60606D;
+  color: var(--color-text-primary);
   margin: 0 0 24px 0;
   font-family: 'Inter', sans-serif;
 }
@@ -1174,7 +1174,7 @@ onMounted(async () => {
 .description-text {
   font-size: 14px;
   line-height: 1.6;
-  color: #6e7881;
+  color: var(--color-text-secondary);
   max-height: 120px;
   overflow: hidden;
   transition: max-height 0.3s ease;
@@ -1191,7 +1191,7 @@ onMounted(async () => {
 
 .description-headline {
   font-weight: 700 !important;
-  color: #2e3a4b !important;
+  color: var(--color-text-primary) !important;
 }
 
 .description-text::after {
@@ -1219,19 +1219,19 @@ onMounted(async () => {
   display: inline-block;
   margin-top: 16px;
   padding: 6px 14px;
-  border: 1px solid #d0d3d9;
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   background: white;
   font-size: 14px;
   font-weight: 600;
-  color: #2e3a4b;
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .read-more-btn:hover {
   background: #f5f6f7;
-  border-color: #6e7881;
+  border-color: var(--color-text-secondary);
 }
 
 /* Property Features 部分 - 两列布局 */
@@ -1259,7 +1259,7 @@ onMounted(async () => {
 .features-section .section-title {
   font-size: 24px;
   font-weight: 700;
-  color: #2e3a4b;
+  color: var(--color-text-primary);
   margin: 0 0 20px 0;
 }
 
@@ -1279,7 +1279,7 @@ onMounted(async () => {
 
 .feature-list-item {
   font-size: 15px;
-  color: #7F8194;
+  color: var(--color-text-secondary);
   line-height: 1.5;
   font-family: 'Inter', sans-serif;
   font-weight: 400;
@@ -1339,7 +1339,7 @@ onMounted(async () => {
 .inspection-section .section-title {
   font-size: 23px;
   font-weight: 700;
-  color: #4C5267;
+  color: var(--color-text-primary);
   margin: 0 0 24px 0;
   font-family: 'Inter', sans-serif;
 }
@@ -1372,7 +1372,7 @@ onMounted(async () => {
   align-items: center;
   padding: 20px;
   background: white;
-  border: 1px solid #D0D3D9;
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   margin-bottom: 8px;
 }
@@ -1397,14 +1397,14 @@ onMounted(async () => {
 .date-day {
   font-size: 15px;
   font-weight: 700;
-  color: #6E7385;
+  color: var(--color-text-secondary);
   margin-bottom: 4px;
   font-family: 'Inter', sans-serif;
 }
 
 .date-time {
   font-size: 15px;
-  color: #7F8194;
+  color: var(--color-text-secondary);
   font-family: 'Inter', sans-serif;
   font-weight: 400;
 }
@@ -1412,7 +1412,7 @@ onMounted(async () => {
 .add-to-calendar-btn {
   width: 40px;
   height: 40px;
-  border: 1px solid #e4e5e7;
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   background: white;
   display: flex;
@@ -1437,11 +1437,11 @@ onMounted(async () => {
   justify-content: center;
   gap: 8px;
   background: white;
-  border: 1px solid #D0D3D9;
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   font-size: 15px;
   font-weight: 700;
-  color: #6E7285;
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;

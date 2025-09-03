@@ -85,3 +85,18 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 实施建议：
   - 在后端添加契约单元测试/契约快照测试，校验两个端点的字段一致性（至少对关键字段如 `inspection_times`）。
   - 在 PR 审查清单中加入“端点字段一致性检查”项。
+
+## 前端样式一致性（新增）
+
+- 页面背景与卡片
+  - 页面背景统一使用 `var(--color-bg-page)`，卡片/表面背景使用 `var(--color-bg-card)`，保持“页灰 + 卡片白”的视觉层次与列表页一致。
+- 栅格与容器
+  - 桌面端（≥1200px）统一容器 `max-width: 1200px`，左右内边距 `32px`；1920px 超宽断点仅居中不改变主容器宽度，避免“另一套主题”的观感。
+- 设计令牌约束
+  - 禁止硬编码颜色/边框/阴影/字号，统一使用 `src/style.css` 中的 tokens：如 `var(--color-text-primary/secondary)`, `var(--color-border-default)`, `var(--juwo-primary)` 等。
+  - 新增/引用 CSS 变量时，必须先在 `:root`（`src/style.css`）声明再使用；禁止使用未定义变量（避免样式回退）。
+  - 对详情页使用到的 tokens 已补齐映射：如 `--space-*`, `--bg-*`, `--shadow-xs`, `--brand-primary`, `--text-*`, `--link-color`。
+- 断点与响应式
+  - 统一断点：`768px`（平板）、`1200px`（桌面）、`1920px`（超宽）。优先小范围覆盖，避免在断点内“大改”造成体系分裂。
+- 兼容性原则
+  - 样式调整不得修改组件逻辑与数据流；以最小变更保证与首页风格、节奏一致。

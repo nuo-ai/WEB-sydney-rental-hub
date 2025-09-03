@@ -1,7 +1,7 @@
 # 🏠 Sydney Rental Hub - 项目主索引
 
 > **最后更新**: 2025-09-03 (Memory Bank完成全面精简)
-> **重要更新**: 虚拟滚动成功启用，渲染性能提升83%; Memory Bank文件精简完成
+> **重要更新**: 虚拟滚动成功启用，渲染性能提升83%; Memory Bank文件精简完成; PC 详情页样式统一（页灰卡白、1200px 容器、左右 32px 内边距、全局 tokens 对齐）
 > **用途**: 快速导航和定位项目所有重要文件和功能
 
 ---
@@ -83,6 +83,7 @@ src/
 | `/api/auth/register` | POST | 用户注册 | JWT令牌 |
 | `/api/user/addresses` | POST | 地址持久化 | localStorage |
 | `/graphql` | ALL | 灵活数据查询 | 不适用于AI工具 |
+| `/api/cache/invalidate` | GET | 缓存失效（测试/调试） | 测试环境 |
 
 **禁止** ❌: 前端调用AI工具的Express服务器 (`localhost:3001`)
 
@@ -92,7 +93,7 @@ src/
 
 - ✅ **Vue前端**: `http://localhost:5173` (虚拟DOM + 响应式)
 - ✅ **Python后端**: `http://localhost:8000` (FastAPI + GraphQL)
-- ✅ **3数据规模**: 3456条房源数据，2000+活跃记录
+- ✅ 数据规模: 3456条房源数据
 - ✅ **4性能优化**: 虚拟滚动 + API缓存 + 数据库索引
 - ✅ **5搜索功能**: 全量数据搜索89号，相邻区域推荐
 - ✅ **6筛选系统**: 单选逻辑 + 服务端筛选 + 区域联动

@@ -29,13 +29,13 @@ vue-frontend/
 
 ### JUWO品牌设计系统
 - **主色**: #FF5824 (橙色)
-- **板本高度**: 统一6px圆角
+- **统一圆角**: 6px（组件设计令牌）
 - **标准房源卡片**: 580px宽度
 - **布局对齐**: 1200px最大宽度，32px间距
 
 ### API集成架构
-- **代理配置**: Vite将`/api`请求转发到`http://172.31.16.1:8000`
-- **拦截器**: 自动携带JWT认证头 (需要时实现)
+- **代理配置**: 默认将`/api`转发到 `http://localhost:8000`；在 WSL/容器环境可通过环境变量 `VITE_API_TARGET` 切换为 `http://172.31.16.1:8000`
+- **拦截器**: 自动携带JWT认证头（按需启用；已具备框架基础）
 - **响应格式**: 统一`{status, data, pagination, error}`结构
 
 ---
@@ -67,7 +67,7 @@ python scripts/run_backend.py  # localhost:8000
 **当前运行状态**:
 - ✅ Vue前端: 正常运行 (虚拟DOM + 响应式系统)
 - ✅ Python后端: 正常运行 (FastAPI + GraphQL)
-- ✅ 数据库连接: 正常 (2000+房源数据)
+- ✅ 数据库连接: 正常 (3456条示例数据；会随导入更新)
 - ✅ CORS代理: 配置完成
 - ✅ 地图服务: OpenStreetMap备选
 - ✅ 认证系统: JWT + 邮箱验证框架
@@ -84,3 +84,10 @@ python scripts/run_backend.py  # localhost:8000
 - API响应格式统一 (description字段问题)
 - 服务端分页完整迁移
 - 代码注释规范建立
+- PC 详情页风格一致性：统一背景/容器/内边距；替换硬编码为全局 tokens；在 src/style.css 补齐缺失变量映射
+
+## 样式系统更新（2025-09-03）
+
+- 在 `src/style.css` 的 `:root` 补充变量映射：`--space-1-5`, `--space-3`, `--space-3-5`, `--space-4`, `--space-6`, `--text-xs`, `--text-sm`, `--text-base`, `--text-lg`, `--font-semibold`, `--bg-base`, `--bg-hover`, `--bg-secondary`, `--radius-full`, `--shadow-xs`, `--brand-primary`, `--text-primary`, `--text-tertiary`, `--link-color`，与 JUWO 全局设计系统对齐。
+- 在 `PropertyDetail.vue` 统一使用全局 tokens：如 `var(--color-bg-page)`, `var(--color-text-*)`, `var(--color-border-default)`；移除未定义变量（如 `--transition-all`）以避免回退。
+- 统一 ≥1200px 与 1920px 断点的容器规范（`max-width: 1200px`, `padding: 0 32px`），与首页 Home 栅格一致，消除“另一套主题”观感。
