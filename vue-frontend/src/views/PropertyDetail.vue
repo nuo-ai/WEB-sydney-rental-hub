@@ -186,31 +186,17 @@
         </section>
 
         <!-- Inspection Times - 按Figma设计卡片式布局 -->
-        <section class="inspection-section">
+        <section v-if="inspectionTimes.length > 0" class="inspection-section">
           <h2 class="section-title">Inspection times</h2>
           <div class="inspection-list">
-            <div class="inspection-item">
+            <div
+              v-for="(inspection, index) in inspectionTimes"
+              :key="index"
+              class="inspection-item"
+            >
               <div class="inspection-date">
-                <div class="date-day">Monday, 1 Sep</div>
-                <div class="date-time">6:00am - 6:10am</div>
-              </div>
-              <button class="add-to-calendar-btn">
-                <el-icon><Calendar /></el-icon>
-              </button>
-            </div>
-            <div class="inspection-item">
-              <div class="inspection-date">
-                <div class="date-day">Tuesday, 2 Sep</div>
-                <div class="date-time">6:00am - 6:10am</div>
-              </div>
-              <button class="add-to-calendar-btn">
-                <el-icon><Calendar /></el-icon>
-              </button>
-            </div>
-            <div class="inspection-item">
-              <div class="inspection-date">
-                <div class="date-day">Wednesday, 3 Sep</div>
-                <div class="date-time">6:00am - 6:10am</div>
+                <div class="date-day">{{ inspection.date }}</div>
+                <div class="date-time">{{ inspection.time }}</div>
               </div>
               <button class="add-to-calendar-btn">
                 <el-icon><Calendar /></el-icon>
@@ -270,6 +256,7 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
+import { parseInspectionTime } from '@/utils/inspectionTimeParser'
 import {
   ArrowLeft, Share, Picture,
   Location, Calendar,
@@ -326,31 +313,65 @@ const isFavorite = computed(() => {
   return propertiesStore.favoriteIds.includes(property.value.listing_id)
 })
 
-const inspectionTimes = computed(() => {
-  if (!property.value || !property.value.inspection_times) return []
 
-  if (typeof property.value.inspection_times === 'string') {
-    const times = property.value.inspection_times.split(',').map(time => {
-      const parts = time.trim().split(' ')
-      return {
-        date: parts[0] || '',
-        time: parts.slice(1).join(' ') || ''
-      }
-    })
-    return times.slice(0, 1) // 只显示第一个
+const inspectionTimes = computed(() => {
+  if (!property.value || !property.value.inspection_times) return [];
+
+  const raw = property.value.inspection_times;
+  let times = [];
+
+  if (Array.isArray(raw)) {
+    // If it's an array of times, use it directly.
+    times = raw;
+  } else if (typeof raw === 'string' && raw.trim()) {
+    // If it's a single string, treat it as a single inspection time.
+    // Do NOT split by comma.
+    times = [raw];
   }
 
-  return []
-})
+  return times
+    .map(t => String(t || '').trim())
+    .filter(Boolean)
+    .map(parseInspectionTime);
+});
 
 const nextInspectionTime = computed(() => {
   if (inspectionTimes.value.length > 0) {
-    const inspection = inspectionTimes.value[0]
-    // 简化显示格式，例如 "Mon 6am"
-    return inspection.time || 'Soon'
+    const firstInspection = inspectionTimes.value[0];
+
+    if (firstInspection.date.toLowerCase().includes('appointment')) {
+      return 'By Appt.';
+    }
+
+    if (firstInspection.date.toLowerCase().includes('cancelled')) {
+      return 'Cancelled';
+    }
+
+    // Try to get a short day name (e.g., "Sat")
+    const dateParts = firstInspection.date.split(' ');
+    const day = dateParts.find(p => /^(mon|tue|wed|thu|fri|sat|sun)/i.test(p)) || dateParts[0] || '';
+
+    // Get the first part of the time string
+    const timeParts = firstInspection.time.split(' ');
+    let startTime = timeParts[0] || '';
+
+    // Remove ":00" to shorten, e.g. "10am" from "10:00am"
+    if (/\d{1,2}:\d{2}(am|pm)/.test(startTime)) {
+       startTime = startTime.replace(':00', '');
+    }
+
+    if (day && startTime && startTime !== 'Details') {
+      return `${day.slice(0, 3)} ${startTime}`; // e.g., "Sat 10am"
+    }
+
+    if (day) {
+        return day.slice(0,3);
+    }
+
+    return 'Details'; // Fallback
   }
-  return ''
-})
+  return ''; // No inspections
+});
 
 const mapHeight = computed(() => {
   // Responsive map height - 使用固定值而不是动态计算
@@ -423,11 +444,13 @@ const handleEmail = () => {
 
 const handleInspections = () => {
   if (inspectionTimes.value.length > 0) {
-    ElMessage.info('Inspection booking coming soon')
+    ElMessage.info('Inspection booking coming soon');
   } else {
-    ElMessage.info('No inspection times available')
+    // 根据用户反馈更新
+    ElMessage.info('可联系中介预约看房');
   }
-}
+};
+
 
 const handleImageError = (event) => {
   console.warn('Image load failed:', event.target.src)
@@ -1280,6 +1303,17 @@ onMounted(async () => {
   margin: 0 0 80px 0;
   border-radius: 0;
   box-shadow: none;
+}
+
+.no-inspection-times {
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  text-align: center;
+  color: #6c757d;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
 }
 
 /* PC端检查时间部分 - 大改 */
