@@ -147,13 +147,14 @@
         </section>
 
         <!-- Property Description -->
-        <section class="description-section">
+        <section class="description-section" v-if="property.property_headline || property.description">
           <h2 class="section-title">Property Description</h2>
 
           <div class="description-content">
             <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
-              <p class="description-headline">Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104</p>
-              <p>?? Fully Furnished 2 Bed 2 Bath in Maroubra! Big Balcony | Quiet Location | Direct Bus to UNSW</p>
+              <!-- 使用后端字段渲染，移除硬编码占位文本
+                   原因：与后端数据契约对齐（详情端点为超集），避免错误展示 -->
+              <p v-if="property.property_headline" class="description-headline">{{ property.property_headline }}</p>
               <p v-if="property.description">{{ property.description }}</p>
             </div>
             <button
@@ -166,7 +167,7 @@
         </section>
 
         <!-- Property Features - 两列布局 -->
-        <section class="features-section">
+        <section class="features-section" v-if="allFeatures.length > 0">
           <h2 class="section-title">Property Features</h2>
           <div class="features-two-column">
             <div
@@ -279,20 +280,72 @@ const showAllFeatures = ref(false)
 const showStaticMap = ref(false)
 const showAuthModal = ref(false)
 
-const allFeatures = [
-  'Ensuite(s)', 'Alarm System', 'Furnished', 'Gas', 'Fireplace(s)', 'Dishwasher',
-  'Energy efficient appliances', 'Rainwater storage tank', 'Shed', 'Garden / Courtyard',
-  'Secure Parking', 'Intercom', 'Built in wardrobes', 'Internal Laundry',
-  'Cable or Satellite', 'Broadband internet access', 'Bath', 'Separate Dining Room',
-  'Study', 'Heating'
-]
+/* 特征映射：以服务端数据为准，兼容多种JSON形态
+   为什么：消除前端硬编码，确保与后端事实数据一致且可扩展（系统契约一致性） */
+const BOOL_FEATURE_MAP = {
+  has_air_conditioning: 'Air conditioning',
+  is_furnished: 'Furnished',
+  has_balcony: 'Balcony',
+  has_dishwasher: 'Dishwasher',
+  has_laundry: 'Internal Laundry',
+  has_built_in_wardrobe: 'Built-in wardrobes',
+  has_gym: 'Gym',
+  has_pool: 'Pool',
+  has_parking: 'Parking',
+  allows_pets: 'Pets allowed',
+  has_security_system: 'Security system',
+  has_storage: 'Storage',
+  has_study_room: 'Study',
+  has_garden: 'Garden',
+  has_intercom: 'Intercom',
+  has_gas: 'Gas',
+  has_heating: 'Heating',
+  has_ensuite: 'Ensuite',
+  is_north_facing: 'North facing',
+  is_newly_built: 'Newly built',
+  has_water_view: 'Water view',
+}
+
+const allFeatures = computed(() => {
+  // 使用后端返回的数据替代硬编码，保证与数据源一致且可扩展
+  const p = property.value
+  const out = new Set()
+  if (!p) return []
+
+  // 1) 解析 property_features（可能是数组/对象/字符串）
+  const pf = p.property_features
+  if (Array.isArray(pf)) {
+    pf.forEach(item => {
+      const s = String(item || '').trim()
+      if (s) out.add(s)
+    })
+  } else if (pf && typeof pf === 'object') {
+    Object.entries(pf).forEach(([key, val]) => {
+      if (typeof val === 'boolean') {
+        if (val && BOOL_FEATURE_MAP[key]) out.add(BOOL_FEATURE_MAP[key])
+      } else if (val != null && String(val).trim() !== '') {
+        out.add(`${key.replace(/_/g, ' ')}: ${val}`)
+      }
+    })
+  } else if (typeof pf === 'string') {
+    pf.split(/[\n;,|]/).map(s => s.trim()).filter(Boolean).forEach(s => out.add(s))
+  }
+
+  // 2) 合并布尔特征列（仅取 true 的项）
+  Object.entries(BOOL_FEATURE_MAP).forEach(([key, label]) => {
+    if (p[key] === true) out.add(label)
+  })
+
+  // 返回去重后的特征数组
+  return Array.from(out)
+})
 
 const displayedFeatures = computed(() => {
   if (showAllFeatures.value) {
-    return allFeatures
+    return allFeatures.value
   }
   // 移动端2列，所以是 2 * 3 = 6
-  return allFeatures.slice(0, 6)
+  return allFeatures.value.slice(0, 6)
 })
 
 // 计算属性
