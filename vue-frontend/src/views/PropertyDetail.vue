@@ -43,7 +43,7 @@
             <div class="action-divider"></div>
             <button @click="toggleFavorite" class="image-action-btn">
               <el-icon :size="20">
-                <component :is="isFavorite ? 'StarFilled' : 'Star'" />
+                <i :class="isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
               </el-icon>
               <span>Save</span>
             </button>
@@ -169,30 +169,26 @@
         <section class="features-section">
           <h2 class="section-title">Property Features</h2>
           <div class="features-two-column">
-            <div class="feature-column">
-              <div class="feature-list-item">Ensuite(s)</div>
-              <div class="feature-list-item">Alarm System</div>
-              <div class="feature-list-item">Furnished</div>
-              <div class="feature-list-item">Gas</div>
-              <div class="feature-list-item">Fireplace(s)</div>
-              <div class="feature-list-item">Dishwasher</div>
-              <div class="feature-list-item">Energy efficient appliances</div>
-              <div class="feature-list-item">Rainwater storage tank</div>
-              <div class="feature-list-item">Shed</div>
-              <div class="feature-list-item">Garden / Courtyard</div>
-            </div>
-            <div class="feature-column">
-              <div class="feature-list-item">Secure Parking</div>
-              <div class="feature-list-item">Intercom</div>
-              <div class="feature-list-item">Built in wardrobes</div>
-              <div class="feature-list-item">Internal Laundry</div>
-              <div class="feature-list-item">Cable or Satellite</div>
-              <div class="feature-list-item">Broadband internet access</div>
-              <div class="feature-list-item">Bath</div>
-              <div class="feature-list-item">Separate Dining Room</div>
-              <div class="feature-list-item">Study</div>
-              <div class="feature-list-item">Heating</div>
-            </div>
+            <div class="feature-list-item">Ensuite(s)</div>
+            <div class="feature-list-item">Alarm System</div>
+            <div class="feature-list-item">Furnished</div>
+            <div class="feature-list-item">Gas</div>
+            <div class="feature-list-item">Fireplace(s)</div>
+            <div class="feature-list-item">Dishwasher</div>
+            <div class="feature-list-item">Energy efficient appliances</div>
+            <div class="feature-list-item">Rainwater storage tank</div>
+            <div class="feature-list-item">Shed</div>
+            <div class="feature-list-item">Garden / Courtyard</div>
+            <div class="feature-list-item">Secure Parking</div>
+            <div class="feature-list-item">Intercom</div>
+            <div class="feature-list-item">Built in wardrobes</div>
+            <div class="feature-list-item">Internal Laundry</div>
+            <div class="feature-list-item">Cable or Satellite</div>
+            <div class="feature-list-item">Broadband internet access</div>
+            <div class="feature-list-item">Bath</div>
+            <div class="feature-list-item">Separate Dining Room</div>
+            <div class="feature-list-item">Study</div>
+            <div class="feature-list-item">Heating</div>
           </div>
           <button
             @click="showAllFeatures = !showAllFeatures"
@@ -288,7 +284,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
 import {
-  ArrowLeft, Share, Star, StarFilled, Picture,
+  ArrowLeft, Share, Picture,
   Location, Calendar,
   Loading, Plus
 } from '@element-plus/icons-vue'
@@ -1233,33 +1229,27 @@ onMounted(async () => {
   margin: 0 0 20px 0;
 }
 
-.features-two-column {
+.features-section .features-two-column {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 移动端默认为2列 */
+  gap: 12px 24px; /* 行间距12px(y-3), 列间距24px(x-6) */
   margin-bottom: 24px;
 }
 
-/* PC端特性列表 */
-@media (min-width: 1200px) {
-  .features-two-column {
-    gap: 100px;
+/* 桌面端(768px以上)切换为三列 */
+@media (min-width: 768px) {
+  .features-section .features-two-column {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-}
-
-.feature-column {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .feature-list-item {
   font-size: 15px;
   color: #7F8194;
-  padding: 10px 0;
   line-height: 1.5;
   font-family: 'Inter', sans-serif;
   font-weight: 400;
+  word-break: break-word; /* 确保长单词可以换行 */
 }
 
 .view-less-btn {
@@ -1278,13 +1268,6 @@ onMounted(async () => {
   text-decoration: underline;
 }
 
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .features-two-column {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-}
 
 /* Inspection Times 部分 - Figma设计 */
 .inspection-section {
