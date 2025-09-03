@@ -59,8 +59,8 @@
 
           <!-- 图片指示器 -->
           <div v-if="images.length > 1" class="image-indicators">
-            <span 
-              v-for="(img, index) in images" 
+            <span
+              v-for="(img, index) in images"
               :key="index"
               :class="['indicator', { active: index === currentImageIndex }]"
               @click="currentImageIndex = index"
@@ -73,13 +73,6 @@
       <main class="content-container">
         <!-- 白色信息卡片 -->
         <section class="info-card">
-          <!-- 可用日期和押金 -->
-          <div class="availability-info">
-            <span class="availability-label">Available from {{ getAvailableDate() }}</span>
-            <span class="divider">|</span>
-            <span class="bond-info">Bond ${{ getBondAmount() }}</span>
-          </div>
-          
           <!-- 价格 -->
           <div class="price-wrapper">
             <span class="price-text">${{ property.rent_pw }} per week</span>
@@ -94,18 +87,22 @@
           <!-- 房源特征 -->
           <div class="property-features">
             <div class="feature-item">
-              <el-icon :size="20"><House /></el-icon>
-              <span class="feature-value">{{ property.bedrooms || 0 }}</span>
+              <i class="fa-solid fa-bed"></i>
+              <span>{{ property.bedrooms || 0 }}</span>
             </div>
             <div class="feature-item">
-              <el-icon :size="20"><Van /></el-icon>
-              <span class="feature-value">{{ property.bathrooms || 0 }}</span>
+              <i class="fa-solid fa-bath"></i>
+              <span>{{ property.bathrooms || 0 }}</span>
             </div>
             <div class="feature-item">
-              <el-icon :size="20"><Ticket /></el-icon>
-              <span class="feature-value">{{ property.parking_spaces || 0 }}</span>
+              <i class="fa-solid fa-car"></i>
+              <span>{{ property.parking_spaces || 0 }}</span>
             </div>
-            <div class="feature-type">Apartment / Unit / Flat</div>
+          </div>
+
+          <!-- 可用日期和押金 -->
+          <div class="availability-info">
+            <span class="availability-label">Available from {{ getAvailableDate() }}</span>
           </div>
         </section>
 
@@ -115,7 +112,7 @@
           <div class="map-wrapper">
             <!-- 优先使用SimpleMap，避免Google Maps API问题 -->
             <div v-if="property.latitude && property.longitude" class="map-container">
-              <SimpleMap 
+              <SimpleMap
                 :latitude="property.latitude"
                 :longitude="property.longitude"
                 :zoom="15"
@@ -123,7 +120,7 @@
                 :marker-title="property.address"
               />
               <!-- 静态地图作为后备 -->
-              <img 
+              <img
                 v-if="showStaticMap"
                 :src="staticMapUrl"
                 alt="Property Location"
@@ -152,14 +149,14 @@
         <!-- Property Description -->
         <section class="description-section">
           <h2 class="section-title">Property Description</h2>
-          
+
           <div class="description-content">
             <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
               <p class="description-headline">Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104</p>
               <p>?? Fully Furnished 2 Bed 2 Bath in Maroubra! Big Balcony | Quiet Location | Direct Bus to UNSW</p>
               <p v-if="property.description">{{ property.description }}</p>
             </div>
-            <button 
+            <button
               @click="toggleDescription"
               class="read-more-btn"
             >
@@ -197,7 +194,7 @@
               <div class="feature-list-item">Heating</div>
             </div>
           </div>
-          <button 
+          <button
             @click="showAllFeatures = !showAllFeatures"
             class="view-less-btn"
           >
@@ -256,7 +253,7 @@
         </el-button>
       </footer>
     </template>
-    
+
     <!-- 骨架屏（仅在没有数据且正在加载时显示） -->
     <div v-else-if="loading && !property" class="loading-state">
       <el-skeleton animated>
@@ -270,14 +267,14 @@
         </template>
       </el-skeleton>
     </div>
-    
+
     <!-- 错误状态 -->
     <div v-else-if="error && !property" class="error-state">
       <el-alert :title="error" type="error" show-icon />
     </div>
-    
+
     <!-- Auth Modal -->
-    <AuthModal 
+    <AuthModal
       v-if="showAuthModal"
       v-model="showAuthModal"
       @success="handleAuthSuccess"
@@ -290,15 +287,13 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
-import { 
-  ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture, 
-  Location, House, Ticket, Van, MoreFilled, Guide, Calendar,
-  HomeFilled, Setting, Grid, Sunny, Loading, Plus
+import {
+  ArrowLeft, Share, Star, StarFilled, Picture,
+  Location, Calendar,
+  Loading, Plus
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import GoogleMap from '@/components/GoogleMap.vue'
 import SimpleMap from '@/components/SimpleMap.vue'
-import MarkdownContent from '@/components/MarkdownContent.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 
 const route = useRoute()
@@ -332,26 +327,9 @@ const isFavorite = computed(() => {
   return propertiesStore.favoriteIds.includes(property.value.listing_id)
 })
 
-const availabilityText = computed(() => {
-  if (!property.value || !property.value.available_date) {
-    return 'now'
-  }
-  
-  const availDate = new Date(property.value.available_date)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  
-  if (availDate <= today) {
-    return 'now'
-  }
-  
-  const options = { day: 'numeric', month: 'short' }
-  return availDate.toLocaleDateString('en-US', options)
-})
-
 const inspectionTimes = computed(() => {
   if (!property.value || !property.value.inspection_times) return []
-  
+
   if (typeof property.value.inspection_times === 'string') {
     const times = property.value.inspection_times.split(',').map(time => {
       const parts = time.trim().split(' ')
@@ -362,7 +340,7 @@ const inspectionTimes = computed(() => {
     })
     return times.slice(0, 1) // 只显示第一个
   }
-  
+
   return []
 })
 
@@ -375,13 +353,6 @@ const nextInspectionTime = computed(() => {
   return ''
 })
 
-const visibleFeatures = computed(() => {
-  if (!property.value || !property.value.property_features) return []
-  return showAllFeatures.value 
-    ? property.value.property_features 
-    : property.value.property_features.slice(0, 3)
-})
-
 const mapHeight = computed(() => {
   // Responsive map height - 使用固定值而不是动态计算
   return '250px'
@@ -390,15 +361,15 @@ const mapHeight = computed(() => {
 // 生成静态地图 URL（使用环境变量中的 API 密钥）
 const staticMapUrl = computed(() => {
   if (!property.value) return ''
-  
+
   // 从环境变量获取 API 密钥（安全实践：不硬编码密钥）
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-  
+
   if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
     console.warn('Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file')
     return ''
   }
-  
+
   const { latitude, longitude } = property.value
   return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x250&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`
 })
@@ -410,7 +381,7 @@ const goBack = () => {
 
 const toggleFavorite = () => {
   if (!property.value) return
-  
+
   if (isFavorite.value) {
     propertiesStore.removeFavorite(property.value.listing_id)
     ElMessage.success('已从收藏中移除')
@@ -422,7 +393,7 @@ const toggleFavorite = () => {
 
 const shareProperty = () => {
   if (!property.value) return
-  
+
   if (navigator.share) {
     navigator.share({
       title: property.value.address,
@@ -444,10 +415,10 @@ const toggleDescription = () => {
 
 const handleEmail = () => {
   if (!property.value) return
-  
+
   const subject = `Enquiry about ${property.value.address}`
   const body = `Hi,\n\nI am interested in the property at:\n${property.value.address}\n$${property.value.rent_pw}/week\n\nPlease send me more information.\n\nThanks!`
-  
+
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
@@ -475,32 +446,6 @@ const handleImageClick = () => {
   }, 50)
 }
 
-const getFeatureIcon = (feature) => {
-  const featureLower = feature.toLowerCase()
-  if (featureLower.includes('air condition')) return 'fas fa-snowflake'
-  if (featureLower.includes('alarm')) return 'fas fa-shield-alt'
-  if (featureLower.includes('balcony')) return 'fas fa-building'
-  if (featureLower.includes('wardrobe')) return 'fas fa-door-closed'
-  if (featureLower.includes('ensuite')) return 'fas fa-bath'
-  if (featureLower.includes('furnished')) return 'fas fa-couch'
-  if (featureLower.includes('gym')) return 'fas fa-dumbbell'
-  if (featureLower.includes('spa')) return 'fas fa-hot-tub'
-  if (featureLower.includes('intercom')) return 'fas fa-phone'
-  if (featureLower.includes('laundry')) return 'fas fa-tshirt'
-  if (featureLower.includes('pets')) return 'fas fa-paw'
-  if (featureLower.includes('pool')) return 'fas fa-swimming-pool'
-  if (featureLower.includes('study')) return 'fas fa-book'
-  if (featureLower.includes('garden')) return 'fas fa-tree'
-  if (featureLower.includes('parking') || featureLower.includes('garage')) return 'fas fa-car'
-  if (featureLower.includes('security')) return 'fas fa-lock'
-  return 'fas fa-check-circle' // 默认图标
-}
-
-const formatInspectionTime = (inspection) => {
-  if (!inspection) return ''
-  return `${inspection.date} ${inspection.time}`.trim()
-}
-
 const handleStaticMapError = () => {
   console.error('Static map failed to load')
   showStaticMap.value = false
@@ -509,7 +454,7 @@ const handleStaticMapError = () => {
 const handleSeeTravelTimes = () => {
   // 测试模式：直接跳转，不需要登录
   const testMode = true // 设置为 false 启用登录验证
-  
+
   if (testMode || authStore.isAuthenticated) {
     // 如果是测试模式或已登录，直接跳转到通勤页面
     router.push({
@@ -544,14 +489,6 @@ const getAvailableDate = () => {
   return date.toLocaleDateString('en-US', options)
 }
 
-// 获取押金金额
-const getBondAmount = () => {
-  if (!property.value) return '0'
-  // 通常押金是4周房租
-  return (property.value.rent_pw * 4).toString()
-}
-
-
 // 预加载下一张图片
 const preloadNextImage = () => {
   if (images.value.length > 1) {
@@ -564,13 +501,13 @@ const preloadNextImage = () => {
 onMounted(async () => {
   // 开始加载数据
   await propertiesStore.fetchPropertyDetail(propertyId)
-  
+
   // 预加载下一张图片
   if (property.value) {
     preloadNextImage()
   }
   propertiesStore.logHistory(propertyId)
-  
+
   // 3秒后显示静态地图作为后备方案
   setTimeout(() => {
     showStaticMap.value = true
@@ -584,15 +521,8 @@ onMounted(async () => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: #f0f2f5;  /* PC端灰色背景 */
+  background-color: #ffffff;  /* 统一为白色背景 */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* PC端背景 */
-@media (min-width: 1200px) {
-  .property-detail-page {
-    background: linear-gradient(to bottom, #000 0%, #000 600px, #f0f2f5 600px, #f0f2f5 100%);
-  }
 }
 
 /* 加载和错误状态 */
@@ -767,7 +697,7 @@ onMounted(async () => {
     max-width: 100%;
     margin: 0;
   }
-  
+
   .property-image {
     width: 100%;
     height: 100%;
@@ -782,12 +712,12 @@ onMounted(async () => {
     max-width: 1920px;
     margin: 0 auto;
   }
-  
+
   .image-container {
     width: 100%;
     max-width: 1920px;
   }
-  
+
   .content-container {
     max-width: 1683px;
     padding: 0;
@@ -854,22 +784,23 @@ onMounted(async () => {
 /* 信息卡片 - 白色背景带阴影 */
 .info-card {
   background: white;
-  padding: 24px 20px;
-  margin: 20px 0;
+  padding: 24px 16px;
+  margin: 0;
   min-height: 180px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   border-radius: 0;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 /* PC端信息卡片 - 巨大变化 */
 @media (min-width: 1200px) {
   .info-card {
     width: 100%;
-    margin: -100px 0 40px 0;
+    margin: 0;
     padding: 40px 48px;
     background: white;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border-radius: 16px;
+    box-shadow: none;
+    border-radius: 0;
     position: relative;
     z-index: 10;
   }
@@ -877,16 +808,14 @@ onMounted(async () => {
 
 /* 可用日期和押金信息 */
 .availability-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: #6e7881;
+  margin-top: 8px;
+  padding-top: 8px;
 }
 
 .availability-label {
-  font-weight: 600;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .divider {
@@ -903,11 +832,16 @@ onMounted(async () => {
 }
 
 .price-text {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
-  color: #1a1a1a;
-  letter-spacing: -0.5px;
-  font-family: 'Inter', sans-serif;
+  color: var(--color-text-price);
+  line-height: 1.2;
+}
+
+.price-text .price-unit {
+  font-size: 14px;
+  color: #666666;
+  font-weight: 400;
 }
 
 /* PC端价格 - 超大字体 */
@@ -917,7 +851,7 @@ onMounted(async () => {
     padding-bottom: 24px;
     border-bottom: 1px solid #e4e5e7;
   }
-  
+
   .price-text {
     font-size: 48px;
     font-weight: 800;
@@ -931,20 +865,18 @@ onMounted(async () => {
 }
 
 .address-main {
-  font-size: 18px;
-  font-weight: 600;
-  color: #2e3a4b;
-  margin: 0 0 8px 0;
-  line-height: 1.4;
-  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: #333333;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 4px;
 }
 
 .address-subtitle {
-  font-size: 16px;
-  font-weight: 400;
-  color: #6e7881;
-  margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 /* PC端地址 */
@@ -952,7 +884,7 @@ onMounted(async () => {
   .address-main {
     font-size: 22px;
   }
-  
+
   .address-subtitle {
     font-size: 18px;
   }
@@ -962,25 +894,27 @@ onMounted(async () => {
 .property-features {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 0;
+  gap: 16px;
+  margin-bottom: 12px;
+  color: #666666;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
-.feature-item .el-icon {
-  color: #6e7881;
+.feature-item i {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
 }
 
-.feature-value {
-  font-size: 18px;
+.feature-item span {
+  color: #000000;
   font-weight: 600;
-  color: #2e3a4b;
-  font-family: 'Inter', sans-serif;
+  font-size: 14px;
 }
 
 .feature-type {
@@ -998,11 +932,11 @@ onMounted(async () => {
   .property-features {
     gap: 24px;
   }
-  
+
   .feature-value {
     font-size: 20px;
   }
-  
+
   .feature-type {
     font-size: 20px;
   }
@@ -1075,22 +1009,23 @@ onMounted(async () => {
 
 /* 位置部分 */
 .location-section {
-  padding: 24px 20px;
+  padding: 24px 16px;
   background: white;
-  margin: 20px 0;
+  margin: 0;
   border-radius: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 /* PC端位置部分 - 大改 */
 @media (min-width: 1200px) {
   .location-section {
     width: 100%;
-    margin: 0 0 40px 0;
+    margin: 0;
     padding: 40px 48px;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -1118,7 +1053,7 @@ onMounted(async () => {
   position: relative;
   width: 100%;
   height: 250px;
-  border-radius: 8px;
+  border-radius: 0;
   overflow: hidden;
   background: #e8e8e8;
   margin-bottom: 16px;
@@ -1128,7 +1063,7 @@ onMounted(async () => {
 @media (min-width: 1200px) {
   .map-container {
     height: 360px; /* Figma地图高度 */
-    border-radius: 12px;
+    border-radius: 0;
   }
 }
 
@@ -1174,22 +1109,23 @@ onMounted(async () => {
 
 /* Property Description 部分 */
 .description-section {
-  padding: 24px 20px;
+  padding: 24px 16px;
   background: white;
-  margin: 20px 0;
+  margin: 0;
   border-radius: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 /* PC端描述部分 - 大改 */
 @media (min-width: 1200px) {
   .description-section {
     width: 100%;
-    margin: 0 0 40px 0;
+    margin: 0;
     padding: 40px 48px;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -1270,22 +1206,23 @@ onMounted(async () => {
 
 /* Property Features 部分 - 两列布局 */
 .features-section {
-  padding: 24px 20px;
+  padding: 24px 16px;
   background: white;
-  margin: 20px 0;
+  margin: 0;
   border-radius: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 /* PC端特性部分 - 大改 */
 @media (min-width: 1200px) {
   .features-section {
     width: 100%;
-    margin: 0 0 40px 0;
+    margin: 0;
     padding: 40px 48px;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -1351,11 +1288,11 @@ onMounted(async () => {
 
 /* Inspection Times 部分 - Figma设计 */
 .inspection-section {
-  padding: 24px 20px;
+  padding: 24px 16px;
   background: white;
-  margin: 20px 0 80px 0;
+  margin: 0 0 80px 0;
   border-radius: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 /* PC端检查时间部分 - 大改 */
@@ -1365,8 +1302,8 @@ onMounted(async () => {
     margin: 0 0 80px 0;
     padding: 40px 48px;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -1566,11 +1503,11 @@ onMounted(async () => {
   .price {
     font-size: 36px;
   }
-  
+
   .address-main {
     font-size: 18px;
   }
-  
+
   .spec-value {
     font-size: 18px;
   }
@@ -1584,11 +1521,11 @@ onMounted(async () => {
   .price {
     font-size: 42px;
   }
-  
+
   .address-main {
     font-size: 20px;
   }
-  
+
   .property-title h2 {
     font-size: 28px;
   }
