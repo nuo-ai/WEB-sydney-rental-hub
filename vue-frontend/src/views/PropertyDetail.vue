@@ -10,12 +10,13 @@
       <!-- 图片展示区域 - Domain风格 -->
       <header class="image-header">
         <!-- 图片容器 -->
-        <div class="image-container">
+        <div class="image-container" ref="imageContainerRef">
           <el-image
             v-if="images.length > 0"
             :src="images[currentImageIndex]"
             :alt="`房源图片 ${currentImageIndex + 1}`"
             class="property-image"
+            @load="handleHeroImageLoad"
             @error="handleImageError"
             :preview-src-list="images"
             :initial-index="currentImageIndex"
@@ -279,6 +280,33 @@ const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
 const showStaticMap = ref(false)
 const showAuthModal = ref(false)
+/* 中文注释：为顶部图片容器提供引用，用于根据原图分辨率动态限制高度，避免放大导致模糊 */
+const imageContainerRef = ref(null)
+
+/* 中文注释：根据图片原始分辨率与容器宽度，计算清晰显示的最大高度，设置到 CSS 变量，避免 1:1 以上的放大 */
+const handleHeroImageLoad = (event) => {
+  const imgEl = event?.target
+  if (!imgEl || !imageContainerRef.value) return
+  const naturalW = imgEl.naturalWidth || 0
+  const naturalH = imgEl.naturalHeight || 0
+  if (!naturalW || !naturalH) return
+  const cw = imageContainerRef.value.clientWidth || 0
+  if (!cw) return
+
+  // 中文注释：加入 DPR（屏幕倍率）校正，避免高清屏上因 2x/3x 超采样导致的模糊
+  const dpr = window.devicePixelRatio || 1
+  const requiredPhysicalW = cw * dpr
+
+  // 若原图像素不足以覆盖“容器宽 × DPR”，则按“原图宽 / DPR”的安全展示宽度回退
+  const safeDisplayW = naturalW >= requiredPhysicalW ? cw : (naturalW / dpr)
+
+  // 按原始宽高比推导清晰高度，再做上下界限制，保证“更挺拔”同时不失真
+  const computed = Math.floor((naturalH / naturalW) * safeDisplayW)
+  const minH = 560
+  const maxH = 820
+  const clamped = Math.max(minH, Math.min(maxH, computed))
+  imageContainerRef.value.style.setProperty('--hero-height', `${clamped}px`)
+}
 
 /* 特征映射：以服务端数据为准，兼容多种JSON形态
    为什么：消除前端硬编码，确保与后端事实数据一致且可扩展（系统契约一致性） */
@@ -775,23 +803,23 @@ onMounted(async () => {
 
 /* 桌面尺寸 - Figma 精确规格 */
 @media (min-width: 1200px) {
-  /* PC 端：限制版心到 1200 并左右各 32px 留白
-     原因：与列表/详情统一的“页灰卡白 + 32px 内边距”规范对齐，避免贴边 */
+  /* Hero 全宽 + 自适应左右留白
+     为什么：还原截图“更大气”的观感，同时用 clamp 保证在窄屏/超宽屏下都有合理留白与稳定表现 */
   .image-header {
-    max-width: 1200px;
-    padding: 0 32px;
+    width: 100%;
+    max-width: none; /* 放开版心限制，做 full-bleed 英雄区 */
+    padding-inline: clamp(16px, 6vw, 115px); /* 自适应左右留白：窄屏收敛到 ~16-32px，≥1440 接近 115px */
     margin: 0 auto;
     background: transparent;
   }
 
   .image-container {
-    /* 改为 4:3 更沉浸，并设置上下界，避免“过扁/过高” */
-    aspect-ratio: 4 / 3;
-    min-height: 560px;
-    max-height: 720px;
+    /* 固定纵横比，避免图片在不同分辨率下“变形”；同时设上下界避免过扁/过高 */
+    aspect-ratio: 3 / 2; /* 1.5：比 16:9 更“挺拔”，比 4:3 略矮，贴近“更大气”的观感 */
     width: 100%;
-    max-width: 100%;
-    height: auto;
+    height: var(--hero-height, auto); /* 加入分辨率守卫：加载后以 --hero-height 为准，避免放大导致模糊 */
+    min-height: 560px;
+    max-height: 820px;
     margin: 0;
     overflow: hidden; /* 防止内部溢出造成滚动条 */
     border-radius: 0; /* 去掉圆角：按产品要求保持直角视觉 */
@@ -819,10 +847,11 @@ onMounted(async () => {
 
 /* 超大屏幕 - 1920px设计稿 */
 @media (min-width: 1920px) {
-  /* 保持 1200 版心 + 32px 内边距，不扩大到 1920，避免出现“另一套主题” */
+  /* 继续使用 Hero 全宽 + clamp 左右留白，避免出现“另一套主题”的观感 */
   .image-header {
-    max-width: 1200px;
-    padding: 0 32px;
+    width: 100%;
+    max-width: none;
+    padding-inline: clamp(16px, 6vw, 115px);
     margin: 0 auto;
   }
 
@@ -887,7 +916,7 @@ onMounted(async () => {
 @media (min-width: 1200px) {
   .content-container {
     max-width: 1200px;
-    padding: 60px 32px;
+    padding: 32px 32px;
     margin: 0 auto;
     position: relative;
     z-index: 5;
@@ -910,7 +939,7 @@ onMounted(async () => {
   .info-card {
     width: 100%;
     margin: 0;
-    padding: 40px 48px;
+    padding: 32px 32px; /* 统一左右 32，与容器对齐 */
     background: white;
     box-shadow: none;
     border-radius: 0;
@@ -974,7 +1003,7 @@ onMounted(async () => {
 
 /* 地址显示 */
 .address-wrapper {
-  margin-bottom: 20px;
+  margin-bottom: 16px; /* 副标题到图标行 16 的节奏 */
 }
 
 .address-main {
@@ -1008,7 +1037,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 24px; /* 图标行到“可入住/押金” 24 */
   color: #666666;
 }
 
@@ -1042,16 +1071,16 @@ onMounted(async () => {
 
 /* PC端特征 */
 @media (min-width: 1200px) {
-  .property-features {
-    gap: 24px;
+  .price-wrapper {
+    margin-bottom: 24px; /* 价格到地址 24 */
+    padding-bottom: 0;    /* 去除内边距，避免占位 */
+    border-bottom: none;  /* 去除价格与地址之间的细线 */
   }
 
-  .feature-value {
-    font-size: 20px;
-  }
-
-  .feature-type {
-    font-size: 20px;
+  .price-text {
+    font-size: 48px;
+    font-weight: 800;
+    color: #000;
   }
 }
 
