@@ -53,3 +53,4 @@ class Property:
     air_conditioning_type: Optional[str] = None
     description: Optional[str] = None # <-- This was missing
     property_headline: Optional[str] = None # 房源标题，如"RENOVATED, SPACIOUS & CLOSE TO TRAIN & SHOPS!"
+    inspection_times: Optional[JSON] = None  # 看房时间（字符串或JSON数组），刷新后也能保留

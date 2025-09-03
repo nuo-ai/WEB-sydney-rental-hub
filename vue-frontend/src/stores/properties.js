@@ -191,8 +191,16 @@ export const usePropertiesStore = defineStore('properties', {
         // 获取更详细的房源信息（例如，描述）
         const fullPropertyDetails = await propertyAPI.getDetail(id);
 
-        // 合并数据，确保 inspection_times 等列表API独有的数据被保留
-        this.currentProperty = { ...this.currentProperty, ...fullPropertyDetails };
+        // 智能合并数据：以现有数据为基础，用详情数据进行补充
+        // 这样可以确保即使 fullPropertyDetails 中缺少某些字段（如 inspection_times），
+        // 已有的数据也不会被覆盖。
+        const finalProperty = {
+          ...existingProperty,
+          ...this.currentProperty,
+          ...fullPropertyDetails
+        };
+
+        this.currentProperty = finalProperty;
 
       } catch (error) {
         this.error = error.message || '获取房源详情失败'

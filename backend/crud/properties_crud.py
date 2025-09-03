@@ -263,7 +263,7 @@ def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
                     property_url, postcode, bond, parking_spaces, 
                     CAST(available_date AS TEXT), images, property_features, 
                     latitude, longitude, ST_AsText(geom) AS geom_wkt, property_description AS description,
-                    property_headline
+                    property_headline, inspection_times
                 FROM properties 
                 WHERE listing_id = %s
             """
@@ -289,7 +289,8 @@ def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
                     longitude=row[15],
                     geom_wkt=row[16],
                     description=row[17], # This line now correctly maps from 'property_description AS description'
-                    property_headline=row[18] if len(row) > 18 else None # 添加property_headline字段
+                    property_headline=row[18] if len(row) > 18 else None, # 添加property_headline字段
+                    inspection_times=row[19] if len(row) > 19 else None
                 )
                 logging.info(f"Fetched property with ID {listing_id} from DB.")
             else:

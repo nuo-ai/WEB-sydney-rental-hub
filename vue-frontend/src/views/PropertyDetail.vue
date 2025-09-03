@@ -256,7 +256,6 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
-import { parseInspectionTime } from '@/utils/inspectionTimeParser'
 import {
   ArrowLeft, Share, Picture,
   Location, Calendar,
@@ -315,25 +314,34 @@ const isFavorite = computed(() => {
 
 
 const inspectionTimes = computed(() => {
-  if (!property.value || !property.value.inspection_times) return [];
+  if (!property.value || !property.value.inspection_times) return []
 
-  const raw = property.value.inspection_times;
-  let times = [];
+  const raw = property.value.inspection_times
 
-  if (Array.isArray(raw)) {
-    // If it's an array of times, use it directly.
-    times = raw;
-  } else if (typeof raw === 'string' && raw.trim()) {
-    // If it's a single string, treat it as a single inspection time.
-    // Do NOT split by comma.
-    times = [raw];
+  // 统一解析单个时间段字符串
+  const parseEntry = (entry) => {
+    if (typeof entry !== 'string') return entry
+    const parts = entry.split(',')
+    return {
+      date: parts.slice(0, -1).join(',').trim(),
+      time: parts[parts.length - 1]?.trim() || '',
+    }
   }
 
-  return times
-    .map(t => String(t || '').trim())
-    .filter(Boolean)
-    .map(parseInspectionTime);
-});
+  if (typeof raw === 'string') {
+    return raw
+      .split(/;|\n|\|/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map(parseEntry)
+  }
+
+  if (Array.isArray(raw)) {
+    return raw.map(parseEntry)
+  }
+
+  return []
+})
 
 const nextInspectionTime = computed(() => {
   if (inspectionTimes.value.length > 0) {
