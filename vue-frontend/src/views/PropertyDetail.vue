@@ -775,30 +775,60 @@ onMounted(async () => {
 
 /* 桌面尺寸 - Figma 精确规格 */
 @media (min-width: 1200px) {
+  /* PC 端：限制版心到 1200 并左右各 32px 留白
+     原因：与列表/详情统一的“页灰卡白 + 32px 内边距”规范对齐，避免贴边 */
+  .image-header {
+    max-width: 1200px;
+    padding: 0 32px;
+    margin: 0 auto;
+    background: transparent;
+  }
+
   .image-container {
-    height: 600px; /* 调整高度 */
+    /* 改为 4:3 更沉浸，并设置上下界，避免“过扁/过高” */
+    aspect-ratio: 4 / 3;
+    min-height: 560px;
+    max-height: 720px;
+    width: 100%;
     max-width: 100%;
+    height: auto;
     margin: 0;
+    overflow: hidden; /* 防止内部溢出造成滚动条 */
+    border-radius: 0; /* 去掉圆角：按产品要求保持直角视觉 */
+    box-shadow: var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.06));
   }
 
   .property-image {
     width: 100%;
     height: 100%;
+    object-fit: cover;   /* 保证铺满并裁切 */
+    object-position: center;
+    border-radius: 0; /* 去掉子元素圆角兜底，避免继承 */
+  }
+
+  :deep(.el-image__inner) {
+    /* 兜底：Element Plus 内部 <img>，确保在极端情况下仍然 cover */
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: center;
+    display: block;
+    border-radius: 0; /* 去掉圆角兜底 */
   }
 }
 
 /* 超大屏幕 - 1920px设计稿 */
 @media (min-width: 1920px) {
+  /* 保持 1200 版心 + 32px 内边距，不扩大到 1920，避免出现“另一套主题” */
   .image-header {
-    max-width: 1920px;
+    max-width: 1200px;
+    padding: 0 32px;
     margin: 0 auto;
   }
 
   .image-container {
     width: 100%;
-    max-width: 1920px;
+    max-width: 100%;
   }
 
   .content-container {
@@ -1595,7 +1625,9 @@ onMounted(async () => {
   }
 }
 
-@media (min-width: 1024px) {
+/* 将 1024 的高度限制为仅在 1024–1199 区间生效
+   原因：避免覆盖 1200+ 的 16:9 比例设置（保持栅格与沉浸感一致） */
+@media (min-width: 1024px) and (max-width: 1199px) {
   .image-container {
     height: 500px;
   }

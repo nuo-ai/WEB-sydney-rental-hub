@@ -5,15 +5,17 @@
 > **用途**: 快速导航和定位项目所有重要文件和功能
 
 ### Solo 实时协作 TL;DR
+
 - 保持前后端服务常开；我不启动/不关闭服务
 - 改动前用 ≤3 行计划：目标 / 改动文件 / 风险与回滚
 - 小步提交：一次仅一个组件或 1–2 个文件，优先复用全局 tokens 与统一栅格
 - 本地验证：刷新页面；如异常，仅贴 Console/Network 摘要或截图（最小信息）
 - 记录一行：activeContext.md 更新“做了什么 + 任务号/commit”；遇接口/全局样式/性能影响再升至 Level 1（加最小 E2E）
 
-完整规则见 ../.clinerules/development-guidelines.md（第9节：Solo 实时协作与省 Token 规则）
+完整规则见 ../.clinerules/development-guidelines.md（第7节：沟通优先协作流程 V2 和 第9节：Solo 实时协作与省 Token 规则）
 
 #### 最小反馈清单（不建 docs，直接贴要点即可）
+
 - 复现：路径 + 1–2 步骤 + 期望/实际（≤3 行）
 - Console：最多 3 行（文件/行号/错误摘要）
 - Network（若相关）：METHOD URL STATUS + 响应前几行
@@ -24,14 +26,14 @@
 
 ## 📚 Memory Bank 文档索引
 
-| 文档 | 用途 | 更新频率 | 字数 (精简后) |
-|------|------|------|------|
-| [projectbrief.md](./projectbrief.md) | 项目概述和商业目标 | 低 | ~300 |
-| [productContext.md](./productContext.md) | 用户故事和交互流程 | 低 | ~200 |
-| [techContext.md](./techContext.md) | 技术栈和架构详情 | 中 | ~500 |
-| [systemPatterns.md](./systemPatterns.md) | 设计模式和最佳实践 | 中 | ~600 |
-| [progress.md](./progress.md) | 开发进展记录 | 高 | ~800 |
-| [activeContext.md](./activeContext.md) | 当前任务和紧急事项 | 高 | ~500 |
+| 文档                                  | 用途               | 更新频率 | 字数 (精简后) |
+| ------------------------------------- | ------------------ | -------- | ------------- |
+| [projectbrief.md](./projectbrief.md)     | 项目概述和商业目标 | 低       | ~300          |
+| [productContext.md](./productContext.md) | 用户故事和交互流程 | 低       | ~200          |
+| [techContext.md](./techContext.md)       | 技术栈和架构详情   | 中       | ~500          |
+| [systemPatterns.md](./systemPatterns.md) | 设计模式和最佳实践 | 中       | ~600          |
+| [progress.md](./progress.md)             | 开发进展记录       | 高       | ~800          |
+| [activeContext.md](./activeContext.md)   | 当前任务和紧急事项 | 高       | ~500          |
 
 ---
 
@@ -42,13 +44,13 @@
 - **筛选查询**: 0.59秒 (优化前2.2秒，提升3.7倍)
 - **DOM节点**: ~400个 (优化前17万+，减少99.8%)
 - **内存占用**: 50MB (优化前400MB，减少87.5%)
-- **数据规模**: 3456条房源，98个唯一区域
 
 ---
 
 ## 🗺️ 项目结构导航
 
 ### 前端 (Vue 3 + Pinia + Vue Router)
+
 ```
 src/
 ├── views/                 # 页面组件
@@ -78,6 +80,7 @@ src/
 ```
 
 ### 后端 (FastAPI + GraphQL)
+
 ```
 ├── main.py               # API端点定义 + 服务入口
 ├── db.py                 # Supabase连接池配置
@@ -91,15 +94,15 @@ src/
 
 ## 🔌 核心API端点
 
-| 端点 | 方法 | 功能 | 缓存策略 |
-|------|------|------|------|
-| `/api/properties` | GET | 房源列表 + 分页 | 服务端分页 |
-| `/api/properties/{id}` | GET | 房源详情 | 15分钟缓存 |
-| `/api/directions` | GET | Haversine通勤计算 | 本地算法 |
-| `/api/auth/register` | POST | 用户注册 | JWT令牌 |
-| `/api/user/addresses` | POST | 地址持久化 | localStorage |
-| `/graphql` | ALL | 灵活数据查询 | 不适用于AI工具 |
-| `/api/cache/invalidate` | GET | 缓存失效（测试/调试） | 测试环境 |
+| 端点                      | 方法 | 功能                  | 缓存策略       |
+| ------------------------- | ---- | --------------------- | -------------- |
+| `/api/properties`       | GET  | 房源列表 + 分页       | 服务端分页     |
+| `/api/properties/{id}`  | GET  | 房源详情              | 15分钟缓存     |
+| `/api/directions`       | GET  | Haversine通勤计算     | 本地算法       |
+| `/api/auth/register`    | POST | 用户注册              | JWT令牌        |
+| `/api/user/addresses`   | POST | 地址持久化            | localStorage   |
+| `/graphql`              | ALL  | 灵活数据查询          | 不适用于AI工具 |
+| `/api/cache/invalidate` | GET  | 缓存失效（测试/调试） | 测试环境       |
 
 **禁止** ❌: 前端调用AI工具的Express服务器 (`localhost:3001`)
 
@@ -109,19 +112,19 @@ src/
 
 - ✅ **Vue前端**: `http://localhost:5173` (虚拟DOM + 响应式)
 - ✅ **Python后端**: `http://localhost:8000` (FastAPI + GraphQL)
-- ✅ 数据规模: 3456条房源数据
-- ✅ **4性能优化**: 虚拟滚动 + API缓存 + 数据库索引
-- ✅ **5搜索功能**: 全量数据搜索89号，相邻区域推荐
-- ✅ **6筛选系统**: 单选逻辑 + 服务端筛选 + 区域联动
-- ✅ **7认证系统**: JWT + 邮箱验证 + 测试模式支持
-- ✅ **8地图服务**: OpenStreetMap免费替代 + 本地计算
-- ✅ **9通勤功能**: 15分钟缓存 + 本地算法 (无API费用)
+- ✅ **性能优化**: 虚拟滚动 + API缓存 + 数据库索引
+- ✅ **搜索功能**: 全量数据搜索89号，相邻区域推荐
+- ✅ **筛选系统**: 单选逻辑 + 服务端筛选 + 区域联动
+- ✅ **认证系统**: JWT + 邮箱验证 + 测试模式支持
+- ✅ **地图服务**: OpenStreetMap免费替代 + 本地计算
+- ✅ **通勤功能**: 15分钟缓存 + 本地算法 (无API费用)
 
 ---
 
 ## 🔑 数据模型概要
 
 ### Property核心字段
+
 ```javascript
 {
   listing_id: Number,      // 主键ID
@@ -142,16 +145,7 @@ src/
 
 ## 🚨 高优先级任务 (P0)
 
-### 立即执行
-1. **清理调试代码**: 删除35个console.log影响生产安全
-2. **Redis降级策略**: 实现连接健康检查和内存备选
-3. **文档完善**: 为认证/收藏/通勤功能补充使用说明
-
-### 下周完成
-1. **搜索增强**: 添加搜索历史和热门推荐功能
-2. **移动端UX**: 优化筛选面板和导航交互体验
-
----
+- 等待用户沟通后确认
 
 ## 🚀 快速启动
 
@@ -172,16 +166,19 @@ curl http://localhost:8000/docs # API文档页
 ## 🛠️ 开发工作流
 
 ### 前期准备
+
 - 启动后端服务 (`local-django :8000`)
 - 处理前端 (`local-urban :5173`)
 - 检查Supabase数据库连接
 
 ### 功能开发
+
 - 使用Pinia store管理状态变化
 - 通过Vite proxy (`/api`) 调用后端
 - 遵循单一数据源原则和组件职责分离
 
 ### 性能测试
+
 - 使用虚拟滚动查看页面性能
 - 检查网络面板的API请求时间
 - 验证筛选和搜索的响应速度
@@ -190,10 +187,10 @@ curl http://localhost:8000/docs # API文档页
 
 ## 🔍 故障排除指南
 
-| 问题症状 | 定位文件/组件 | 解决思路 |
-|----------|-------------|----------|
-| 房源列表空白 | `api.js`, `properties.js` | 检查API调用和数据格式 |
-| 筛选无效 | `applyFilters()` action | 确认服务端筛选参数 |
-| 详情页报错 | `PropertyDetail.vue` | 检查ID类型转换和字段名称 |
-| 通勤功能失败 | `CommuteCalculator.vue` | 验证Google API替代方案 |
-| 图片不显示 | `PropertyCard.vue` | 检查images数组处理逻辑 |
+| 问题症状     | 定位文件/组件                 | 解决思路                 |
+| ------------ | ----------------------------- | ------------------------ |
+| 房源列表空白 | `api.js`, `properties.js` | 检查API调用和数据格式    |
+| 筛选无效     | `applyFilters()` action     | 确认服务端筛选参数       |
+| 详情页报错   | `PropertyDetail.vue`        | 检查ID类型转换和字段名称 |
+| 通勤功能失败 | `CommuteCalculator.vue`     | 验证Google API替代方案   |
+| 图片不显示   | `PropertyCard.vue`          | 检查images数组处理逻辑   |
