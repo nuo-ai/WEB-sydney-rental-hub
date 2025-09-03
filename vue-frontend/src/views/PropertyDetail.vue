@@ -169,26 +169,13 @@
         <section class="features-section">
           <h2 class="section-title">Property Features</h2>
           <div class="features-two-column">
-            <div class="feature-list-item">Ensuite(s)</div>
-            <div class="feature-list-item">Alarm System</div>
-            <div class="feature-list-item">Furnished</div>
-            <div class="feature-list-item">Gas</div>
-            <div class="feature-list-item">Fireplace(s)</div>
-            <div class="feature-list-item">Dishwasher</div>
-            <div class="feature-list-item">Energy efficient appliances</div>
-            <div class="feature-list-item">Rainwater storage tank</div>
-            <div class="feature-list-item">Shed</div>
-            <div class="feature-list-item">Garden / Courtyard</div>
-            <div class="feature-list-item">Secure Parking</div>
-            <div class="feature-list-item">Intercom</div>
-            <div class="feature-list-item">Built in wardrobes</div>
-            <div class="feature-list-item">Internal Laundry</div>
-            <div class="feature-list-item">Cable or Satellite</div>
-            <div class="feature-list-item">Broadband internet access</div>
-            <div class="feature-list-item">Bath</div>
-            <div class="feature-list-item">Separate Dining Room</div>
-            <div class="feature-list-item">Study</div>
-            <div class="feature-list-item">Heating</div>
+            <div
+              v-for="feature in displayedFeatures"
+              :key="feature"
+              class="feature-list-item"
+            >
+              {{ feature }}
+            </div>
           </div>
           <button
             @click="showAllFeatures = !showAllFeatures"
@@ -305,6 +292,22 @@ const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
 const showStaticMap = ref(false)
 const showAuthModal = ref(false)
+
+const allFeatures = [
+  'Ensuite(s)', 'Alarm System', 'Furnished', 'Gas', 'Fireplace(s)', 'Dishwasher',
+  'Energy efficient appliances', 'Rainwater storage tank', 'Shed', 'Garden / Courtyard',
+  'Secure Parking', 'Intercom', 'Built in wardrobes', 'Internal Laundry',
+  'Cable or Satellite', 'Broadband internet access', 'Bath', 'Separate Dining Room',
+  'Study', 'Heating'
+]
+
+const displayedFeatures = computed(() => {
+  if (showAllFeatures.value) {
+    return allFeatures
+  }
+  // 移动端2列，所以是 2 * 3 = 6
+  return allFeatures.slice(0, 6)
+})
 
 // 计算属性
 const property = computed(() => propertiesStore.currentProperty)
@@ -1202,7 +1205,7 @@ onMounted(async () => {
 
 /* Property Features 部分 - 两列布局 */
 .features-section {
-  padding: 24px 16px;
+  padding: 24px 16px 33px 16px; /* 调整底部padding以满足33px间距要求 */
   background: white;
   margin: 0;
   border-radius: 0;
@@ -1215,7 +1218,7 @@ onMounted(async () => {
   .features-section {
     width: 100%;
     margin: 0;
-    padding: 40px 48px;
+    padding: 40px 48px 33px 48px; /* 同样调整底部padding */
     background: white;
     border-radius: 0;
     box-shadow: none;
@@ -1233,7 +1236,7 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr)); /* 移动端默认为2列 */
   gap: 12px 24px; /* 行间距12px(y-3), 列间距24px(x-6) */
-  margin-bottom: 24px;
+  margin-bottom: 28px; /* 更新为28px间距 */
 }
 
 /* 桌面端(768px以上)切换为三列 */
@@ -1256,12 +1259,13 @@ onMounted(async () => {
   display: inline-block;
   padding: 0;
   font-size: 14px;
-  font-weight: 400;
-  color: #22c55e;
+  font-weight: 600; /* 加粗以匹配设计 */
+  color: var(--juwo-primary, #FF5824); /* 使用品牌主色 */
   background: none;
   border: none;
   cursor: pointer;
   text-decoration: none;
+  margin-top: 0; /* 确保自身没有顶部边距 */
 }
 
 .view-less-btn:hover {

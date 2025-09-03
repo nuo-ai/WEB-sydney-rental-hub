@@ -1,0 +1,43 @@
+{
+  "text": {
+    "primary": "var(--color-neutral-900, #111827)",
+    "secondary": "var(--color-neutral-700, #374151)",
+    "muted": "var(--color-neutral-600, #4B5563)",
+    "inverse": "var(--color-neutral-50, #FAFAFA)",
+    "link": "var(--color-blue-600, #2563EB)",
+    "onBrand": "var(--color-neutral-50, #FAFAFA)"
+  },
+  "bg": {
+    "primary": "var(--color-neutral-50, #FAFAFA)",
+    "subtle": "var(--color-neutral-100, #F3F4F6)",
+    "elevated": "var(--color-neutral-0, #FFFFFF)",
+    "inverse": "var(--color-neutral-900, #111827)",
+    "brand": "var(--color-brand-600)"
+  },
+  "border": {
+    "subtle": "var(--color-neutral-200, #E5E7EB)",
+    "default": "var(--color-neutral-300, #D1D5DB)",
+    "strong": "var(--color-neutral-400, #9CA3AF)",
+    "focus": "var(--color-blue-500, #3B82F6)"
+  },
+  "accent": {
+    "brand": "var(--color-brand-600)",
+    "brandHover": "var(--color-brand-700)",
+    "success": "var(--color-green-600, #16A34A)",
+    "info": "var(--color-blue-600, #2563EB)",
+    "warning": "var(--color-brand-500)",
+    "overlay": "rgba(0,0,0,.5)",
+    "focusRing": "var(--color-blue-500, #3B82F6)"
+  },
+  "elevation": {
+    "1": "var(--shadow-elevation-1, 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.2))",
+    "2": "var(--shadow-elevation-2, 0 2px 8px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06))",
+    "3": "var(--shadow-elevation-3, 0 8px 24px rgba(0,0,0,.12))"
+  },
+  "radius": {
+    "sm": "var(--radius-sm, 2px)",
+    "md": "var(--radius-md, 3px)",
+    "lg": "var(--radius-lg, 4px)",
+    "full": "var(--radius-full, 9999px)"
+  }
+}
