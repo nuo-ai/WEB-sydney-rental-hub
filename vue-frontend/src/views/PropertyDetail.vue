@@ -483,9 +483,9 @@ const handleStaticMapError = () => {
 
 const handleSeeTravelTimes = () => {
   // 测试模式：直接跳转，不需要登录
-  const testMode = true // 设置为 false 启用登录验证
+  const isTest = authStore.testMode
 
-  if (testMode || authStore.isAuthenticated) {
+  if (isTest || authStore.isAuthenticated) {
     // 如果是测试模式或已登录，直接跳转到通勤页面
     router.push({
       name: 'CommuteTimes',

@@ -44,7 +44,7 @@ const setCachedData = (key, data) => {
 // 清除所有缓存（用于调试或强制刷新）
 const clearAllCache = () => {
   cache.clear()
-  console.log('API缓存已清除')
+  // API缓存已清除（移除 console.log 调试输出）
 }
 
 // 暴露到window对象方便调试
@@ -84,20 +84,20 @@ export const propertyAPI = {
         page_size: 20, // 减小默认大小，提高响应速度
         ...params
       }
-      
+
       // 检查缓存
       const cacheKey = getCacheKey('/properties', finalParams)
       const cachedData = getCachedData(cacheKey)
       if (cachedData) {
         return cachedData
       }
-      
+
       const response = await apiClient.get('/properties', { params: finalParams })
-      
+
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`)
       }
-      
+
       const data = response.data.data || []
       // 缓存数据
       setCachedData(cacheKey, data)
@@ -117,18 +117,18 @@ export const propertyAPI = {
       if (cachedData) {
         return cachedData
       }
-      
+
       const response = await apiClient.get('/properties', { params })
-      
+
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`)
       }
-      
+
       const result = {
         data: response.data.data || [],
         pagination: response.data.pagination || null
       }
-      
+
       // 缓存结果
       setCachedData(cacheKey, result)
       return result
@@ -147,22 +147,20 @@ export const propertyAPI = {
       if (cachedData) {
         return cachedData
       }
-      
-      const startTime = Date.now()
-      
+
+
       const response = await apiClient.get(`/properties/${id}`)
-      
-      const loadTime = Date.now() - startTime
-      
+
+
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`)
       }
-      
+
       const data = response.data.data
-      
+
       // 缓存详情数据
       setCachedData(cacheKey, data)
-      
+
       return data
     } catch (error) {
       console.error('获取房源详情失败:', error)
@@ -177,18 +175,18 @@ export const propertyAPI = {
         page_size: 100,
         ...filters
       }
-      
+
       // 如果有搜索关键词，添加到参数中
       if (query && query.trim()) {
         params.search = query.trim()
       }
-      
+
       const response = await apiClient.get('/properties', { params })
-      
+
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`)
       }
-      
+
       return response.data.data || []
     } catch (error) {
       console.error('搜索房源失败:', error)
@@ -216,7 +214,7 @@ export const userAPI = {
   },
 
   // 联系我们
-  async contactUs(payload) {
+  async contactUs() {
     // TODO: 实现后端联系API
     // 模拟成功响应
     return { success: true, message: '您的请求已发送' }
@@ -278,7 +276,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // 地球半径（公里）
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = 
+  const a =
     Math.sin(dLat/2) * Math.sin(dLat/2) +
     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
     Math.sin(dLon/2) * Math.sin(dLon/2);
@@ -294,20 +292,20 @@ function estimateCommute(distance, mode) {
     TRANSIT: 25,    // 25 km/h（包括等车和换乘）
     WALKING: 5      // 5 km/h
   };
-  
+
   // 路线弯曲系数（实际路线通常比直线距离长）
   const routeFactors = {
     DRIVING: 1.4,
     TRANSIT: 1.3,
     WALKING: 1.2
   };
-  
+
   const speed = speeds[mode] || speeds.DRIVING;
   const factor = routeFactors[mode] || routeFactors.DRIVING;
   const actualDistance = distance * factor;
   const hours = actualDistance / speed;
   const minutes = Math.round(hours * 60);
-  
+
   // 格式化时间显示
   let duration;
   if (minutes < 60) {
@@ -317,12 +315,12 @@ function estimateCommute(distance, mode) {
     const m = minutes % 60;
     duration = m > 0 ? `${h} hr ${m} min` : `${h} hr`;
   }
-  
+
   // 格式化距离显示
-  const distanceStr = actualDistance < 1 
-    ? `${Math.round(actualDistance * 1000)} m` 
+  const distanceStr = actualDistance < 1
+    ? `${Math.round(actualDistance * 1000)} m`
     : `${actualDistance.toFixed(1)} km`;
-  
+
   return {
     duration,
     distance: distanceStr,
@@ -347,26 +345,26 @@ export const transportAPI = {
     try {
       // 测试模式：使用本地估算
       const testMode = localStorage.getItem('auth-testMode') === 'true';
-      
+
       if (testMode) {
         // 解析起点坐标
         const originCoords = parseCoordinates(origin);
         if (!originCoords) {
           throw new Error('Invalid origin coordinates');
         }
-        
+
         // 目标地址坐标（需要从保存的地址数据中获取）
         // 从localStorage获取保存的地址
         const savedAddresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]');
         const destAddress = savedAddresses.find(addr => addr.address === destination);
-        
+
         if (destAddress && destAddress.latitude && destAddress.longitude) {
           // 计算距离和估算时间
           const distance = calculateDistance(
             originCoords.lat, originCoords.lng,
             destAddress.latitude, destAddress.longitude
           );
-          
+
           const result = estimateCommute(distance, mode);
           return result;
         } else {
@@ -379,16 +377,16 @@ export const transportAPI = {
           return defaultEstimates[mode] || defaultEstimates.DRIVING;
         }
       }
-      
+
       // 生产模式：调用后端API
       const response = await apiClient.get('/directions', {
         params: { origin, destination, mode }
       });
-      
+
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`);
       }
-      
+
       return response.data.data;
     } catch (error) {
       console.error(`获取通勤路线失败 (模式: ${mode}):`, error);

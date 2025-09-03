@@ -53,31 +53,31 @@
                   fit="cover"
                   @click="handleImageClick"
                 />
-                
+
                 <!-- 轮播控制按钮 -->
                 <template v-if="images.length > 1">
-                  <button 
-                    @click="previousImage" 
+                  <button
+                    @click="previousImage"
                     class="carousel-btn prev-btn"
                     :disabled="currentImageIndex === 0"
                   >
                     <el-icon><ArrowLeft /></el-icon>
                   </button>
-                  <button 
-                    @click="nextImage" 
+                  <button
+                    @click="nextImage"
                     class="carousel-btn next-btn"
                     :disabled="currentImageIndex === images.length - 1"
                   >
                     <el-icon><ArrowRight /></el-icon>
                   </button>
-                  
+
                   <!-- 图片计数器 -->
                   <div class="image-counter">
                     {{ currentImageIndex + 1 }} / {{ images.length }}
                   </div>
                 </template>
               </div>
-              
+
               <!-- 无图片占位符 -->
               <div v-else class="no-image-placeholder">
                 <el-icon :size="60"><Picture /></el-icon>
@@ -111,7 +111,7 @@
                 <!-- Actions moved to header -->
               </div>
             </div>
-            
+
             <!-- 房型与可入住日期 -->
             <div class="property-specs">
               <div class="specs-row-single">
@@ -154,16 +154,16 @@
           <div class="description-section">
             <h3 class="section-title">Property Description</h3>
             <div class="description-content">
-              <p 
-                class="description-text" 
+              <p
+                class="description-text"
                 :class="{ 'expanded': isDescriptionExpanded }"
               >
                 {{ property.description }}
               </p>
-              <el-button 
+              <el-button
                 v-if="property.description && property.description.length > 200"
-                type="primary" 
-                link 
+                type="primary"
+                link
                 @click="toggleDescription"
                 class="read-more-btn"
               >
@@ -206,10 +206,10 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref, nextTick, watch } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { ArrowLeft, ArrowRight, Share, DocumentCopy, Location, Star, StarFilled, Picture } from '@element-plus/icons-vue'
+import { ArrowLeft, ArrowRight, Share, DocumentCopy, Location, Picture } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue';
 
@@ -244,19 +244,19 @@ const availabilityText = computed(() => {
   if (!property.value || !property.value.available_date) {
     return '立即入住';
   }
-  
+
   const availDate = new Date(property.value.available_date)
   const today = new Date()
   today.setHours(0, 0, 0, 0);
-  
+
   if (availDate <= today) {
     return '立即入住';
   }
-  
+
   const year = availDate.getFullYear();
   const month = availDate.getMonth() + 1;
   const day = availDate.getDate();
-  
+
   return `${year}年${month}月${day}日起可入住`;
 });
 
@@ -272,7 +272,7 @@ const copyAddress = () => {
 
 const inspectionTimes = computed(() => {
   if (!property.value || !property.value.inspection_times) return []
-  
+
   // 处理inspection_times字符串或数组
   if (typeof property.value.inspection_times === 'string') {
     return property.value.inspection_times.split(',').map(time => ({
@@ -280,7 +280,7 @@ const inspectionTimes = computed(() => {
       time: time.split(' ')[1] || ''
     }))
   }
-  
+
   return property.value.inspection_times || []
 })
 
@@ -309,7 +309,7 @@ const handleImageError = (event) => {
 
 const toggleFavorite = () => {
   if (!property.value) return
-  
+
   if (isFavorite.value) {
     propertiesStore.removeFavorite(property.value.listing_id)
     ElMessage.success('已从收藏中移除')
@@ -321,13 +321,13 @@ const toggleFavorite = () => {
 
 const shareProperty = () => {
   if (!property.value) return
-  
+
   if (navigator.share) {
     navigator.share({
       title: property.value.address,
       text: `${property.value.address} - $${property.value.rent_pw}/week`,
       url: window.location.href
-    }).catch(err => console.log('分享失败:', err))
+    }).catch(err => console.error('分享失败:', err))
   } else {
     // 备用方案：复制到剪贴板
     navigator.clipboard.writeText(window.location.href)
@@ -343,10 +343,10 @@ const toggleDescription = () => {
 // 操作按钮处理函数
 const handleEmail = () => {
   if (!property.value) return
-  
+
   const subject = `咨询房源: ${property.value.address}`
   const body = `您好，我对以下房源感兴趣：\n\n地址: ${property.value.address}\n价格: $${property.value.rent_pw}/week\n\n请提供更多信息。\n\n谢谢！`
-  
+
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
@@ -371,7 +371,7 @@ const handleImageClick = () => {
       mask.style.opacity = '0.95';
       mask.style.backgroundColor = '#000000';
     }
-    
+
     // Add image counter
     const wrapper = document.querySelector('.el-image-viewer__wrapper');
     if (wrapper && !wrapper.querySelector('.custom-image-counter')) {
@@ -388,16 +388,16 @@ const handleImageClick = () => {
       counter.style.padding = '8px 16px';
       counter.style.borderRadius = '20px';
       counter.style.zIndex = '2002';
-      
+
       // Find current image index
       const currentImg = wrapper.querySelector('.el-image-viewer__img');
       if (currentImg && currentImg.src) {
         const currentIndex = images.value.findIndex(img => currentImg.src.includes(img)) + 1;
         counter.textContent = `${currentIndex} / ${images.value.length}`;
       }
-      
+
       wrapper.appendChild(counter);
-      
+
       // Update counter when image changes
       const observer = new MutationObserver(() => {
         const img = wrapper.querySelector('.el-image-viewer__img');
@@ -406,20 +406,19 @@ const handleImageClick = () => {
           counter.textContent = `${index} / ${images.value.length}`;
         }
       });
-      
-      observer.observe(wrapper, { 
-        subtree: true, 
-        attributes: true, 
-        attributeFilter: ['src'] 
+
+      observer.observe(wrapper, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src']
       });
     }
   }, 50);
 }
 
 onMounted(() => {
-  console.log('Component Mounted. Property ID:', propertyId);
   propertiesStore.fetchPropertyDetail(propertyId).then(() => {
-    console.log('After fetch, property is:', property.value);
+    // 数据加载完成
   });
   propertiesStore.logHistory(propertyId);
 });
@@ -992,27 +991,27 @@ onMounted(() => {
   .inspections-section {
     padding: 32px;
   }
-  
+
   .action-buttons-section {
     padding: 0 32px;
   }
-  
+
   .property-price {
     font-size: 32px;
   }
-  
+
   .property-address {
     font-size: 22px;
   }
-  
+
   .property-suburb {
     font-size: 20px;
   }
-  
+
   .specs-row {
     flex-wrap: nowrap;
   }
-  
+
   .availability-info {
     flex-direction: row;
     gap: 24px;
@@ -1024,17 +1023,17 @@ onMounted(() => {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .property-actions {
     align-self: flex-end;
   }
-  
+
   .specs-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .spec-divider {
     display: none;
   }

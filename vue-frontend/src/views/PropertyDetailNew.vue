@@ -10,7 +10,7 @@
           class="main-image"
           fit="cover"
         />
-        
+
         <!-- 返回按钮 -->
         <button @click="goBack" class="back-btn">
           <el-icon :size="20"><ArrowLeft /></el-icon>
@@ -20,7 +20,7 @@
       <!-- 主内容区 1683x1909 位于 left:117px top:687px -->
       <div class="main-content-wrapper">
         <div class="main-content">
-          
+
           <!-- 第一部分：基本信息 -->
           <div class="info-section">
             <!-- 价格和可用日期 -->
@@ -29,16 +29,16 @@
               <span class="divider">|</span>
               <span>Bond ${{ getBondAmount() }}</span>
             </div>
-            
+
             <!-- 价格 -->
             <div class="price">${{ property?.rent_pw || 0 }} per week</div>
-            
+
             <!-- 地址 -->
             <div class="address">
               <h1>{{ property?.address }}</h1>
               <p>{{ property?.suburb }}, NSW {{ property?.postcode }}</p>
             </div>
-            
+
             <!-- 房屋特征 -->
             <div class="features">
               <div class="feature">
@@ -61,7 +61,7 @@
           <div class="map-section">
             <h2>Location</h2>
             <div class="map-container">
-              <SimpleMap 
+              <SimpleMap
                 v-if="property?.latitude && property?.longitude"
                 :latitude="property.latitude"
                 :longitude="property.longitude"
@@ -70,7 +70,7 @@
                 :marker-title="property.address"
               />
             </div>
-            
+
             <!-- See travel times 按钮 - 保留原功能 -->
             <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
               <div class="travel-icon-wrapper">
@@ -128,7 +128,7 @@
           <div class="inspection-section">
             <h2 class="inspection-title">Inspection times</h2>
             <span class="inspection-label">INSPECTIONS</span>
-            
+
             <div class="inspection-grid">
               <!-- 左列 -->
               <div class="inspection-column">
@@ -169,7 +169,7 @@
                   </button>
                 </div>
               </div>
-              
+
               <!-- 右列 -->
               <div class="inspection-column">
                 <div class="inspection-item">
@@ -199,7 +199,7 @@
                     <el-icon><Calendar /></el-icon>
                   </button>
                 </div>
-                
+
                 <!-- Add all to planner 按钮 -->
                 <div class="planner-btn-wrapper">
                   <button class="add-to-planner">
@@ -214,9 +214,9 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Auth Modal -->
-    <AuthModal 
+    <AuthModal
       v-if="showAuthModal"
       v-model="showAuthModal"
       @success="handleAuthSuccess"
@@ -229,7 +229,7 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
-import { 
+import {
   ArrowLeft, House, Ticket, Van, Calendar, Plus
 } from '@element-plus/icons-vue'
 import SimpleMap from '@/components/SimpleMap.vue'
@@ -260,9 +260,9 @@ const getBondAmount = () => {
 
 // 保留原有的 handleSeeTravelTimes 功能
 const handleSeeTravelTimes = () => {
-  const testMode = true
-  
-  if (testMode || authStore.isAuthenticated) {
+  const isTest = authStore.testMode
+
+  if (isTest || authStore.isAuthenticated) {
     router.push({
       name: 'CommuteTimes',
       query: {
@@ -686,11 +686,11 @@ onMounted(async () => {
     width: 100%;
     max-width: 1920px;
   }
-  
+
   .image-section {
     width: 100%;
   }
-  
+
   .main-content-wrapper {
     position: relative;
     left: 0;
@@ -700,7 +700,7 @@ onMounted(async () => {
     margin: 0 auto;
     padding: 20px;
   }
-  
+
   .map-section,
   .description-section,
   .features-section,
@@ -714,11 +714,11 @@ onMounted(async () => {
   .image-section {
     height: 300px;
   }
-  
+
   .inspection-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
     gap: 20px;

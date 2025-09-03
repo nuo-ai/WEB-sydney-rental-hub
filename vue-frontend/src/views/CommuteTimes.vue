@@ -7,10 +7,10 @@
       </button>
       <h1 class="page-title">Location</h1>
     </header>
-    
+
     <!-- 地图区域 -->
     <section class="map-section">
-      <SimpleMap 
+      <SimpleMap
         v-if="propertyCoordinates"
         :latitude="propertyCoordinates.lat"
         :longitude="propertyCoordinates.lng"
@@ -23,18 +23,18 @@
         <span>Loading map...</span>
       </div>
     </section>
-    
+
     <!-- Travel Time 区域 -->
     <section class="travel-time-section">
       <h2 class="section-title">Travel Time</h2>
       <p class="from-address">From {{ fullAddress }}</p>
-      
+
       <!-- 交通方式选择 -->
-      <TransportModes 
-        v-model="selectedMode" 
+      <TransportModes
+        v-model="selectedMode"
         @change="handleModeChange"
       />
-      
+
       <!-- 地址列表 -->
       <div class="locations-list">
         <!-- 用户保存的地址 -->
@@ -46,7 +46,7 @@
           :from="propertyCoordinates"
           @remove="removeLocation"
         />
-        
+
         <!-- 空状态 -->
         <div v-if="userLocations.length === 0" class="empty-state">
           <i class="fas fa-map-marked-alt"></i>
@@ -54,21 +54,21 @@
           <p class="empty-hint">Add your frequent destinations to see travel times</p>
         </div>
       </div>
-      
+
       <!-- 添加地址按钮 -->
       <button class="add-location-btn" @click="showAddModal = true">
         <i class="fas fa-plus"></i>
         <span>Add location</span>
       </button>
     </section>
-    
+
     <!-- 模态框 -->
-    <AddLocationModal 
+    <AddLocationModal
       v-if="showAddModal"
       v-model="showAddModal"
       @select="handleAddressSelected"
     />
-    
+
     <NameLocationModal
       v-if="showNameModal"
       v-model="showNameModal"
@@ -159,19 +159,19 @@ const saveLocation = async (data) => {
       lat = data.address.geometry.location.lat
       lng = data.address.geometry.location.lng
     }
-    
+
     // 保存地址到用户账户
-    const savedAddress = await authStore.saveUserAddress({
+    await authStore.saveUserAddress({
       address: data.address.formatted_address,
       label: data.label,
       placeId: data.address.place_id,
       latitude: lat,
       longitude: lng
     })
-    
+
     showNameModal.value = false
     selectedAddress.value = null
-    
+
     ElMessage.success('Location added successfully!')
   } catch (error) {
     console.error('Error saving location:', error)
@@ -195,6 +195,7 @@ const removeLocation = async (locationId) => {
     await authStore.removeUserAddress(locationId)
     ElMessage.success('Location removed')
   } catch (error) {
+    console.error('Failed to remove location', error)
     ElMessage.error('Failed to remove location')
   }
 }
@@ -202,27 +203,17 @@ const removeLocation = async (locationId) => {
 // 生命周期
 onMounted(() => {
   // 测试模式：跳过登录检查
-  const testMode = true // 设置为 false 启用登录验证
-  
-  // Enable test mode in localStorage
-  if (testMode) {
-    localStorage.setItem('auth-testMode', 'true')
-  }
-  
+  const isTest = authStore.testMode
+
+
   // 检查是否登录
-  if (!testMode && !authStore.isAuthenticated) {
+  if (!isTest && !authStore.isAuthenticated) {
     ElMessage.warning('Please login to access this feature')
     router.push('/')
     return
   }
-  
-  // 测试模式下设置模拟用户
-  if (testMode && !authStore.isAuthenticated) {
-    // 模拟登录状态
-    authStore.user = { id: 'test', name: 'Test User', email: 'test@example.com' }
-    authStore.token = 'test-token'
-  }
-  
+
+
   // 设置当前房源信息到store
   if (propertyCoordinates.value) {
     commuteStore.setCurrentProperty({
@@ -231,7 +222,7 @@ onMounted(() => {
       coordinates: propertyCoordinates.value
     })
   }
-  
+
   // 加载用户保存的地址（在测试模式下会加载模拟数据）
   authStore.loadUserAddresses()
 })

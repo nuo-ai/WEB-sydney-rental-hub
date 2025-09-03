@@ -44,18 +44,18 @@
                 class="main-image"
                 @error="handleImageError"
               />
-              
+
               <!-- 左右切换按钮 -->
               <template v-if="images.length > 1">
-                <button 
-                  @click="previousImage" 
+                <button
+                  @click="previousImage"
                   class="carousel-nav prev"
                   :disabled="currentImageIndex === 0"
                 >
                   <i class="fas fa-chevron-left"></i>
                 </button>
-                <button 
-                  @click="nextImage" 
+                <button
+                  @click="nextImage"
                   class="carousel-nav next"
                   :disabled="currentImageIndex === images.length - 1"
                 >
@@ -67,10 +67,10 @@
               <div class="image-counter" v-if="images.length > 1">
                 {{ currentImageIndex + 1 }} of {{ images.length }}
               </div>
-              
+
               <!-- 图片指示点 -->
               <div class="image-dots" v-if="images.length > 1">
-                <span 
+                <span
                   v-for="(img, index) in images"
                   :key="index"
                   :class="['dot', { active: index === currentImageIndex }]"
@@ -78,7 +78,7 @@
                 ></span>
               </div>
             </div>
-            
+
             <!-- 无图片占位符 -->
             <div v-else class="no-image-placeholder">
               <i class="fas fa-image"></i>
@@ -104,7 +104,7 @@
           <div class="address-section">
             <p class="property-address">{{ property.address }}</p>
           </div>
-          
+
           <!-- 规格 -->
           <div class="property-specs">
             <div class="spec-item">
@@ -120,7 +120,7 @@
               <span>{{ property.parking_spaces || '-' }}</span>
             </div>
           </div>
-          
+
           <!-- 看房时间 -->
           <div v-if="property.inspection_times" class="inspection-row">
             <div class="inspection-label">Inspection: {{ property.inspection_times }}</div>
@@ -157,8 +157,8 @@
               <span>{{ feature }}</span>
             </div>
           </div>
-          <button 
-            v-if="property.property_features.length > 6" 
+          <button
+            v-if="property.property_features.length > 6"
             @click="showAllFeatures = !showAllFeatures"
             class="show-more-btn"
           >
@@ -179,7 +179,7 @@
               {{ property.description }}
             </p>
           </div>
-          <button 
+          <button
             v-if="property.description && property.description.length > 200"
             @click="toggleDescription"
             class="read-more-btn"
@@ -195,7 +195,7 @@
         </div>
       </div>
     </main>
-    
+
     <!-- 底部操作栏 -->
     <footer v-if="property" class="sticky-footer">
       <button class="footer-btn enquire-btn" @click="handleEmail">Enquire</button>
@@ -205,7 +205,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref, nextTick, watch } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
@@ -251,19 +251,19 @@ const availabilityText = computed(() => {
   if (!property.value || !property.value.available_date) {
     return 'Available now'
   }
-  
+
   const availDate = new Date(property.value.available_date)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  
+
   if (availDate <= today) {
     return 'Available now'
   }
-  
+
   const day = availDate.getDate().toString().padStart(2, '0')
   const month = (availDate.getMonth() + 1).toString().padStart(2, '0')
   const year = availDate.getFullYear()
-  
+
   return `Available from ${day}/${month}/${year}`
 })
 
@@ -281,10 +281,10 @@ const toggleFavorite = () => {
 
 const shareProperty = async () => {
   if (!property.value) return
-  
+
   const shareUrl = window.location.href
   const shareText = `Check out this property: ${property.value.address} - $${property.value.rent_pw}/week`
-  
+
   if (navigator.share) {
     try {
       await navigator.share({
@@ -293,7 +293,7 @@ const shareProperty = async () => {
         url: shareUrl
       })
     } catch (err) {
-      console.log('Share cancelled')
+      console.warn('Share cancelled', err)
     }
   } else {
     navigator.clipboard.writeText(shareUrl)
@@ -308,7 +308,7 @@ const toggleDescription = () => {
 
 const getFeatureIcon = (feature) => {
   const featureLower = feature.toLowerCase()
-  
+
   if (featureLower.includes('air condition')) return 'fas fa-snowflake feature-icon'
   if (featureLower.includes('alarm')) return 'fas fa-shield-alt feature-icon'
   if (featureLower.includes('balcony')) return 'fas fa-home feature-icon'
@@ -319,7 +319,7 @@ const getFeatureIcon = (feature) => {
   if (featureLower.includes('security')) return 'fas fa-lock feature-icon'
   if (featureLower.includes('laundry')) return 'fas fa-tshirt feature-icon'
   if (featureLower.includes('dishwasher')) return 'fas fa-utensils feature-icon'
-  
+
   return 'fas fa-check-circle feature-icon'
 }
 
@@ -788,11 +788,13 @@ onMounted(() => {
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4; /* 标准属性，提升兼容性 */
   -webkit-box-orient: vertical;
 }
 
 .description-text.expanded {
   -webkit-line-clamp: unset;
+  line-clamp: unset; /* 标准属性，提升兼容性 */
 }
 
 .read-more-btn {
@@ -860,7 +862,7 @@ onMounted(() => {
   .image-container {
     height: 400px;
   }
-  
+
   .main-content {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }

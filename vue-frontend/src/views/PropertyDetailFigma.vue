@@ -31,7 +31,7 @@
           <div class="nav-actions">
             <button @click="toggleFavorite" class="nav-btn">
               <el-icon>
-                <component :is="isFavorite ? 'StarFilled' : 'Star'" />
+                <component :is="isFavorite ? StarFilled : Star" />
               </el-icon>
             </button>
             <button @click="shareProperty" class="nav-btn">
@@ -61,8 +61,8 @@
 
           <!-- 图片指示器 -->
           <div v-if="images.length > 1" class="image-indicators">
-            <span 
-              v-for="(img, index) in images" 
+            <span
+              v-for="(img, index) in images"
               :key="index"
               :class="['indicator', { active: index === currentImageIndex }]"
               @click="currentImageIndex = index"
@@ -82,7 +82,7 @@
               <el-icon><MoreFilled /></el-icon>
             </el-button>
           </div>
-          
+
           <div class="price-section">
             <h1 class="price">${{ property.rent_pw }} <span class="price-unit">per week</span></h1>
           </div>
@@ -118,7 +118,7 @@
           <div class="map-wrapper">
             <!-- 静态地图 -->
             <div v-if="property.latitude && property.longitude" class="static-map">
-              <img 
+              <img
                 :src="`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-l+007bff(${property.longitude},${property.latitude})/${property.longitude},${property.latitude},14,0/600x300@2x?access_token=pk.eyJ1IjoianV3b21hcCIsImEiOiJjbTM2eGhiN3EwMHJnMmxzZW9sZ3N0NnhlIn0.dxPXAtxvnzoNKi_QdPXSyA`"
                 alt="Property Location"
                 class="map-image"
@@ -143,12 +143,12 @@
             <h2>{{ property.address }}</h2>
             <p class="property-id">PROPERTY ID: {{ property.listing_id }} (quote when calling)</p>
           </div>
-          
+
           <div v-if="property.description" class="description-content">
             <p class="description-text" :class="{ expanded: isDescriptionExpanded }">
               {{ property.description }}
             </p>
-            <button 
+            <button
               v-if="property.description.length > 200"
               @click="toggleDescription"
               class="read-more-btn"
@@ -168,13 +168,13 @@
               <span>{{ feature.name }}</span>
             </div>
           </div>
-          <button 
+          <button
             v-if="propertyFeatures.length > 3"
             @click="showAllFeatures = !showAllFeatures"
             class="show-more-btn"
           >
             Show {{ showAllFeatures ? 'less' : `${propertyFeatures.length - 3} more` }}
-            <el-icon><component :is="showAllFeatures ? 'ArrowUp' : 'ArrowDown'" /></el-icon>
+            <el-icon><component :is="showAllFeatures ? ArrowUp : ArrowDown" /></el-icon>
           </button>
         </section>
 
@@ -201,10 +201,9 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { 
-  ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture, 
-  Location, House, Ticket, Van, MoreFilled, Guide,
-  HomeFilled, Setting, Grid, Sunny
+import {
+  ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture,
+  Location, House, Ticket, Van, MoreFilled, Guide
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue'
@@ -241,22 +240,22 @@ const availabilityText = computed(() => {
   if (!property.value || !property.value.available_date) {
     return 'now'
   }
-  
+
   const availDate = new Date(property.value.available_date)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  
+
   if (availDate <= today) {
     return 'now'
   }
-  
+
   const options = { day: 'numeric', month: 'short' }
   return availDate.toLocaleDateString('en-US', options)
 })
 
 const inspectionTimes = computed(() => {
   if (!property.value || !property.value.inspection_times) return []
-  
+
   if (typeof property.value.inspection_times === 'string') {
     const times = property.value.inspection_times.split(',').map(time => {
       const parts = time.trim().split(' ')
@@ -267,14 +266,14 @@ const inspectionTimes = computed(() => {
     })
     return times.slice(0, 1) // 只显示第一个
   }
-  
+
   return []
 })
 
 // Property features mapping
 const propertyFeatures = computed(() => {
   if (!property.value || !property.value.property_features) return []
-  
+
   const iconMap = {
     'Air conditioning': 'Sunny',
     'Alarm system': 'Bell',
@@ -309,7 +308,7 @@ const goBack = () => {
 
 const toggleFavorite = () => {
   if (!property.value) return
-  
+
   if (isFavorite.value) {
     propertiesStore.removeFavorite(property.value.listing_id)
     ElMessage.success('已从收藏中移除')
@@ -321,13 +320,13 @@ const toggleFavorite = () => {
 
 const shareProperty = () => {
   if (!property.value) return
-  
+
   if (navigator.share) {
     navigator.share({
       title: property.value.address,
       text: `${property.value.address} - $${property.value.rent_pw}/week`,
       url: window.location.href
-    }).catch(err => console.log('分享失败:', err))
+    }).catch(err => console.error('分享失败:', err))
   } else {
     navigator.clipboard.writeText(window.location.href)
       .then(() => ElMessage.success('链接已复制到剪贴板'))
@@ -341,10 +340,10 @@ const toggleDescription = () => {
 
 const handleEmail = () => {
   if (!property.value) return
-  
+
   const subject = `Enquiry about ${property.value.address}`
   const body = `Hi,\n\nI am interested in the property at:\n${property.value.address}\n$${property.value.rent_pw}/week\n\nPlease send me more information.\n\nThanks!`
-  
+
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
