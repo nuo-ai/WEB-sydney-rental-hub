@@ -72,146 +72,149 @@
 
       <!-- 主体内容 - Domain风格卡片布局 -->
       <main class="content-container">
-        <!-- 白色信息卡片 -->
-        <section class="info-card">
-          <!-- 价格 -->
-          <div class="price-wrapper">
-            <span class="price-text">${{ property.rent_pw }} per week</span>
-          </div>
-
-          <!-- 地址 -->
-          <div class="address-wrapper">
-            <h1 class="address-main">{{ property.address }}</h1>
-            <p class="address-subtitle">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
-          </div>
-
-          <!-- 房源特征 -->
-          <div class="property-features">
-            <div class="feature-item">
-              <i class="fa-solid fa-bed"></i>
-              <span>{{ property.bedrooms || 0 }}</span>
-            </div>
-            <div class="feature-item">
-              <i class="fa-solid fa-bath"></i>
-              <span>{{ property.bathrooms || 0 }}</span>
-            </div>
-            <div class="feature-item">
-              <i class="fa-solid fa-car"></i>
-              <span>{{ property.parking_spaces || 0 }}</span>
-            </div>
-          </div>
-
-          <!-- 可用日期和押金 -->
-          <div class="availability-info">
-            <span class="availability-label">Available from {{ getAvailableDate() }}</span>
-          </div>
-        </section>
-
-        <!-- 位置地图 -->
-        <section class="location-section">
-          <h2 class="section-title">Location</h2>
-          <div class="map-wrapper">
-            <!-- 优先使用SimpleMap，避免Google Maps API问题 -->
-            <div v-if="property.latitude && property.longitude" class="map-container">
-              <SimpleMap
-                :latitude="property.latitude"
-                :longitude="property.longitude"
-                :zoom="15"
-                :height="mapHeight"
-                :marker-title="property.address"
-              />
-              <!-- 静态地图作为后备 -->
-              <img
-                v-if="showStaticMap"
-                :src="staticMapUrl"
-                alt="Property Location"
-                class="static-map-image"
-                @error="handleStaticMapError"
-              />
-            </div>
-            <div v-else class="map-placeholder">
-              <el-icon :size="32"><Location /></el-icon>
-              <span>位置信息暂不可用</span>
+        <!-- 新增：单张白卡一体化容器 -->
+        <div class="content-card">
+          <!-- 白色信息卡片 -->
+          <section class="info-card">
+            <!-- 价格 -->
+            <div class="price-wrapper">
+              <span class="price-text">${{ property.rent_pw }} per week</span>
             </div>
 
-            <!-- See travel times button -->
-            <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
-              <div class="travel-icon-wrapper">
-                <i class="fas fa-location-dot"></i>
+            <!-- 地址 -->
+            <div class="address-wrapper">
+              <h1 class="address-main">{{ property.address }}</h1>
+              <p class="address-subtitle">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
+            </div>
+
+            <!-- 房源特征 -->
+            <div class="property-features">
+              <div class="feature-item">
+                <i class="fa-solid fa-bed"></i>
+                <span>{{ property.bedrooms || 0 }}</span>
               </div>
-              <div class="travel-btn-content">
-                <span class="travel-btn-title">See travel times</span>
-                <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
+              <div class="feature-item">
+                <i class="fa-solid fa-bath"></i>
+                <span>{{ property.bathrooms || 0 }}</span>
               </div>
-            </button>
-          </div>
-        </section>
-
-        <!-- Property Description -->
-        <section class="description-section" v-if="property.property_headline || property.description">
-          <h2 class="section-title">Property Description</h2>
-
-          <div class="description-content">
-            <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
-              <!-- 使用后端字段渲染，移除硬编码占位文本
-                   原因：与后端数据契约对齐（详情端点为超集），避免错误展示 -->
-              <p v-if="property.property_headline" class="description-headline">{{ property.property_headline }}</p>
-              <p v-if="property.description">{{ property.description }}</p>
-            </div>
-            <button
-              @click="toggleDescription"
-              class="read-more-btn"
-            >
-              {{ isDescriptionExpanded ? 'Read less' : 'Read more' }}
-            </button>
-          </div>
-        </section>
-
-        <!-- Property Features - 两列布局 -->
-        <section class="features-section" v-if="allFeatures.length > 0">
-          <h2 class="section-title">Property Features</h2>
-          <div class="features-two-column">
-            <div
-              v-for="feature in displayedFeatures"
-              :key="feature"
-              class="feature-list-item"
-            >
-              {{ feature }}
-            </div>
-          </div>
-          <button
-            @click="showAllFeatures = !showAllFeatures"
-            class="view-less-btn"
-          >
-            {{ showAllFeatures ? 'View less' : 'View all features' }}
-          </button>
-        </section>
-
-        <!-- Inspection Times - 按Figma设计卡片式布局 -->
-        <section v-if="inspectionTimes.length > 0" class="inspection-section">
-          <h2 class="section-title">Inspection times</h2>
-          <div class="inspection-list">
-            <div
-              v-for="(inspection, index) in inspectionTimes"
-              :key="index"
-              class="inspection-item"
-            >
-              <div class="inspection-date">
-                <div class="date-day">{{ inspection.date }}</div>
-                <div class="date-time">{{ inspection.time }}</div>
+              <div class="feature-item">
+                <i class="fa-solid fa-car"></i>
+                <span>{{ property.parking_spaces || 0 }}</span>
               </div>
-              <button class="add-to-calendar-btn">
-                <el-icon><Calendar /></el-icon>
+            </div>
+
+            <!-- 可用日期和押金 -->
+            <div class="availability-info">
+              <span class="availability-label">Available from {{ getAvailableDate() }}</span>
+            </div>
+          </section>
+
+          <!-- 位置地图 -->
+          <section class="location-section">
+            <h2 class="section-title">Location</h2>
+            <div class="map-wrapper">
+              <!-- 优先使用SimpleMap，避免Google Maps API问题 -->
+              <div v-if="property.latitude && property.longitude" class="map-container">
+                <SimpleMap
+                  :latitude="property.latitude"
+                  :longitude="property.longitude"
+                  :zoom="15"
+                  :height="mapHeight"
+                  :marker-title="property.address"
+                />
+                <!-- 静态地图作为后备 -->
+                <img
+                  v-if="showStaticMap"
+                  :src="staticMapUrl"
+                  alt="Property Location"
+                  class="static-map-image"
+                  @error="handleStaticMapError"
+                />
+              </div>
+              <div v-else class="map-placeholder">
+                <el-icon :size="32"><Location /></el-icon>
+                <span>位置信息暂不可用</span>
+              </div>
+
+              <!-- See travel times button -->
+              <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
+                <div class="travel-icon-wrapper">
+                  <i class="fas fa-location-dot"></i>
+                </div>
+                <div class="travel-btn-content">
+                  <span class="travel-btn-title">See travel times</span>
+                  <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
+                </div>
               </button>
             </div>
-          </div>
-          <button class="add-to-planner-btn">
-            <el-icon><Plus /></el-icon>
-            Add all to planner
-          </button>
-        </section>
+          </section>
 
-        <!-- 通勤计算器 - 已移至独立页面 -->
+          <!-- Property Description -->
+          <section class="description-section" v-if="property.property_headline || property.description">
+            <h2 class="section-title">Property Description</h2>
+
+            <div class="description-content">
+              <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
+                <!-- 使用后端字段渲染，移除硬编码占位文本
+                     原因：与后端数据契约对齐（详情端点为超集），避免错误展示 -->
+                <p v-if="property.property_headline" class="description-headline">{{ property.property_headline }}</p>
+                <p v-if="property.description">{{ property.description }}</p>
+              </div>
+              <button
+                @click="toggleDescription"
+                class="read-more-btn"
+              >
+                {{ isDescriptionExpanded ? 'Read less' : 'Read more' }}
+              </button>
+            </div>
+          </section>
+
+          <!-- Property Features - 两列布局 -->
+          <section class="features-section" v-if="allFeatures.length > 0">
+            <h2 class="section-title">Property Features</h2>
+            <div class="features-two-column">
+              <div
+                v-for="feature in displayedFeatures"
+                :key="feature"
+                class="feature-list-item"
+              >
+                {{ feature }}
+              </div>
+            </div>
+            <button
+              @click="showAllFeatures = !showAllFeatures"
+              class="view-less-btn"
+            >
+              {{ showAllFeatures ? 'View less' : 'View all features' }}
+            </button>
+          </section>
+
+          <!-- Inspection Times - 按Figma设计卡片式布局 -->
+          <section v-if="inspectionTimes.length > 0" class="inspection-section">
+            <h2 class="section-title">Inspection times</h2>
+            <div class="inspection-list">
+              <div
+                v-for="(inspection, index) in inspectionTimes"
+                :key="index"
+                class="inspection-item"
+              >
+                <div class="inspection-date">
+                  <div class="date-day">{{ inspection.date }}</div>
+                  <div class="date-time">{{ inspection.time }}</div>
+                </div>
+                <button class="add-to-calendar-btn">
+                  <el-icon><Calendar /></el-icon>
+                </button>
+              </div>
+            </div>
+            <button class="add-to-planner-btn">
+              <el-icon><Plus /></el-icon>
+              Add all to planner
+            </button>
+          </section>
+
+          <!-- 通勤计算器 - 已移至独立页面 -->
+        </div>
       </main>
 
       <!-- 底部固定操作栏 -->
@@ -1679,4 +1682,37 @@ onMounted(async () => {
   background-color: #000000 !important;
   opacity: 0.95 !important;
 }
+/* 单张白卡一体化容器：由父容器统一承载白底与分隔线 */
+.content-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border-default);
+  border-radius: 0;            /* 移动端无圆角 */
+  overflow: hidden;            /* 防止子元素溢出破坏边界 */
+}
+
+/* 在白卡内部，子 section 透明化并移除自身边线与阴影，由父容器统一管理分隔线 */
+.content-card .info-card,
+.content-card .location-section,
+.content-card .description-section,
+.content-card .features-section,
+.content-card .inspection-section {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;                  /* 覆盖 inspection-section 原有的外边距，避免“白卡外溢” */
+}
+
+/* 统一分隔线：除首个以外的 section 顶部加1px分隔线 */
+.content-card > * + * {
+  border-top: 1px solid #e5e5e5;
+}
+
+/* 桌面端：轻微圆角与阴影，贴近 Figma 的“单卡”视觉 */
+@media (min-width: 1200px) {
+  .content-card {
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+}
+
 </style>
