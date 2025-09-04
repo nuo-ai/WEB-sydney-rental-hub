@@ -340,64 +340,17 @@ function parseCoordinates(location) {
 }
 
 export const transportAPI = {
-  // 获取通勤路线（使用本地估算避免Google API费用）
+  // 获取通勤路线（调用后端Google Maps API）
   async getDirections(origin, destination, mode) {
-    try {
-      // 测试模式：使用本地估算
-      const testMode = localStorage.getItem('auth-testMode') === 'true';
+    const response = await apiClient.get('/directions', {
+      params: { origin, destination, mode }
+    });
 
-      if (testMode) {
-        // 解析起点坐标
-        const originCoords = parseCoordinates(origin);
-        if (!originCoords) {
-          throw new Error('Invalid origin coordinates');
-        }
-
-        // 目标地址坐标（需要从保存的地址数据中获取）
-        // 从localStorage获取保存的地址
-        const savedAddresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]');
-        const destAddress = savedAddresses.find(addr => addr.address === destination);
-
-        if (destAddress && destAddress.latitude && destAddress.longitude) {
-          // 计算距离和估算时间
-          const distance = calculateDistance(
-            originCoords.lat, originCoords.lng,
-            destAddress.latitude, destAddress.longitude
-          );
-
-          const result = estimateCommute(distance, mode);
-          return result;
-        } else {
-          // 如果找不到坐标，返回默认估算
-          const defaultEstimates = {
-            DRIVING: { duration: '15-30 min', distance: '10-20 km' },
-            TRANSIT: { duration: '25-45 min', distance: '10-20 km' },
-            WALKING: { duration: '2-3 hr', distance: '10-20 km' }
-          };
-          return defaultEstimates[mode] || defaultEstimates.DRIVING;
-        }
-      }
-
-      // 生产模式：调用后端API
-      const response = await apiClient.get('/directions', {
-        params: { origin, destination, mode }
-      });
-
-      if (response.data.error) {
-        throw new Error(`API错误: ${response.data.error.message}`);
-      }
-
-      return response.data.data;
-    } catch (error) {
-      console.error(`获取通勤路线失败 (模式: ${mode}):`, error);
-      // 返回默认估算作为降级方案
-      const fallbackEstimates = {
-        DRIVING: { duration: '20-40 min', distance: '15-25 km' },
-        TRANSIT: { duration: '30-50 min', distance: '15-25 km' },
-        WALKING: { duration: '3-4 hr', distance: '15-25 km' }
-      };
-      return fallbackEstimates[mode] || fallbackEstimates.DRIVING;
+    if (response.data.error) {
+      throw new Error(`API错误: ${response.data.error.message}`);
     }
+
+    return response.data.data;
   }
 };
 

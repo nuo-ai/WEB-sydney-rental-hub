@@ -390,3 +390,204 @@ const removeDestination = (destinationId) => {
   transform: translateX(30px);
 }
 </style>
+
+async fetchCommuteTime(destination) {
+      console.log('Attempting to fetch commute time with updated code...');
+      if (!destination.id || !this.property.id) {
+        destination.isLoading = true;
+        const origin = `${props.property.latitude},${props.property.longitude}`;
+        try {
+            const result = await transportAPI.getDirections(origin, destination.address, mode);
+            if (result.error) throw new Error(result.error);
+            destination.results[mode] = result;
+        } catch (error) {
+            console.error("Commute calculation failed:", error);
+            destination.results[mode] = { error: true, duration: '计算失败', distance: '' };
+            ElMessage.error(`无法计算到 ${destination.name} 的通勤时间`);
+        } finally {
+            destination.isLoading = false;
+        }
+    };
+};
+
+const handleAddLocation = () => {
+    const address = newDestinationAddress.value.trim();
+    if (!address) return;
+    
+    if (commuteDestinations.some(d => d.address === address)) {
+        ElMessage.warning('该目的地已存在。');
+        return;
+    }
+
+    const newDest = reactive({
+        id: `dest_${Date.now()}`,
+        name: newDestinationName.value.trim() || address,
+        address: address,
+        results: {},
+        isLoading: false
+    });
+    commuteDestinations.push(newDest);
+    
+    fetchCommuteTime(newDest, activeCommuteMode.value);
+
+    newDestinationAddress.value = '';
+    newDestinationName.value = '';
+};
+
+const handlePresetClick = (dest) => {
+    if (commuteDestinations.some(d => d.address === dest.address)) {
+        ElMessage.info(`目的地 "${dest.name}" 已在列表中。`);
+        return;
+    }
+     const newDest = reactive({
+        id: `dest_${Date.now()}`,
+        name: dest.name,
+        address: dest.address,
+        results: {},
+        isLoading: false
+    });
+    commuteDestinations.push(newDest);
+    fetchCommuteTime(newDest, activeCommuteMode.value);
+};
+
+const handleTabChange = (newMode) => {
+    // newMode is the name of the tab pane, which is the mode string.
+    commuteDestinations.forEach(dest => {
+        // 无条件重新获取，确保数据刷新
+        fetchCommuteTime(dest, newMode);
+    });
+};
+
+const removeDestination = (destinationId) => {
+    const index = commuteDestinations.findIndex(d => d.id === destinationId);
+    if (index !== -1) {
+        commuteDestinations.splice(index, 1);
+    }
+};
+
+</script>
+
+<style scoped>
+.commute-calculator-container {
+    border-top: 1px solid #e3e3e3;
+    padding-top: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d2d2d;
+  margin: 0 0 16px 0;
+}
+
+.commute-form {
+    margin-bottom: 24px;
+}
+
+.destination-input-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.preset-destinations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.commute-tabs {
+    margin-bottom: 16px;
+}
+.commute-tabs .el-tabs__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.commute-results {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.no-results {
+    text-align: center;
+    color: #999;
+    padding: 24px 0;
+    font-size: 14px;
+}
+
+.commute-result-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.destination-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.destination-name {
+    font-weight: 600;
+    color: #2d2d2d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.destination-address {
+    font-size: 12px;
+    color: #595959;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.commute-time {
+    flex-shrink: 0;
+    width: 100px;
+    text-align: right;
+}
+
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    color: #999;
+    font-size: 14px;
+}
+
+.duration-text {
+    font-weight: 700;
+    font-size: 16px;
+}
+.duration-text.error {
+    color: #f56c6c;
+}
+
+.distance-text {
+    font-size: 12px;
+    color: #595959;
+}
+
+.remove-btn {
+    margin-left: auto;
+}
+
+/* Transition for list items */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+</style>

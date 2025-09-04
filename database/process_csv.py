@@ -200,6 +200,12 @@ def clean_data(df):
     if 'agent_phone' in df.columns:
         # Ensure agent_phone is treated as a string, remove trailing .0 if it was inferred as float
         df['agent_phone'] = df['agent_phone'].astype(str).str.replace(r'\.0$', '', regex=True)
+        
+        # 修复电话号码前导零丢失问题
+        # 为9位纯数字的电话号码添加前导零
+        df['agent_phone'] = df['agent_phone'].apply(
+            lambda x: '0' + x if x.isdigit() and len(x) == 9 and not x.startswith('0') else x
+        )
     
     db_columns_from_csv = [
         'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
