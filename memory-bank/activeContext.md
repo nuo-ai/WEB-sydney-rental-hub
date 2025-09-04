@@ -62,3 +62,5 @@
 - [X] 虚拟滚动性能优化，节点数量减少99.8%
 - [X] 数据库索引自动优化，提升查询性能
 - [X] **PC 详情页风格一致性**: 统一页面背景/容器宽度/左右内边距；用全局设计令牌替换硬编码颜色/边框/过渡，补齐缺失 CSS 变量映射（`src/style.css`）。
+- [任务#TBD] 修复详情页 description 正文未按 Markdown 排版：在 PropertyDetail.vue 使用 MarkdownContent 渲染，保留展开/收起与样式（影响 PC/移动端），待用户验收
+- 2025-09-04 | Task t4 | PropertyDetail 布局：桌面端正文左缘 453px、右缘距页面 496px，地图右缘与描述右缘对齐；≥1920px 仅限制描述段落行长为 --paragraph-measure(默认 68ch)；Hero 大图不受影响。Ref: t1,t2,t3,t4（commit: 待填）

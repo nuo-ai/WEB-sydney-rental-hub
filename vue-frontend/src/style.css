@@ -597,59 +597,316 @@ html, body {
   letter-spacing: -0.01em;
 }
 
-/* ========== 动画效果 ========== */
+/* 房型规格统一样式（bed/bath/car） */
+.spec-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+.spec-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 单元与单元之间的水平间距：10px */
+.spec-item + .spec-item {
+  margin-left: 10px;
+}
+
+/* 规范化图标在 24x24 视觉框内居中 */
+.spec-item .spec-icon,
+.spec-item .fa,
+.spec-item .fas,
+.spec-item .far,
+.spec-item .fa-solid,
+.spec-item .el-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  line-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 文本 16px，且与图标之间 6px */
+.spec-item .spec-text {
+  font-size: 16px;
+  line-height: 24px;
+  margin-left: 6px;
+}
+
+/* === 房型规格 - 在 spec-row 场景下强覆盖，确保 24/16 与 6/10 生效 === */
+/* 说明：使用更高优先级选择器 + !important，避免被历史 .spec-item 与局部样式覆盖 */
+.spec-row .spec-item { gap: 0 !important; } /* 避免与 margin-left 叠加导致间距变宽 */
+.spec-row .spec-item + .spec-item { margin-left: 10px !important; } /* 单元与单元间 10px */
+
+.spec-row .spec-item .spec-icon,
+.spec-row .spec-item .fa,
+.spec-row .spec-item .fas,
+.spec-row .spec-item .far,
+.spec-row .spec-item .fa-solid,
+.spec-row .spec-item .el-icon {
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 24px !important;
+  line-height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 文本 16px，且与图标之间 6px */
+.spec-row .spec-item .spec-text {
+  font-size: 16px !important;
+  line-height: 24px !important;
+  margin-left: 6px !important;
+}
+
+/* 兜底：若有历史选择器直接作用于 i/span，这里强行提回规范 */
+.spec-row .spec-item i {
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  line-height: 24px !important;
+}
+.spec-row .spec-item span {
+  font-size: 16px !important;
+}
+/* === end === */
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.spec-item i {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+}
+
+.spec-item span {
+  color: #000000;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 底部信息区域 */
+.property-footer {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.availability-text {
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.inspection-text {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ========== 筛选组件样式 ========== */
+
+/* 筛选按钮样式 */
+.filter-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--color-border-default);
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--juwo-primary);
+  color: var(--juwo-primary);
+}
+
+.filter-btn.active {
+  background: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  color: white;
+}
+
+/* ========== 响应式设计系统 ========== */
+
+/* PC端隐藏移动端Logo */
+@media (min-width: 769px) {
+  .mobile-logo-section {
+    display: none;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+}
+
+/* 移动端优先设计 */
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* 房源网格布局 */
+.properties-grid {
+  display: grid;
+  gap: 20px;
+}
+
+/* 移动端 - 单列布局 */
+@media (max-width: 767px) {
+  .properties-grid {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .property-card {
+    width: 100%;
+    max-width: 580px;
+    margin: 0;
+  }
+
+  .property-image-container {
+    width: 100%;
+    height: 250px;
   }
 }
 
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
+/* 平板端和桌面端 - 保持左对齐 */
+@media (min-width: 768px) {
+  .properties-grid {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    max-width: 100%; /* 确保网格不超过其容器 */
   }
-  to {
-    transform: translateY(0);
+
+  .property-card {
+    width: 580px;
+    margin: 0;
+  }
+
+  .container {
+    padding: 0 32px;
   }
 }
 
-.slide-up {
-  animation: slideUp 0.3s ease-out;
+/* ========== 搜索和筛选组件样式 ========== */
+
+/* 搜索栏容器 */
+.search-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
 }
 
-/* Element Plus 日期选择器弹出层 z-index 修复 */
-.el-picker-panel {
-  z-index: 10002 !important;
+/* 自动补全建议列表 */
+.location-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
 }
 
-.el-date-picker {
-  z-index: 10002 !important;
+.suggestion-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f1f1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.el-popper {
-  z-index: 10002 !important;
+.suggestion-item:last-child {
+  border-bottom: none;
 }
 
-.el-popper.is-light {
-  z-index: 10002 !important;
+.suggestion-item:hover {
+  background-color: var(--juwo-primary-50);
+  color: var(--juwo-primary);
 }
 
-/* 确保所有 Element Plus 弹出层在筛选面板之上 */
-.el-overlay {
-  z-index: 10001 !important;
+/* 区域标签样式 */
+.location-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-/* 日期选择器的弹出框 */
-body > .el-popper {
-  z-index: 10002 !important;
+.location-tag {
+  background: var(--juwo-primary);
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.location-tag:hover {
+  background: var(--juwo-primary-dark);
+}
+
+.remove-location-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.remove-location-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ========== 导航组件样式已移至Navigation.vue组件内 ========== */
+
+/* ========== 加载和状态样式 ========== */
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--color-text-secondary);
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-secondary);
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: var(--color-border-default);
+  margin-bottom: 16px;
 }

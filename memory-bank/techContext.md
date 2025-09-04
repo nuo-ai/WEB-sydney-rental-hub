@@ -91,3 +91,17 @@ python scripts/run_backend.py  # localhost:8000
 - 在 `src/style.css` 的 `:root` 补充变量映射：`--space-1-5`, `--space-3`, `--space-3-5`, `--space-4`, `--space-6`, `--text-xs`, `--text-sm`, `--text-base`, `--text-lg`, `--font-semibold`, `--bg-base`, `--bg-hover`, `--bg-secondary`, `--radius-full`, `--shadow-xs`, `--brand-primary`, `--text-primary`, `--text-tertiary`, `--link-color`，与 JUWO 全局设计系统对齐。
 - 在 `PropertyDetail.vue` 统一使用全局 tokens：如 `var(--color-bg-page)`, `var(--color-text-*)`, `var(--color-border-default)`；移除未定义变量（如 `--transition-all`）以避免回退。
 - 统一 ≥1200px 与 1920px 断点的容器规范（`max-width: 1200px`, `padding: 0 32px`），与首页 Home 栅格一致，消除“另一套主题”观感。
+
+### PropertyDetail 布局实现摘要
+- 选择器基线：.property-detail-page .content-card 及其分区（description-section、map-section 等）
+- 断点：
+  - ≥1200px：启用 453px 左缘、496px 右缘的主版心计算；容器全宽布局
+  - ≥1920px：仅对 .description-section p 应用 max-width: var(--paragraph-measure, 68ch)
+- 关键计算：
+  - margin-left: calc(453px - var(--section-padding-x, 50px))
+  - margin-right: calc(496px - var(--section-padding-x, 50px))
+- 分隔线伪元素：left/right = var(--section-padding-x, 50px)，保证与正文内边距对齐
+- 不影响区域：Hero 顶部大图、<1200px 移动端布局
+- 潜在风险/注意：
+  - 若后续修改 --section-padding-x，需同时验证分隔线、标题与卡片边缘是否仍一致
+  - 长段落 measure 仅对 p 生效，富文本内其他块级元素（如 ul/ol、表格）如需限制应另行评估

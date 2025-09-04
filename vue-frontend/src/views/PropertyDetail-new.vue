@@ -106,18 +106,18 @@
           </div>
 
           <!-- 规格 -->
-          <div class="property-specs">
+          <div class="property-specs spec-row">
             <div class="spec-item">
-              <i class="fas fa-bed"></i>
-              <span>{{ property.bedrooms || 0 }}</span>
+              <BedDouble class="spec-icon" />
+              <span class="spec-text">{{ property.bedrooms || 0 }}</span>
             </div>
             <div class="spec-item">
-              <i class="fas fa-bath"></i>
-              <span>{{ property.bathrooms || 0 }}</span>
+              <Bath class="spec-icon" />
+              <span class="spec-text">{{ property.bathrooms || 0 }}</span>
             </div>
             <div class="spec-item">
-              <i class="fas fa-car"></i>
-              <span>{{ property.parking_spaces || '-' }}</span>
+              <CarFront class="spec-icon" />
+              <span class="spec-text">{{ property.parking_spaces || '-' }}</span>
             </div>
           </div>
 
@@ -153,7 +153,7 @@
           <h3 class="card-title">Property features</h3>
           <div class="features-list">
             <div v-for="(feature, index) in visibleFeatures" :key="index" class="feature-item">
-              <i :class="getFeatureIcon(feature)"></i>
+              <component :is="getFeatureIconComponent(feature)" class="spec-icon" />
               <span>{{ feature }}</span>
             </div>
           </div>
@@ -210,6 +210,21 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue'
+import { 
+  BedDouble, 
+  Bath, 
+  CarFront,
+  AirVent,
+  Shield,
+  Home,
+  DoorClosed,
+  Waves,
+  Dumbbell,
+  Lock,
+  WashingMachine,
+  CookingPot,
+  CheckCircle,
+} from 'lucide-vue-next';
 
 const route = useRoute()
 const router = useRouter()
@@ -306,22 +321,29 @@ const toggleDescription = () => {
   isDescriptionExpanded.value = !isDescriptionExpanded.value
 }
 
-const getFeatureIcon = (feature) => {
-  const featureLower = feature.toLowerCase()
+const featureIconMap = {
+  'air condition': AirVent,
+  'alarm': Shield,
+  'balcony': Home,
+  'wardrobe': DoorClosed,
+  'pool': Waves,
+  'gym': Dumbbell,
+  'parking': CarFront,
+  'garage': CarFront,
+  'security': Lock,
+  'laundry': WashingMachine,
+  'dishwasher': CookingPot
+};
 
-  if (featureLower.includes('air condition')) return 'fas fa-snowflake feature-icon'
-  if (featureLower.includes('alarm')) return 'fas fa-shield-alt feature-icon'
-  if (featureLower.includes('balcony')) return 'fas fa-home feature-icon'
-  if (featureLower.includes('wardrobe')) return 'fas fa-door-closed feature-icon'
-  if (featureLower.includes('pool')) return 'fas fa-swimming-pool feature-icon'
-  if (featureLower.includes('gym')) return 'fas fa-dumbbell feature-icon'
-  if (featureLower.includes('parking') || featureLower.includes('garage')) return 'fas fa-car feature-icon'
-  if (featureLower.includes('security')) return 'fas fa-lock feature-icon'
-  if (featureLower.includes('laundry')) return 'fas fa-tshirt feature-icon'
-  if (featureLower.includes('dishwasher')) return 'fas fa-utensils feature-icon'
-
-  return 'fas fa-check-circle feature-icon'
-}
+const getFeatureIconComponent = (feature) => {
+  const featureLower = feature.toLowerCase();
+  for (const key in featureIconMap) {
+    if (featureLower.includes(key)) {
+      return featureIconMap[key];
+    }
+  }
+  return CheckCircle;
+};
 
 const handleEmail = () => {
   if (!property.value) return
@@ -594,7 +616,8 @@ onMounted(() => {
 }
 
 .spec-icon {
-  font-size: 14px;
+  width: 24px;
+  height: 24px;
   color: #666;
 }
 
@@ -703,20 +726,13 @@ onMounted(() => {
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .feature-item:last-child {
   border-bottom: none;
-}
-
-.feature-icon {
-  width: 20px;
-  font-size: 16px;
-  color: #666;
-  text-align: center;
 }
 
 .feature-item span {

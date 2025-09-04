@@ -59,22 +59,22 @@
             @click.stop="toggleFavorite"
             title="Save"
           >
-            <i :class="favoriteIconClass"></i>
+            <Star :class="{ 'is-favorite': isFavorite }" class="spec-icon" />
           </button>
           <!-- 更多选项按钮 -->
           <el-dropdown trigger="click" @command="handleMoreAction">
             <button class="action-btn more-btn" @click.stop>
-              <i class="fa-solid fa-ellipsis"></i>
+              <MoreHorizontal class="spec-icon" />
             </button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="share">
-                  <i class="fa-solid fa-share"></i>
-                  <span style="margin-left: 8px">Share</span>
-                </el-dropdown-item>
-                <el-dropdown-item command="hide">
-                  <i class="fa-solid fa-eye-slash"></i>
-                  <span style="margin-left: 8px">Hide</span>
+                  <Share2 class="spec-icon" />
+                    <span>Share</span>
+                  </el-dropdown-item>
+                  <el-dropdown-item command="hide">
+                    <EyeOff class="spec-icon" />
+                    <span>Hide</span>
                   <div style="font-size: 12px; color: #999; margin-left: 24px">Remove from results</div>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -89,19 +89,19 @@
         <div class="property-address-secondary">{{ locationInfo }}</div>
       </div>
       
-      <!-- 房型信息 - Font Awesome图标 + 数字 -->
-      <div class="property-features">
-        <div class="feature-item">
-          <i class="fa-solid fa-bed"></i>
-          <span>{{ property.bedrooms || 0 }}</span>
+      <!-- 房型信息 - Lucide 图标 + 数字 -->
+      <div class="property-features spec-row">
+        <div class="feature-item spec-item">
+          <BedDouble class="spec-icon" />
+          <span class="spec-text">{{ property.bedrooms || 0 }}</span>
         </div>
-        <div class="feature-item">
-          <i class="fa-solid fa-bath"></i>
-          <span>{{ property.bathrooms || 0 }}</span>
+        <div class="feature-item spec-item">
+          <Bath class="spec-icon" />
+          <span class="spec-text">{{ property.bathrooms || 0 }}</span>
         </div>
-        <div class="feature-item">
-          <i class="fa-solid fa-car"></i>
-          <span>{{ property.parking_spaces || 0 }}</span>
+        <div class="feature-item spec-item">
+          <CarFront class="spec-icon" />
+          <span class="spec-text">{{ property.parking_spaces || 0 }}</span>
         </div>
       </div>
       
@@ -123,10 +123,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
+import { BedDouble, Bath, CarFront, Star, MoreHorizontal, Share2, EyeOff } from 'lucide-vue-next' // 导入 Lucide 图标
+import { usePropertiesStore } from '@/stores/properties'
 
-// 组件属性
 const props = defineProps({
   property: {
     type: Object,
@@ -172,9 +172,7 @@ const isFavorite = computed(() => {
   return propertiesStore.isFavorite(props.property.listing_id)
 })
 
-const favoriteIconClass = computed(() => {
-  return isFavorite.value ? 'fa-solid fa-star' : 'fa-regular fa-star'
-})
+
 
 const isNewProperty = computed(() => {
   return props.property.listing_id > 2500
@@ -243,10 +241,6 @@ const handleCardClick = () => {
 
 const toggleFavorite = () => {
   propertiesStore.toggleFavorite(props.property.listing_id)
-}
-
-const toggleCompare = () => {
-  propertiesStore.toggleCompare(props.property.listing_id)
 }
 
 // 处理更多操作菜单
@@ -405,19 +399,18 @@ const handleMoreAction = (command) => {
   background: transparent;
 }
 
-/* 收藏按钮样式 */
-.favorite-btn {
-  font-size: 18px;
+.action-btn .spec-icon {
+  width: 22px;
+  height: 22px;
 }
 
-.favorite-btn.is-favorite i {
+/* 收藏按钮样式 */
+.favorite-btn .spec-icon.is-favorite {
   color: #FF5824;
+  fill: #FF5824;
 }
 
 /* 更多选项按钮 */
-.more-btn {
-  font-size: 20px;
-}
 
 /* 新房源标签 - 更优雅 */
 .property-status-tag {
@@ -433,6 +426,18 @@ const handleMoreAction = (command) => {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   z-index: 10;
+}
+
+/* 下拉菜单项统一样式 */
+:deep(.el-dropdown-menu__item) {
+  display: flex;
+  align-items: center;
+}
+
+:deep(.el-dropdown-menu__item) .spec-icon {
+  margin-right: 8px;
+  width: 16px; /* 匹配下拉菜单的紧凑布局 */
+  height: 16px;
 }
 
 /* 房源内容区域 */
@@ -475,7 +480,7 @@ const handleMoreAction = (command) => {
   line-height: 1.3;
 }
 
-/* 房型信息图标 - Font Awesome */
+/* 房型信息图标 - Lucide */
 .property-features {
   display: flex;
   align-items: center;
@@ -488,12 +493,6 @@ const handleMoreAction = (command) => {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.feature-item i {
-  font-size: 14px;
-  width: 16px;
-  text-align: center;
 }
 
 .feature-item span {

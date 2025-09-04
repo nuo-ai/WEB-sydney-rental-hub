@@ -94,15 +94,15 @@
             <!-- 房源特征 -->
             <div class="property-features">
               <div class="feature-item">
-                <i class="fa-solid fa-bed"></i>
+                <BedDouble class="spec-icon" />
                 <span>{{ property.bedrooms || 0 }}</span>
               </div>
               <div class="feature-item">
-                <i class="fa-solid fa-bath"></i>
+                <Bath class="spec-icon" />
                 <span>{{ property.bathrooms || 0 }}</span>
               </div>
               <div class="feature-item">
-                <i class="fa-solid fa-car"></i>
+                <CarFront class="spec-icon" />
                 <span>{{ property.parking_spaces || 0 }}</span>
               </div>
             </div>
@@ -276,6 +276,7 @@ import {
   Location, Calendar,
   Loading, Plus
 } from '@element-plus/icons-vue'
+import { BedDouble, Bath, CarFront } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
 import SimpleMap from '@/components/SimpleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
@@ -439,44 +440,6 @@ const inspectionTimes = computed(() => {
 
   return []
 })
-
-const nextInspectionTime = computed(() => {
-  if (inspectionTimes.value.length > 0) {
-    const firstInspection = inspectionTimes.value[0];
-
-    if (firstInspection.date.toLowerCase().includes('appointment')) {
-      return 'By Appt.';
-    }
-
-    if (firstInspection.date.toLowerCase().includes('cancelled')) {
-      return 'Cancelled';
-    }
-
-    // Try to get a short day name (e.g., "Sat")
-    const dateParts = firstInspection.date.split(' ');
-    const day = dateParts.find(p => /^(mon|tue|wed|thu|fri|sat|sun)/i.test(p)) || dateParts[0] || '';
-
-    // Get the first part of the time string
-    const timeParts = firstInspection.time.split(' ');
-    let startTime = timeParts[0] || '';
-
-    // Remove ":00" to shorten, e.g. "10am" from "10:00am"
-    if (/\d{1,2}:\d{2}(am|pm)/.test(startTime)) {
-       startTime = startTime.replace(':00', '');
-    }
-
-    if (day && startTime && startTime !== 'Details') {
-      return `${day.slice(0, 3)} ${startTime}`; // e.g., "Sat 10am"
-    }
-
-    if (day) {
-        return day.slice(0,3);
-    }
-
-    return 'Details'; // Fallback
-  }
-  return ''; // No inspections
-});
 
 const mapHeight = computed(() => {
   // Responsive map height - 使用固定值而不是动态计算
