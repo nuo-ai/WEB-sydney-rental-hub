@@ -635,7 +635,7 @@ onMounted(async () => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: var(--color-bg-page);  /* 统一与全局页面背景 */
+  background-color: #FFFFFF;  /* 统一页面与卡片背景为纯白 */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -918,9 +918,14 @@ onMounted(async () => {
 /* PC端主内容区域 - 完全改变布局 */
 @media (min-width: 1200px) {
   .content-container {
-    max-width: 1200px;
-    padding: 32px 32px;
-    margin: 0 auto;
+    max-width: none !important;
+    width: 100% !important;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     position: relative;
     z-index: 5;
   }
@@ -1688,6 +1693,7 @@ onMounted(async () => {
   border: 1px solid var(--color-border-default);
   border-radius: 0;            /* 移动端无圆角 */
   overflow: hidden;            /* 防止子元素溢出破坏边界 */
+  box-shadow: none;
 }
 
 /* 在白卡内部，子 section 透明化并移除自身边线与阴影，由父容器统一管理分隔线 */
@@ -1711,8 +1717,114 @@ onMounted(async () => {
 @media (min-width: 1200px) {
   .content-card {
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    box-shadow: none;
   }
 }
 
+/* 统一桌面端对齐与内容可读宽度（单张白卡内部） */
+@media (min-width: 1200px) {
+  /* 桌面端版心标准：左右内边距 50px，可读宽度 801px（按设计尺规） */
+  .content-card {
+    --section-padding-x: 50px;
+    --content-measure: 801px;
+  }
+
+  /* 1) 统一各区块左右内边距为 50px，保证左边缘对齐 */
+  .content-card .info-card,
+  .content-card .location-section,
+  .content-card .description-section,
+  .content-card .features-section,
+  .content-card .inspection-section {
+    padding: 40px var(--section-padding-x) !important; /* 统一左 50px，对齐 */
+  }
+
+  /* 2) 限制区块内直接子元素的最大宽度（标题、地图容器、内容容器等） */
+  .content-card section > * {
+    max-width: var(--content-measure); /* 801px */
+  }
+
+  /* 3) 标题与正文对齐并受同一上限约束 */
+  .content-card .section-title {
+    max-width: var(--content-measure);
+  }
+
+  /* 4) 地图整体宽度跟随可读宽度，避免过宽；同时两侧各留 50px 内边距 */
+  .content-card .map-wrapper {
+    max-width: var(--content-measure);
+  }
+
+  /* 5) 正文段落行长控制，进一步提升可读性 */
+  .content-card .description-text {
+    max-width: 68ch; /* 典型可读行长 */
+  }
+}
+
+
+/* ==== 覆盖层（放在样式结尾，确保权重更高）==== */
+/* 1) 扁平化白卡外观：无边框、无圆角、无阴影 */
+.content-card {
+  box-shadow: none !important;   /* 去除白卡阴影 */
+  border: none !important;       /* 去除白卡四周边线（避免两侧“竖线”） */
+  border-radius: 0 !important;   /* 去除圆角 */
+}
+
+/* 内部子区块：确保无阴影，背景保持白色以便分隔线清晰可见 */
+.content-card .info-card,
+.content-card .location-section,
+.content-card .description-section,
+.content-card .features-section,
+.content-card .inspection-section {
+  box-shadow: none !important;
+  background: #fff;
+}
+
+/* 2) 移除基于 border-top 的旧分隔线规则，改用伪元素绘制以控制左右对齐 */
+.content-card > * + * {
+  border-top: none !important; /* 覆盖之前的边框分隔线 */
+}
+
+/* 3) 桌面端：分隔线左对齐正文内容（48px 内边距），右对齐地图右缘（与 --content-measure 一致） */
+@media (min-width: 1200px) {
+  /* 让每个区块能承载绝对定位的伪元素 */
+  .content-card > * { position: relative; }
+
+  .content-card > * + *::before {
+    content: "";
+    position: absolute;
+    left: var(--section-padding-x, 50px);                 /* 与正文左侧对齐（标准 50px） */
+    width: calc(100% - calc(var(--section-padding-x, 50px) * 2)); /* 分隔线右端对齐到内容右缘（= 页面右侧 496） */
+    top: 0;
+    height: 1px;
+    background-color: var(--divider-color, #E5E7EB);
+  }
+}
+
+/* 移动端与小屏：恢复基础分隔线（无需特殊对齐规则） */
+@media (max-width: 1199px) {
+  .content-card > * + * { border-top: 1px solid var(--divider-color, #E5E7EB) !important; }
+}
+/* 超宽屏段落行长限制：提升可读性，不改变容器的 453px/496px 对齐规则 */
+@media (min-width: 1920px) {
+  .property-detail-page .content-card .description-section p {
+    max-width: var(--paragraph-measure, 68ch);
+    margin-right: auto;
+  }
+}
+/* 新增：桌面端固定正文左右边距（左 453 / 右 496），并移除 801px 上限以保证右缘对齐 */
+@media (min-width: 1200px) {
+  .content-card {
+    margin-left: calc(453px - var(--section-padding-x, 50px)) !important;
+    margin-right: calc(496px - var(--section-padding-x, 50px)) !important;
+    width: auto !important; /* 由左右外边距与卡片内边距共同决定可用内容宽度 */
+  }
+
+  /* 取消 801px 限宽，让标题/内容/地图充满卡片可用宽度（从而右缘能对齐到 496） */
+  .content-card section > *,
+  .content-card .section-title,
+  .content-card .map-wrapper,
+  .content-card .description-text {
+    max-width: none !important;
+    width: auto !important;
+  }
+}
 </style>
