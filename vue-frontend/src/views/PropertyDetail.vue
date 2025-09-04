@@ -50,23 +50,27 @@
             </button>
           </div>
 
-          <!-- Photos按钮和Inspect按钮 - 左下角 -->
+          <!-- 图片计数器 - 左下角 -->
           <div class="image-bottom-controls">
-            <button @click="handleInspections" class="inspect-btn-overlay">
-              <el-icon :size="18"><Calendar /></el-icon>
-              <span>Inspect {{ nextInspectionTime }}</span>
-            </button>
+            <!-- 这里改为 Photos pill（图标 + 文案 + 数字徽标） -->
+            <div class="inspect-btn-overlay image-counter" aria-label="照片数量">
+              <img v-if="!photoIconFailed" :src="photoIcon" alt="" aria-hidden="true" class="pill-icon" @error="photoIconFailed = true" />
+              <el-icon v-else :size="16" class="pill-icon" aria-hidden="true"><Picture /></el-icon>
+              <span class="pill-label">Photos</span>
+              <span class="pill-badge">{{ images.length > 99 ? '99+' : images.length }}</span>
+            </div>
+
+            <!-- 指示点 -->
+            <div v-if="images.length > 1" class="image-indicators">
+              <span
+                v-for="(img, index) in images"
+                :key="index"
+                :class="['indicator', { active: index === currentImageIndex }]"
+                @click="currentImageIndex = index"
+              ></span>
+            </div>
           </div>
 
-          <!-- 图片指示器 -->
-          <div v-if="images.length > 1" class="image-indicators">
-            <span
-              v-for="(img, index) in images"
-              :key="index"
-              :class="['indicator', { active: index === currentImageIndex }]"
-              @click="currentImageIndex = index"
-            ></span>
-          </div>
         </div>
       </header>
 
@@ -262,6 +266,7 @@
 </template>
 
 <script setup>
+import photoIcon from '../assets/photo.svg'
 import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
@@ -285,6 +290,8 @@ const propertyId = route.params.id
 
 // 响应式状态
 const currentImageIndex = ref(0)
+// 修复点 2：为图标加载增加失败标志，触发兜底图标
+const photoIconFailed = ref(false)
 const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
 const showStaticMap = ref(false)
@@ -642,7 +649,9 @@ onMounted(async () => {
 .property-detail-page {
   min-height: 100vh;
   background-color: #FFFFFF;  /* 统一页面与卡片背景为纯白 */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* 新增：统一字体栈（含中文优先级） */
+  --font-ui: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* 加载和错误状态 */
@@ -729,16 +738,16 @@ onMounted(async () => {
 }
 
 .image-action-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 10px 16px;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: background 0.2s ease;
   color: #808296;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-ui); /* 统一：替换系统字体为变量 */
   font-size: 14px;
   font-weight: 400;
 }
@@ -763,7 +772,7 @@ onMounted(async () => {
   position: absolute;
   bottom: 16px;
   left: 16px;
-  z-index: 10;
+  z-index: 50; /* 修复点 3：提升层级，避免被图片/预览层/其他覆盖物压住 */
 }
 
 .inspect-btn-overlay {
@@ -786,6 +795,59 @@ onMounted(async () => {
   background: #f8f8f8;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* 将覆盖按钮样式变为计数器时的非交互徽标状态 */
+.inspect-btn-overlay.image-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  background: transparent;
+  color: #3C475B;
+  border: 0;
+  border-radius: 0;
+  cursor: default;
+  font-family: var(--font-ui); /* 统一：移除 "F37 Bolton" */
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* 禁止 hover 视觉（若基类有 hover 效果） */
+.inspect-btn-overlay.image-counter:hover {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+/* 图标尺寸与对齐 */
+.inspect-btn-overlay.image-counter .pill-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* 文案 */
+.inspect-btn-overlay.image-counter .pill-label {
+  white-space: nowrap;
+}
+
+/* 数字徽标（圆胶囊） */
+.inspect-btn-overlay.image-counter .pill-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 9999px;
+  background: #EEF1F4;  /* 浅灰圆点背景 */
+  color: #3C475B;       /* 数字颜色与主体一致 */
+  font-weight: 600;     /* 让数字更稳重，若要 400 请告知 */
+  font-size: 12px;      /* 比主体略小，贴近视觉稿 */
+  line-height: 1;
 }
 
 .image-container {
@@ -970,7 +1032,7 @@ onMounted(async () => {
 
 .availability-label {
   color: #4b5563;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -988,7 +1050,7 @@ onMounted(async () => {
 }
 
 .price-text {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--color-text-price);
   line-height: 1.2;
@@ -1009,8 +1071,8 @@ onMounted(async () => {
   }
 
   .price-text {
-    font-size: 48px;
-    font-weight: 800;
+    font-size: 25px;
+    font-weight: 700;
     color: #000;
   }
 }
@@ -1021,7 +1083,7 @@ onMounted(async () => {
 }
 
 .address-main {
-  font-size: 15px;
+  font-size: 16px;
   color: #333333;
   font-weight: 500;
   line-height: 1.3;
@@ -1038,7 +1100,7 @@ onMounted(async () => {
 /* PC端地址 */
 @media (min-width: 1200px) {
   .address-main {
-    font-size: 22px;
+    font-size: 16px;
   }
 
   .address-subtitle {
@@ -1062,15 +1124,17 @@ onMounted(async () => {
 }
 
 .feature-item i {
-  font-size: 14px;
-  width: 16px;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
   text-align: center;
 }
 
 .feature-item span {
   color: #000000;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .feature-type {
@@ -1080,20 +1144,20 @@ onMounted(async () => {
   font-size: 18px;
   font-weight: 600;
   color: #6e7881;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui); /* 统一 */
 }
 
 /* PC端特征 */
 @media (min-width: 1200px) {
   .price-wrapper {
-    margin-bottom: 24px; /* 价格到地址 24 */
-    padding-bottom: 0;    /* 去除内边距，避免占位 */
-    border-bottom: none;  /* 去除价格与地址之间的细线 */
+    margin-bottom: 32px; /* 价格到地址 32 */
+    padding-bottom: 24px;    /* 保持内边距 */
+    border-bottom: 1px solid #e4e5e7;  /* 保持分隔线 */
   }
 
   .price-text {
-    font-size: 48px;
-    font-weight: 800;
+    font-size: 25px;
+    font-weight: 700;
     color: #000;
   }
 }
@@ -1186,17 +1250,18 @@ onMounted(async () => {
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 23px;
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 20px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui); /* 统一 */
 }
 
 /* PC端标题 */
 @media (min-width: 1200px) {
-  .section-title {
-    font-size: 24px;
+  .section-title,
+  .description-section .section-title {
+    font-size: 25px;
     margin: 0 0 24px 0;
   }
 }
@@ -1290,7 +1355,7 @@ onMounted(async () => {
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 24px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui); /* 统一 */
 }
 
 .description-content {
@@ -1298,8 +1363,8 @@ onMounted(async () => {
 }
 
 .description-text {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--color-text-secondary);
   max-height: 120px;
   overflow: hidden;
@@ -1407,7 +1472,7 @@ onMounted(async () => {
   font-size: 15px;
   color: var(--color-text-secondary);
   line-height: 1.5;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 400;
   word-break: break-word; /* 确保长单词可以换行 */
 }
@@ -1446,7 +1511,7 @@ onMounted(async () => {
   border-radius: 4px;
   text-align: center;
   color: #6c757d;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-size: 15px;
 }
 
@@ -1467,7 +1532,7 @@ onMounted(async () => {
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 24px 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .inspection-section .section-subtitle {
@@ -1525,13 +1590,13 @@ onMounted(async () => {
   font-weight: 700;
   color: var(--color-text-secondary);
   margin-bottom: 4px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 .date-time {
   font-size: 15px;
   color: var(--color-text-secondary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
   font-weight: 400;
 }
 
@@ -1570,7 +1635,7 @@ onMounted(async () => {
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* PC端添加到计划按钮 */
