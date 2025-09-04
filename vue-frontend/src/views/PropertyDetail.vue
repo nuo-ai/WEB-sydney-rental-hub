@@ -155,10 +155,15 @@
 
             <div class="description-content">
               <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
-                <!-- 使用后端字段渲染，移除硬编码占位文本
-                     原因：与后端数据契约对齐（详情端点为超集），避免错误展示 -->
+                <!-- 继续显示后端给的标题 -->
                 <p v-if="property.property_headline" class="description-headline">{{ property.property_headline }}</p>
-                <p v-if="property.description">{{ property.description }}</p>
+
+                <!-- 将正文改为 Markdown 渲染（含换行、列表等），并进行 XSS 清理 -->
+                <MarkdownContent
+                  v-if="property.description"
+                  :content="property.description"
+                  :preserve-line-breaks="true"
+                />
               </div>
               <button
                 @click="toggleDescription"
@@ -269,6 +274,7 @@ import {
 import { ElMessage } from 'element-plus'
 import SimpleMap from '@/components/SimpleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
+import MarkdownContent from '@/components/MarkdownContent.vue'
 
 const route = useRoute()
 const router = useRouter()
