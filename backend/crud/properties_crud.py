@@ -230,7 +230,7 @@ def get_all_properties_from_db(
                     bathrooms=row[5],
                     property_type=row[6],
                     property_url=row[7],
-                    postcode=row[8],
+                    postcode=str(row[8]) if row[8] is not None else None,
                     bond=row[9],
                     parking_spaces=row[10],
                     available_date=row[11],
@@ -279,7 +279,7 @@ def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
                     bathrooms=row[5],
                     property_type=row[6],
                     property_url=row[7],
-                    postcode=row[8],
+                    postcode=str(row[8]) if row[8] is not None else None,
                     bond=row[9],
                     parking_spaces=row[10],
                     available_date=row[11], # Already cast to TEXT in query

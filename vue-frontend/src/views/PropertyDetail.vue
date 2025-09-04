@@ -87,8 +87,15 @@
 
             <!-- 地址 -->
             <div class="address-wrapper">
-              <h1 class="address-main">{{ property.address }}</h1>
-              <p class="address-subtitle">{{ property.suburb }}, NSW {{ property.postcode || '' }}</p>
+              <!-- PC端显示完整地址一行 -->
+              <h1 class="address-main address-pc">{{ property.address }}</h1>
+              <!-- 移动端显示地址和区号分行 -->
+              <div class="address-mobile">
+                <h1 class="address-main">{{ property.address && property.address.includes(',') ? property.address.split(',')[0] : property.address }}</h1>
+                <p class="address-subtitle">
+                  {{ property.suburb }}, NSW {{ property.postcode || '' }}
+                </p>
+              </div>
             </div>
 
             <!-- 房源特征 -->
@@ -1060,6 +1067,15 @@ onMounted(async () => {
   line-height: 1.3;
 }
 
+/* 移动端和PC端的响应式显示 */
+.address-pc {
+  display: none; /* 默认在移动端隐藏 */
+}
+
+.address-mobile {
+  display: block; /* 默认在移动端显示 */
+}
+
 /* PC端地址 */
 @media (min-width: 1200px) {
   .address-main {
@@ -1068,6 +1084,15 @@ onMounted(async () => {
 
   .address-subtitle {
     font-size: 18px;
+  }
+  
+  /* PC端显示完整地址一行，隐藏移动端分行显示 */
+  .address-pc {
+    display: block;
+  }
+  
+  .address-mobile {
+    display: none;
   }
 }
 

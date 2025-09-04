@@ -125,8 +125,11 @@ const searchPlaceholder = computed(() => {
 // const locationSuggestions = computed(() => propertiesStore.locationSuggestions)
 
 const filteredSuggestions = computed(() => {
-  // 直接返回搜索结果
-  return locationSuggestions.value
+  // 过滤掉已经选择的区域，避免重复显示
+  return locationSuggestions.value.filter(suggestion => {
+    // 检查该建议是否已经在选中的区域列表中
+    return !selectedLocations.value.some(selected => selected.id === suggestion.id)
+  })
 })
 
 // 方法
@@ -159,7 +162,15 @@ const loadNearbySuggestions = async () => {
   const lastLocation = selectedLocations.value[selectedLocations.value.length - 1]
   try {
     const result = await locationAPI.getNearbySuburbs(lastLocation.name)
-    nearbySuggestions.value = result.nearby || []
+    // 过滤掉已经选择的区域，避免重复显示
+    const nearbyResults = result.nearby || []
+    nearbySuggestions.value = nearbyResults.filter(suggestion => {
+      // 检查该建议是否已经在选中的区域列表中
+      return !selectedLocations.value.some(selected => 
+        selected.id === suggestion.id || 
+        (selected.name === suggestion.name && selected.postcode === suggestion.postcode)
+      )
+    })
   } catch (error) {
     console.error('获取相邻区域失败:', error)
     nearbySuggestions.value = []
