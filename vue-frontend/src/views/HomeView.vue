@@ -136,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
@@ -147,10 +147,13 @@ import FilterTabs from '@/components/FilterTabs.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 
-// 路由
+/* 路由 */
 const router = useRouter()
 
-// 状态管理
+/* 轻量 i18n：在脚本中访问文案（与全局 $t 一致） */
+const t = inject('t') || ((k) => k)
+
+/* 状态管理 */
 const propertiesStore = usePropertiesStore()
 
 // 响应式数据
@@ -178,7 +181,13 @@ const useVirtualScroll = computed(() => {
   return enableVirtual && displayedProperties.value.length > VIRTUAL_SCROLL_THRESHOLD
 })
 
-// 方法
+/* 方法 */
+// 工具：是否已选择区域（suburb/postcode）
+const hasRegionSelected = () => {
+  const list = propertiesStore.selectedLocations
+  return Array.isArray(list) && list.some((l) => l && (l.type === 'suburb' || l.type === 'postcode'))
+}
+
 const handleSearch = () => {
   // 搜索逻辑已在SearchBar组件中处理，这里主要是响应搜索事件
 }
@@ -204,11 +213,21 @@ const handleLocationSelected = async () => {
 }
 
 const handleToggleFullPanel = (show) => {
+  // 入口拦截：若未选区域，直接轻提示并阻止打开
+  if (show && !hasRegionSelected()) {
+    ElMessage.warning(t('filter.selectRegionFirst') || '请先选择区域后再筛选')
+    return
+  }
   showFilterPanel.value = show
 }
 
 const handleOpenFilterPanel = () => {
-  // 说明：从 SearchBar 右侧图标触发，打开统一筛选面板（保持“单一入口”）
+  // 入口拦截：若未选区域，直接轻提示并阻止打开
+  if (!hasRegionSelected()) {
+    ElMessage.warning(t('filter.selectRegionFirst') || '请先选择区域后再筛选')
+    return
+  }
+  // 从 SearchBar 右侧图标触发，打开统一 FilterPanel
   showFilterPanel.value = true
 }
 

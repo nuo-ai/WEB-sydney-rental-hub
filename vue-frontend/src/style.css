@@ -85,6 +85,10 @@
   --text-primary: var(--color-text-primary);
   --text-tertiary: #8b8f97;
   --link-color: var(--juwo-primary);
+
+  /* 输入框后缀定位令牌（统一管理） */
+  --search-suffix-right: 12px; /* 图标距输入框右边界 */
+  --search-suffix-hit: 32px;   /* 命中区域尺寸，必要时可收紧为 24–28px */
 }
 
 /* ========== 全局重置样式 ========== */

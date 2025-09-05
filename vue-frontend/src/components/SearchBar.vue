@@ -434,7 +434,7 @@ watch(
 /* 说明：筛选图标容器采用绝对定位贴右；视觉尺寸 16×16，命中区域放大到 32×32 增强可点性 */
 .filter-icon-btn {
   position: absolute;
-  right: var(--space-3, 12px);
+  right: var(--search-suffix-right, 12px);
   top: 50%;
   transform: translateY(-50%);
   width: var(--search-suffix-hit, 32px);   /* 命中区域 */

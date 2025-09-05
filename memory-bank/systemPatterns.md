@@ -81,6 +81,27 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 关键变量：--section-padding-x（默认 50px）、--paragraph-measure（默认 68ch）。
 - 调整对齐或行长时优先改变量，避免散点修改。
 
+## 输入框后缀对齐模式（新增）
+- 原则：后缀图标相对 `.el-input__wrapper` 绝对定位（position:absolute；right 使用令牌），文本占位通过 wrapper 的 `padding-right` 令牌化预留；禁止以 `.el-input__suffix` 作为定位锚点。
+- 为什么：suffix-inner 常不占满，clearable/内部结构变化会导致“看起来靠左”或覆盖占位符；以 wrapper 为锚点稳健且易于令牌化。
+- 实施：
+  - `.el-input__wrapper { position: relative; padding-right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px)); }`
+  - `.filter-icon-btn { position:absolute; right: var(--search-suffix-right, 12px); top:50%; transform: translateY(-50%); }`
+  - SVG 图标 `stroke: currentColor`，颜色用 `var(--color-text-secondary)`；a11y：button + aria-label。
+- 令牌：
+  - `--search-suffix-right`: 右内边距，默认 12px
+  - `--search-suffix-hit`: 命中区域宽高，默认 32px（可调至 24–28px 以收紧命中范围）
+- 溯源：activeContext 2025-09-06｜UI-SEARCH-FILTER-SUFFIX
+
+## 移动端 Full-bleed 卡片模式（新增）
+- 原则：移动端卡片支持“满屏贴边（full-bleed）”，改变宽度不改变高度；桌面端不受影响。
+- 实施（@media ≤767px）：
+  - `.property-card { width:100vw; max-width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); border-radius:0; }`
+  - 保持图片容器/轮播高度不变（例如 250px），`object-fit: cover`。
+- 为什么：在移动端提供更沉浸的视觉，且不破坏既有内容节奏。
+- 注意：full-bleed 与全站容器 32px 留白是两种视觉范式；优先以“组件局部”实现，不影响全局容器规则。
+- 溯源：activeContext 2025-09-06｜UI-CARD-FULLBLEED-MOBILE
+
 ## 经验教训总结
 
 - **CSS全局影响**: 全局 `overflow-x: hidden` 会破坏 `position: sticky`

@@ -346,6 +346,8 @@ const hasAppliedFilters = computed(() => {
   )
 })
 
+
+
 // 相邻多选逻辑
 const isBedroomSelected = (value) => {
   return filters.value.bedrooms.includes(value)
@@ -900,6 +902,7 @@ onMounted(() => {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
 }
+
 
 /* 移动端全屏模式 */
 @media (max-width: 767px) {

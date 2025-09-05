@@ -21,7 +21,8 @@ const MESSAGES = {
       furnishedOnly: '只显示带家具的房源',
       cancel: '取消',
       showResults: '显示结果',
-      anyPrice: '不限价格'
+      anyPrice: '不限价格',
+      selectRegionFirst: '请先选择区域后再筛选'
     }
   }
 }

@@ -1,8 +1,12 @@
 # 当前上下文与紧急焦点
 
-**最后更新**: 2025-09-05
+**最后更新**: 2025-09-06
 
 ---
+
+2025-09-06｜UI-SEARCH-FILTER-SUFFIX｜SearchBar 在 el-input 内嵌 sliders-horizontal 16×16，右距 12px；相对 .el-input__wrapper 绝对定位；令牌化 --search-suffix-right=12px、--search-suffix-hit=32px；移除 clearable；HomeView 隐藏 FilterTabs，监听 openFilterPanel｜commit 2deb50c
+2025-09-06｜UI-CARD-FULLBLEED-MOBILE｜移动端房源卡片 @media≤767px：width/max-width:100vw；左右 margin: calc(50% - 50vw) 实现 full-bleed；border-radius:0；图片/轮播高度 250px 不变｜commit 2deb50c
+2025-09-06｜API-LIST-500-FIX｜移除 /api/properties SELECT 中 cover_image（数据库无此列），修复 500｜commit 2deb50c
 
 2025-09-05｜PATCH-FILTER-MIN｜移除筛选失败时的本地回退递归；统一计数入口为 store.getFilteredCount；不改后端契约；影响文件 FilterPanel.vue / stores/properties.js｜commit 504304d（range dc68225..504304d）
 2025-09-05｜DOC-FILTER-PLAN｜新增 docs/filter-upgrade-plan.md：筛选功能与面板升级技术方案；仅文档，无代码改动

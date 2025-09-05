@@ -153,6 +153,19 @@ const mapFilterStateToApiParams = (
   return params
 }
 
+// 特性开关守卫工具：检测是否已选择“区域”（suburb/postcode）
+// 目的：在 UI 禁用之外，增加 Store 侧的早返回保护，避免无意义的接口请求
+const hasRegionSelected = (selectedLocations = []) => {
+  try {
+    return (
+      Array.isArray(selectedLocations) &&
+      selectedLocations.some((l) => l && (l.type === 'suburb' || l.type === 'postcode'))
+    )
+  } catch {
+    return false
+  }
+}
+
 export const usePropertiesStore = defineStore('properties', {
   state: () => ({
     // 房源数据
@@ -185,6 +198,12 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 对比状态
     compareIds: JSON.parse(localStorage.getItem('juwo-compare') || '[]'),
+
+    // 特性开关（集中管理回滚策略）
+    // requireRegionBeforeFilter: 启用后，未选择区域（suburb/postcode）将禁用筛选并在 Store 侧早返回
+    featureFlags: {
+      requireRegionBeforeFilter: true,
+    },
   }),
 
   getters: {
@@ -392,6 +411,17 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
 
       try {
+        // Store 守卫：未选择区域时直接短路返回，避免无意义请求
+        if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+          // 清空当前结果，维持一致 UI 行为（按钮已禁用，此处为双保险）
+          this.filteredProperties = []
+          this.totalCount = 0
+          this.totalPages = 0
+          this.hasNext = false
+          this.hasPrev = false
+          this.currentPage = 1
+          return
+        }
         // 统一通过映射层构造请求参数
         // 目的：维持 V1 行为（默认），并可通过开关无缝切至 V2 契约（suburbs/price_min/...）
         const mappedParams = mapFilterStateToApiParams(
@@ -541,6 +571,10 @@ export const usePropertiesStore = defineStore('properties', {
     // 获取筛选后的结果数量
     async getFilteredCount(params = {}) {
       try {
+        // Store 守卫：未选择区域时计数恒为 0（不触发网络请求）
+        if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+          return 0
+        }
         // 计数亦走统一映射，确保与列表参数一致
         const mappedParams = mapFilterStateToApiParams(
           params,

@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-05
+**最后更新**: 2025-09-06
 
 ---
 
@@ -108,6 +108,26 @@ python scripts/run_backend.py  # localhost:8000
   - 长段落 measure 仅对 p 生效，富文本内其他块级元素（如 ul/ol、表格）如需限制应另行评估
 
 ---
+
+## 运行与集成增补（2025-09-06）
+
+- 搜索框内嵌筛选入口（SearchBar.vue / HomeView.vue）
+  - 在 el-input 的 suffix 内嵌 sliders-horizontal SVG（16×16，stroke: currentColor），颜色使用 var(--color-text-secondary) 与搜索 icon 一致；
+  - 绝对定位相对 .el-input__wrapper：right: var(--search-suffix-right, 12px); top: 50%; transform: translateY(-50%);
+  - wrapper 右侧 padding-right 使用令牌化计算：calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px))，避免占位符/文本被覆盖；
+  - 交互：button 语义 + aria-label="筛选"，点击 emit('openFilterPanel') 打开统一 FilterPanel；移除 clearable；
+  - HomeView 监听 openFilterPanel 并隐藏 FilterTabs（v-if=false），维持“筛选入口单一”。
+
+- 移动端房源卡片 full-bleed（PropertyCard.vue）
+  - @media (max-width: 767px) 下：width/max-width:100vw；左右 margin: calc(50% - 50vw) 实现贴边；border-radius:0；
+  - 高度不变：图片容器与轮播容器保持 250px，object-fit: cover；桌面端不受影响。
+
+- 后端列表接口修复（backend/main.py）
+  - 移除 /api/properties 列表查询中的 cover_image 字段（数据库 schema 无此列），解决 500 错误，保证分页/筛选稳定。
+
+- 设计令牌（新增/约定）
+  - --search-suffix-right: 12px（后缀右间距）
+  - --search-suffix-hit: 32px（后缀命中区域宽高，可收紧为 24–28px）
 
 ## 运行与集成增补（2025-09-05）
 

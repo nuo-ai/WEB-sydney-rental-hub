@@ -1,4 +1,4 @@
-# 项目简报 (Project Brief)
++# 项目简报 (Project Brief)
 
 **文档状态**: 生存文档 (Living Document)
 **最后更新**: 2025-08-19
@@ -37,4 +37,4 @@
 
 ## 兼容性准则
 
-- 遵循 systemPatterns.md 的“API 设计与契约一致性”原则：详情端点应为列表端点字段的超集；新增字段应优先在详情端点补齐，再评估是否需要在列表端点返回。参见 [systemPatterns.md](./systemPatterns.md)。
+所有技术实现必须遵循 systemPatterns.md 中的“API 设计与契约一致性”规范（详情端点应为列表端点的超集）。参见 ./systemPatterns.md。
