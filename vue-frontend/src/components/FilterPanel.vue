@@ -189,6 +189,7 @@ const buildQueryFromFilters = (filterParams) => {
   put('date_to', filterParams.date_to)
   if (filterParams.isFurnished === true) q.isFurnished = '1'
   put('suburb', filterParams.suburb)
+  put('postcodes', filterParams.postcodes)
   return q
 }
 
@@ -239,6 +240,25 @@ const applyQueryToState = (query, store) => {
           name,
           fullName: name,
         }))
+      }
+    }
+    // postcodes（CSV）
+    const postcodesCsv = query.postcodes
+    if (postcodesCsv) {
+      const codes = String(postcodesCsv)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+      if (codes.length) {
+        const existing = Array.isArray(store.selectedLocations) ? store.selectedLocations : []
+        store.selectedLocations = existing.concat(
+          codes.map((code) => ({
+            id: `postcode_${code}`,
+            type: 'postcode',
+            name: code,
+            fullName: code,
+          })),
+        )
       }
     }
   } catch (e) {
@@ -391,9 +411,18 @@ const updateFilteredCount = async () => {
   }
 
   // 添加已选择的区域
-  const selectedSuburbs = propertiesStore.selectedLocations.map((loc) => loc.name)
+  const selectedSuburbs = propertiesStore.selectedLocations
+    .filter((loc) => loc.type === 'suburb')
+    .map((loc) => loc.name)
   if (selectedSuburbs.length > 0) {
     filterParams.suburb = selectedSuburbs.join(',')
+  }
+  // 支持 postcodes（与 suburbs 区分；CSV）
+  const selectedPostcodes = propertiesStore.selectedLocations
+    .filter((loc) => loc.type === 'postcode')
+    .map((loc) => loc.name)
+  if (selectedPostcodes.length > 0) {
+    filterParams.postcodes = selectedPostcodes.join(',')
   }
 
   // 移除 null 值
@@ -461,9 +490,18 @@ const applyFiltersToStore = async () => {
     }
 
     // 添加已选择的区域
-    const selectedSuburbs = propertiesStore.selectedLocations.map((loc) => loc.name)
+    const selectedSuburbs = propertiesStore.selectedLocations
+      .filter((loc) => loc.type === 'suburb')
+      .map((loc) => loc.name)
     if (selectedSuburbs.length > 0) {
       filterParams.suburb = selectedSuburbs.join(',')
+    }
+    // 支持 postcodes（与 suburbs 区分；CSV）
+    const selectedPostcodes = propertiesStore.selectedLocations
+      .filter((loc) => loc.type === 'postcode')
+      .map((loc) => loc.name)
+    if (selectedPostcodes.length > 0) {
+      filterParams.postcodes = selectedPostcodes.join(',')
     }
 
     await propertiesStore.applyFilters(filterParams)
