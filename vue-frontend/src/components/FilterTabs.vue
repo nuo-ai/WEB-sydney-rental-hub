@@ -219,16 +219,10 @@ const toggleFullPanel = () => {
   emit('toggleFullPanel', !props.filterPanelOpen)
 }
 
-const toggleDropdown = (dropdown) => {
-  if (activeDropdown.value === dropdown) {
-    closeDropdown()
-  } else {
-    // 确保关闭主筛选面板
-    if (props.filterPanelOpen) {
-      emit('toggleFullPanel', false)
-    }
-    activeDropdown.value = dropdown
-  }
+const toggleDropdown = () => {
+  // 一致性要求：触发器仅用于打开统一筛选面板（不再使用预设/下拉）
+  emit('toggleFullPanel', true)
+  activeDropdown.value = null
 }
 
 const closeDropdown = () => {
@@ -394,6 +388,11 @@ defineExpose({
     width: 90%;
     max-width: 340px;
   }
+
+  /* 移动端隐藏平铺的快速筛选标签，仅保留“筛选”触发按钮 */
+  .filter-tab-dropdown {
+    display: none;
+  }
 }
 
 .filter-tabs::-webkit-scrollbar {
@@ -455,9 +454,10 @@ defineExpose({
   color: var(--juwo-primary);
 }
 
-/* 下拉框容器 */
+/* 下拉框容器：PC/移动端都隐藏，仅保留“筛选”主触发按钮 */
 .filter-tab-dropdown {
   position: relative;
+  display: none;
 }
 
 /* 快速筛选下拉框 */

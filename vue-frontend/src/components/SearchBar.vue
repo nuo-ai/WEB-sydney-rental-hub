@@ -28,6 +28,7 @@
         </template>
       </el-input>
 
+
       <!-- 自动补全建议列表 -->
       <div
         v-if="
@@ -378,6 +379,7 @@ watch(
   position: relative;
 }
 
+
 .search-input :deep(.el-input__wrapper) {
   border-radius: 6px;
   border: 1px solid var(--color-border-default);
@@ -552,5 +554,6 @@ watch(
   .suggestion-item {
     padding: 16px;
   }
+
 }
 </style>

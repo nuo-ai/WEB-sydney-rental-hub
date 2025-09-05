@@ -213,7 +213,16 @@ const applyQueryToState = (query, store) => {
       filters.value.bathrooms = [String(query.bathrooms)]
     }
     if (query.parking) {
-      filters.value.parking = [String(query.parking)]
+      const p = String(query.parking)
+      // 兼容旧直链：'0' 与 'any' 视为 Any（不传）
+      if (p === '0' || p === 'any') {
+        filters.value.parking = []
+      } else if (['1', '2', '3+'].includes(p)) {
+        filters.value.parking = [p]
+      } else {
+        // 非法值回退为 Any
+        filters.value.parking = []
+      }
     }
     // 日期
     if (query.date_from) {
@@ -293,9 +302,9 @@ const bathroomOptions = [
 
 const parkingOptions = [
   { value: 'any', label: 'Any' },
-  { value: '0', label: '0' },
   { value: '1', label: '1' },
-  { value: '2+', label: '2+' },
+  { value: '2', label: '2' },
+  { value: '3+', label: '3+' },
 ]
 
 // 计算属性
