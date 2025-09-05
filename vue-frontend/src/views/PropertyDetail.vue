@@ -57,7 +57,7 @@
               <img v-if="!photoIconFailed" :src="photoIcon" alt="" aria-hidden="true" class="pill-icon" @error="photoIconFailed = true" />
               <el-icon v-else :size="16" class="pill-icon" aria-hidden="true"><Picture /></el-icon>
               <span class="pill-label">Photos</span>
-              <span class="pill-badge">{{ images.length > 99 ? '99+' : images.length }}</span>
+              <span :class="['pill-badge', { 'two-digits': images.length >= 10 }]">{{ images.length > 99 ? '99+' : images.length }}</span>
             </div>
 
             <!-- 指示点 -->
@@ -771,18 +771,22 @@ onMounted(async () => {
 .inspect-btn-overlay.image-counter {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  min-width: 118px;
   height: 40px;
   padding: 0 14px;
-  background: transparent;
-  color: #3C475B;
-  border: 0;
-  border-radius: 0;
+  background: #fefefe;
+  color: #3c475b;
+  border: 1px solid #cfd1d7;
+  border-radius: 4px;
   cursor: default;
-  font-family: var(--font-ui); /* 统一：移除 "F37 Bolton" */
+  font-family: var(--font-ui);
   font-weight: 400;
   font-size: 14px;
   line-height: 1;
+  box-shadow: none;
+  box-sizing: border-box;
 }
 
 /* 禁止 hover 视觉（若基类有 hover 效果） */
@@ -790,6 +794,7 @@ onMounted(async () => {
   transform: none;
   filter: none;
   box-shadow: none;
+  background: #fefefe;
 }
 
 /* 图标尺寸与对齐 */
@@ -802,6 +807,8 @@ onMounted(async () => {
 /* 文案 */
 .inspect-btn-overlay.image-counter .pill-label {
   white-space: nowrap;
+  padding-right: 0;
+  line-height: 1;
 }
 
 /* 数字徽标（圆胶囊） */
@@ -809,15 +816,24 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 8px;
-  border-radius: 9999px;
-  background: #EEF1F4;  /* 浅灰圆点背景 */
-  color: #3C475B;       /* 数字颜色与主体一致 */
-  font-weight: 600;     /* 让数字更稳重，若要 400 请告知 */
-  font-size: 12px;      /* 比主体略小，贴近视觉稿 */
+  width: 22px;
+  height: 22px;
+  margin-left: 0;
+  padding: 0;
+  border-radius: 100%;
+  background: #e6e9ed;
+  color: #3c475b;
+  font-weight: 600;
+  font-size: 12px;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+/* 两位及以上（含 99+）→ 自动胶囊 */
+.inspect-btn-overlay.image-counter .pill-badge.two-digits {
+  width: auto;
+  padding: 0 4px;
+  border-radius: 11px;
 }
 
 .image-container {
@@ -1085,12 +1101,12 @@ onMounted(async () => {
   .address-subtitle {
     font-size: 18px;
   }
-  
+
   /* PC端显示完整地址一行，隐藏移动端分行显示 */
   .address-pc {
     display: block;
   }
-  
+
   .address-mobile {
     display: none;
   }
