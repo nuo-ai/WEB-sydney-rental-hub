@@ -97,8 +97,8 @@ src/
 | 端点                      | 方法 | 功能                  | 缓存策略       |
 | ------------------------- | ---- | --------------------- | -------------- |
 | `/api/properties`       | GET  | 房源列表 + 分页       | 服务端分页     |
-| `/api/properties/{id}`  | GET  | 房源详情              | 15分钟缓存     |
-| `/api/directions`       | GET  | Haversine通勤计算     | 本地算法       |
+| `/api/properties/{id}`  | GET  | 房源详情              | 30分钟缓存     |
+| `/api/directions`       | GET  | 后端代理 Google Directions（生产）；失败回退 Haversine（测试/降级） | 本地算法       |
 | `/api/auth/register`    | POST | 用户注册              | JWT令牌        |
 | `/api/user/addresses`   | POST | 地址持久化            | localStorage   |
 | `/graphql`              | ALL  | 灵活数据查询          | 不适用于AI工具 |
@@ -117,7 +117,7 @@ src/
 - ✅ **筛选系统**: 单选逻辑 + 服务端筛选 + 区域联动
 - ✅ **认证系统**: JWT + 邮箱验证 + 测试模式支持
 - ✅ **地图服务**: OpenStreetMap免费替代 + 本地计算
-- ✅ **通勤功能**: 15分钟缓存 + 本地算法 (无API费用)
+- ✅ **通勤功能**: 后端 Google Directions API 已启用；本地 Haversine 仅作测试/降级使用
 
 ---
 

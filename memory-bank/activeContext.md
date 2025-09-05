@@ -1,8 +1,10 @@
 # 当前上下文与紧急焦点
 
-**最后更新**: 2025-09-04
+**最后更新**: 2025-09-05
 
 ---
+
+2025-09-05｜DOCS-ALIGN｜对齐 Memory Bank：更新 /api/directions 为“后端 Google Directions（生产）+ Haversine 回退”，统一详情缓存 30min；纯文档，无代码改动
 
 ## 当前项目运行状态
 

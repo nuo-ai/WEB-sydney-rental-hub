@@ -9,8 +9,8 @@
 
 - **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia
 - **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
-- **数据库**: PostgreSQL (Supabase) + Redis缓存 (15分钟TTL)
-- **地图**: OpenStreetMap (免费) + 本地通勤计算 (Haversine算法)
+- **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL；详情端点 /api/properties/{id} 为 30 分钟）
+- **地图**: OpenStreetMap（底图）+ 后端 Google Directions（生产）+ Haversine（测试回退）
 
 ---
 
@@ -37,6 +37,7 @@ vue-frontend/
 - **代理配置**: 默认将`/api`转发到 `http://localhost:8000`；在 WSL/容器环境可通过环境变量 `VITE_API_TARGET` 切换为 `http://172.31.16.1:8000`
 - **拦截器**: 自动携带JWT认证头（按需启用；已具备框架基础）
 - **响应格式**: 统一`{status, data, pagination, error}`结构
+- **失败策略**: 前端已移除 testMode 与本地估算降级；当后端异常时快速失败并抛错，便于监控定位
 
 ---
 
