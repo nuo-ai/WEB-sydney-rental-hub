@@ -11,8 +11,11 @@
         <h3 class="panel-title chinese-text">筛选</h3>
         <div class="header-actions">
           <button class="reset-link" @click="resetFilters">重置筛选</button>
-          <button class="close-btn" @click="closePanel">
-            <i class="fa-solid fa-xmark"></i>
+          <button class="close-btn" @click="closePanel" aria-label="关闭筛选面板">
+            <!-- 使用内联SVG替代 Font Awesome，符合“SVG组件化图标”与统一风格要求；避免新增依赖 -->
+            <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </button>
         </div>
       </div>
