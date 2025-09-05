@@ -521,9 +521,13 @@ const handleMoreAction = (command) => {
 /* 响应式适配 */
 @media (max-width: 767px) {
   .property-card {
-    width: 100%;
-    max-width: 580px;
-    margin: 0 0 20px 0;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-radius: 0; /* 满屏出血：去圆角 */
   }
 
   .property-image-container {
