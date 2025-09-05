@@ -207,10 +207,6 @@ const debouncedSearch = debounce((query) => {
   searchLocationSuggestions(query)
 }, 300)
 
-const debouncedTextSearch = debounce((query) => {
-  propertiesStore.setSearchQuery(query)
-  emit('search', query)
-}, 500)
 
 // 事件处理
 const handleFocus = () => {
@@ -229,9 +225,9 @@ const handleInput = (value) => {
     showSuggestions.value = true
     debouncedSearch(value) // 调用API搜索
   } else {
-    // 有选中区域时，进行文本搜索
-    debouncedTextSearch(value)
-    showSuggestions.value = false
+    // 已选区域：仍然展示建议列表，用于继续添加区域/邮编
+    showSuggestions.value = true
+    debouncedSearch(value)
   }
 }
 
@@ -260,8 +256,11 @@ const handleKeydown = (event) => {
       event.preventDefault()
       if (currentSuggestionIndex.value >= 0 && suggestions[currentSuggestionIndex.value]) {
         selectLocation(suggestions[currentSuggestionIndex.value])
+      } else if (suggestions.length > 0) {
+        // 未选择具体项时，默认选择第一条建议，便于连续添加区域/邮编
+        selectLocation(suggestions[0])
       } else if (selectedLocations.value.length === 0 && searchQuery.value.trim()) {
-        // 直接搜索
+        // 无建议且尚未选择区域时，触发一次搜索
         debouncedSearch(searchQuery.value)
       }
       break
