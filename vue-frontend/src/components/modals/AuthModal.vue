@@ -96,8 +96,8 @@ import EmailVerifyModal from './EmailVerifyModal.vue'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'success'])
@@ -113,25 +113,28 @@ const authFormRef = ref()
 
 const authForm = ref({
   email: '',
-  password: ''
+  password: '',
 })
 
 // 表单验证规则
 const authRules = {
   email: [
     { required: true, message: 'Please enter email address', trigger: 'blur' },
-    { type: 'email', message: 'Please enter a valid email address', trigger: 'blur' }
+    { type: 'email', message: 'Please enter a valid email address', trigger: 'blur' },
   ],
   password: [
     { required: true, message: 'Please enter password', trigger: 'blur' },
-    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
-  ]
+    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' },
+  ],
 }
 
 // 监听props变化
-watch(() => props.modelValue, (newVal) => {
-  visible.value = newVal
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    visible.value = newVal
+  },
+)
 
 // 监听visible变化
 watch(visible, (newVal) => {
@@ -143,7 +146,7 @@ const handleClose = () => {
   // 重置表单
   authForm.value = {
     email: '',
-    password: ''
+    password: '',
   }
   if (authFormRef.value) {
     authFormRef.value.clearValidate()

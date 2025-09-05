@@ -17,9 +17,7 @@
             </el-icon>
             <h3 class="chinese-text">还没有收藏的房源</h3>
             <p class="chinese-text">浏览房源时点击收藏按钮，将喜欢的房源保存在这里</p>
-            <el-button type="primary" @click="goToHome">
-              去看房源
-            </el-button>
+            <el-button type="primary" @click="goToHome"> 去看房源 </el-button>
           </div>
 
           <!-- 收藏房源网格 -->

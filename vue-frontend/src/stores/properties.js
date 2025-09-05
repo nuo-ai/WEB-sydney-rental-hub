@@ -34,7 +34,7 @@ export const usePropertiesStore = defineStore('properties', {
     viewHistory: JSON.parse(localStorage.getItem('juwo-history') || '[]'),
 
     // 对比状态
-    compareIds: JSON.parse(localStorage.getItem('juwo-compare') || '[]')
+    compareIds: JSON.parse(localStorage.getItem('juwo-compare') || '[]'),
   }),
 
   getters: {
@@ -55,8 +55,8 @@ export const usePropertiesStore = defineStore('properties', {
         return state.favoritePropertiesData
       }
       // 兼容旧逻辑：从allProperties中过滤
-      return state.allProperties.filter(property =>
-        state.favoriteIds.includes(String(property.listing_id))
+      return state.allProperties.filter((property) =>
+        state.favoriteIds.includes(String(property.listing_id)),
       )
     },
 
@@ -64,7 +64,7 @@ export const usePropertiesStore = defineStore('properties', {
     locationSuggestions: (state) => {
       const locationMap = new Map()
 
-      state.allProperties.forEach(property => {
+      state.allProperties.forEach((property) => {
         // 处理区域 (suburb)
         if (property.suburb) {
           const suburb = property.suburb.trim()
@@ -78,7 +78,7 @@ export const usePropertiesStore = defineStore('properties', {
               name: suburb,
               postcode: postcode,
               fullName: postcode ? `${suburb} NSW ${postcode}` : suburb,
-              count: 0
+              count: 0,
             })
           }
           locationMap.get(key).count++
@@ -97,7 +97,7 @@ export const usePropertiesStore = defineStore('properties', {
               name: postcode,
               suburb: suburb,
               fullName: suburb ? `${postcode} (${suburb})` : postcode,
-              count: 0
+              count: 0,
             })
           }
           locationMap.get(key).count++
@@ -105,7 +105,7 @@ export const usePropertiesStore = defineStore('properties', {
       })
 
       return Array.from(locationMap.values()).sort((a, b) => b.count - a.count)
-    }
+    },
   },
 
   actions: {
@@ -119,7 +119,7 @@ export const usePropertiesStore = defineStore('properties', {
         const paginationParams = {
           page: params.page || this.currentPage,
           page_size: params.page_size || this.pageSize,
-          ...params
+          ...params,
         }
 
         const response = await propertyAPI.getListWithPagination(paginationParams)
@@ -140,7 +140,6 @@ export const usePropertiesStore = defineStore('properties', {
         // if (this.allProperties.length === 0 && !params.suburb) {
         //   this.loadBaseDataAsync()
         // }
-
       } catch (error) {
         this.error = error.message || '获取房源数据失败'
         console.error('❌ 房源数据加载失败:', error)
@@ -171,25 +170,28 @@ export const usePropertiesStore = defineStore('properties', {
 
       try {
         // 尝试从当前列表、所有属性或当前已加载的房源中获取基础数据
-        let existingProperty = this.filteredProperties.find(p => String(p.listing_id) === idStr) ||
-                                this.allProperties.find(p => String(p.listing_id) === idStr) ||
-                                (this.currentProperty && String(this.currentProperty.listing_id) === idStr ? this.currentProperty : null);
+        let existingProperty =
+          this.filteredProperties.find((p) => String(p.listing_id) === idStr) ||
+          this.allProperties.find((p) => String(p.listing_id) === idStr) ||
+          (this.currentProperty && String(this.currentProperty.listing_id) === idStr
+            ? this.currentProperty
+            : null)
 
         // 如果在前端状态中找不到，则直接从列表API获取基础数据
         if (!existingProperty) {
-          const listResponse = await propertyAPI.getListWithPagination({ listing_id: idStr });
+          const listResponse = await propertyAPI.getListWithPagination({ listing_id: idStr })
           if (listResponse.data && listResponse.data.length > 0) {
-            existingProperty = listResponse.data[0];
+            existingProperty = listResponse.data[0]
           }
         }
 
         // 如果有基础数据，先显示，避免白屏
         if (existingProperty) {
-          this.currentProperty = existingProperty;
+          this.currentProperty = existingProperty
         }
 
         // 获取更详细的房源信息（例如，描述）
-        const fullPropertyDetails = await propertyAPI.getDetail(id);
+        const fullPropertyDetails = await propertyAPI.getDetail(id)
 
         // 智能合并数据：以现有数据为基础，用详情数据进行补充
         // 这样可以确保即使 fullPropertyDetails 中缺少某些字段（如 inspection_times），
@@ -197,11 +199,10 @@ export const usePropertiesStore = defineStore('properties', {
         const finalProperty = {
           ...existingProperty,
           ...this.currentProperty,
-          ...fullPropertyDetails
-        };
+          ...fullPropertyDetails,
+        }
 
-        this.currentProperty = finalProperty;
-
+        this.currentProperty = finalProperty
       } catch (error) {
         this.error = error.message || '获取房源详情失败'
         console.error('❌ 房源详情加载失败:', error)
@@ -209,7 +210,6 @@ export const usePropertiesStore = defineStore('properties', {
         this.loading = false
       }
     },
-
 
     // 搜索房源
     async searchProperties(query, filters = {}) {
@@ -222,7 +222,6 @@ export const usePropertiesStore = defineStore('properties', {
         this.filteredProperties = properties
         this.totalCount = properties.length
         this.currentPage = 1 // 重置到第一页
-
       } catch (error) {
         this.error = error.message || '搜索房源失败'
         console.error('❌ 房源搜索失败:', error)
@@ -241,12 +240,16 @@ export const usePropertiesStore = defineStore('properties', {
         const filterParams = {
           page: 1,
           page_size: 20,
-          ...filters
+          ...filters,
         }
 
         // 移除null和空值
-        Object.keys(filterParams).forEach(key => {
-          if (filterParams[key] === null || filterParams[key] === undefined || filterParams[key] === '') {
+        Object.keys(filterParams).forEach((key) => {
+          if (
+            filterParams[key] === null ||
+            filterParams[key] === undefined ||
+            filterParams[key] === ''
+          ) {
             delete filterParams[key]
           }
         })
@@ -265,22 +268,19 @@ export const usePropertiesStore = defineStore('properties', {
         }
 
         this.currentPage = 1 // 重置到第一页
-
       } catch (error) {
-        console.error('❌ 筛选失败 - 退回到本地筛选:', error)
+        console.error('❌ 筛选失败:', error)
         this.error = error.message || '筛选失败'
-        // 备用方案：使用本地筛选
-        await this.applyLocalFilters(filters)
+        // 快速失败：禁止本地降级，避免递归回退导致卡死
       } finally {
         this.loading = false
       }
     },
 
     // 本地筛选备用方案
-    async applyLocalFilters(filters) {
-      // 不再使用本地数据，直接调用API筛选
-      // 这样可以确保数据始终是最新的，并且遵守is_active过滤
-      return this.applyFilters(filters)
+    async applyLocalFilters() {
+      // 已弃用：为避免递归回退与数据不一致，此方法不再执行任何操作
+      return
     },
 
     // 设置搜索查询
@@ -295,7 +295,7 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 添加选中区域
     addSelectedLocation(location) {
-      const existingIndex = this.selectedLocations.findIndex(loc => loc.id === location.id)
+      const existingIndex = this.selectedLocations.findIndex((loc) => loc.id === location.id)
       if (existingIndex === -1) {
         this.selectedLocations.push(location)
       }
@@ -303,7 +303,7 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 移除选中区域
     removeSelectedLocation(locationId) {
-      this.selectedLocations = this.selectedLocations.filter(loc => loc.id !== locationId)
+      this.selectedLocations = this.selectedLocations.filter((loc) => loc.id !== locationId)
     },
 
     // 添加收藏
@@ -334,14 +334,15 @@ export const usePropertiesStore = defineStore('properties', {
         this.favoriteIds.splice(index, 1)
         // 从收藏数据中移除
         this.favoritePropertiesData = this.favoritePropertiesData.filter(
-          p => String(p.listing_id) !== id
+          (p) => String(p.listing_id) !== id,
         )
       } else {
         this.favoriteIds.push(id)
         // 如果当前有该房源数据，添加到收藏数据中
-        const property = this.filteredProperties.find(p => String(p.listing_id) === id) ||
-                        this.allProperties.find(p => String(p.listing_id) === id)
-        if (property && !this.favoritePropertiesData.find(p => String(p.listing_id) === id)) {
+        const property =
+          this.filteredProperties.find((p) => String(p.listing_id) === id) ||
+          this.allProperties.find((p) => String(p.listing_id) === id)
+        if (property && !this.favoritePropertiesData.find((p) => String(p.listing_id) === id)) {
           this.favoritePropertiesData.push(property)
         }
       }
@@ -359,15 +360,15 @@ export const usePropertiesStore = defineStore('properties', {
 
       try {
         // 批量获取收藏的房源
-        const promises = this.favoriteIds.map(id =>
-          propertyAPI.getDetail(id).catch(err => {
+        const promises = this.favoriteIds.map((id) =>
+          propertyAPI.getDetail(id).catch((err) => {
             console.warn(`获取收藏房源 ${id} 失败:`, err)
             return null
-          })
+          }),
         )
 
         const results = await Promise.all(promises)
-        this.favoritePropertiesData = results.filter(p => p !== null)
+        this.favoritePropertiesData = results.filter((p) => p !== null)
       } catch (error) {
         console.error('获取收藏房源失败:', error)
       }
@@ -378,8 +379,8 @@ export const usePropertiesStore = defineStore('properties', {
       try {
         const response = await propertyAPI.getListWithPagination({
           ...params,
-          page_size: 1,  // 只需要获取总数
-          page: 1
+          page_size: 1, // 只需要获取总数
+          page: 1,
         })
         return response.pagination?.total || 0
       } catch (error) {
@@ -438,7 +439,7 @@ export const usePropertiesStore = defineStore('properties', {
     logHistory(propertyId) {
       const id = String(propertyId)
       // 移除已存在的记录，再添加到最前面
-      const history = this.viewHistory.filter(item => item !== id)
+      const history = this.viewHistory.filter((item) => item !== id)
       history.unshift(id)
       // 最多只保留50条
       this.viewHistory = history.slice(0, 50)
@@ -459,7 +460,7 @@ export const usePropertiesStore = defineStore('properties', {
 
       // 从当前显示列表中移除
       this.filteredProperties = this.filteredProperties.filter(
-        property => String(property.listing_id) !== id
+        (property) => String(property.listing_id) !== id,
       )
       this.totalCount = Math.max(0, this.totalCount - 1)
     },
@@ -480,6 +481,6 @@ export const usePropertiesStore = defineStore('properties', {
         }
       }
       localStorage.setItem('juwo-compare', JSON.stringify(this.compareIds))
-    }
-  }
+    },
+  },
 })

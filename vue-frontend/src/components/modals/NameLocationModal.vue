@@ -15,33 +15,24 @@
         <button class="skip-btn" @click="handleSkip">Skip</button>
       </div>
     </template>
-    
+
     <div class="modal-content">
       <!-- 选中的地址 -->
       <div class="selected-address">
         <i class="fas fa-map-marker-alt"></i>
         <p>{{ displayAddress }}</p>
       </div>
-      
+
       <!-- 标签选择 -->
       <div class="label-options">
-        <label
-          v-for="option in labelOptions"
-          :key="option.value"
-          class="label-option"
-        >
-          <input
-            type="radio"
-            v-model="selectedLabel"
-            :value="option.value"
-            name="location-label"
-          />
+        <label v-for="option in labelOptions" :key="option.value" class="label-option">
+          <input type="radio" v-model="selectedLabel" :value="option.value" name="location-label" />
           <span class="radio-circle"></span>
           <span class="label-text">{{ option.label }}</span>
           <i :class="option.icon" class="label-icon"></i>
         </label>
       </div>
-      
+
       <!-- 确认按钮 -->
       <div class="action-section">
         <el-button
@@ -64,12 +55,12 @@ import { ref, computed, watch } from 'vue'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   address: {
     type: Object,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm', 'skip', 'back'])
@@ -83,23 +74,23 @@ const labelOptions = [
   {
     value: 'Work',
     label: 'Work',
-    icon: 'fas fa-briefcase'
+    icon: 'fas fa-briefcase',
   },
   {
     value: 'School',
     label: 'School',
-    icon: 'fas fa-graduation-cap'
+    icon: 'fas fa-graduation-cap',
   },
   {
     value: 'Home',
     label: 'Home',
-    icon: 'fas fa-home'
+    icon: 'fas fa-home',
   },
   {
     value: 'Other',
     label: 'Other',
-    icon: 'fas fa-map-pin'
-  }
+    icon: 'fas fa-map-pin',
+  },
 ]
 
 // 计算属性
@@ -109,13 +100,16 @@ const displayAddress = computed(() => {
 })
 
 // 监听props变化
-watch(() => props.modelValue, (newVal) => {
-  visible.value = newVal
-  if (newVal) {
-    // 重置选择
-    selectedLabel.value = 'Work'
-  }
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    visible.value = newVal
+    if (newVal) {
+      // 重置选择
+      selectedLabel.value = 'Work'
+    }
+  },
+)
 
 // 监听visible变化
 watch(visible, (newVal) => {
@@ -136,7 +130,7 @@ const handleSkip = () => {
   // Skip时默认使用Other标签
   const data = {
     address: props.address,
-    label: 'Other'
+    label: 'Other',
   }
   emit('skip', data)
   emit('confirm', data) // 也触发confirm事件
@@ -146,13 +140,13 @@ const handleSkip = () => {
 
 const handleConfirm = () => {
   if (!selectedLabel.value) return
-  
+
   // 确认按钮被点击
   emit('confirm', {
     address: props.address,
-    label: selectedLabel.value
+    label: selectedLabel.value,
   })
-  
+
   visible.value = false
   emit('update:modelValue', false)
 }
@@ -288,7 +282,7 @@ const handleConfirm = () => {
   background: #fef2f2;
 }
 
-.label-option input[type="radio"] {
+.label-option input[type='radio'] {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -379,11 +373,11 @@ const handleConfirm = () => {
   .modal-content {
     padding: 20px 16px;
   }
-  
+
   .modal-header {
     padding: 16px;
   }
-  
+
   .modal-title {
     font-size: 18px;
   }

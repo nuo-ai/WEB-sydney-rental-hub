@@ -10,13 +10,13 @@ import DOMPurify from 'dompurify'
 const props = defineProps({
   content: {
     type: String,
-    default: ''
+    default: '',
   },
   // 是否将普通换行转换为 <br>
   preserveLineBreaks: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 })
 
 // 配置 marked
@@ -24,14 +24,14 @@ marked.setOptions({
   breaks: true, // 将换行符转换为 <br>
   gfm: true, // 启用 GitHub Flavored Markdown
   headerIds: false, // 不生成标题ID
-  mangle: false // 不转义邮箱
+  mangle: false, // 不转义邮箱
 })
 
 const sanitizedHtml = computed(() => {
   if (!props.content) return ''
-  
+
   let processedContent = props.content
-  
+
   // 预处理文本，将列表标记转换为Markdown格式
   processedContent = processedContent
     // 将 "- " 开头的行确保被识别为列表
@@ -39,23 +39,41 @@ const sanitizedHtml = computed(() => {
     // 将 "• " 转换为 "- "
     .replace(/^• /gm, '- ')
     // 将 "Feature:" 或 "THE FEATURES" 等标题加粗
-    .replace(/^(Features?:|THE FEATURES?|FEATURES?:?)\s*$/gmi, '**$1**')
-    .replace(/^(THE PROPERTY|PROPERTY:?)\s*$/gmi, '**$1**')
+    .replace(/^(Features?:|THE FEATURES?|FEATURES?:?)\s*$/gim, '**$1**')
+    .replace(/^(THE PROPERTY|PROPERTY:?)\s*$/gim, '**$1**')
     // 确保列表项之间有适当的间距
     .replace(/\n-\s/g, '\n- ')
-  
+
   // 使用marked解析Markdown
   const html = marked(processedContent)
-  
+
   // 使用DOMPurify清理HTML，防止XSS攻击
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'b', 'em', 'i', 'u',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'pre', 'code',
-      'a', 'hr', 'span'
+      'p',
+      'br',
+      'strong',
+      'b',
+      'em',
+      'i',
+      'u',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'pre',
+      'code',
+      'a',
+      'hr',
+      'span',
     ],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
   })
 })
 </script>
@@ -108,12 +126,24 @@ const sanitizedHtml = computed(() => {
   line-height: 1.3;
 }
 
-.markdown-content :deep(h1) { font-size: 24px; }
-.markdown-content :deep(h2) { font-size: 20px; }
-.markdown-content :deep(h3) { font-size: 18px; }
-.markdown-content :deep(h4) { font-size: 16px; }
-.markdown-content :deep(h5) { font-size: 14px; }
-.markdown-content :deep(h6) { font-size: 14px; }
+.markdown-content :deep(h1) {
+  font-size: 24px;
+}
+.markdown-content :deep(h2) {
+  font-size: 20px;
+}
+.markdown-content :deep(h3) {
+  font-size: 18px;
+}
+.markdown-content :deep(h4) {
+  font-size: 16px;
+}
+.markdown-content :deep(h5) {
+  font-size: 14px;
+}
+.markdown-content :deep(h6) {
+  font-size: 14px;
+}
 
 .markdown-content :deep(blockquote) {
   margin: 12px 0;

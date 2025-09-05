@@ -28,11 +28,7 @@
             placeholder="Address"
             @input="handleInput"
           />
-          <button
-            v-if="searchQuery"
-            class="clear-btn"
-            @click="clearSearch"
-          >
+          <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -100,8 +96,8 @@ import placesService from '@/services/places'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'select'])
@@ -121,15 +117,18 @@ const presetLocations = ref([])
 let sessionToken = null
 
 // 监听props变化
-watch(() => props.modelValue, (newVal) => {
-  visible.value = newVal
-  if (newVal) {
-    // 聚焦输入框
-    nextTick(() => {
-      searchInput.value?.focus()
-    })
-  }
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    visible.value = newVal
+    if (newVal) {
+      // 聚焦输入框
+      nextTick(() => {
+        searchInput.value?.focus()
+      })
+    }
+  },
+)
 
 // 监听visible变化
 watch(visible, (newVal) => {
@@ -199,9 +198,9 @@ const selectLocation = (location) => {
     geometry: {
       location: {
         lat: () => location.latitude,
-        lng: () => location.longitude
-      }
-    }
+        lng: () => location.longitude,
+      },
+    },
   }
   emit('select', formattedLocation)
   handleClose()
@@ -222,9 +221,9 @@ const selectResult = async (result) => {
       geometry: {
         location: {
           lat: () => placeDetails.latitude,
-          lng: () => placeDetails.longitude
-        }
-      }
+          lng: () => placeDetails.longitude,
+        },
+      },
     }
 
     // Reset session token after selection (Google billing optimization)
@@ -254,10 +253,10 @@ const handleClose = () => {
 // 生命周期
 onMounted(async () => {
   // Load preset locations
-  presetLocations.value = placesService.getPresetLocations().map(loc => ({
+  presetLocations.value = placesService.getPresetLocations().map((loc) => ({
     ...loc,
     placeId: loc.place_id, // Keep both formats for compatibility
-    address: loc.formatted_address
+    address: loc.formatted_address,
   }))
 
   // Pre-load Google Maps API
@@ -493,8 +492,12 @@ onMounted(async () => {
 
 /* 动画 */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .fa-spin {

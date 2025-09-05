@@ -54,10 +54,19 @@
           <div class="image-bottom-controls">
             <!-- 这里改为 Photos pill（图标 + 文案 + 数字徽标） -->
             <div class="inspect-btn-overlay image-counter" aria-label="照片数量">
-              <img v-if="!photoIconFailed" :src="photoIcon" alt="" aria-hidden="true" class="pill-icon" @error="photoIconFailed = true" />
+              <img
+                v-if="!photoIconFailed"
+                :src="photoIcon"
+                alt=""
+                aria-hidden="true"
+                class="pill-icon"
+                @error="photoIconFailed = true"
+              />
               <el-icon v-else :size="16" class="pill-icon" aria-hidden="true"><Picture /></el-icon>
               <span class="pill-label">Photos</span>
-              <span :class="['pill-badge', { 'two-digits': images.length >= 10 }]">{{ images.length > 99 ? '99+' : images.length }}</span>
+              <span :class="['pill-badge', { 'two-digits': images.length >= 10 }]">{{
+                images.length > 99 ? '99+' : images.length
+              }}</span>
             </div>
 
             <!-- 指示点 -->
@@ -70,7 +79,6 @@
               ></span>
             </div>
           </div>
-
         </div>
       </header>
 
@@ -91,7 +99,13 @@
               <h1 class="address-main address-pc">{{ property.address }}</h1>
               <!-- 移动端显示地址和区号分行 -->
               <div class="address-mobile">
-                <h1 class="address-main">{{ property.address && property.address.includes(',') ? property.address.split(',')[0] : property.address }}</h1>
+                <h1 class="address-main">
+                  {{
+                    property.address && property.address.includes(',')
+                      ? property.address.split(',')[0]
+                      : property.address
+                  }}
+                </h1>
                 <p class="address-subtitle">
                   {{ property.suburb }}, NSW {{ property.postcode || '' }}
                 </p>
@@ -154,20 +168,27 @@
                 </div>
                 <div class="travel-btn-content">
                   <span class="travel-btn-title">See travel times</span>
-                  <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
+                  <span class="travel-btn-subtitle"
+                    >Find out travel times from this property to your destinations</span
+                  >
                 </div>
               </button>
             </div>
           </section>
 
           <!-- Property Description -->
-          <section class="description-section" v-if="property.property_headline || property.description">
+          <section
+            class="description-section"
+            v-if="property.property_headline || property.description"
+          >
             <h2 class="section-title">Property Description</h2>
 
             <div class="description-content">
               <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
                 <!-- 继续显示后端给的标题 -->
-                <p v-if="property.property_headline" class="description-headline">{{ property.property_headline }}</p>
+                <p v-if="property.property_headline" class="description-headline">
+                  {{ property.property_headline }}
+                </p>
 
                 <!-- 将正文改为 Markdown 渲染（含换行、列表等），并进行 XSS 清理 -->
                 <MarkdownContent
@@ -176,10 +197,7 @@
                   :preserve-line-breaks="true"
                 />
               </div>
-              <button
-                @click="toggleDescription"
-                class="read-more-btn"
-              >
+              <button @click="toggleDescription" class="read-more-btn">
                 {{ isDescriptionExpanded ? 'Read less' : 'Read more' }}
               </button>
             </div>
@@ -189,18 +207,11 @@
           <section class="features-section" v-if="allFeatures.length > 0">
             <h2 class="section-title">Property Features</h2>
             <div class="features-two-column">
-              <div
-                v-for="feature in displayedFeatures"
-                :key="feature"
-                class="feature-list-item"
-              >
+              <div v-for="feature in displayedFeatures" :key="feature" class="feature-list-item">
                 {{ feature }}
               </div>
             </div>
-            <button
-              @click="showAllFeatures = !showAllFeatures"
-              class="view-less-btn"
-            >
+            <button @click="showAllFeatures = !showAllFeatures" class="view-less-btn">
               {{ showAllFeatures ? 'View less' : 'View all features' }}
             </button>
           </section>
@@ -235,12 +246,8 @@
 
       <!-- 底部固定操作栏 -->
       <footer class="action-footer">
-        <el-button class="action-btn enquire-btn" @click="handleEmail">
-          Enquire
-        </el-button>
-        <el-button class="action-btn inspect-btn" @click="handleInspections">
-          Inspect
-        </el-button>
+        <el-button class="action-btn enquire-btn" @click="handleEmail"> Enquire </el-button>
+        <el-button class="action-btn inspect-btn" @click="handleInspections"> Inspect </el-button>
       </footer>
     </template>
 
@@ -264,11 +271,7 @@
     </div>
 
     <!-- Auth Modal -->
-    <AuthModal
-      v-if="showAuthModal"
-      v-model="showAuthModal"
-      @success="handleAuthSuccess"
-    />
+    <AuthModal v-if="showAuthModal" v-model="showAuthModal" @success="handleAuthSuccess" />
   </div>
 </template>
 
@@ -279,9 +282,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
 import {
-  ArrowLeft, Share, Picture,
-  Location, Calendar,
-  Loading, Plus
+  ArrowLeft,
+  Share,
+  Picture,
+  Location,
+  Calendar,
+  Loading,
+  Plus,
 } from '@element-plus/icons-vue'
 import { BedDouble, Bath, CarFront } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
@@ -322,7 +329,7 @@ const handleHeroImageLoad = (event) => {
   const requiredPhysicalW = cw * dpr
 
   // 若原图像素不足以覆盖“容器宽 × DPR”，则按“原图宽 / DPR”的安全展示宽度回退
-  const safeDisplayW = naturalW >= requiredPhysicalW ? cw : (naturalW / dpr)
+  const safeDisplayW = naturalW >= requiredPhysicalW ? cw : naturalW / dpr
 
   // 按原始宽高比推导清晰高度，再做上下界限制，保证“更挺拔”同时不失真
   const computed = Math.floor((naturalH / naturalW) * safeDisplayW)
@@ -367,7 +374,7 @@ const allFeatures = computed(() => {
   // 1) 解析 property_features（可能是数组/对象/字符串）
   const pf = p.property_features
   if (Array.isArray(pf)) {
-    pf.forEach(item => {
+    pf.forEach((item) => {
       const s = String(item || '').trim()
       if (s) out.add(s)
     })
@@ -380,7 +387,10 @@ const allFeatures = computed(() => {
       }
     })
   } else if (typeof pf === 'string') {
-    pf.split(/[\n;,|]/).map(s => s.trim()).filter(Boolean).forEach(s => out.add(s))
+    pf.split(/[\n;,|]/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .forEach((s) => out.add(s))
   }
 
   // 2) 合并布尔特征列（仅取 true 的项）
@@ -409,14 +419,13 @@ const images = computed(() => {
   if (!property.value || !property.value.images || !Array.isArray(property.value.images)) {
     return []
   }
-  return property.value.images.filter(url => url && typeof url === 'string' && url.trim() !== '')
+  return property.value.images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
 })
 
 const isFavorite = computed(() => {
   if (!property.value) return false
   return propertiesStore.favoriteIds.includes(property.value.listing_id)
 })
-
 
 const inspectionTimes = computed(() => {
   if (!property.value || !property.value.inspection_times) return []
@@ -461,7 +470,9 @@ const staticMapUrl = computed(() => {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
 
   if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
-    console.warn('Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file')
+    console.warn(
+      'Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file',
+    )
     return ''
   }
 
@@ -490,15 +501,18 @@ const shareProperty = () => {
   if (!property.value) return
 
   if (navigator.share) {
-    navigator.share({
-      title: property.value.address,
-      text: `${property.value.address} - $${property.value.rent_pw}/week`,
-      url: window.location.href
-    }).catch(() => {
-      // 用户取消分享或分享失败
-    })
+    navigator
+      .share({
+        title: property.value.address,
+        text: `${property.value.address} - $${property.value.rent_pw}/week`,
+        url: window.location.href,
+      })
+      .catch(() => {
+        // 用户取消分享或分享失败
+      })
   } else {
-    navigator.clipboard.writeText(window.location.href)
+    navigator.clipboard
+      .writeText(window.location.href)
       .then(() => ElMessage.success('链接已复制到剪贴板'))
       .catch(() => ElMessage.error('复制失败'))
   }
@@ -519,13 +533,12 @@ const handleEmail = () => {
 
 const handleInspections = () => {
   if (inspectionTimes.value.length > 0) {
-    ElMessage.info('Inspection booking coming soon');
+    ElMessage.info('Inspection booking coming soon')
   } else {
     // 根据用户反馈更新
-    ElMessage.info('可联系中介预约看房');
+    ElMessage.info('可联系中介预约看房')
   }
-};
-
+}
 
 const handleImageError = (event) => {
   console.warn('Image load failed:', event.target.src)
@@ -561,8 +574,8 @@ const handleSeeTravelTimes = () => {
         address: property.value.address,
         suburb: property.value.suburb,
         lat: property.value.latitude,
-        lng: property.value.longitude
-      }
+        lng: property.value.longitude,
+      },
     })
   } else {
     // 如果未登录，显示登录/注册模态框
@@ -618,9 +631,9 @@ onMounted(async () => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: #FFFFFF;  /* 统一页面与卡片背景为纯白 */
+  background-color: #ffffff; /* 统一页面与卡片背景为纯白 */
   /* 新增：统一字体栈（含中文优先级） */
-  --font-ui: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-ui: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   font-family: var(--font-ui);
 }
 
@@ -865,7 +878,11 @@ onMounted(async () => {
   .image-header {
     width: 100%;
     max-width: none; /* 放开版心限制，做 full-bleed 英雄区 */
-    padding-inline: clamp(16px, 6vw, 115px); /* 自适应左右留白：窄屏收敛到 ~16-32px，≥1440 接近 115px */
+    padding-inline: clamp(
+      16px,
+      6vw,
+      115px
+    ); /* 自适应左右留白：窄屏收敛到 ~16-32px，≥1440 接近 115px */
     margin: 0 auto;
     background: transparent;
   }
@@ -874,19 +891,22 @@ onMounted(async () => {
     /* 固定纵横比，避免图片在不同分辨率下“变形”；同时设上下界避免过扁/过高 */
     aspect-ratio: 3 / 2; /* 1.5：比 16:9 更“挺拔”，比 4:3 略矮，贴近“更大气”的观感 */
     width: 100%;
-    height: var(--hero-height, auto); /* 加入分辨率守卫：加载后以 --hero-height 为准，避免放大导致模糊 */
+    height: var(
+      --hero-height,
+      auto
+    ); /* 加入分辨率守卫：加载后以 --hero-height 为准，避免放大导致模糊 */
     min-height: 560px;
     max-height: 820px;
     margin: 0;
     overflow: hidden; /* 防止内部溢出造成滚动条 */
     border-radius: 0; /* 去掉圆角：按产品要求保持直角视觉 */
-    box-shadow: var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.06));
+    box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.06));
   }
 
   .property-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;   /* 保证铺满并裁切 */
+    object-fit: cover; /* 保证铺满并裁切 */
     object-position: center;
     border-radius: 0; /* 去掉子元素圆角兜底，避免继承 */
   }
@@ -958,7 +978,6 @@ onMounted(async () => {
   border-radius: 3px;
   background: white;
 }
-
 
 /* 内容容器 - PC端1683px宽度居中 */
 .content-container {
@@ -1155,8 +1174,8 @@ onMounted(async () => {
 @media (min-width: 1200px) {
   .price-wrapper {
     margin-bottom: 32px; /* 价格到地址 32 */
-    padding-bottom: 24px;    /* 保持内边距 */
-    border-bottom: 1px solid #e4e5e7;  /* 保持分隔线 */
+    padding-bottom: 24px; /* 保持内边距 */
+    border-bottom: 1px solid #e4e5e7; /* 保持分隔线 */
   }
 
   .price-text {
@@ -1165,7 +1184,6 @@ onMounted(async () => {
     color: #000;
   }
 }
-
 
 /* See travel times button - 符合 Figma 设计稿 */
 .see-travel-times-btn {
@@ -1486,7 +1504,7 @@ onMounted(async () => {
   padding: 0;
   font-size: 14px;
   font-weight: 600; /* 加粗以匹配设计 */
-  color: var(--juwo-primary, #FF5824); /* 使用品牌主色 */
+  color: var(--juwo-primary, #ff5824); /* 使用品牌主色 */
   background: none;
   border: none;
   cursor: pointer;
@@ -1497,7 +1515,6 @@ onMounted(async () => {
 .view-less-btn:hover {
   text-decoration: underline;
 }
-
 
 /* Inspection Times 部分 - Figma设计 */
 .inspection-section {
@@ -1766,8 +1783,8 @@ onMounted(async () => {
 .content-card {
   background: #ffffff;
   border: 1px solid var(--color-border-default);
-  border-radius: 0;            /* 移动端无圆角 */
-  overflow: hidden;            /* 防止子元素溢出破坏边界 */
+  border-radius: 0; /* 移动端无圆角 */
+  overflow: hidden; /* 防止子元素溢出破坏边界 */
   box-shadow: none;
 }
 
@@ -1780,7 +1797,7 @@ onMounted(async () => {
   background: transparent;
   border: 0;
   box-shadow: none;
-  margin: 0;                  /* 覆盖 inspection-section 原有的外边距，避免“白卡外溢” */
+  margin: 0; /* 覆盖 inspection-section 原有的外边距，避免“白卡外溢” */
 }
 
 /* 统一分隔线：除首个以外的 section 顶部加1px分隔线 */
@@ -1834,13 +1851,12 @@ onMounted(async () => {
   }
 }
 
-
 /* ==== 覆盖层（放在样式结尾，确保权重更高）==== */
 /* 1) 扁平化白卡外观：无边框、无圆角、无阴影 */
 .content-card {
-  box-shadow: none !important;   /* 去除白卡阴影 */
-  border: none !important;       /* 去除白卡四周边线（避免两侧“竖线”） */
-  border-radius: 0 !important;   /* 去除圆角 */
+  box-shadow: none !important; /* 去除白卡阴影 */
+  border: none !important; /* 去除白卡四周边线（避免两侧“竖线”） */
+  border-radius: 0 !important; /* 去除圆角 */
 }
 
 /* 内部子区块：确保无阴影，背景保持白色以便分隔线清晰可见 */
@@ -1861,22 +1877,28 @@ onMounted(async () => {
 /* 3) 桌面端：分隔线左对齐正文内容（48px 内边距），右对齐地图右缘（与 --content-measure 一致） */
 @media (min-width: 1200px) {
   /* 让每个区块能承载绝对定位的伪元素 */
-  .content-card > * { position: relative; }
+  .content-card > * {
+    position: relative;
+  }
 
   .content-card > * + *::before {
-    content: "";
+    content: '';
     position: absolute;
-    left: var(--section-padding-x, 50px);                 /* 与正文左侧对齐（标准 50px） */
-    width: calc(100% - calc(var(--section-padding-x, 50px) * 2)); /* 分隔线右端对齐到内容右缘（= 页面右侧 496） */
+    left: var(--section-padding-x, 50px); /* 与正文左侧对齐（标准 50px） */
+    width: calc(
+      100% - calc(var(--section-padding-x, 50px) * 2)
+    ); /* 分隔线右端对齐到内容右缘（= 页面右侧 496） */
     top: 0;
     height: 1px;
-    background-color: var(--divider-color, #E5E7EB);
+    background-color: var(--divider-color, #e5e7eb);
   }
 }
 
 /* 移动端与小屏：恢复基础分隔线（无需特殊对齐规则） */
 @media (max-width: 1199px) {
-  .content-card > * + * { border-top: 1px solid var(--divider-color, #E5E7EB) !important; }
+  .content-card > * + * {
+    border-top: 1px solid var(--divider-color, #e5e7eb) !important;
+  }
 }
 /* 超宽屏段落行长限制：提升可读性，不改变容器的 453px/496px 对齐规则 */
 @media (min-width: 1920px) {

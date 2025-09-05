@@ -14,9 +14,7 @@
             </el-icon>
             <h3 class="chinese-text">地图功能开发中</h3>
             <p class="chinese-text">即将集成Google Maps显示房源位置</p>
-            <el-button type="primary" @click="goToHome">
-              返回房源列表
-            </el-button>
+            <el-button type="primary" @click="goToHome"> 返回房源列表 </el-button>
           </div>
         </div>
       </div>

@@ -3,9 +3,9 @@
   <div class="filter-tabs-container">
     <div class="filter-tabs">
       <!-- 筛选标签 - 打开完整筛选面板 -->
-      <button 
+      <button
         class="filter-tab"
-        :class="{ 'active': props.filterPanelOpen }"
+        :class="{ active: props.filterPanelOpen }"
         @click="toggleFullPanel"
       >
         <i class="fa-solid fa-sliders"></i>
@@ -13,27 +13,26 @@
       </button>
 
       <!-- 区域标签 - 快速区域选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'area' }">
-        <button 
-          class="filter-tab"
-          @click.stop="toggleDropdown('area')"
-        >
+      <div class="filter-tab-dropdown" :class="{ active: activeDropdown === 'area' }">
+        <button class="filter-tab" @click.stop="toggleDropdown('area')">
           <span class="chinese-text">区域</span>
           <i class="fa-solid fa-chevron-down"></i>
-          <span v-if="selectedAreas.length > 0" class="filter-badge">{{ selectedAreas.length }}</span>
+          <span v-if="selectedAreas.length > 0" class="filter-badge">{{
+            selectedAreas.length
+          }}</span>
         </button>
-        
+
         <!-- 区域快速选择下拉 -->
         <div v-if="activeDropdown === 'area'" class="quick-filter-dropdown">
           <div class="dropdown-header chinese-text">选择区域</div>
           <div class="area-options">
             <label v-for="area in popularAreas" :key="area.value" class="area-option">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 :value="area.value"
                 :checked="selectedAreas.includes(area.value)"
                 @click="toggleArea(area.value)"
-              >
+              />
               <span>{{ area.label }}</span>
             </label>
           </div>
@@ -41,25 +40,24 @@
       </div>
 
       <!-- 卧室标签 - 快速卧室选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'bedrooms' }">
-        <button 
-          class="filter-tab"
-          @click.stop="toggleDropdown('bedrooms')"
-        >
+      <div class="filter-tab-dropdown" :class="{ active: activeDropdown === 'bedrooms' }">
+        <button class="filter-tab" @click.stop="toggleDropdown('bedrooms')">
           <span class="chinese-text">卧室</span>
           <i class="fa-solid fa-chevron-down"></i>
-          <span v-if="selectedBedrooms.length > 0" class="filter-badge">{{ selectedBedrooms.length }}</span>
+          <span v-if="selectedBedrooms.length > 0" class="filter-badge">{{
+            selectedBedrooms.length
+          }}</span>
         </button>
-        
+
         <!-- 卧室快速选择下拉 -->
         <div v-if="activeDropdown === 'bedrooms'" class="quick-filter-dropdown">
           <div class="dropdown-header chinese-text">卧室数量</div>
           <div class="bedroom-options">
-            <button 
-              v-for="option in bedroomOptions" 
+            <button
+              v-for="option in bedroomOptions"
               :key="option.value"
               class="option-btn"
-              :class="{ 'selected': selectedBedrooms.includes(option.value) }"
+              :class="{ selected: selectedBedrooms.includes(option.value) }"
               @click="toggleBedroom(option.value)"
             >
               {{ option.label }}
@@ -69,25 +67,22 @@
       </div>
 
       <!-- 价格标签 - 快速价格选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'price' }">
-        <button 
-          class="filter-tab"
-          @click.stop="toggleDropdown('price')"
-        >
+      <div class="filter-tab-dropdown" :class="{ active: activeDropdown === 'price' }">
+        <button class="filter-tab" @click.stop="toggleDropdown('price')">
           <span class="chinese-text">价格</span>
           <i class="fa-solid fa-chevron-down"></i>
           <span v-if="priceRangeText !== 'Any Price'" class="filter-badge">1</span>
         </button>
-        
+
         <!-- 价格快速选择下拉 -->
         <div v-if="activeDropdown === 'price'" class="quick-filter-dropdown">
           <div class="dropdown-header chinese-text">价格范围 (周租)</div>
           <div class="price-options">
-            <button 
-              v-for="range in priceRanges" 
+            <button
+              v-for="range in priceRanges"
               :key="range.label"
               class="option-btn"
-              :class="{ 'selected': isPriceRangeSelected(range) }"
+              :class="{ selected: isPriceRangeSelected(range) }"
               @click="selectPriceRange(range)"
             >
               {{ range.label }}
@@ -112,25 +107,22 @@
       </div>
 
       <!-- 空出时间标签 - 快速时间选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'availability' }">
-        <button 
-          class="filter-tab"
-          @click.stop="toggleDropdown('availability')"
-        >
+      <div class="filter-tab-dropdown" :class="{ active: activeDropdown === 'availability' }">
+        <button class="filter-tab" @click.stop="toggleDropdown('availability')">
           <span class="chinese-text">空出时间</span>
           <i class="fa-solid fa-chevron-down"></i>
           <span v-if="selectedAvailability !== 'any'" class="filter-badge">1</span>
         </button>
-        
+
         <!-- 空出时间快速选择下拉 -->
         <div v-if="activeDropdown === 'availability'" class="quick-filter-dropdown">
           <div class="dropdown-header chinese-text">入住时间</div>
           <div class="availability-options">
-            <button 
-              v-for="option in availabilityOptions" 
+            <button
+              v-for="option in availabilityOptions"
               :key="option.value"
               class="option-btn"
-              :class="{ 'selected': selectedAvailability === option.value }"
+              :class="{ selected: selectedAvailability === option.value }"
               @click="selectAvailability(option.value)"
             >
               {{ option.label }}
@@ -153,12 +145,12 @@ import { usePropertiesStore } from '@/stores/properties'
 const props = defineProps({
   filterPanelOpen: {
     type: Boolean,
-    default: false
+    default: false,
   },
   currentFilters: {
     type: Object,
-    default: () => ({})
-  }
+    default: () => ({}),
+  },
 })
 
 // 组件事件
@@ -181,7 +173,7 @@ const popularAreas = [
   { value: 'manly', label: 'Manly' },
   { value: 'parramatta', label: 'Parramatta' },
   { value: 'chatswood', label: 'Chatswood' },
-  { value: 'newtown', label: 'Newtown' }
+  { value: 'newtown', label: 'Newtown' },
 ]
 
 const bedroomOptions = [
@@ -189,7 +181,7 @@ const bedroomOptions = [
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },
-  { value: '4+', label: '4+' }
+  { value: '4+', label: '4+' },
 ]
 
 const priceRanges = [
@@ -198,7 +190,7 @@ const priceRanges = [
   { label: '$400 - $600', min: 400, max: 600 },
   { label: '$600 - $800', min: 600, max: 800 },
   { label: '$800 - $1200', min: 800, max: 1200 },
-  { label: '$1200+', min: 1200, max: 5000 }
+  { label: '$1200+', min: 1200, max: 5000 },
 ]
 
 const availabilityOptions = [
@@ -206,7 +198,7 @@ const availabilityOptions = [
   { value: 'immediate', label: '立即入住' },
   { value: 'thisWeek', label: '本周' },
   { value: 'thisMonth', label: '本月' },
-  { value: 'nextMonth', label: '下个月' }
+  { value: 'nextMonth', label: '下个月' },
 ]
 
 // 计算属性
@@ -245,7 +237,7 @@ const closeDropdown = () => {
 
 const toggleArea = (areaValue) => {
   const index = selectedAreas.value.indexOf(areaValue)
-  
+
   if (index > -1) {
     selectedAreas.value.splice(index, 1)
   } else {
@@ -267,7 +259,7 @@ const toggleBedroom = (value) => {
       }
     } else {
       // 移除'any'选项，添加具体选项
-      selectedBedrooms.value = selectedBedrooms.value.filter(v => v !== 'any')
+      selectedBedrooms.value = selectedBedrooms.value.filter((v) => v !== 'any')
       selectedBedrooms.value.push(value)
     }
   }
@@ -299,9 +291,9 @@ const applyFilters = () => {
     bedrooms: selectedBedrooms.value.includes('any') ? 'any' : selectedBedrooms.value.join(','),
     minPrice: customPriceRange.value[0] > 0 ? customPriceRange.value[0] : null,
     maxPrice: customPriceRange.value[1] < 5000 ? customPriceRange.value[1] : null,
-    availability: selectedAvailability.value
+    availability: selectedAvailability.value,
   }
-  
+
   propertiesStore.applyFilters(filterParams)
   emit('filtersChanged', filterParams)
 }
@@ -310,7 +302,7 @@ const applyFilters = () => {
 onMounted(() => {
   // 点击外部关闭下拉
   document.addEventListener('click', handleClickOutside)
-  
+
   // 同步初始筛选状态
   if (props.currentFilters) {
     syncFiltersFromPanel(props.currentFilters)
@@ -336,10 +328,7 @@ const syncFiltersFromPanel = (filters) => {
     selectedBedrooms.value = filters.bedrooms === 'any' ? ['any'] : filters.bedrooms.split(',')
   }
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-    customPriceRange.value = [
-      filters.minPrice || 0,
-      filters.maxPrice || 5000
-    ]
+    customPriceRange.value = [filters.minPrice || 0, filters.maxPrice || 5000]
   }
   if (filters.availability) {
     selectedAvailability.value = filters.availability
@@ -348,7 +337,7 @@ const syncFiltersFromPanel = (filters) => {
 
 // 暴露方法给父组件
 defineExpose({
-  syncFiltersFromPanel
+  syncFiltersFromPanel,
 })
 </script>
 
@@ -374,7 +363,7 @@ defineExpose({
   .filter-tabs-container {
     max-width: none;
   }
-  
+
   .filter-tabs {
     justify-content: flex-start; /* 紧邻搜索框，不要右对齐 */
     flex-wrap: wrap;
@@ -390,16 +379,16 @@ defineExpose({
     padding: 0 16px;
     box-sizing: border-box;
   }
-  
+
   .filter-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 4px; /* 为滚动条留空间 */
   }
-  
+
   /* 移动端下拉框调整 */
   .quick-filter-dropdown {
-    position: fixed;  /* 移动端使用fixed定位 */
+    position: fixed; /* 移动端使用fixed定位 */
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
@@ -480,12 +469,12 @@ defineExpose({
   border: 1px solid var(--color-border-default);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 10001;  /* 提高z-index以确保在FilterPanel之上 */
+  z-index: 10001; /* 提高z-index以确保在FilterPanel之上 */
   min-width: 220px;
   max-width: 280px;
   padding: 16px;
   margin-top: 4px;
-  pointer-events: auto;  /* 确保可以接收点击事件 */
+  pointer-events: auto; /* 确保可以接收点击事件 */
 }
 
 .dropdown-header {
@@ -516,7 +505,7 @@ defineExpose({
   background: var(--juwo-primary-50);
 }
 
-.area-option input[type="checkbox"] {
+.area-option input[type='checkbox'] {
   margin: 0;
 }
 
@@ -599,7 +588,7 @@ defineExpose({
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10000;  /* 提高以配合dropdown */
+  z-index: 10000; /* 提高以配合dropdown */
   background: transparent;
   pointer-events: auto;
 }
@@ -610,18 +599,18 @@ defineExpose({
     padding: 8px 4px;
     gap: 6px;
   }
-  
+
   .filter-tab {
     padding: 8px 12px;
     font-size: 13px;
   }
-  
+
   .quick-filter-dropdown {
     min-width: 200px;
     max-width: 240px;
     padding: 12px;
   }
-  
+
   .filter-badge {
     top: -2px;
     right: -2px;

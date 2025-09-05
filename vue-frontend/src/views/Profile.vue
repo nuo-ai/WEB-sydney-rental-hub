@@ -99,13 +99,11 @@
                 <i class="fas fa-heart empty-icon"></i>
                 <h4 class="empty-title">暂无收藏</h4>
                 <p class="empty-text">点击房源卡片上的心形图标即可收藏</p>
-                <button class="btn btn-primary" @click="$router.push('/')">
-                  去看看房源
-                </button>
+                <button class="btn btn-primary" @click="$router.push('/')">去看看房源</button>
               </div>
               <div v-else class="property-grid">
                 <div v-for="item in favorites" :key="item.id" class="card property-card-mini">
-                  <img :src="item.image" :alt="item.address" class="property-image-mini">
+                  <img :src="item.image" :alt="item.address" class="property-image-mini" />
                   <div class="card-body">
                     <div class="price price-sm">
                       <span class="price-symbol">$</span>
@@ -143,7 +141,7 @@
                   <div class="card history-card">
                     <div class="card-body">
                       <div class="history-property">
-                        <img :src="item.image" :alt="item.address" class="history-image">
+                        <img :src="item.image" :alt="item.address" class="history-image" />
                         <div class="history-info">
                           <h4 class="history-address">{{ item.address }}</h4>
                           <p class="history-suburb">{{ item.suburb }}, NSW</p>
@@ -206,7 +204,7 @@
                     <span class="setting-hint">接收新房源和价格变动通知</span>
                   </div>
                   <label class="switch">
-                    <input type="checkbox" v-model="settings.emailNotifications">
+                    <input type="checkbox" v-model="settings.emailNotifications" />
                     <span class="switch-slider"></span>
                   </label>
                 </div>
@@ -216,7 +214,7 @@
                     <span class="setting-hint">浏览器推送通知</span>
                   </div>
                   <label class="switch">
-                    <input type="checkbox" v-model="settings.pushNotifications">
+                    <input type="checkbox" v-model="settings.pushNotifications" />
                     <span class="switch-slider"></span>
                   </label>
                 </div>
@@ -230,7 +228,7 @@
                     <span class="setting-hint">保存最近浏览的房源</span>
                   </div>
                   <label class="switch">
-                    <input type="checkbox" v-model="settings.saveHistory">
+                    <input type="checkbox" v-model="settings.saveHistory" />
                     <span class="switch-slider"></span>
                   </label>
                 </div>
@@ -239,9 +237,7 @@
               <div class="settings-actions">
                 <button class="btn btn-secondary">清除缓存</button>
                 <button class="btn btn-secondary">导出数据</button>
-                <button class="btn btn-text" style="color: var(--status-error)">
-                  退出登录
-                </button>
+                <button class="btn btn-text" style="color: var(--status-error)">退出登录</button>
               </div>
             </div>
           </div>
@@ -269,7 +265,7 @@ const tabs = [
   { id: 'favorites', label: '我的收藏', icon: 'fas fa-heart' },
   { id: 'history', label: '浏览历史', icon: 'fas fa-history' },
   { id: 'searches', label: '搜索订阅', icon: 'fas fa-bell' },
-  { id: 'settings', label: '账号设置', icon: 'fas fa-cog' }
+  { id: 'settings', label: '账号设置', icon: 'fas fa-cog' },
 ]
 
 // 统计数据
@@ -291,7 +287,7 @@ const favorites = computed(() => {
       rent_pw: 750,
       bedrooms: 2,
       bathrooms: 1,
-      car_spaces: 1
+      car_spaces: 1,
     },
     {
       id: 2,
@@ -301,8 +297,8 @@ const favorites = computed(() => {
       rent_pw: 680,
       bedrooms: 1,
       bathrooms: 1,
-      car_spaces: 0
-    }
+      car_spaces: 0,
+    },
   ]
 })
 
@@ -314,7 +310,7 @@ const browsingHistory = ref([
     image: '/api/placeholder/100/80',
     address: '789 Broadway',
     suburb: 'Glebe',
-    rent_pw: 820
+    rent_pw: 820,
   },
   {
     id: 2,
@@ -322,8 +318,8 @@ const browsingHistory = ref([
     image: '/api/placeholder/100/80',
     address: '321 King Street',
     suburb: 'Newtown',
-    rent_pw: 590
-  }
+    rent_pw: 590,
+  },
 ])
 
 // 搜索订阅（模拟数据）
@@ -335,7 +331,7 @@ const savedSearches = ref([
     minPrice: 600,
     maxPrice: 800,
     bedrooms: 2,
-    newCount: 3
+    newCount: 3,
   },
   {
     id: 2,
@@ -344,15 +340,15 @@ const savedSearches = ref([
     minPrice: 400,
     maxPrice: 500,
     bedrooms: 1,
-    newCount: 0
-  }
+    newCount: 0,
+  },
 ])
 
 // 设置
 const settings = ref({
   emailNotifications: true,
   pushNotifications: false,
-  saveHistory: true
+  saveHistory: true,
 })
 
 // 格式化日期
@@ -787,7 +783,7 @@ const formatDate = (date) => {
 
 .switch-slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 18px;
   width: 18px;
   left: 3px;

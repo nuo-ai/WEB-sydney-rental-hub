@@ -17,7 +17,9 @@ import PropertyCard from '@/components/PropertyCard.vue'
 const propertiesStore = usePropertiesStore()
 
 const compareItems = computed(() => {
-  return propertiesStore.allProperties.filter(p => propertiesStore.compareIds.includes(p.listing_id))
+  return propertiesStore.allProperties.filter((p) =>
+    propertiesStore.compareIds.includes(p.listing_id),
+  )
 })
 </script>
 

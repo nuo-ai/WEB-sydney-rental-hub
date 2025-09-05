@@ -2,7 +2,7 @@
   <div id="app" class="app-container">
     <!-- 导航组件 -->
     <Navigation :isHidden="isNavHidden" />
-    
+
     <!-- 主要内容区域 -->
     <router-view class="main-view" @updateNavVisibility="handleNavVisibility" />
 
@@ -180,11 +180,11 @@ img {
   .app-container {
     background: white;
   }
-  
+
   .main-view {
     padding: 0;
   }
-  
+
   nav {
     display: none;
   }

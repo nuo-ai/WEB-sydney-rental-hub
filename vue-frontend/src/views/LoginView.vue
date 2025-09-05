@@ -2,15 +2,31 @@
   <div class="login-container">
     <div class="login-box">
       <h2 class="title">登录</h2>
-      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" @submit.prevent="handleLogin">
+      <el-form
+        ref="loginFormRef"
+        :model="loginForm"
+        :rules="loginRules"
+        @submit.prevent="handleLogin"
+      >
         <el-form-item prop="email">
           <el-input v-model="loginForm.email" placeholder="邮箱" size="large" />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="loginForm.password" type="password" placeholder="密码" size="large" show-password />
+          <el-input
+            v-model="loginForm.password"
+            type="password"
+            placeholder="密码"
+            size="large"
+            show-password
+          />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" native-type="submit" :loading="authStore.loading" style="width: 100%;">
+          <el-button
+            type="primary"
+            native-type="submit"
+            :loading="authStore.loading"
+            style="width: 100%"
+          >
             登录
           </el-button>
         </el-form-item>
@@ -38,7 +54,10 @@ const loginForm = ref({
 })
 
 const loginRules = {
-  email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }, { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] },
+  ],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 

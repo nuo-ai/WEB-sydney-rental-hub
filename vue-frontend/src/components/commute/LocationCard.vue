@@ -4,7 +4,7 @@
       <span class="location-label" :class="labelClass">{{ location.label }}</span>
       <span class="location-address">{{ truncatedAddress }}</span>
     </div>
-    
+
     <div class="commute-info">
       <div v-if="isLoading" class="loading">
         <i class="fas fa-spinner fa-spin"></i>
@@ -17,7 +17,7 @@
         <div class="time">--</div>
       </div>
     </div>
-    
+
     <button class="remove-btn" @click="handleRemove" title="Remove location">
       <i class="fas fa-times"></i>
     </button>
@@ -32,16 +32,16 @@ import { transportAPI } from '@/services/api'
 const props = defineProps({
   location: {
     type: Object,
-    required: true
+    required: true,
   },
   mode: {
     type: String,
-    default: 'DRIVING'
+    default: 'DRIVING',
   },
   from: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const emit = defineEmits(['remove'])
@@ -70,38 +70,38 @@ const labelClass = computed(() => {
 // 计算通勤时间
 const calculateCommute = async () => {
   if (!props.from || !props.location) return
-  
+
   isLoading.value = true
   error.value = null
-  
+
   try {
     // 检查缓存
     const cacheKey = `${props.from.lat},${props.from.lng}-${props.location.id}-${props.mode}`
     const cached = commuteStore.getFromCache(cacheKey)
-    
+
     if (cached) {
       commuteData.value = cached
     } else {
       // 准备API调用参数
       const origin = `${props.from.lat},${props.from.lng}`
       const destination = props.location.address
-      
+
       // 确保location有坐标信息（用于本地估算）
       if (!props.location.latitude || !props.location.longitude) {
         console.warn('Location missing coordinates:', props.location)
       }
-      
+
       const result = await transportAPI.getDirections(origin, destination, props.mode)
-      
+
       if (result.error) {
         throw new Error(result.error)
       }
-      
+
       commuteData.value = {
         duration: result.duration || 'N/A',
-        distance: result.distance || ''
+        distance: result.distance || '',
       }
-      
+
       // 缓存结果
       commuteStore.setCache(cacheKey, commuteData.value)
     }
@@ -110,7 +110,7 @@ const calculateCommute = async () => {
     error.value = err.message
     commuteData.value = {
       duration: 'N/A',
-      distance: ''
+      distance: '',
     }
   } finally {
     isLoading.value = false
@@ -118,14 +118,21 @@ const calculateCommute = async () => {
 }
 
 // 监听交通方式变化
-watch(() => props.mode, () => {
-  calculateCommute()
-})
+watch(
+  () => props.mode,
+  () => {
+    calculateCommute()
+  },
+)
 
 // 监听起点变化
-watch(() => props.from, () => {
-  calculateCommute()
-}, { deep: true })
+watch(
+  () => props.from,
+  () => {
+    calculateCommute()
+  },
+  { deep: true },
+)
 
 const handleRemove = () => {
   emit('remove', props.location.id)
@@ -268,7 +275,7 @@ onMounted(() => {
   .location-card {
     padding: 10px;
   }
-  
+
   .commute-info {
     min-width: 70px;
     margin: 0 8px;

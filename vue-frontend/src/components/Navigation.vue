@@ -7,7 +7,7 @@
         :key="item.name"
         :to="item.path"
         class="nav-item"
-        :class="{ 'active': isActive(item.path) }"
+        :class="{ active: isActive(item.path) }"
       >
         <i :class="item.icon"></i>
         <span class="chinese-text">{{ item.label }}</span>
@@ -33,7 +33,7 @@
             :key="item.name"
             :to="item.path"
             class="main-nav-item"
-            :class="{ 'active': isActive(item.path) }"
+            :class="{ active: isActive(item.path) }"
           >
             <i :class="item.icon"></i>
             <span class="chinese-text">{{ item.label }}</span>
@@ -48,7 +48,7 @@
           :key="item.name"
           :to="item.path"
           class="user-nav-item"
-          :class="{ 'active': isActive(item.path) }"
+          :class="{ active: isActive(item.path) }"
         >
           <i :class="item.icon"></i>
           <span class="chinese-text">{{ item.label }}</span>
@@ -67,8 +67,8 @@ import { useRoute } from 'vue-router'
 const props = defineProps({
   isHidden: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 // 路由
@@ -80,32 +80,32 @@ const navItems = [
     name: 'home',
     path: '/',
     icon: 'fa-solid fa-magnifying-glass',
-    label: '搜索'
+    label: '搜索',
   },
   {
     name: 'favorites',
     path: '/favorites',
     icon: 'fa-regular fa-heart',
-    label: '收藏'
+    label: '收藏',
   },
   {
     name: 'chat',
     path: '/chat',
     icon: 'fa-solid fa-comments',
-    label: 'AI助手'
+    label: 'AI助手',
   },
   {
     name: 'map',
     path: '/map',
     icon: 'fa-regular fa-map',
-    label: '地图'
+    label: '地图',
   },
   {
     name: 'profile',
     path: '/profile',
     icon: 'fa-regular fa-user',
-    label: '我的'
-  }
+    label: '我的',
+  },
 ]
 
 const mainNavItems = [
@@ -113,20 +113,20 @@ const mainNavItems = [
     name: 'home',
     path: '/',
     icon: 'fa-solid fa-magnifying-glass',
-    label: '搜索'
+    label: '搜索',
   },
   {
     name: 'favorites',
     path: '/favorites',
     icon: 'fa-regular fa-heart',
-    label: '收藏'
+    label: '收藏',
   },
   {
     name: 'map',
     path: '/map',
     icon: 'fa-regular fa-map',
-    label: '地图'
-  }
+    label: '地图',
+  },
 ]
 
 const userNavItems = [
@@ -134,14 +134,14 @@ const userNavItems = [
     name: 'chat',
     path: '/chat',
     icon: 'fa-solid fa-comments',
-    label: 'AI助手'
+    label: 'AI助手',
   },
   {
     name: 'profile',
     path: '/profile',
     icon: 'fa-regular fa-user',
-    label: '我的'
-  }
+    label: '我的',
+  },
 ]
 
 // 计算属性

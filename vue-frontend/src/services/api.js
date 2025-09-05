@@ -9,8 +9,8 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000, // 增加超时时间到30秒
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 // 简单的内存缓存
@@ -32,7 +32,7 @@ const getCachedData = (key) => {
 const setCachedData = (key, data) => {
   cache.set(key, {
     data,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   })
   // 限制缓存大小
   if (cache.size > 50) {
@@ -60,7 +60,7 @@ apiClient.interceptors.request.use(
   (error) => {
     console.error('❌ 请求错误:', error)
     return Promise.reject(error)
-  }
+  },
 )
 
 // 响应拦截器
@@ -71,7 +71,7 @@ apiClient.interceptors.response.use(
   (error) => {
     console.error('❌ API错误:', error.response?.status, error.message)
     return Promise.reject(error)
-  }
+  },
 )
 
 // 房源API服务
@@ -82,7 +82,7 @@ export const propertyAPI = {
       // 确保page_size不超过后端限制
       const finalParams = {
         page_size: 20, // 减小默认大小，提高响应速度
-        ...params
+        ...params,
       }
 
       // 检查缓存
@@ -126,7 +126,7 @@ export const propertyAPI = {
 
       const result = {
         data: response.data.data || [],
-        pagination: response.data.pagination || null
+        pagination: response.data.pagination || null,
       }
 
       // 缓存结果
@@ -148,9 +148,7 @@ export const propertyAPI = {
         return cachedData
       }
 
-
       const response = await apiClient.get(`/properties/${id}`)
-
 
       if (response.data.error) {
         throw new Error(`API错误: ${response.data.error.message}`)
@@ -173,7 +171,7 @@ export const propertyAPI = {
     try {
       const params = {
         page_size: 100,
-        ...filters
+        ...filters,
       }
 
       // 如果有搜索关键词，添加到参数中
@@ -192,7 +190,7 @@ export const propertyAPI = {
       console.error('搜索房源失败:', error)
       throw error
     }
-  }
+  },
 }
 
 // 用户API服务 (预留)
@@ -218,7 +216,7 @@ export const userAPI = {
     // TODO: 实现后端联系API
     // 模拟成功响应
     return { success: true, message: '您的请求已发送' }
-  }
+  },
 }
 
 // 位置/区域API服务
@@ -241,7 +239,7 @@ export const locationAPI = {
   async getSuggestions(query, limit = 20) {
     try {
       const response = await apiClient.get('/locations/suggestions', {
-        params: { q: query, limit }
+        params: { q: query, limit },
       })
       if (response.data.status === 'success') {
         return response.data.data
@@ -257,7 +255,7 @@ export const locationAPI = {
   async getNearbySuburbs(suburb, limit = 6) {
     try {
       const response = await apiClient.get('/locations/nearby', {
-        params: { suburb, limit }
+        params: { suburb, limit },
       })
       if (response.data.status === 'success') {
         return response.data.data
@@ -267,27 +265,25 @@ export const locationAPI = {
       console.error('❌ 获取相邻区域失败:', error)
       return { current: suburb, nearby: [] }
     }
-  }
+  },
 }
 
 // 交通API服务
-
-
 
 export const transportAPI = {
   // 获取通勤路线（调用后端Google Maps API）
   async getDirections(origin, destination, mode) {
     const response = await apiClient.get('/directions', {
-      params: { origin, destination, mode }
-    });
+      params: { origin, destination, mode },
+    })
 
     if (response.data.error) {
-      throw new Error(`API错误: ${response.data.error.message}`);
+      throw new Error(`API错误: ${response.data.error.message}`)
     }
 
-    return response.data.data;
-  }
-};
+    return response.data.data
+  },
+}
 
 // 导出API客户端和工具函数
 export { clearAllCache }

@@ -2,17 +2,10 @@
   <div class="search-bar-container">
     <!-- 选中的区域标签 -->
     <div v-if="selectedLocations.length > 0" class="location-tags">
-      <span 
-        v-for="location in selectedLocations" 
-        :key="location.id"
-        class="location-tag"
-      >
+      <span v-for="location in selectedLocations" :key="location.id" class="location-tag">
         <i class="fa-solid fa-map-marker-alt"></i>
         <span>{{ location.name }}</span>
-        <button 
-          class="remove-location-btn"
-          @click="removeLocation(location.id)"
-        >
+        <button class="remove-location-btn" @click="removeLocation(location.id)">
           <i class="fa-solid fa-times"></i>
         </button>
       </span>
@@ -36,8 +29,11 @@
       </el-input>
 
       <!-- 自动补全建议列表 -->
-      <div 
-        v-if="showSuggestions && (filteredSuggestions.length > 0 || nearbySuggestions.length > 0 || isLoadingSuggestions)" 
+      <div
+        v-if="
+          showSuggestions &&
+          (filteredSuggestions.length > 0 || nearbySuggestions.length > 0 || isLoadingSuggestions)
+        "
         class="location-suggestions"
       >
         <!-- 搜索结果 -->
@@ -50,11 +46,18 @@
             v-for="(suggestion, index) in filteredSuggestions"
             :key="suggestion.id"
             class="suggestion-item"
-            :class="{ 'active': currentSuggestionIndex === index }"
+            :class="{ active: currentSuggestionIndex === index }"
             @click="selectLocation(suggestion)"
           >
             <div class="suggestion-content">
-              <i :class="suggestion.type === 'suburb' ? 'fa-solid fa-map-marker-alt' : 'fa-solid fa-hashtag'" class="suggestion-icon"></i>
+              <i
+                :class="
+                  suggestion.type === 'suburb'
+                    ? 'fa-solid fa-map-marker-alt'
+                    : 'fa-solid fa-hashtag'
+                "
+                class="suggestion-icon"
+              ></i>
               <div class="suggestion-text">
                 <div class="suggestion-name">{{ suggestion.fullName }}</div>
                 <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
@@ -62,7 +65,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 相邻区域推荐 -->
         <div v-if="!searchQuery && nearbySuggestions.length > 0">
           <div class="suggestions-section-title">
@@ -81,7 +84,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 加载中状态 -->
         <div v-if="isLoadingSuggestions" class="loading-suggestions">
           <i class="fa-solid fa-spinner fa-spin"></i>
@@ -126,9 +129,9 @@ const searchPlaceholder = computed(() => {
 
 const filteredSuggestions = computed(() => {
   // 过滤掉已经选择的区域，避免重复显示
-  return locationSuggestions.value.filter(suggestion => {
+  return locationSuggestions.value.filter((suggestion) => {
     // 检查该建议是否已经在选中的区域列表中
-    return !selectedLocations.value.some(selected => selected.id === suggestion.id)
+    return !selectedLocations.value.some((selected) => selected.id === suggestion.id)
   })
 })
 
@@ -164,11 +167,12 @@ const loadNearbySuggestions = async () => {
     const result = await locationAPI.getNearbySuburbs(lastLocation.name)
     // 过滤掉已经选择的区域，避免重复显示
     const nearbyResults = result.nearby || []
-    nearbySuggestions.value = nearbyResults.filter(suggestion => {
+    nearbySuggestions.value = nearbyResults.filter((suggestion) => {
       // 检查该建议是否已经在选中的区域列表中
-      return !selectedLocations.value.some(selected => 
-        selected.id === suggestion.id || 
-        (selected.name === suggestion.name && selected.postcode === suggestion.postcode)
+      return !selectedLocations.value.some(
+        (selected) =>
+          selected.id === suggestion.id ||
+          (selected.name === suggestion.name && selected.postcode === suggestion.postcode),
       )
     })
   } catch (error) {
@@ -208,7 +212,7 @@ const handleFocus = () => {
 const handleInput = (value) => {
   searchQuery.value = value
   currentSuggestionIndex.value = -1
-  
+
   if (selectedLocations.value.length === 0) {
     showSuggestions.value = true
     debouncedSearch(value) // 调用API搜索
@@ -221,28 +225,25 @@ const handleInput = (value) => {
 
 const handleKeydown = (event) => {
   const suggestions = filteredSuggestions.value
-  
+
   switch (event.key) {
     case 'ArrowDown':
       event.preventDefault()
       if (suggestions.length > 0) {
         currentSuggestionIndex.value = Math.min(
-          currentSuggestionIndex.value + 1, 
-          suggestions.length - 1
+          currentSuggestionIndex.value + 1,
+          suggestions.length - 1,
         )
       }
       break
-      
+
     case 'ArrowUp':
       event.preventDefault()
       if (suggestions.length > 0) {
-        currentSuggestionIndex.value = Math.max(
-          currentSuggestionIndex.value - 1, 
-          -1
-        )
+        currentSuggestionIndex.value = Math.max(currentSuggestionIndex.value - 1, -1)
       }
       break
-      
+
     case 'Enter':
       event.preventDefault()
       if (currentSuggestionIndex.value >= 0 && suggestions[currentSuggestionIndex.value]) {
@@ -252,7 +253,7 @@ const handleKeydown = (event) => {
         debouncedSearch(searchQuery.value)
       }
       break
-      
+
     case 'Escape':
       event.preventDefault()
       showSuggestions.value = false
@@ -263,7 +264,7 @@ const handleKeydown = (event) => {
 
 const selectLocation = async (location) => {
   // 检查是否已经选中
-  const existingIndex = selectedLocations.value.findIndex(loc => loc.id === location.id)
+  const existingIndex = selectedLocations.value.findIndex((loc) => loc.id === location.id)
   if (existingIndex !== -1) return
 
   propertiesStore.addSelectedLocation(location)
@@ -271,19 +272,19 @@ const selectLocation = async (location) => {
   showSuggestions.value = false
   currentSuggestionIndex.value = -1
   locationSuggestions.value = [] // 清空搜索结果
-  
+
   emit('locationSelected', location)
-  
+
   // 加载相邻区域建议
   await loadNearbySuggestions()
 }
 
 const removeLocation = async (locationId) => {
   propertiesStore.removeSelectedLocation(locationId)
-  
+
   // 触发重新搜索，传递一个特殊标记表示是移除操作
   emit('locationSelected', { removed: true })
-  
+
   // 重新加载相邻区域建议
   await loadNearbySuggestions()
 }
@@ -299,7 +300,7 @@ const handleClickOutside = (event) => {
 // 生命周期
 onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
-  
+
   // 初始化时不再加载所有区域数据，改为按需搜索
   // 这样可以避免加载大量数据到前端
 })
@@ -309,11 +310,14 @@ onUnmounted(() => {
 })
 
 // 监听属性变化
-watch(() => propertiesStore.searchQuery, (newQuery) => {
-  if (searchQuery.value !== newQuery) {
-    searchQuery.value = newQuery
-  }
-})
+watch(
+  () => propertiesStore.searchQuery,
+  (newQuery) => {
+    if (searchQuery.value !== newQuery) {
+      searchQuery.value = newQuery
+    }
+  },
+)
 </script>
 
 <style scoped>
@@ -531,7 +535,7 @@ watch(() => propertiesStore.searchQuery, (newQuery) => {
   .search-bar-container {
     width: 100%;
   }
-  
+
   .location-suggestions {
     margin-left: -16px;
     margin-right: -16px;
@@ -539,12 +543,12 @@ watch(() => propertiesStore.searchQuery, (newQuery) => {
     border-left: none;
     border-right: none;
   }
-  
+
   .location-tags {
     margin-left: -4px;
     margin-right: -4px;
   }
-  
+
   .suggestion-item {
     padding: 16px;
   }

@@ -18,7 +18,7 @@
         class="search-filter-section"
         :class="{
           'is-fixed': isSearchBarFixed,
-          'nav-hidden': isNavHidden && windowWidth > 768
+          'nav-hidden': isNavHidden && windowWidth > 768,
         }"
       >
         <div class="search-content-container">
@@ -70,9 +70,7 @@
               <Warning />
             </el-icon>
             <p class="chinese-text">{{ propertiesStore.error }}</p>
-            <el-button type="primary" @click="retryLoadProperties">
-              重新加载
-            </el-button>
+            <el-button type="primary" @click="retryLoadProperties"> 重新加载 </el-button>
           </div>
 
           <!-- 空状态 -->
@@ -82,9 +80,7 @@
             </el-icon>
             <h3 class="chinese-text">没有找到匹配的房源</h3>
             <p class="chinese-text">请尝试调整搜索条件或筛选器</p>
-            <el-button type="primary" @click="clearFilters">
-              清除筛选条件
-            </el-button>
+            <el-button type="primary" @click="clearFilters"> 清除筛选条件 </el-button>
           </div>
 
           <!-- 房源列表容器 -->
@@ -110,7 +106,10 @@
           </div>
 
           <!-- 分页组件：虚拟滚动启用时隐藏，两种导航方式互斥避免用户困惑 -->
-          <div v-if="!useVirtualScroll && propertiesStore.totalPages > 1" class="pagination-container">
+          <div
+            v-if="!useVirtualScroll && propertiesStore.totalPages > 1"
+            class="pagination-container"
+          >
             <el-pagination
               :current-page="propertiesStore.currentPage"
               :page-size="propertiesStore.pageSize"
@@ -160,7 +159,7 @@ const searchBarElement = ref(null)
 const lastScrollY = ref(0)
 const isNavHidden = ref(false)
 const windowWidth = ref(window.innerWidth)
-const filterPanelRef = ref(null)  // 添加FilterPanel组件的引用
+const filterPanelRef = ref(null) // 添加FilterPanel组件的引用
 
 // 定义事件发射器
 const emit = defineEmits(['updateNavVisibility'])
@@ -184,13 +183,13 @@ const handleSearch = () => {
 
 const handleLocationSelected = async () => {
   // 当选择或移除区域后，调用API进行服务端筛选
-  const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
+  const selectedSuburbs = propertiesStore.selectedLocations.map((loc) => loc.name)
 
   try {
     if (selectedSuburbs.length > 0) {
       // 有选中的区域，进行筛选
       const params = {
-        suburb: selectedSuburbs.join(',')
+        suburb: selectedSuburbs.join(','),
       }
       await propertiesStore.fetchProperties(params)
     } else {
@@ -211,12 +210,13 @@ const handleQuickFiltersChanged = (filterParams) => {
   if (filterPanelRef.value) {
     // 转换格式以同步到FilterPanel
     const syncData = {
-      priceRange: filterParams.minPrice !== null || filterParams.maxPrice !== null
-        ? [filterParams.minPrice || 0, filterParams.maxPrice || 5000]
-        : [0, 5000],
+      priceRange:
+        filterParams.minPrice !== null || filterParams.maxPrice !== null
+          ? [filterParams.minPrice || 0, filterParams.maxPrice || 5000]
+          : [0, 5000],
       bedrooms: filterParams.bedrooms === 'any' ? [] : filterParams.bedrooms.split(','),
       bathrooms: filterParams.bathrooms === 'any' ? [] : filterParams.bathrooms?.split(',') || [],
-      parking: filterParams.parking === 'any' ? [] : filterParams.parking?.split(',') || []
+      parking: filterParams.parking === 'any' ? [] : filterParams.parking?.split(',') || [],
     }
     filterPanelRef.value.setFilters(syncData)
   }
@@ -232,7 +232,7 @@ const handlePageChange = async (page) => {
   // 滚动到顶部
   window.scrollTo({
     top: 0,
-    behavior: 'smooth'
+    behavior: 'smooth',
   })
 }
 
@@ -257,7 +257,6 @@ const clearFilters = () => {
   propertiesStore.resetFilters()
   showFilterPanel.value = false
 }
-
 
 const loadProperties = async () => {
   try {
@@ -439,7 +438,6 @@ onUnmounted(() => {
     font-size: 20px;
   }
 }
-
 
 /* Domain标准搜索区域 - 全屏容器 */
 .search-filter-section {

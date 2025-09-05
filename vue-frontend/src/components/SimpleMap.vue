@@ -32,24 +32,24 @@ import { Location } from '@element-plus/icons-vue'
 const props = defineProps({
   latitude: {
     type: Number,
-    required: true
+    required: true,
   },
   longitude: {
     type: Number,
-    required: true
+    required: true,
   },
   zoom: {
     type: Number,
-    default: 14
+    default: 14,
   },
   height: {
     type: String,
-    default: '200px'
+    default: '200px',
   },
   markerTitle: {
     type: String,
-    default: 'Property Location'
-  }
+    default: 'Property Location',
+  },
 })
 
 // 是否使用静态图片模式
@@ -81,7 +81,6 @@ const formattedCoordinates = computed(() => {
   const lng = props.longitude.toFixed(6)
   return `纬度: ${lat}, 经度: ${lng}`
 })
-
 </script>
 
 <style scoped>

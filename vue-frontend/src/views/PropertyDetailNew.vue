@@ -20,7 +20,6 @@
       <!-- 主内容区 1683x1909 位于 left:117px top:687px -->
       <div class="main-content-wrapper">
         <div class="main-content">
-
           <!-- 第一部分：基本信息 -->
           <div class="info-section">
             <!-- 价格和可用日期 -->
@@ -78,7 +77,9 @@
               </div>
               <div class="travel-btn-content">
                 <span class="travel-btn-title">See travel times</span>
-                <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
+                <span class="travel-btn-subtitle"
+                  >Find out travel times from this property to your destinations</span
+                >
               </div>
             </button>
           </div>
@@ -87,8 +88,13 @@
           <div class="description-section">
             <h2 class="section-title">Property Description</h2>
             <div class="description-content">
-              <p class="headline">Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104</p>
-              <p>?? Fully Furnished 2 Bed 2 Bath in Maroubra |Big Balcony I Quiet Location | Direct Bus to UNSW</p>
+              <p class="headline">
+                Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104
+              </p>
+              <p>
+                ?? Fully Furnished 2 Bed 2 Bath in Maroubra |Big Balcony I Quiet Location | Direct
+                Bus to UNSW
+              </p>
               <p>??Address: 7/264 Maroubra Road, Maroubra</p>
             </div>
             <button class="read-more-btn" @click="isDescriptionExpanded = !isDescriptionExpanded">
@@ -210,17 +216,12 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
     <!-- Auth Modal -->
-    <AuthModal
-      v-if="showAuthModal"
-      v-model="showAuthModal"
-      @success="handleAuthSuccess"
-    />
+    <AuthModal v-if="showAuthModal" v-model="showAuthModal" @success="handleAuthSuccess" />
   </div>
 </template>
 
@@ -229,9 +230,7 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
-import {
-  ArrowLeft, House, Ticket, Van, Calendar, Plus
-} from '@element-plus/icons-vue'
+import { ArrowLeft, House, Ticket, Van, Calendar, Plus } from '@element-plus/icons-vue'
 import SimpleMap from '@/components/SimpleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 
@@ -248,7 +247,7 @@ const showAuthModal = ref(false)
 const property = computed(() => propertiesStore.currentProperty)
 const images = computed(() => {
   if (!property.value?.images) return []
-  return property.value.images.filter(url => url && url.trim())
+  return property.value.images.filter((url) => url && url.trim())
 })
 
 const goBack = () => router.go(-1)
@@ -270,8 +269,8 @@ const handleSeeTravelTimes = () => {
         address: property.value.address,
         suburb: property.value.suburb,
         lat: property.value.latitude,
-        lng: property.value.longitude
-      }
+        lng: property.value.longitude,
+      },
     })
   } else {
     showAuthModal.value = true
@@ -517,7 +516,7 @@ onMounted(async () => {
 .section-title {
   font-size: 23px;
   font-weight: 700;
-  color: #60606D;
+  color: #60606d;
   margin: 0 0 24px 0;
   font-family: Inter, sans-serif;
 }
@@ -529,14 +528,14 @@ onMounted(async () => {
 .headline {
   font-size: 15px;
   font-weight: 700;
-  color: #757D8B;
+  color: #757d8b;
   margin-bottom: 12px;
   font-family: Inter, sans-serif;
 }
 
 .description-content p {
   font-size: 14px;
-  color: #757D8B;
+  color: #757d8b;
   line-height: 1.6;
   margin-bottom: 8px;
   font-family: Inter, sans-serif;
@@ -544,12 +543,12 @@ onMounted(async () => {
 
 .read-more-btn {
   padding: 6px 14px;
-  border: 1px solid #6F6997;
+  border: 1px solid #6f6997;
   border-radius: 4px;
   background: white;
   font-size: 13px;
   font-weight: 700;
-  color: #4F6181;
+  color: #4f6181;
   cursor: pointer;
   font-family: Inter, sans-serif;
 }
@@ -573,14 +572,14 @@ onMounted(async () => {
 
 .feature-item {
   font-size: 15px;
-  color: #7F8194;
+  color: #7f8194;
   padding: 10px 0;
   font-family: Inter, sans-serif;
 }
 
 .view-less-btn {
   font-size: 15px;
-  color: #6FC168;
+  color: #6fc168;
   background: none;
   border: none;
   cursor: pointer;
@@ -601,7 +600,7 @@ onMounted(async () => {
 .inspection-title {
   font-size: 23px;
   font-weight: 700;
-  color: #4C5267;
+  color: #4c5267;
   margin: 0 0 8px 0;
   font-family: Inter, sans-serif;
 }
@@ -609,7 +608,7 @@ onMounted(async () => {
 .inspection-label {
   font-size: 14px;
   font-weight: 700;
-  color: #6F7386;
+  color: #6f7386;
   text-transform: uppercase;
   font-family: Inter, sans-serif;
 }
@@ -624,7 +623,7 @@ onMounted(async () => {
 .inspection-item {
   width: 305px;
   height: 72px;
-  border: 1px solid #D0D3D9;
+  border: 1px solid #d0d3d9;
   background: white;
   padding: 16px 20px;
   display: flex;
@@ -636,14 +635,14 @@ onMounted(async () => {
 .inspection-date .day {
   font-size: 15px;
   font-weight: 700;
-  color: #6E7385;
+  color: #6e7385;
   margin-bottom: 4px;
   font-family: Inter, sans-serif;
 }
 
 .inspection-date .time {
   font-size: 15px;
-  color: #7F8194;
+  color: #7f8194;
   font-family: Inter, sans-serif;
 }
 
@@ -666,7 +665,7 @@ onMounted(async () => {
 .add-to-planner {
   width: 305px;
   height: 72px;
-  border: 1px solid #D0D3D9;
+  border: 1px solid #d0d3d9;
   background: white;
   display: flex;
   align-items: center;
@@ -674,7 +673,7 @@ onMounted(async () => {
   gap: 8px;
   font-size: 15px;
   font-weight: 700;
-  color: #6E7285;
+  color: #6e7285;
   cursor: pointer;
   border-radius: 4px;
   font-family: Inter, sans-serif;

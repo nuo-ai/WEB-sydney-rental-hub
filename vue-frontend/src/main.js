@@ -8,9 +8,9 @@ import App from './App.vue'
 import router from './router'
 
 // 导入设计系统样式（按顺序）
-import './styles/design-tokens.css'  // 设计令牌
+import './styles/design-tokens.css' // 设计令牌
 import './styles/base-components.css' // 基础组件
-import './style.css'                  // 全局样式
+import './style.css' // 全局样式
 
 import { useAuthStore } from './stores/auth'
 

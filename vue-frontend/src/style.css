@@ -3,37 +3,38 @@
 /* ========== JUWO品牌色彩系统 ========== */
 :root {
   /* JUWO主品牌色 #FF5824 */
-  --juwo-primary: #FF5824;
-  --juwo-primary-light: #FF7851;
-  --juwo-primary-dark: #E64100;
-  --juwo-primary-50: #FFF3F0;
-  --juwo-primary-100: #FFE5D9;
-  --juwo-primary-500: #FF5824;
-  --juwo-primary-600: #E64100;
-  --juwo-primary-700: #CC3700;
+  --juwo-primary: #ff5824;
+  --juwo-primary-light: #ff7851;
+  --juwo-primary-dark: #e64100;
+  --juwo-primary-50: #fff3f0;
+  --juwo-primary-100: #ffe5d9;
+  --juwo-primary-500: #ff5824;
+  --juwo-primary-600: #e64100;
+  --juwo-primary-700: #cc3700;
 
   /* Element Plus主题定制 */
-  --el-color-primary: #FF5824;
-  --el-color-primary-light-1: #FF7851;
-  --el-color-primary-light-3: #FFB399;
-  --el-color-primary-light-5: #FFD1BF;
-  --el-color-primary-light-7: #FFE5D9;
-  --el-color-primary-light-8: #FFEBE0;
-  --el-color-primary-light-9: #FFF3F0;
-  --el-color-primary-dark-2: #E64100;
+  --el-color-primary: #ff5824;
+  --el-color-primary-light-1: #ff7851;
+  --el-color-primary-light-3: #ffb399;
+  --el-color-primary-light-5: #ffd1bf;
+  --el-color-primary-light-7: #ffe5d9;
+  --el-color-primary-light-8: #ffebe0;
+  --el-color-primary-light-9: #fff3f0;
+  --el-color-primary-dark-2: #e64100;
 
   /* 从现有设计系统继承的颜色 */
   --color-text-primary: #2d2d2d;
   --color-text-secondary: #595959;
   --color-text-price: #000000;
-  --color-border-default: #E3E3E3;
-  --color-bg-page: #F4F7F9;
-  --color-bg-card: #FFFFFF;
+  --color-border-default: #e3e3e3;
+  --color-bg-page: #f4f7f9;
+  --color-bg-card: #ffffff;
 
   /* 专业字体系统 */
-  --font-english: "SF Pro Text", -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-chinese: "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
-  --font-system: -apple-system, "PingFang SC", "Inter", sans-serif;
+  --font-english: 'SF Pro Text', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-chinese:
+    'PingFang SC', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif;
+  --font-system: -apple-system, 'PingFang SC', 'Inter', sans-serif;
 
   /* 专业间距系统 */
   --space-xs: 4px;
@@ -59,11 +60,11 @@
 /* ========== 统一补充：详情页引用的设计令牌，映射到全局变量（不影响现有页面） ========== */
 :root {
   /* 间距（对齐 Tailwind 语义，用于详情页按钮/栅格） */
-  --space-1-5: 6px;   /* 0.375rem */
-  --space-3: 12px;    /* 0.75rem */
-  --space-3-5: 14px;  /* 0.875rem */
-  --space-4: 16px;    /* 1rem */
-  --space-6: 24px;    /* 1.5rem */
+  --space-1-5: 6px; /* 0.375rem */
+  --space-3: 12px; /* 0.75rem */
+  --space-3-5: 14px; /* 0.875rem */
+  --space-4: 16px; /* 1rem */
+  --space-6: 24px; /* 1.5rem */
 
   /* 字体与字重（详情页使用到的变量名） */
   --text-xs: 12px;
@@ -77,7 +78,7 @@
   --bg-hover: #f7f8fa;
   --bg-secondary: var(--juwo-primary-50);
   --radius-full: 9999px;
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --brand-primary: var(--juwo-primary);
 
   /* 文本与链接颜色（与全局一致） */
@@ -93,7 +94,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   font-family: var(--font-system);
   color: var(--color-text-primary);
   background-color: var(--color-bg-page);
@@ -639,8 +641,12 @@ html, body {
 
 /* === 房型规格 - 在 spec-row 场景下强覆盖，确保 24/16 与 6/10 生效 === */
 /* 说明：使用更高优先级选择器 + !important，避免被历史 .spec-item 与局部样式覆盖 */
-.spec-row .spec-item { gap: 0 !important; } /* 避免与 margin-left 叠加导致间距变宽 */
-.spec-row .spec-item + .spec-item { margin-left: 10px !important; } /* 单元与单元间 10px */
+.spec-row .spec-item {
+  gap: 0 !important;
+} /* 避免与 margin-left 叠加导致间距变宽 */
+.spec-row .spec-item + .spec-item {
+  margin-left: 10px !important;
+} /* 单元与单元间 10px */
 
 .spec-row .spec-item .spec-icon,
 .spec-row .spec-item .fa,

@@ -2,8 +2,8 @@
   <div class="google-map-container">
     <!-- 如果地图加载失败，显示静态地图作为备用 -->
     <div v-if="mapError" class="map-fallback">
-      <img 
-        :src="staticMapUrl" 
+      <img
+        :src="staticMapUrl"
         :alt="markerTitle"
         class="static-map"
         @error="handleStaticMapError"
@@ -13,7 +13,7 @@
         <span>{{ markerTitle }}</span>
       </div>
     </div>
-    
+
     <!-- 正常的Google地图 -->
     <div v-else ref="mapRef" class="google-map" :id="mapId">
       <!-- 加载占位符 -->
@@ -32,28 +32,28 @@ import { Loading, Location } from '@element-plus/icons-vue'
 const props = defineProps({
   latitude: {
     type: Number,
-    required: true
+    required: true,
   },
   longitude: {
     type: Number,
-    required: true
+    required: true,
   },
   zoom: {
     type: Number,
-    default: 14
+    default: 14,
   },
   height: {
     type: String,
-    default: '200px'
+    default: '200px',
   },
   showMarker: {
     type: Boolean,
-    default: true
+    default: true,
   },
   markerTitle: {
     type: String,
-    default: 'Property Location'
-  }
+    default: 'Property Location',
+  },
 })
 
 const mapRef = ref(null)
@@ -72,15 +72,15 @@ const staticMapUrl = computed(() => {
   const zoom = props.zoom
   const center = `${props.latitude},${props.longitude}`
   const marker = `markers=color:red%7C${center}`
-  
+
   // 从环境变量获取 API 密钥（安全实践）
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-  
+
   if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
     console.warn('Google Maps API key not configured')
     return ''
   }
-  
+
   return `https://maps.googleapis.com/maps/api/staticmap?center=${center}&zoom=${zoom}&size=${size}&${marker}&key=${apiKey}`
 })
 
@@ -114,27 +114,29 @@ const loadGoogleMaps = () => {
       const script = document.createElement('script')
       // 从环境变量获取 API 密钥（不再使用硬编码的后备密钥）
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-      
+
       if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
-        console.error('Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file')
+        console.error(
+          'Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file',
+        )
         rejectLoad(new Error('API key not configured'))
         return
       }
-      
+
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
       script.async = true
       script.defer = true
-      
+
       script.onload = () => {
         googleMapsLoaded = true
         resolveLoad()
       }
-      
+
       script.onerror = () => {
         const error = new Error('Failed to load Google Maps')
         rejectLoad(error)
       }
-      
+
       document.head.appendChild(script)
     })
 
@@ -148,22 +150,22 @@ const initMap = async () => {
   if (isInitializing || mapLoaded.value || isDestroyed) {
     return
   }
-  
+
   isInitializing = true
-  
+
   try {
     // 初始化地图
     await loadGoogleMaps()
-    
+
     // Wait for DOM to be ready
     await nextTick()
-    
+
     if (!mapRef.value) {
       console.error('Map ref not found')
       isInitializing = false
       return
     }
-    
+
     const mapOptions = {
       center: { lat: props.latitude, lng: props.longitude },
       zoom: props.zoom,
@@ -174,24 +176,24 @@ const initMap = async () => {
         {
           featureType: 'poi',
           elementType: 'labels',
-          stylers: [{ visibility: 'off' }]
-        }
-      ]
+          stylers: [{ visibility: 'off' }],
+        },
+      ],
     }
-    
+
     // 创建地图
     map = new google.maps.Map(mapRef.value, mapOptions)
-    
+
     if (props.showMarker) {
       marker = new google.maps.Marker({
         position: { lat: props.latitude, lng: props.longitude },
         map: map,
         title: props.markerTitle,
-        animation: google.maps.Animation.DROP
+        animation: google.maps.Animation.DROP,
       })
       // 添加标记到地图
     }
-    
+
     // 检查组件是否还存在
     if (!isDestroyed) {
       mapLoaded.value = true
@@ -207,16 +209,19 @@ const initMap = async () => {
 }
 
 // Update map center when coordinates change
-watch(() => [props.latitude, props.longitude], ([newLat, newLng]) => {
-  if (map && googleMapsLoaded && !isDestroyed) {
-    const newCenter = { lat: newLat, lng: newLng }
-    map.setCenter(newCenter)
-    
-    if (marker) {
-      marker.setPosition(newCenter)
+watch(
+  () => [props.latitude, props.longitude],
+  ([newLat, newLng]) => {
+    if (map && googleMapsLoaded && !isDestroyed) {
+      const newCenter = { lat: newLat, lng: newLng }
+      map.setCenter(newCenter)
+
+      if (marker) {
+        marker.setPosition(newCenter)
+      }
     }
-  }
-})
+  },
+)
 
 onMounted(() => {
   initMap()

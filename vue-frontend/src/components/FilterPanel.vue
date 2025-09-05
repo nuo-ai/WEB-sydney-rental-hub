@@ -5,7 +5,7 @@
     <div class="filter-overlay" @click="closePanel"></div>
 
     <!-- 筛选面板 -->
-    <div class="domain-filter-panel" :class="{ 'visible': visible }">
+    <div class="domain-filter-panel" :class="{ visible: visible }">
       <!-- 面板头部 -->
       <div class="panel-header">
         <h3 class="panel-title chinese-text">筛选</h3>
@@ -45,7 +45,7 @@
               v-for="option in bedroomOptions"
               :key="option.value"
               class="filter-btn"
-              :class="{ 'active': isBedroomSelected(option.value) }"
+              :class="{ active: isBedroomSelected(option.value) }"
               @click="toggleBedroom(option.value)"
             >
               {{ option.label }}
@@ -61,7 +61,7 @@
               v-for="option in bathroomOptions"
               :key="option.value"
               class="filter-btn"
-              :class="{ 'active': isBathroomSelected(option.value) }"
+              :class="{ active: isBathroomSelected(option.value) }"
               @click="toggleBathroom(option.value)"
             >
               {{ option.label }}
@@ -77,7 +77,7 @@
               v-for="option in parkingOptions"
               :key="option.value"
               class="filter-btn"
-              :class="{ 'active': isParkingSelected(option.value) }"
+              :class="{ active: isParkingSelected(option.value) }"
               @click="toggleParking(option.value)"
             >
               {{ option.label }}
@@ -114,26 +114,15 @@
           <h4 class="section-title chinese-text">家具</h4>
           <div class="furnished-toggle">
             <span class="toggle-label chinese-text">只显示带家具的房源</span>
-            <el-switch
-              v-model="filters.isFurnished"
-              size="large"
-              @change="handleFurnishedChange"
-            />
+            <el-switch v-model="filters.isFurnished" size="large" @change="handleFurnishedChange" />
           </div>
         </div>
       </div>
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="large" @click="closePanel">
-          取消
-        </el-button>
-        <el-button
-          type="primary"
-          class="apply-btn"
-          size="large"
-          @click="applyFilters"
-        >
+        <el-button class="cancel-btn" size="large" @click="closePanel"> 取消 </el-button>
+        <el-button type="primary" class="apply-btn" size="large" @click="applyFilters">
           显示结果 ({{ filteredCount }})
         </el-button>
       </div>
@@ -149,8 +138,8 @@ import { usePropertiesStore } from '@/stores/properties'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 // 组件事件
@@ -167,7 +156,7 @@ const filters = ref({
   parking: [],
   startDate: null,
   endDate: null,
-  isFurnished: false
+  isFurnished: false,
 })
 
 // 本地计算的筛选结果数量
@@ -188,27 +177,27 @@ const bedroomOptions = [
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },
-  { value: '4+', label: '4+' }
+  { value: '4+', label: '4+' },
 ]
 
 const bathroomOptions = [
   { value: 'any', label: 'Any' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
-  { value: '3+', label: '3+' }
+  { value: '3+', label: '3+' },
 ]
 
 const parkingOptions = [
   { value: 'any', label: 'Any' },
   { value: '0', label: '0' },
   { value: '1', label: '1' },
-  { value: '2+', label: '2+' }
+  { value: '2+', label: '2+' },
 ]
 
 // 计算属性
 const visible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => emit('update:modelValue', value),
 })
 
 const priceRangeText = computed(() => {
@@ -232,14 +221,16 @@ const filteredCount = computed(() => {
 
 // 检查是否应用了筛选
 const hasAppliedFilters = computed(() => {
-  return filters.value.priceRange[0] > 0 ||
-         filters.value.priceRange[1] < 5000 ||
-         filters.value.bedrooms.length > 0 ||
-         filters.value.bathrooms.length > 0 ||
-         filters.value.parking.length > 0 ||
-         filters.value.startDate !== null ||
-         filters.value.endDate !== null ||
-         filters.value.isFurnished !== false
+  return (
+    filters.value.priceRange[0] > 0 ||
+    filters.value.priceRange[1] < 5000 ||
+    filters.value.bedrooms.length > 0 ||
+    filters.value.bathrooms.length > 0 ||
+    filters.value.parking.length > 0 ||
+    filters.value.startDate !== null ||
+    filters.value.endDate !== null ||
+    filters.value.isFurnished !== false
+  )
 })
 
 // 相邻多选逻辑
@@ -303,7 +294,7 @@ const toggleParking = (value) => {
 
 // 实时更新筛选数量（不立即应用到store）
 const updateFilteredCount = async () => {
-  // 准备筛选参数，与后端API保持一致
+  // 准备筛选参数（先沿用现有键名，后续统一映射）
   const filterParams = {
     minPrice: filters.value.priceRange[0] > 0 ? filters.value.priceRange[0] : null,
     maxPrice: filters.value.priceRange[1] < 5000 ? filters.value.priceRange[1] : null,
@@ -312,110 +303,41 @@ const updateFilteredCount = async () => {
     parking: filters.value.parking.length > 0 ? filters.value.parking.join(',') : null,
     date_from: filters.value.startDate ? formatDateToYYYYMMDD(filters.value.startDate) : null,
     date_to: filters.value.endDate ? formatDateToYYYYMMDD(filters.value.endDate) : null,
-    isFurnished: filters.value.isFurnished || null
+    isFurnished: filters.value.isFurnished || null,
   }
 
   // 添加已选择的区域
-  const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
+  const selectedSuburbs = propertiesStore.selectedLocations.map((loc) => loc.name)
   if (selectedSuburbs.length > 0) {
     filterParams.suburb = selectedSuburbs.join(',')
   }
 
   // 移除 null 值
-  Object.keys(filterParams).forEach(key => {
+  Object.keys(filterParams).forEach((key) => {
     if (filterParams[key] === null || filterParams[key] === '') {
       delete filterParams[key]
     }
   })
 
-  // 如果没有任何筛选条件（包括区域），显示总数
+  // 无筛选条件时，直接使用当前总数，避免不必要请求
   if (Object.keys(filterParams).length === 0) {
-    localFilteredCount.value = 3456
+    localFilteredCount.value =
+      propertiesStore.totalCount || propertiesStore.allProperties.length || 0
     return
   }
 
   try {
-    // 调用API获取实际的筛选结果数量
-    const response = await fetch(`/api/properties?page=1&page_size=1&${new URLSearchParams(filterParams)}`)
-    const data = await response.json()
-    if (data.status === 'success' && data.pagination) {
-      localFilteredCount.value = data.pagination.total
-    } else {
-      // 如果API调用失败，使用估算
-      calculateLocalCount()
-    }
+    // 统一通过 store 入口获取计数，避免双通道不一致
+    const total = await propertiesStore.getFilteredCount(filterParams)
+    localFilteredCount.value = total
   } catch (error) {
     console.error('获取筛选计数失败:', error)
-    // 使用估算作为备用方案
-    calculateLocalCount()
+    // 快速失败：不做本地估算，避免与真实结果不一致
+    localFilteredCount.value = 0
   }
 }
 
-
-// 本地计算备用方案 - 基于总数进行估算
-const calculateLocalCount = () => {
-  // 基于区域筛选后的总数进行估算
-  let totalProperties = 3456
-
-  // 如果有选中区域，使用区域筛选后的基数
-  const selectedSuburbs = propertiesStore.selectedLocations
-  if (selectedSuburbs.length > 0) {
-    // 使用当前store中的totalCount（如果有）或估算值
-    totalProperties = propertiesStore.totalCount || Math.floor(3456 * (selectedSuburbs.length / 10))
-  }
-
-  // 如果没有其他筛选条件（除了区域）
-  if (!hasAppliedFilters.value && selectedSuburbs.length === 0) {
-    localFilteredCount.value = totalProperties
-    return
-  }
-
-  // 根据筛选条件估算
-  let estimate = totalProperties
-
-      // 卧室筛选估算
-      const allBedroomOpts = ['1', '2', '3', '4+']
-      const isAllBeds = allBedroomOpts.every(opt => filters.value.bedrooms.includes(opt))
-      if (filters.value.bedrooms.length > 0 && !isAllBeds) {
-        const bedroomCount = filters.value.bedrooms.length
-        estimate = Math.floor(estimate * (bedroomCount / 4))
-      }
-
-      // 价格筛选估算
-      const [minPrice, maxPrice] = filters.value.priceRange
-      if (minPrice > 0 || maxPrice < 5000) {
-        const priceRange = maxPrice - minPrice
-        estimate = Math.floor(estimate * (priceRange / 5000))
-      }
-
-      // 浴室筛选估算
-      const allBathOpts = ['1', '2', '3+']
-      const isAllBaths = allBathOpts.every(opt => filters.value.bathrooms.includes(opt))
-      if (filters.value.bathrooms.length > 0 && !isAllBaths) {
-        estimate = Math.floor(estimate * 0.7)
-      }
-
-      // 车位筛选估算
-      const allParkOpts = ['0', '1', '2+']
-      const isAllParks = allParkOpts.every(opt => filters.value.parking.includes(opt))
-      if (filters.value.parking.length > 0 && !isAllParks) {
-        estimate = Math.floor(estimate * 0.6)
-      }
-
-      // 家具筛选估算
-      if (filters.value.isFurnished) {
-        estimate = Math.floor(estimate * 0.4)
-      }
-
-      // 空出日期筛选估算
-      if (filters.value.startDate || filters.value.endDate) {
-        estimate = Math.floor(estimate * 0.8)  // 大约80%的房源在指定时间可用
-      }
-
-
-  // 保证估算值合理
-  localFilteredCount.value = Math.max(1, Math.min(estimate, totalProperties))
-}
+/* 本地估算已移除：为避免与真实结果不一致，计数统一走后端接口，通过 store.getFilteredCount() 获取 */
 
 const handlePriceChange = () => {
   nextTick(() => updateFilteredCount())
@@ -451,11 +373,11 @@ const applyFiltersToStore = async () => {
       parking: filters.value.parking.length > 0 ? filters.value.parking.join(',') : null,
       date_from: filters.value.startDate ? formatDateToYYYYMMDD(filters.value.startDate) : null,
       date_to: filters.value.endDate ? formatDateToYYYYMMDD(filters.value.endDate) : null,
-      isFurnished: filters.value.isFurnished || null
+      isFurnished: filters.value.isFurnished || null,
     }
 
     // 添加已选择的区域
-    const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
+    const selectedSuburbs = propertiesStore.selectedLocations.map((loc) => loc.name)
     if (selectedSuburbs.length > 0) {
       filterParams.suburb = selectedSuburbs.join(',')
     }
@@ -482,17 +404,17 @@ const resetFilters = () => {
     parking: [],
     startDate: null,
     endDate: null,
-    isFurnished: false
+    isFurnished: false,
   }
 
   // 如果有选中的区域，基于区域更新计数；否则显示总数
   if (propertiesStore.selectedLocations.length > 0) {
     updateFilteredCount()
   } else {
-    localFilteredCount.value = propertiesStore.totalCount || 3456
+    localFilteredCount.value =
+      propertiesStore.totalCount || propertiesStore.allProperties.length || 0
   }
 }
-
 
 // 暴露方法给父组件以同步状态
 defineExpose({
@@ -501,7 +423,7 @@ defineExpose({
     if (newFilters.bedrooms) filters.value.bedrooms = newFilters.bedrooms
     if (newFilters.bathrooms) filters.value.bathrooms = newFilters.bathrooms
     if (newFilters.parking) filters.value.parking = newFilters.parking
-  }
+  },
 })
 
 // 生命周期
@@ -518,7 +440,8 @@ onMounted(() => {
   if (propertiesStore.selectedLocations.length > 0) {
     updateFilteredCount()
   } else {
-    localFilteredCount.value = propertiesStore.totalCount || 3456
+    localFilteredCount.value =
+      propertiesStore.totalCount || propertiesStore.allProperties.length || 0
   }
 })
 </script>
@@ -531,12 +454,12 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2000;  /* 降低z-index，让日期选择器能显示在上面 */
-  pointer-events: none;  /* 默认不捕获事件，只在visible时才捕获 */
+  z-index: 2000; /* 降低z-index，让日期选择器能显示在上面 */
+  pointer-events: none; /* 默认不捕获事件，只在visible时才捕获 */
 }
 
 .filter-panel-wrapper.visible {
-  pointer-events: auto;  /* 只在显示时捕获点击事件 */
+  pointer-events: auto; /* 只在显示时捕获点击事件 */
 }
 
 /* 遮罩层 */
@@ -548,7 +471,7 @@ onMounted(() => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
   transition: opacity 0.3s ease;
-  pointer-events: auto;  /* 确保遮罩层可点击 */
+  pointer-events: auto; /* 确保遮罩层可点击 */
 }
 
 /* 移动端遮罩层 */
@@ -571,7 +494,7 @@ onMounted(() => {
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
-  z-index: 2001;  /* 确保面板在遮罩层之上 */
+  z-index: 2001; /* 确保面板在遮罩层之上 */
 }
 
 .domain-filter-panel.visible {
@@ -767,7 +690,7 @@ onMounted(() => {
 
 /* 确保日期选择器弹出层在最上层 */
 :deep(.el-date-picker__popper) {
-  z-index: 10002 !important;  /* 高于筛选面板的9999 */
+  z-index: 10002 !important; /* 高于筛选面板的9999 */
 }
 
 :deep(.el-popper) {

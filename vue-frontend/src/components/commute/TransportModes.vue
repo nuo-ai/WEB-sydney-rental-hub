@@ -16,8 +16,8 @@
 defineProps({
   modelValue: {
     type: String,
-    default: 'DRIVING'
-  }
+    default: 'DRIVING',
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -26,18 +26,18 @@ const modes = [
   {
     value: 'DRIVING',
     icon: 'fas fa-car',
-    label: 'Driving'
+    label: 'Driving',
   },
   {
     value: 'TRANSIT',
     icon: 'fas fa-bus',
-    label: 'Public transport'
+    label: 'Public transport',
   },
   {
     value: 'WALKING',
     icon: 'fas fa-walking',
-    label: 'Walking'
-  }
+    label: 'Walking',
+  },
 ]
 
 const selectMode = (value) => {
@@ -80,7 +80,9 @@ const selectMode = (value) => {
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.1);
   transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s;
+  transition:
+    width 0.3s,
+    height 0.3s;
 }
 
 .mode-btn:hover::before {

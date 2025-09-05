@@ -72,9 +72,7 @@
                   </button>
 
                   <!-- 图片计数器 -->
-                  <div class="image-counter">
-                    {{ currentImageIndex + 1 }} / {{ images.length }}
-                  </div>
+                  <div class="image-counter">{{ currentImageIndex + 1 }} / {{ images.length }}</div>
                 </template>
               </div>
 
@@ -116,15 +114,19 @@
             <div class="property-specs">
               <div class="specs-row-single">
                 <div class="spec-items-container">
-                  <span v-if="property.bedrooms" class="spec-item"><i class="fa-solid fa-bed"></i>{{ property.bedrooms }}</span>
-                  <span v-if="property.bathrooms" class="spec-item"><i class="fa-solid fa-bath"></i>{{ property.bathrooms }}</span>
-                  <span v-if="property.parking_spaces" class="spec-item"><i class="fa-solid fa-car"></i>{{ property.parking_spaces }}</span>
+                  <span v-if="property.bedrooms" class="spec-item"
+                    ><i class="fa-solid fa-bed"></i>{{ property.bedrooms }}</span
+                  >
+                  <span v-if="property.bathrooms" class="spec-item"
+                    ><i class="fa-solid fa-bath"></i>{{ property.bathrooms }}</span
+                  >
+                  <span v-if="property.parking_spaces" class="spec-item"
+                    ><i class="fa-solid fa-car"></i>{{ property.parking_spaces }}</span
+                  >
                 </div>
               </div>
               <div class="availability-info">
-                <p v-if="property.bond" class="bond-info">
-                  押金: ${{ property.bond }}
-                </p>
+                <p v-if="property.bond" class="bond-info">押金: ${{ property.bond }}</p>
                 <p v-if="property.is_furnished" class="furnished-info">
                   <el-icon><House /></el-icon> 已配家具
                 </p>
@@ -133,7 +135,10 @@
           </div>
 
           <!-- Feature Tags Section -->
-          <div v-if="property.property_features && property.property_features.length" class="feature-tags-section">
+          <div
+            v-if="property.property_features && property.property_features.length"
+            class="feature-tags-section"
+          >
             <h3 class="section-title">Features</h3>
             <div class="tag-group">
               <el-tag
@@ -154,10 +159,7 @@
           <div class="description-section">
             <h3 class="section-title">Property Description</h3>
             <div class="description-content">
-              <p
-                class="description-text"
-                :class="{ 'expanded': isDescriptionExpanded }"
-              >
+              <p class="description-text" :class="{ expanded: isDescriptionExpanded }">
                 {{ property.description }}
               </p>
               <el-button
@@ -209,9 +211,16 @@
 import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { ArrowLeft, ArrowRight, Share, DocumentCopy, Location, Picture } from '@element-plus/icons-vue'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Share,
+  DocumentCopy,
+  Location,
+  Picture,
+} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import CommuteCalculator from '@/components/CommuteCalculator.vue';
+import CommuteCalculator from '@/components/CommuteCalculator.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -232,7 +241,7 @@ const images = computed(() => {
   if (!property.value || !property.value.images || !Array.isArray(property.value.images)) {
     return []
   }
-  return property.value.images.filter(url => url && typeof url === 'string' && url.trim() !== '')
+  return property.value.images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
 })
 
 const isFavorite = computed(() => {
@@ -242,42 +251,41 @@ const isFavorite = computed(() => {
 
 const availabilityText = computed(() => {
   if (!property.value || !property.value.available_date) {
-    return '立即入住';
+    return '立即入住'
   }
 
   const availDate = new Date(property.value.available_date)
   const today = new Date()
-  today.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0)
 
   if (availDate <= today) {
-    return '立即入住';
+    return '立即入住'
   }
 
-  const year = availDate.getFullYear();
-  const month = availDate.getMonth() + 1;
-  const day = availDate.getDate();
+  const year = availDate.getFullYear()
+  const month = availDate.getMonth() + 1
+  const day = availDate.getDate()
 
-  return `${year}年${month}月${day}日起可入住`;
-});
-
-
+  return `${year}年${month}月${day}日起可入住`
+})
 
 const copyAddress = () => {
-  if (!property.value) return;
-  const fullAddress = `${property.value.address}, ${property.value.suburb}, NSW ${property.value.postcode}`;
-  navigator.clipboard.writeText(fullAddress)
+  if (!property.value) return
+  const fullAddress = `${property.value.address}, ${property.value.suburb}, NSW ${property.value.postcode}`
+  navigator.clipboard
+    .writeText(fullAddress)
     .then(() => ElMessage.success('地址已复制到剪贴板'))
-    .catch(() => ElMessage.error('复制失败'));
-};
+    .catch(() => ElMessage.error('复制失败'))
+}
 
 const inspectionTimes = computed(() => {
   if (!property.value || !property.value.inspection_times) return []
 
   // 处理inspection_times字符串或数组
   if (typeof property.value.inspection_times === 'string') {
-    return property.value.inspection_times.split(',').map(time => ({
+    return property.value.inspection_times.split(',').map((time) => ({
       date: time.split(' ')[0],
-      time: time.split(' ')[1] || ''
+      time: time.split(' ')[1] || '',
     }))
   }
 
@@ -323,14 +331,17 @@ const shareProperty = () => {
   if (!property.value) return
 
   if (navigator.share) {
-    navigator.share({
-      title: property.value.address,
-      text: `${property.value.address} - $${property.value.rent_pw}/week`,
-      url: window.location.href
-    }).catch(err => console.error('分享失败:', err))
+    navigator
+      .share({
+        title: property.value.address,
+        text: `${property.value.address} - $${property.value.rent_pw}/week`,
+        url: window.location.href,
+      })
+      .catch((err) => console.error('分享失败:', err))
   } else {
     // 备用方案：复制到剪贴板
-    navigator.clipboard.writeText(window.location.href)
+    navigator.clipboard
+      .writeText(window.location.href)
       .then(() => ElMessage.success('链接已复制到剪贴板'))
       .catch(() => ElMessage.error('复制失败'))
   }
@@ -361,67 +372,67 @@ const handleInspections = () => {
 const handleImageClick = () => {
   // Fix lightbox styles after a short delay
   setTimeout(() => {
-    const mask = document.querySelector('.el-image-viewer__mask');
+    const mask = document.querySelector('.el-image-viewer__mask')
     if (mask) {
-      mask.style.position = 'fixed';
-      mask.style.top = '0';
-      mask.style.left = '0';
-      mask.style.width = '100%';
-      mask.style.height = '100%';
-      mask.style.opacity = '0.95';
-      mask.style.backgroundColor = '#000000';
+      mask.style.position = 'fixed'
+      mask.style.top = '0'
+      mask.style.left = '0'
+      mask.style.width = '100%'
+      mask.style.height = '100%'
+      mask.style.opacity = '0.95'
+      mask.style.backgroundColor = '#000000'
     }
 
     // Add image counter
-    const wrapper = document.querySelector('.el-image-viewer__wrapper');
+    const wrapper = document.querySelector('.el-image-viewer__wrapper')
     if (wrapper && !wrapper.querySelector('.custom-image-counter')) {
-      const counter = document.createElement('div');
-      counter.className = 'custom-image-counter';
-      counter.style.position = 'absolute';
-      counter.style.top = '20px';
-      counter.style.left = '50%';
-      counter.style.transform = 'translateX(-50%)';
-      counter.style.color = 'white';
-      counter.style.fontSize = '16px';
-      counter.style.fontWeight = 'bold';
-      counter.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-      counter.style.padding = '8px 16px';
-      counter.style.borderRadius = '20px';
-      counter.style.zIndex = '2002';
+      const counter = document.createElement('div')
+      counter.className = 'custom-image-counter'
+      counter.style.position = 'absolute'
+      counter.style.top = '20px'
+      counter.style.left = '50%'
+      counter.style.transform = 'translateX(-50%)'
+      counter.style.color = 'white'
+      counter.style.fontSize = '16px'
+      counter.style.fontWeight = 'bold'
+      counter.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+      counter.style.padding = '8px 16px'
+      counter.style.borderRadius = '20px'
+      counter.style.zIndex = '2002'
 
       // Find current image index
-      const currentImg = wrapper.querySelector('.el-image-viewer__img');
+      const currentImg = wrapper.querySelector('.el-image-viewer__img')
       if (currentImg && currentImg.src) {
-        const currentIndex = images.value.findIndex(img => currentImg.src.includes(img)) + 1;
-        counter.textContent = `${currentIndex} / ${images.value.length}`;
+        const currentIndex = images.value.findIndex((img) => currentImg.src.includes(img)) + 1
+        counter.textContent = `${currentIndex} / ${images.value.length}`
       }
 
-      wrapper.appendChild(counter);
+      wrapper.appendChild(counter)
 
       // Update counter when image changes
       const observer = new MutationObserver(() => {
-        const img = wrapper.querySelector('.el-image-viewer__img');
+        const img = wrapper.querySelector('.el-image-viewer__img')
         if (img && img.src) {
-          const index = images.value.findIndex(imgSrc => img.src.includes(imgSrc)) + 1;
-          counter.textContent = `${index} / ${images.value.length}`;
+          const index = images.value.findIndex((imgSrc) => img.src.includes(imgSrc)) + 1
+          counter.textContent = `${index} / ${images.value.length}`
         }
-      });
+      })
 
       observer.observe(wrapper, {
         subtree: true,
         attributes: true,
-        attributeFilter: ['src']
-      });
+        attributeFilter: ['src'],
+      })
     }
-  }, 50);
+  }, 50)
 }
 
 onMounted(() => {
   propertiesStore.fetchPropertyDetail(propertyId).then(() => {
     // 数据加载完成
-  });
-  propertiesStore.logHistory(propertyId);
-});
+  })
+  propertiesStore.logHistory(propertyId)
+})
 </script>
 
 <style scoped>
@@ -471,7 +482,7 @@ onMounted(() => {
 .property-detail-content {
   background: white;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 

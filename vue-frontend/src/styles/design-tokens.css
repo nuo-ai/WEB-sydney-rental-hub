@@ -8,17 +8,17 @@
   /* ========================================
      1. 颜色系统 (Color System)
      ======================================== */
-  
+
   /* 品牌色 */
-  --brand-primary: #FF5824;
-  --brand-primary-hover: #E64100;
-  --brand-primary-active: #CC3700;
-  --brand-primary-light: #FFF3F0;
-  --brand-primary-50: #FFF3F0;
-  --brand-primary-100: #FFE5D9;
-  --brand-primary-500: #FF5824;
-  --brand-primary-600: #E64100;
-  
+  --brand-primary: #ff5824;
+  --brand-primary-hover: #e64100;
+  --brand-primary-active: #cc3700;
+  --brand-primary-light: #fff3f0;
+  --brand-primary-50: #fff3f0;
+  --brand-primary-100: #ffe5d9;
+  --brand-primary-500: #ff5824;
+  --brand-primary-600: #e64100;
+
   /* 文字色阶 */
   --text-primary: #2d2d2d;
   --text-secondary: #666666;
@@ -26,7 +26,7 @@
   --text-disabled: #cccccc;
   --text-price: #000000;
   --text-inverse: #ffffff;
-  
+
   /* 背景色 */
   --bg-page: #f8f9fa;
   --bg-base: #ffffff;
@@ -36,36 +36,37 @@
   --bg-active: #eeeeee;
   --bg-disabled: #f9f9f9;
   --bg-overlay: rgba(0, 0, 0, 0.5);
-  
+
   /* 边框色 */
   --border-light: #e5e7eb;
   --border-default: #d1d5db;
   --border-dark: #9ca3af;
   --border-focus: var(--brand-primary);
-  
+
   /* 状态色 */
   --status-success: #10b981;
   --status-warning: #f59e0b;
   --status-error: #ef4444;
   --status-info: #3b82f6;
-  
+
   /* 链接色 */
   --link-color: #007bff;
   --link-hover: #0056b3;
-  
+
   /* 警告色背景 */
   --warning-light: #fef3c7;
   --warning-dark: #92400e;
-  
+
   /* ========================================
      2. 字体系统 (Typography System)
      ======================================== */
-  
+
   /* 字体家族 */
-  --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
-  --font-chinese: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", sans-serif;
-  --font-mono: "SF Mono", Monaco, Consolas, "Courier New", monospace;
-  
+  --font-primary:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-chinese: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', sans-serif;
+  --font-mono: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+
   /* 字体大小 - 移动端优先 */
   --text-xs: 12px;
   --text-sm: 14px;
@@ -76,14 +77,14 @@
   --text-3xl: 28px;
   --text-4xl: 36px;
   --text-5xl: 48px;
-  
+
   /* 字重 */
   --font-light: 300;
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
-  
+
   /* 行高 */
   --leading-none: 1;
   --leading-tight: 1.25;
@@ -91,11 +92,11 @@
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
   --leading-loose: 2;
-  
+
   /* ========================================
      3. 间距系统 (Spacing System) - 8px网格
      ======================================== */
-  
+
   /* 基础间距 */
   --space-0: 0;
   --space-px: 1px;
@@ -118,14 +119,14 @@
   --space-16: 64px;
   --space-20: 80px;
   --space-24: 96px;
-  
+
   /* 组件内间距 */
   --padding-xs: 8px 12px;
   --padding-sm: 12px 16px;
   --padding-md: 16px 20px;
   --padding-lg: 20px 24px;
   --padding-xl: 24px 32px;
-  
+
   /* 组件间间距 */
   --gap-xs: 8px;
   --gap-sm: 12px;
@@ -133,11 +134,11 @@
   --gap-lg: 24px;
   --gap-xl: 32px;
   --gap-2xl: 48px;
-  
+
   /* ========================================
      4. 圆角系统 (Border Radius)
      ======================================== */
-  
+
   --radius-none: 0;
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -145,18 +146,18 @@
   --radius-xl: 16px;
   --radius-2xl: 24px;
   --radius-full: 9999px;
-  
+
   /* ========================================
      5. 阴影系统 (Shadow System)
      ======================================== */
-  
+
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 8px 0 rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 16px 32px 0 rgba(0, 0, 0, 0.12);
   --shadow-2xl: 0 24px 48px 0 rgba(0, 0, 0, 0.15);
-  
+
   /* 专用阴影 */
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
@@ -164,37 +165,40 @@
   --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
   --shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.2);
   --shadow-up: 0 -2px 8px rgba(0, 0, 0, 0.05);
-  
+
   /* ========================================
      6. 动画系统 (Animation System)
      ======================================== */
-  
+
   /* 持续时间 */
   --duration-instant: 100ms;
   --duration-fast: 150ms;
   --duration-normal: 250ms;
   --duration-slow: 350ms;
   --duration-slower: 500ms;
-  
+
   /* 缓动函数 */
   --ease-linear: linear;
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  
+
   /* 标准过渡 */
   --transition-all: all var(--duration-normal) var(--ease-in-out);
-  --transition-colors: color var(--duration-fast) var(--ease-in-out), background-color var(--duration-fast) var(--ease-in-out), border-color var(--duration-fast) var(--ease-in-out);
+  --transition-colors:
+    color var(--duration-fast) var(--ease-in-out),
+    background-color var(--duration-fast) var(--ease-in-out),
+    border-color var(--duration-fast) var(--ease-in-out);
   --transition-transform: transform var(--duration-normal) var(--ease-out);
   --transition-opacity: opacity var(--duration-normal) var(--ease-in-out);
   --transition-shadow: box-shadow var(--duration-normal) var(--ease-in-out);
   --transition-bg: background-color var(--duration-fast) var(--ease-in-out);
-  
+
   /* ========================================
      7. 布局系统 (Layout System)
      ======================================== */
-  
+
   /* 容器宽度 */
   --container-xs: 480px;
   --container-sm: 640px;
@@ -202,31 +206,31 @@
   --container-lg: 1024px;
   --container-xl: 1280px;
   --container-2xl: 1536px;
-  
+
   /* 最大宽度 */
   --max-width-xs: 320px;
   --max-width-sm: 480px;
   --max-width-md: 640px;
   --max-width-lg: 768px;
   --max-width-xl: 1024px;
-  
+
   /* 断点 */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
-  
+
   /* 高度 */
   --height-input: 48px;
   --height-button: 48px;
   --height-navbar: 64px;
   --height-footer: 200px;
-  
+
   /* ========================================
      8. Z-Index 层级系统
      ======================================== */
-  
+
   --z-below: -1;
   --z-base: 0;
   --z-above: 1;

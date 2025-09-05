@@ -22,7 +22,9 @@ const propertiesStore = usePropertiesStore()
 const router = useRouter()
 
 const compareItems = computed(() => {
-  return propertiesStore.allProperties.filter(p => propertiesStore.compareIds.includes(p.listing_id))
+  return propertiesStore.allProperties.filter((p) =>
+    propertiesStore.compareIds.includes(p.listing_id),
+  )
 })
 
 const removeFromCompare = (id) => {
@@ -47,7 +49,7 @@ const goToCompare = () => {
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   z-index: 1001;
 }
 .compare-items {

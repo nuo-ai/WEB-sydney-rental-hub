@@ -97,7 +97,9 @@
 
           <!-- 价格 -->
           <div class="price-section">
-            <h1 class="price-amount">${{ property.rent_pw }} <span class="price-period">per week</span></h1>
+            <h1 class="price-amount">
+              ${{ property.rent_pw }} <span class="price-period">per week</span>
+            </h1>
           </div>
 
           <!-- 地址 -->
@@ -141,7 +143,9 @@
               <i class="far fa-clock"></i>
               <div>
                 <span class="travel-title">See travel times</span>
-                <span class="travel-subtitle">Find out travel times from this property to your destination</span>
+                <span class="travel-subtitle"
+                  >Find out travel times from this property to your destination</span
+                >
               </div>
             </div>
             <i class="fas fa-chevron-right"></i>
@@ -149,7 +153,10 @@
         </div>
 
         <!-- 4. Property features 卡片 -->
-        <div class="features-card" v-if="property.property_features && property.property_features.length">
+        <div
+          class="features-card"
+          v-if="property.property_features && property.property_features.length"
+        >
           <h3 class="card-title">Property features</h3>
           <div class="features-list">
             <div v-for="(feature, index) in visibleFeatures" :key="index" class="feature-item">
@@ -162,7 +169,9 @@
             @click="showAllFeatures = !showAllFeatures"
             class="show-more-btn"
           >
-            <span>{{ showAllFeatures ? 'Show less' : `Show ${property.property_features.length - 6} more` }}</span>
+            <span>{{
+              showAllFeatures ? 'Show less' : `Show ${property.property_features.length - 6} more`
+            }}</span>
             <i :class="showAllFeatures ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
           </button>
         </div>
@@ -175,7 +184,7 @@
             <span>APPLY: Send through an enquiry and you'll receive the link to apply</span>
           </div>
           <div class="description-content">
-            <p class="description-text" :class="{ 'expanded': isDescriptionExpanded }">
+            <p class="description-text" :class="{ expanded: isDescriptionExpanded }">
               {{ property.description }}
             </p>
           </div>
@@ -210,9 +219,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue'
-import { 
-  BedDouble, 
-  Bath, 
+import {
+  BedDouble,
+  Bath,
   CarFront,
   AirVent,
   Shield,
@@ -224,7 +233,7 @@ import {
   WashingMachine,
   CookingPot,
   CheckCircle,
-} from 'lucide-vue-next';
+} from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -246,7 +255,7 @@ const images = computed(() => {
   if (!property.value || !property.value.images || !Array.isArray(property.value.images)) {
     return []
   }
-  return property.value.images.filter(url => url && typeof url === 'string' && url.trim() !== '')
+  return property.value.images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
 })
 
 const isFavorite = computed(() => {
@@ -305,13 +314,14 @@ const shareProperty = async () => {
       await navigator.share({
         title: 'Property Details',
         text: shareText,
-        url: shareUrl
+        url: shareUrl,
       })
     } catch (err) {
       console.warn('Share cancelled', err)
     }
   } else {
-    navigator.clipboard.writeText(shareUrl)
+    navigator.clipboard
+      .writeText(shareUrl)
       .then(() => ElMessage.success('链接已复制'))
       .catch(() => ElMessage.error('复制失败'))
   }
@@ -323,27 +333,27 @@ const toggleDescription = () => {
 
 const featureIconMap = {
   'air condition': AirVent,
-  'alarm': Shield,
-  'balcony': Home,
-  'wardrobe': DoorClosed,
-  'pool': Waves,
-  'gym': Dumbbell,
-  'parking': CarFront,
-  'garage': CarFront,
-  'security': Lock,
-  'laundry': WashingMachine,
-  'dishwasher': CookingPot
-};
+  alarm: Shield,
+  balcony: Home,
+  wardrobe: DoorClosed,
+  pool: Waves,
+  gym: Dumbbell,
+  parking: CarFront,
+  garage: CarFront,
+  security: Lock,
+  laundry: WashingMachine,
+  dishwasher: CookingPot,
+}
 
 const getFeatureIconComponent = (feature) => {
-  const featureLower = feature.toLowerCase();
+  const featureLower = feature.toLowerCase()
   for (const key in featureIconMap) {
     if (featureLower.includes(key)) {
-      return featureIconMap[key];
+      return featureIconMap[key]
     }
   }
-  return CheckCircle;
-};
+  return CheckCircle
+}
 
 const handleEmail = () => {
   if (!property.value) return
@@ -368,7 +378,8 @@ const nextImage = () => {
 }
 
 const handleImageError = (event) => {
-  event.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EImage not available%3C/text%3E%3C/svg%3E'
+  event.target.src =
+    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f0f0f0" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3EImage not available%3C/text%3E%3C/svg%3E'
 }
 
 onMounted(() => {
@@ -426,7 +437,7 @@ onMounted(() => {
   align-items: center;
   padding: 12px 16px;
   z-index: 10;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
 }
 
 .nav-icon-btn {

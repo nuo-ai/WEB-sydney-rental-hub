@@ -6,7 +6,7 @@
       :style="{
         height: `${totalHeight}px`,
         width: '100%',
-        position: 'relative'
+        position: 'relative',
       }"
     >
       <!-- 虚拟化的房源卡片 -->
@@ -20,7 +20,7 @@
           left: 0,
           width: '100%',
           height: `${item.height}px`,
-          transform: `translateY(${item.offset}px)`
+          transform: `translateY(${item.offset}px)`,
         }"
       >
         <div class="virtual-row">
@@ -45,10 +45,9 @@ const props = defineProps({
   properties: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
-
 
 // 响应式引用
 const containerRef = ref(null)
@@ -64,11 +63,11 @@ const OVERSCAN = 3 // 预渲染的行数
 const getColumns = () => {
   const width = window.innerWidth
   if (width < 768) {
-    return 1  // 移动端单列
+    return 1 // 移动端单列
   } else if (width < 1024) {
-    return 2  // 平板双列
+    return 2 // 平板双列
   } else {
-    return 2  // 桌面端双列
+    return 2 // 桌面端双列
   }
 }
 
@@ -92,7 +91,7 @@ const visibleRange = computed(() => {
 
   return {
     start: Math.max(0, start - OVERSCAN),
-    end: Math.min(totalRows.value, end + OVERSCAN)
+    end: Math.min(totalRows.value, end + OVERSCAN),
   }
 })
 
@@ -111,7 +110,7 @@ const visibleItems = computed(() => {
         index: i,
         offset: i * rowHeight.value,
         height: rowHeight.value,
-        properties: rowProperties
+        properties: rowProperties,
       })
     }
   }
@@ -141,7 +140,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
-
 </script>
 
 <style scoped>

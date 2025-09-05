@@ -30,10 +30,7 @@
       <p class="from-address">From {{ fullAddress }}</p>
 
       <!-- 交通方式选择 -->
-      <TransportModes
-        v-model="selectedMode"
-        @change="handleModeChange"
-      />
+      <TransportModes v-model="selectedMode" @change="handleModeChange" />
 
       <!-- 地址列表 -->
       <div class="locations-list">
@@ -63,11 +60,7 @@
     </section>
 
     <!-- 模态框 -->
-    <AddLocationModal
-      v-if="showAddModal"
-      v-model="showAddModal"
-      @select="handleAddressSelected"
-    />
+    <AddLocationModal v-if="showAddModal" v-model="showAddModal" @select="handleAddressSelected" />
 
     <NameLocationModal
       v-if="showNameModal"
@@ -124,7 +117,7 @@ const propertyCoordinates = computed(() => {
   if (propertyLat.value && propertyLng.value) {
     return {
       lat: propertyLat.value,
-      lng: propertyLng.value
+      lng: propertyLng.value,
     }
   }
   return null
@@ -166,7 +159,7 @@ const saveLocation = async (data) => {
       label: data.label,
       placeId: data.address.place_id,
       latitude: lat,
-      longitude: lng
+      longitude: lng,
     })
 
     showNameModal.value = false
@@ -205,7 +198,6 @@ onMounted(() => {
   // 测试模式：跳过登录检查
   const isTest = authStore.testMode
 
-
   // 检查是否登录
   if (!isTest && !authStore.isAuthenticated) {
     ElMessage.warning('Please login to access this feature')
@@ -213,13 +205,12 @@ onMounted(() => {
     return
   }
 
-
   // 设置当前房源信息到store
   if (propertyCoordinates.value) {
     commuteStore.setCurrentProperty({
       id: propertyId.value,
       address: fullAddress.value,
-      coordinates: propertyCoordinates.value
+      coordinates: propertyCoordinates.value,
     })
   }
 

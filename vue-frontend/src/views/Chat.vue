@@ -14,9 +14,7 @@
             </el-icon>
             <h3 class="chinese-text">AI助手功能开发中</h3>
             <p class="chinese-text">即将提供智能房源推荐和在线咨询服务</p>
-            <el-button type="primary" @click="goToHome">
-              返回房源列表
-            </el-button>
+            <el-button type="primary" @click="goToHome"> 返回房源列表 </el-button>
           </div>
         </div>
       </div>

@@ -11,8 +11,8 @@
         class="property-carousel"
       >
         <el-carousel-item v-for="(image, index) in validImages" :key="index">
-          <img 
-            :src="image" 
+          <img
+            :src="image"
             :alt="`房源图片 ${index + 1}`"
             @error="handleImageError"
             class="carousel-image"
@@ -20,29 +20,27 @@
           />
         </el-carousel-item>
       </el-carousel>
-      
+
       <!-- 备用单图片显示 -->
-      <img 
+      <img
         v-else
         :src="placeholderImage"
         alt="房源图片"
         class="single-image"
         @click="handleCardClick"
       />
-      
+
       <!-- 图片计数器 (仅多图片时显示) -->
       <div v-if="validImages.length > 1" class="image-counter">
         {{ currentImageIndex + 1 }} / {{ validImages.length }}
       </div>
-      
+
       <!-- 移除图片上的按钮 -->
-      
+
       <!-- 新房源标签 -->
-      <div v-if="isNewProperty" class="property-status-tag">
-        New
-      </div>
+      <div v-if="isNewProperty" class="property-status-tag">New</div>
     </div>
-    
+
     <!-- 房源内容区域 -->
     <div class="property-content" @click="handleCardClick">
       <!-- 价格和操作按钮行 -->
@@ -53,7 +51,7 @@
         </div>
         <div class="property-actions">
           <!-- 收藏按钮 -->
-          <button 
+          <button
             class="action-btn favorite-btn"
             :class="{ 'is-favorite': isFavorite }"
             @click.stop="toggleFavorite"
@@ -70,25 +68,27 @@
               <el-dropdown-menu>
                 <el-dropdown-item command="share">
                   <Share2 class="spec-icon" />
-                    <span>Share</span>
-                  </el-dropdown-item>
-                  <el-dropdown-item command="hide">
-                    <EyeOff class="spec-icon" />
-                    <span>Hide</span>
-                  <div style="font-size: 12px; color: #999; margin-left: 24px">Remove from results</div>
+                  <span>Share</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="hide">
+                  <EyeOff class="spec-icon" />
+                  <span>Hide</span>
+                  <div style="font-size: 12px; color: #999; margin-left: 24px">
+                    Remove from results
+                  </div>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
       </div>
-      
+
       <!-- 地址信息 - 两行显示，保持英文 -->
       <div class="property-address english-text">
         <div class="property-address-primary">{{ streetAddress }},</div>
         <div class="property-address-secondary">{{ locationInfo }}</div>
       </div>
-      
+
       <!-- 房型信息 - Lucide 图标 + 数字 -->
       <div class="property-features spec-row">
         <div class="feature-item spec-item">
@@ -104,14 +104,14 @@
           <span class="spec-text">{{ property.parking_spaces || 0 }}</span>
         </div>
       </div>
-      
+
       <!-- 底部信息区域 -->
       <div class="property-footer">
         <!-- 空出日期 - 中文显示 -->
         <div class="availability-text chinese-text">
           空出日期: {{ formatAvailabilityDate(property.available_date) }}
         </div>
-        
+
         <!-- 开放时间 - 中文显示 -->
         <div v-if="property.inspection_times" class="inspection-text chinese-text">
           开放时间: {{ formatInspectionTime(property.inspection_times) }}
@@ -130,8 +130,8 @@ import { usePropertiesStore } from '@/stores/properties'
 const props = defineProps({
   property: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
 // 组件事件
@@ -149,7 +149,7 @@ const validImages = computed(() => {
   if (!props.property.images || !Array.isArray(props.property.images)) {
     return []
   }
-  return props.property.images.filter(url => url && typeof url === 'string' && url.trim() !== '')
+  return props.property.images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
 })
 
 const placeholderImage = computed(() => {
@@ -172,12 +172,9 @@ const isFavorite = computed(() => {
   return propertiesStore.isFavorite(props.property.listing_id)
 })
 
-
-
 const isNewProperty = computed(() => {
   return props.property.listing_id > 2500
 })
-
 
 // 方法
 const formatPrice = (price) => {
@@ -187,25 +184,25 @@ const formatPrice = (price) => {
 
 const formatAvailabilityDate = (dateString) => {
   if (!dateString) return '立即入住'
-  
+
   const availDate = new Date(dateString)
   const today = new Date()
-  
+
   if (availDate <= today) {
     return '立即入住'
   }
-  
+
   // 格式化为中文日期
   const year = availDate.getFullYear()
   const month = availDate.getMonth() + 1
   const day = availDate.getDate()
-  
+
   return `${year}年${month}月${day}日`
 }
 
 const formatInspectionTime = (timeString) => {
   if (!timeString) return ''
-  
+
   // 简单的英文到中文时间转换
   let formatted = timeString
   formatted = formatted.replace(/Monday/g, '周一')
@@ -222,7 +219,7 @@ const formatInspectionTime = (timeString) => {
   formatted = formatted.replace(/Fri/g, '周五')
   formatted = formatted.replace(/Sat/g, '周六')
   formatted = formatted.replace(/Sun/g, '周日')
-  
+
   return formatted
 }
 
@@ -237,7 +234,6 @@ const handleImageError = (event) => {
 const handleCardClick = () => {
   emit('click', props.property)
 }
-
 
 const toggleFavorite = () => {
   propertiesStore.toggleFavorite(props.property.listing_id)
@@ -311,7 +307,7 @@ const handleMoreAction = (command) => {
   box-shadow: none !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 /* 左箭头位置 */
@@ -385,12 +381,12 @@ const handleMoreAction = (command) => {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #9B9B9B;
+  color: #9b9b9b;
   padding: 0;
 }
 
 .action-btn:hover {
-  color: #6B6B6B;
+  color: #6b6b6b;
 }
 
 .action-btn:focus,
@@ -406,8 +402,8 @@ const handleMoreAction = (command) => {
 
 /* 收藏按钮样式 */
 .favorite-btn .spec-icon.is-favorite {
-  color: #FF5824;
-  fill: #FF5824;
+  color: #ff5824;
+  fill: #ff5824;
 }
 
 /* 更多选项按钮 */
@@ -417,7 +413,7 @@ const handleMoreAction = (command) => {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: #22C55E;
+  background: #22c55e;
   color: white;
   font-size: 10px;
   font-weight: 600;
@@ -529,11 +525,11 @@ const handleMoreAction = (command) => {
     max-width: 580px;
     margin: 0 0 20px 0;
   }
-  
+
   .property-image-container {
     height: 250px;
   }
-  
+
   .property-carousel :deep(.el-carousel__container) {
     height: 250px;
   }

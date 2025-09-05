@@ -179,19 +179,19 @@
         </section>
 
         <!-- 通勤计算器 -->
-        <section v-if="property && property.latitude && property.longitude" class="commute-section" id="commute">
+        <section
+          v-if="property && property.latitude && property.longitude"
+          class="commute-section"
+          id="commute"
+        >
           <CommuteCalculator :property="property" />
         </section>
       </main>
 
       <!-- 底部固定操作栏 -->
       <footer class="action-footer">
-        <el-button class="action-btn enquire-btn" @click="handleEmail">
-          Enquire
-        </el-button>
-        <el-button class="action-btn inspect-btn" @click="handleInspections">
-          Inspect
-        </el-button>
+        <el-button class="action-btn enquire-btn" @click="handleEmail"> Enquire </el-button>
+        <el-button class="action-btn inspect-btn" @click="handleInspections"> Inspect </el-button>
       </footer>
     </template>
   </div>
@@ -202,8 +202,20 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import {
-  ArrowLeft, ArrowRight, ArrowDown, ArrowUp, Share, Star, StarFilled, Picture,
-  Location, House, Ticket, Van, MoreFilled, Guide
+  ArrowLeft,
+  ArrowRight,
+  ArrowDown,
+  ArrowUp,
+  Share,
+  Star,
+  StarFilled,
+  Picture,
+  Location,
+  House,
+  Ticket,
+  Van,
+  MoreFilled,
+  Guide,
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import CommuteCalculator from '@/components/CommuteCalculator.vue'
@@ -228,7 +240,7 @@ const images = computed(() => {
   if (!property.value || !property.value.images || !Array.isArray(property.value.images)) {
     return []
   }
-  return property.value.images.filter(url => url && typeof url === 'string' && url.trim() !== '')
+  return property.value.images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
 })
 
 const isFavorite = computed(() => {
@@ -257,11 +269,11 @@ const inspectionTimes = computed(() => {
   if (!property.value || !property.value.inspection_times) return []
 
   if (typeof property.value.inspection_times === 'string') {
-    const times = property.value.inspection_times.split(',').map(time => {
+    const times = property.value.inspection_times.split(',').map((time) => {
       const parts = time.trim().split(' ')
       return {
         date: parts[0] || '',
-        time: parts.slice(1).join(' ') || ''
+        time: parts.slice(1).join(' ') || '',
       }
     })
     return times.slice(0, 1) // 只显示第一个
@@ -277,23 +289,23 @@ const propertyFeatures = computed(() => {
   const iconMap = {
     'Air conditioning': 'Sunny',
     'Alarm system': 'Bell',
-    'Balcony': 'Grid',
+    Balcony: 'Grid',
     'Built-in wardrobes': 'Box',
-    'Ensuite': 'Ticket',
-    'Furnished': 'HomeFilled',
-    'Gym': 'Trophy',
+    Ensuite: 'Ticket',
+    Furnished: 'HomeFilled',
+    Gym: 'Trophy',
     'Indoor spa': 'Coffee',
-    'Intercom': 'Phone',
+    Intercom: 'Phone',
     'Internal laundry': 'Dish',
     'Pets allowed': 'Guide',
-    'Pool': 'Ship',
-    'Study': 'Reading',
-    'Garden': 'Grape'
+    Pool: 'Ship',
+    Study: 'Reading',
+    Garden: 'Grape',
   }
 
-  return property.value.property_features.map(feature => ({
+  return property.value.property_features.map((feature) => ({
     name: feature,
-    icon: iconMap[feature] || 'Setting'
+    icon: iconMap[feature] || 'Setting',
   }))
 })
 
@@ -322,13 +334,16 @@ const shareProperty = () => {
   if (!property.value) return
 
   if (navigator.share) {
-    navigator.share({
-      title: property.value.address,
-      text: `${property.value.address} - $${property.value.rent_pw}/week`,
-      url: window.location.href
-    }).catch(err => console.error('分享失败:', err))
+    navigator
+      .share({
+        title: property.value.address,
+        text: `${property.value.address} - $${property.value.rent_pw}/week`,
+        url: window.location.href,
+      })
+      .catch((err) => console.error('分享失败:', err))
   } else {
-    navigator.clipboard.writeText(window.location.href)
+    navigator.clipboard
+      .writeText(window.location.href)
       .then(() => ElMessage.success('链接已复制到剪贴板'))
       .catch(() => ElMessage.error('复制失败'))
   }
@@ -418,7 +433,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   z-index: 10;
-  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
 }
 
 .nav-btn {

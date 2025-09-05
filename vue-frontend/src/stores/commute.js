@@ -3,8 +3,8 @@ import { transportAPI } from '@/services/api'
 
 export const useCommuteStore = defineStore('commute', {
   state: () => ({
-    currentProperty: null,      // 当前查询的房源信息
-    selectedMode: 'DRIVING',    // 当前选中的交通方式
+    currentProperty: null, // 当前查询的房源信息
+    selectedMode: 'DRIVING', // 当前选中的交通方式
     calculationCache: new Map(), // 缓存计算结果
     isCalculating: false,
     cacheExpiry: 15 * 60 * 1000, // 缓存15分钟
@@ -42,7 +42,7 @@ export const useCommuteStore = defineStore('commute', {
     setCache(key, data) {
       this.calculationCache.set(key, {
         data,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       })
     },
 
@@ -69,11 +69,7 @@ export const useCommuteStore = defineStore('commute', {
       try {
         // 调用API
         const origin = `${this.currentProperty.coordinates.lat},${this.currentProperty.coordinates.lng}`
-        const result = await transportAPI.getDirections(
-          origin,
-          destination.address,
-          selectedMode
-        )
+        const result = await transportAPI.getDirections(origin, destination.address, selectedMode)
 
         if (result.error) {
           throw new Error(result.error)
@@ -82,7 +78,7 @@ export const useCommuteStore = defineStore('commute', {
         const commuteData = {
           duration: result.duration,
           distance: result.distance,
-          mode: selectedMode
+          mode: selectedMode,
         }
 
         // 缓存结果
@@ -106,19 +102,19 @@ export const useCommuteStore = defineStore('commute', {
           const result = await this.calculateCommute(destination, selectedMode)
           results.push({
             destinationId: destination.id,
-            ...result
+            ...result,
           })
         } catch {
           results.push({
             destinationId: destination.id,
             error: true,
             duration: 'N/A',
-            distance: ''
+            distance: '',
           })
         }
       }
 
       return results
-    }
+    },
   },
 })

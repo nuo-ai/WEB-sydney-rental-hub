@@ -15,15 +15,18 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => {
       // Check for testMode in localStorage or environment
-      const testMode = localStorage.getItem('auth-testMode') === 'true' ||
-                      import.meta.env.VITE_AUTH_TEST_MODE === 'true'
+      const testMode =
+        localStorage.getItem('auth-testMode') === 'true' ||
+        import.meta.env.VITE_AUTH_TEST_MODE === 'true'
 
       return testMode || (!!state.token && !!state.user)
     },
 
     testMode: () => {
-      return localStorage.getItem('auth-testMode') === 'true' ||
-             import.meta.env.VITE_AUTH_TEST_MODE === 'true'
+      return (
+        localStorage.getItem('auth-testMode') === 'true' ||
+        import.meta.env.VITE_AUTH_TEST_MODE === 'true'
+      )
     },
   },
 
@@ -52,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
           }
 
           return Promise.reject(error)
-        }
+        },
       )
     },
     async register(email, password, fullName = null) {
@@ -62,7 +65,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await apiClient.post('/auth/register', {
           email,
           password,
-          full_name: fullName
+          full_name: fullName,
         })
 
         if (response.data.status === 'success') {
@@ -121,7 +124,7 @@ export const useAuthStore = defineStore('auth', {
     async verifyEmail(token) {
       try {
         const response = await apiClient.post('/auth/verify-email', null, {
-          params: { token }
+          params: { token },
         })
 
         if (response.data.status === 'success') {
@@ -166,15 +169,15 @@ export const useAuthStore = defineStore('auth', {
               label: 'School',
               latitude: -33.8888,
               longitude: 151.1873,
-              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o'
+              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o',
             },
             {
               id: 'preset-2',
               address: 'Central Station, Sydney NSW 2000',
               label: 'Transit',
-              latitude: -33.8830,
+              latitude: -33.883,
               longitude: 151.2067,
-              placeId: 'ChIJN1t_tDeuEmsRGYPVA4xwBA8'
+              placeId: 'ChIJN1t_tDeuEmsRGYPVA4xwBA8',
             },
             {
               id: 'preset-3',
@@ -182,8 +185,8 @@ export const useAuthStore = defineStore('auth', {
               label: 'Work',
               latitude: -33.8688,
               longitude: 151.2093,
-              placeId: 'ChIJP3Sa8ziYEmsRUKgyFmh9AQM'
-            }
+              placeId: 'ChIJP3Sa8ziYEmsRUKgyFmh9AQM',
+            },
           ]
           addresses = presetAddresses
           localStorage.setItem('juwo-addresses', JSON.stringify(presetAddresses))
@@ -225,7 +228,7 @@ export const useAuthStore = defineStore('auth', {
           const savedAddress = {
             id: Date.now().toString(),
             ...address,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           }
 
           this.savedAddresses.push(savedAddress)
@@ -244,7 +247,7 @@ export const useAuthStore = defineStore('auth', {
           label: address.label,
           place_id: address.placeId,
           latitude: address.latitude,
-          longitude: address.longitude
+          longitude: address.longitude,
         })
 
         const savedAddress = response.data
@@ -261,18 +264,17 @@ export const useAuthStore = defineStore('auth', {
       try {
         // In test mode, remove from localStorage
         if (this.testMode) {
-          const index = this.savedAddresses.findIndex(a => a.id === addressId)
+          const index = this.savedAddresses.findIndex((a) => a.id === addressId)
           if (index > -1) {
             this.savedAddresses.splice(index, 1)
 
             // Update localStorage
             const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
-            const localIndex = addresses.findIndex(a => a.id === addressId)
+            const localIndex = addresses.findIndex((a) => a.id === addressId)
             if (localIndex > -1) {
               addresses.splice(localIndex, 1)
               localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
             }
-
           }
           return
         }
@@ -281,7 +283,7 @@ export const useAuthStore = defineStore('auth', {
         await apiClient.delete(`/auth/addresses/${addressId}`)
 
         // 从本地状态移除
-        const index = this.savedAddresses.findIndex(a => a.id === addressId)
+        const index = this.savedAddresses.findIndex((a) => a.id === addressId)
         if (index > -1) {
           this.savedAddresses.splice(index, 1)
         }
@@ -300,7 +302,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const response = await apiClient.post('/auth/refresh', {
-          refresh_token: this.refreshToken
+          refresh_token: this.refreshToken,
         })
 
         if (response.data.access_token) {

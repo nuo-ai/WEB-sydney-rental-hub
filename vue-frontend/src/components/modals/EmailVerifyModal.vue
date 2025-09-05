@@ -22,9 +22,7 @@
 
       <h3 class="verify-title">Verify your email address</h3>
 
-      <p class="verify-description">
-        We've sent a verification email to:
-      </p>
+      <p class="verify-description">We've sent a verification email to:</p>
 
       <div class="email-display">{{ email }}</div>
 
@@ -40,14 +38,10 @@
           @click="checkVerification"
           class="check-btn"
         >
-          {{ checking ? 'Checking...' : 'I\'ve verified my email' }}
+          {{ checking ? 'Checking...' : "I've verified my email" }}
         </el-button>
 
-        <button
-          class="resend-link"
-          @click="resendEmail"
-          :disabled="resendCountdown > 0"
-        >
+        <button class="resend-link" @click="resendEmail" :disabled="resendCountdown > 0">
           {{ resendCountdown > 0 ? `Resend in ${resendCountdown}s` : 'Resend verification email' }}
         </button>
       </div>
@@ -74,12 +68,12 @@ import { ElMessage } from 'element-plus'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   email: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'verified'])
@@ -94,14 +88,17 @@ let countdownInterval = null
 let verificationInterval = null
 
 // 监听props变化
-watch(() => props.modelValue, (newVal) => {
-  visible.value = newVal
-  if (newVal) {
-    startAutoCheck()
-  } else {
-    stopAutoCheck()
-  }
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    visible.value = newVal
+    if (newVal) {
+      startAutoCheck()
+    } else {
+      stopAutoCheck()
+    }
+  },
+)
 
 // 监听visible变化
 watch(visible, (newVal) => {
