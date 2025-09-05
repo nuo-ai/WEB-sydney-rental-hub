@@ -3,6 +3,120 @@
 import { defineStore } from 'pinia'
 import { propertyAPI } from '@/services/api'
 
+// 特性开关：V2 参数映射（默认关闭以保持向后兼容）
+// 说明：开启后将把前端筛选状态映射为统一的后端白名单参数（suburbs/price_min/...）
+// 风险控制：若后端未识别新参数，关闭开关即可回退到旧行为
+const enableFilterV2 = false
+
+// 小工具：格式化日期为 YYYY-MM-DD（避免各处重复实现）
+const _fmtDate = (date) => {
+  if (!date) return null
+  const d = new Date(date)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+/**
+ * 统一的筛选参数映射函数（V1→V2 兼容层）
+ * 为什么：抽离参数构造，保持“组件只触发 action，契约在 store 统一管理”，
+ * 并为后续切换到契约一致性的 V2 做铺垫（开启开关即可切换）
+ */
+const mapFilterStateToApiParams = (
+  rawFilters = {},
+  selectedLocations = [],
+  paging = {},
+  opts = { enableFilterV2: false },
+) => {
+  // V1：保持现有键名与行为，确保零风险上线
+  if (!opts.enableFilterV2) {
+    const legacy = { ...rawFilters }
+
+    // 若组件侧未补齐 suburb，则基于已选区域填充（与历史行为一致）
+    if (!legacy.suburb && Array.isArray(selectedLocations) && selectedLocations.length) {
+      const suburbs = selectedLocations
+        .filter((l) => l && (l.type ? l.type === 'suburb' : true))
+        .map((l) => l.name)
+        .filter(Boolean)
+      if (suburbs.length) legacy.suburb = suburbs.join(',')
+    }
+
+    // 透传日期（若来自 Date 对象，统一格式化）
+    if (legacy.date_from && legacy.date_from instanceof Date) {
+      legacy.date_from = _fmtDate(legacy.date_from)
+    }
+    if (legacy.date_to && legacy.date_to instanceof Date) {
+      legacy.date_to = _fmtDate(legacy.date_to)
+    }
+
+    // 注入分页（上限控制留给调用方）
+    if (paging.page) legacy.page = paging.page
+    if (paging.page_size) legacy.page_size = paging.page_size
+    if (paging.sort) legacy.sort = paging.sort
+
+    return legacy
+  }
+
+  // V2：对齐白名单参数（suburbs/date_from/date_to/price_min/price_max/bedrooms/page/page_size/sort）
+  const params = {}
+
+  // suburbs（仅 suburb 类型，去重 + 保序）
+  const suburbs = Array.from(
+    new Set(
+      (selectedLocations || [])
+        .filter((l) => l && l.type === 'suburb')
+        .map((l) => l.name)
+        .filter(Boolean),
+    ),
+  )
+  if (suburbs.length) params.suburbs = suburbs.join(',')
+
+  // 日期（闭区间），接受 Date 或字符串
+  if (rawFilters.startDate) params.date_from = _fmtDate(rawFilters.startDate) || rawFilters.date_from
+  if (rawFilters.endDate) params.date_to = _fmtDate(rawFilters.endDate) || rawFilters.date_to
+  if (!params.date_from && rawFilters.date_from) params.date_from = rawFilters.date_from
+  if (!params.date_to && rawFilters.date_to) params.date_to = rawFilters.date_to
+
+  // 价格：兼容 priceRange 或 minPrice/maxPrice
+  let min = 0
+  let max = 5000
+  if (Array.isArray(rawFilters.priceRange)) {
+    ;[min, max] = rawFilters.priceRange
+  } else {
+    min = Number(rawFilters.minPrice ?? 0)
+    max = Number(rawFilters.maxPrice ?? 5000)
+  }
+  if (min > max) [min, max] = [max, min] // 纠偏以降低用户困惑
+  if (min > 0) params.price_min = min
+  if (max < 5000) params.price_max = max
+
+  // 卧室：最小卧室数（支持 '4+' → 4），兼容字符串或 CSV
+  if (rawFilters.bedrooms) {
+    const b = Array.isArray(rawFilters.bedrooms)
+      ? rawFilters.bedrooms[0]
+      : String(rawFilters.bedrooms).split(',')[0]
+    if (b) params.bedrooms = b.endsWith('+') ? parseInt(b) : parseInt(b)
+  }
+
+  // 分页/排序（含上限 50）
+  const page = Number(paging.page ?? 1)
+  let pageSize = Number(paging.page_size ?? 20)
+  pageSize = Math.min(Math.max(pageSize, 1), 50)
+  params.page = page
+  params.page_size = pageSize
+  if (paging.sort) params.sort = paging.sort
+
+  // 删除空值
+  Object.keys(params).forEach((k) => {
+    if (params[k] === '' || params[k] === null || typeof params[k] === 'undefined') {
+      delete params[k]
+    }
+  })
+
+  return params
+}
+
 export const usePropertiesStore = defineStore('properties', {
   state: () => ({
     // 房源数据
@@ -236,25 +350,27 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
 
       try {
-        // 直接使用API进行服务端筛选
-        const filterParams = {
-          page: 1,
-          page_size: 20,
-          ...filters,
-        }
+        // 统一通过映射层构造请求参数
+        // 目的：维持 V1 行为（默认），并可通过开关无缝切至 V2 契约（suburbs/price_min/...）
+        const mappedParams = mapFilterStateToApiParams(
+          filters,
+          this.selectedLocations,
+          { page: 1, page_size: 20 },
+          { enableFilterV2 },
+        )
 
-        // 移除null和空值
-        Object.keys(filterParams).forEach((key) => {
+        // 移除 null/空串，避免无效参数污染缓存与后端白名单
+        Object.keys(mappedParams).forEach((key) => {
           if (
-            filterParams[key] === null ||
-            filterParams[key] === undefined ||
-            filterParams[key] === ''
+            mappedParams[key] === null ||
+            mappedParams[key] === undefined ||
+            mappedParams[key] === ''
           ) {
-            delete filterParams[key]
+            delete mappedParams[key]
           }
         })
 
-        const response = await propertyAPI.getListWithPagination(filterParams)
+        const response = await propertyAPI.getListWithPagination(mappedParams)
 
         // 更新数据
         this.filteredProperties = response.data || []
@@ -377,11 +493,15 @@ export const usePropertiesStore = defineStore('properties', {
     // 获取筛选后的结果数量
     async getFilteredCount(params = {}) {
       try {
-        const response = await propertyAPI.getListWithPagination({
-          ...params,
-          page_size: 1, // 只需要获取总数
-          page: 1,
-        })
+        // 计数亦走统一映射，确保与列表参数一致
+        const mappedParams = mapFilterStateToApiParams(
+          params,
+          this.selectedLocations,
+          { page: 1, page_size: 1 }, // 仅取总数
+          { enableFilterV2 },
+        )
+
+        const response = await propertyAPI.getListWithPagination(mappedParams)
         return response.pagination?.total || 0
       } catch (error) {
         console.error('获取筛选数量失败:', error)

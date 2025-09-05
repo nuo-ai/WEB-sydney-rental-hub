@@ -133,6 +133,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
+import { ElMessage } from 'element-plus'
 
 // 组件属性
 const props = defineProps({
@@ -332,8 +333,8 @@ const updateFilteredCount = async () => {
     localFilteredCount.value = total
   } catch (error) {
     console.error('获取筛选计数失败:', error)
-    // 快速失败：不做本地估算，避免与真实结果不一致
-    localFilteredCount.value = 0
+    // 快速失败：不做本地估算，不篡改现有计数，并就近提示错误
+    ElMessage.error('筛选计数失败，请稍后重试')
   }
 }
 
@@ -386,6 +387,7 @@ const applyFiltersToStore = async () => {
     emit('filtersChanged', filterParams)
   } catch (error) {
     console.error('筛选应用失败:', error)
+    ElMessage.error('筛选失败，请稍后重试')
   }
 }
 
