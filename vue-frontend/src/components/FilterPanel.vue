@@ -193,7 +193,8 @@ const buildQueryFromFilters = (filterParams) => {
 }
 
 /* 从 URL Query 恢复筛选状态（刷新/直链可复现） */
-const applyQueryToState = (query) => {
+const applyQueryToState = (query, store) => {
+  if (!store) return
   try {
     // 价格
     const min = query.minPrice ? Number(query.minPrice) : 0
@@ -232,7 +233,7 @@ const applyQueryToState = (query) => {
         .map((s) => s.trim())
         .filter(Boolean)
       if (names.length) {
-        propertiesStore.selectedLocations = names.map((name) => ({
+        store.selectedLocations = names.map((name) => ({
           id: `suburb_${name}`,
           type: 'suburb',
           name,
@@ -529,7 +530,7 @@ watch(visible, (newValue) => {
 // 初始化时设置默认计数
 onMounted(() => {
   // 先从 URL 恢复筛选状态（刷新/直链）
-  applyQueryToState(route.query)
+  applyQueryToState(route.query, propertiesStore)
 
   // 若存在筛选或已有选区，则刷新计数；否则显示总数
   if (propertiesStore.selectedLocations.length > 0 || hasAppliedFilters.value) {
