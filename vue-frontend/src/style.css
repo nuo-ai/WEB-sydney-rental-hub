@@ -579,6 +579,11 @@ body {
   margin-bottom: 16px;
 }
 
+/* 自定义消息样式：二级黑色（用于“请先输入区域或邮编”提示） */
+.el-message.secondary-hint .el-message__content {
+  color: var(--color-text-secondary) !important;
+}
+
 /* ========== 工具类样式 ========== */
 
 .text-juwo-primary {

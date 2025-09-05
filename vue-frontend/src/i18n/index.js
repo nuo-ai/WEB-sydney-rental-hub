@@ -23,6 +23,9 @@ const MESSAGES = {
       showResults: '显示结果',
       anyPrice: '不限价格',
       selectRegionFirst: '请先选择区域后再筛选'
+    },
+    search: {
+      ph: '请先输入区域或邮编，例如 ‘Ultimo’ 或 ‘2000’'
     }
   }
 }

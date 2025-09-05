@@ -215,7 +215,7 @@ const handleLocationSelected = async () => {
 const handleToggleFullPanel = (show) => {
   // 入口拦截：若未选区域，直接轻提示并阻止打开
   if (show && !hasRegionSelected()) {
-    ElMessage.warning(t('filter.selectRegionFirst') || '请先选择区域后再筛选')
+    ElMessage({ message: t('search.ph'), customClass: 'secondary-hint' })
     return
   }
   showFilterPanel.value = show
@@ -224,7 +224,7 @@ const handleToggleFullPanel = (show) => {
 const handleOpenFilterPanel = () => {
   // 入口拦截：若未选区域，直接轻提示并阻止打开
   if (!hasRegionSelected()) {
-    ElMessage.warning(t('filter.selectRegionFirst') || '请先选择区域后再筛选')
+    ElMessage({ message: t('search.ph'), customClass: 'secondary-hint' })
     return
   }
   // 从 SearchBar 右侧图标触发，打开统一 FilterPanel

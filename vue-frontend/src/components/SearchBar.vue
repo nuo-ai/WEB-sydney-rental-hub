@@ -110,15 +110,18 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 
 // 组件事件
 const emit = defineEmits(['search', 'locationSelected', 'openFilterPanel']) // 说明：新增 openFilterPanel，用于在搜索框内图标触发统一筛选面板
 
-// 状态管理
+/* 状态管理 */
 const propertiesStore = usePropertiesStore()
+
+/* 轻量 i18n：统一占位与拦截提示文案 */
+const t = inject('t') || ((k) => k)
 
 // 响应式数据
 const searchQuery = ref('')
@@ -131,12 +134,7 @@ const isLoadingSuggestions = ref(false)
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.selectedLocations)
 
-const searchPlaceholder = computed(() => {
-  if (selectedLocations.value.length > 0) {
-    return '继续搜索区域或邮编...'
-  }
-  return '输入区域或邮编，例如 "Ultimo" 或 "2007"'
-})
+const searchPlaceholder = computed(() => t('search.ph'))
 
 // 删除这行，改为使用响应式数据
 // const locationSuggestions = computed(() => propertiesStore.locationSuggestions)
