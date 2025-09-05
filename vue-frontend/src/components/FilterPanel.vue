@@ -8,9 +8,9 @@
     <div class="domain-filter-panel" :class="{ visible: visible }">
       <!-- 面板头部 -->
       <div class="panel-header">
-        <h3 class="panel-title chinese-text">筛选</h3>
+        <h3 class="panel-title chinese-text">{{ $t('filter.title') }}</h3>
         <div class="header-actions">
-          <button class="reset-link" @click="resetFilters">重置筛选</button>
+          <button class="reset-link" @click="resetFilters">{{ $t('filter.reset') }}</button>
           <button class="close-btn" @click="closePanel" aria-label="关闭筛选面板">
             <!-- 使用内联SVG替代 Font Awesome，符合“SVG组件化图标”与统一风格要求；避免新增依赖 -->
             <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -25,7 +25,7 @@
         <!-- 价格范围滑块 -->
         <div class="filter-section">
           <div class="section-header">
-            <h4 class="section-title chinese-text">价格范围 (周租, AUD)</h4>
+            <h4 class="section-title chinese-text">{{ $t('filter.priceSection') }}</h4>
             <span class="price-display">{{ priceRangeText }}</span>
           </div>
           <el-slider
@@ -42,7 +42,7 @@
 
         <!-- 卧室数量 -->
         <div class="filter-section">
-          <h4 class="section-title chinese-text">卧室</h4>
+          <h4 class="section-title chinese-text">{{ $t('filter.bedrooms') }}</h4>
           <div class="filter-buttons-group">
             <button
               v-for="option in bedroomOptions"
@@ -58,7 +58,7 @@
 
         <!-- 浴室数量 -->
         <div class="filter-section">
-          <h4 class="section-title chinese-text">浴室</h4>
+          <h4 class="section-title chinese-text">{{ $t('filter.bathrooms') }}</h4>
           <div class="filter-buttons-group">
             <button
               v-for="option in bathroomOptions"
@@ -74,7 +74,7 @@
 
         <!-- 车位数量 -->
         <div class="filter-section">
-          <h4 class="section-title chinese-text">车位</h4>
+          <h4 class="section-title chinese-text">{{ $t('filter.parking') }}</h4>
           <div class="filter-buttons-group">
             <button
               v-for="option in parkingOptions"
@@ -90,21 +90,21 @@
 
         <!-- 空出日期 -->
         <div class="filter-section">
-          <h4 class="section-title chinese-text">空出日期</h4>
+          <h4 class="section-title chinese-text">{{ $t('filter.date') }}</h4>
           <div class="date-picker-group">
             <el-date-picker
               v-model="filters.startDate"
               type="date"
-              placeholder="开始日期"
+              :placeholder="$t('filter.dateStart')"
               size="large"
               class="date-picker-start"
               @change="handleStartDateChange"
             />
-            <span class="date-separator">至</span>
+            <span class="date-separator">{{ $t('filter.to') }}</span>
             <el-date-picker
               v-model="filters.endDate"
               type="date"
-              placeholder="结束日期"
+              :placeholder="$t('filter.dateEnd')"
               size="large"
               class="date-picker-end"
               @change="handleEndDateChange"
@@ -114,9 +114,9 @@
 
         <!-- 家具选项 -->
         <div class="filter-section">
-          <h4 class="section-title chinese-text">家具</h4>
+          <h4 class="section-title chinese-text">{{ $t('filter.furniture') }}</h4>
           <div class="furnished-toggle">
-            <span class="toggle-label chinese-text">只显示带家具的房源</span>
+            <span class="toggle-label chinese-text">{{ $t('filter.furnishedOnly') }}</span>
             <el-switch v-model="filters.isFurnished" size="large" @change="handleFurnishedChange" />
           </div>
         </div>
@@ -124,9 +124,9 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="large" @click="closePanel"> 取消 </el-button>
+        <el-button class="cancel-btn" size="large" @click="closePanel"> {{ $t('filter.cancel') }} </el-button>
         <el-button type="primary" class="apply-btn" size="large" @click="applyFilters">
-          显示结果 ({{ filteredCount }})
+          {{ $t('filter.showResults') }} ({{ filteredCount }})
         </el-button>
       </div>
     </div>
@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, nextTick, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
@@ -153,6 +153,9 @@ const emit = defineEmits(['update:modelValue', 'filtersChanged'])
 /* 路由：用于 URL Query 同步（P1-5） */
 const router = useRouter()
 const route = useRoute()
+
+// 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
+const t = inject('t') || ((k) => k)
 
 // 状态管理
 const propertiesStore = usePropertiesStore()
@@ -283,7 +286,7 @@ const visible = computed({
 const priceRangeText = computed(() => {
   const [min, max] = filters.value.priceRange
   if (min === 0 && max === 5000) {
-    return 'Any Price'
+    return t('filter.anyPrice')
   } else if (max === 5000) {
     return `$${min}+`
   } else {

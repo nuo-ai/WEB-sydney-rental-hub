@@ -71,6 +71,16 @@ const mapFilterStateToApiParams = (
     ),
   )
   if (suburbs.length) params.suburbs = suburbs.join(',')
+  // postcodes（仅 postcode 类型，V2 才参与映射）
+  const postcodes = Array.from(
+    new Set(
+      (selectedLocations || [])
+        .filter((l) => l && l.type === 'postcode')
+        .map((l) => l.name)
+        .filter(Boolean),
+    ),
+  )
+  if (postcodes.length) params.postcodes = postcodes.join(',')
 
   // 日期（闭区间），接受 Date 或字符串
   if (rawFilters.startDate) params.date_from = _fmtDate(rawFilters.startDate) || rawFilters.date_from
@@ -262,7 +272,13 @@ export const usePropertiesStore = defineStore('properties', {
           ...params,
         }
 
+        const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(paginationParams)
+        const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const dur = t1 - t0
+        if (dur > 800) {
+          console.warn(`[FILTER-PERF] fetchProperties p95 threshold exceeded: ${Math.round(dur)} ms`, paginationParams)
+        }
 
         // 更新数据
         this.filteredProperties = response.data || []
@@ -396,7 +412,13 @@ export const usePropertiesStore = defineStore('properties', {
           }
         })
 
+        const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
+        const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const dur = t1 - t0
+        if (dur > 800) {
+          console.warn(`[FILTER-PERF] applyFilters p95 threshold exceeded: ${Math.round(dur)} ms`, mappedParams)
+        }
 
         // 更新数据
         this.filteredProperties = response.data || []
@@ -527,7 +549,13 @@ export const usePropertiesStore = defineStore('properties', {
           { enableFilterV2 },
         )
 
+        const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
+        const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const dur = t1 - t0
+        if (dur > 800) {
+          console.warn(`[FILTER-PERF] getFilteredCount p95 threshold exceeded: ${Math.round(dur)} ms`, mappedParams)
+        }
         return response.pagination?.total || 0
       } catch (error) {
         console.error('获取筛选数量失败:', error)

@@ -13,6 +13,7 @@ import './styles/base-components.css' // 基础组件
 import './style.css' // 全局样式
 
 import { useAuthStore } from './stores/auth'
+import i18n from './i18n'
 
 const app = createApp(App)
 
@@ -27,6 +28,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 app.use(createPinia())
+app.use(i18n)
 app.use(router)
 
 // Initialize auth store after Pinia is set up
