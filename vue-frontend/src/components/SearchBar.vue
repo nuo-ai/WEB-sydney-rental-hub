@@ -60,8 +60,8 @@
             v-for="(suggestion, index) in filteredSuggestions"
             :key="suggestion.id"
             class="suggestion-item"
-            :class="{ active: currentSuggestionIndex === index }"
-            @click="selectLocation(suggestion)"
+            :class="{ active: currentSuggestionIndex === index, selected: isSelected(suggestion) }"
+            @click="toggleSuggestion(suggestion)"
           >
             <div class="suggestion-content">
               <i
@@ -75,6 +75,18 @@
               <div class="suggestion-text">
                 <div class="suggestion-name">{{ suggestion.fullName }}</div>
                 <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
+              </div>
+              <div
+                class="suggestion-checkbox"
+                :aria-checked="isSelected(suggestion) ? 'true' : 'false'"
+                role="checkbox"
+                @click.stop="toggleSuggestion(suggestion)"
+                :class="{ checked: isSelected(suggestion) }"
+                aria-label="多选"
+              >
+                <svg v-if="isSelected(suggestion)" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
             </div>
           </div>
@@ -255,10 +267,10 @@ const handleKeydown = (event) => {
     case 'Enter':
       event.preventDefault()
       if (currentSuggestionIndex.value >= 0 && suggestions[currentSuggestionIndex.value]) {
-        selectLocation(suggestions[currentSuggestionIndex.value])
+        toggleSuggestion(suggestions[currentSuggestionIndex.value])
       } else if (suggestions.length > 0) {
-        // 未选择具体项时，默认选择第一条建议，便于连续添加区域/邮编
-        selectLocation(suggestions[0])
+        // 未选择具体项时，默认选中或取消第一条，便于连续多选
+        toggleSuggestion(suggestions[0])
       } else if (selectedLocations.value.length === 0 && searchQuery.value.trim()) {
         // 无建议且尚未选择区域时，触发一次搜索
         debouncedSearch(searchQuery.value)
@@ -279,15 +291,32 @@ const selectLocation = async (location) => {
   if (existingIndex !== -1) return
 
   propertiesStore.addSelectedLocation(location)
-  searchQuery.value = ''
-  showSuggestions.value = false
+  // 不清空输入与不关闭建议列表，支持连续多选
   currentSuggestionIndex.value = -1
-  locationSuggestions.value = [] // 清空搜索结果
 
   emit('locationSelected', location)
 
-  // 加载相邻区域建议
+  // 加载相邻区域建议（当 searchQuery 为空时用于“你可能还喜欢”）
   await loadNearbySuggestions()
+}
+
+// 判断某建议是否已被选中
+const isSelected = (suggestion) => {
+  return selectedLocations.value.some((selected) => {
+    if (selected.id && suggestion.id) return selected.id === suggestion.id
+    // 兜底：按类型+名称（与 nearby 建议结构兼容）
+    return selected.type === suggestion.type && selected.name === suggestion.name
+  })
+}
+
+// 切换选择/取消（用于多选复选框或整行点击）
+const toggleSuggestion = async (suggestion) => {
+  if (isSelected(suggestion)) {
+    propertiesStore.removeSelectedLocation(suggestion.id)
+    emit('locationSelected', { removed: true, id: suggestion.id })
+    return
+  }
+  await selectLocation(suggestion)
 }
 
 const removeLocation = async (locationId) => {
@@ -501,6 +530,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: space-between;
 }
 
 .suggestion-icon {
@@ -524,6 +554,30 @@ watch(
 .suggestion-count {
   font-size: 12px;
   color: var(--color-text-secondary);
+}
+
+/* 复选框样式（多选小方框） */
+.suggestion-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: white;
+}
+.suggestion-checkbox.checked {
+  background: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  color: #fff;
+}
+
+/* 选中行弱高亮（可按需调整） */
+.suggestion-item.selected {
+  background-color: #fffaf6;
 }
 
 /* 新增：区域标题样式 */
