@@ -107,6 +107,32 @@ const mapFilterStateToApiParams = (
   params.page_size = pageSize
   if (paging.sort) params.sort = paging.sort
 
+  // 扩展：家具/浴室/车位（V2 才启用）
+  // 为什么：与“白名单 + 下限语义”保持一致，避免在多位/any 表达上产生歧义
+  if (rawFilters.isFurnished === true) {
+    params.furnished = true
+  }
+  // 浴室下限：'any' 省略；'3+' -> 3；'2' -> 2
+  if (rawFilters.bathrooms) {
+    const bRaw = Array.isArray(rawFilters.bathrooms)
+      ? rawFilters.bathrooms[0]
+      : String(rawFilters.bathrooms).split(',')[0]
+    if (bRaw && bRaw !== 'any') {
+      const bMin = bRaw.endsWith('+') ? parseInt(bRaw) : parseInt(bRaw)
+      if (!Number.isNaN(bMin)) params.bathrooms_min = bMin
+    }
+  }
+  // 车位下限：'any' 省略；'2+' -> 2；'0' -> 0（有效）
+  if (rawFilters.parking) {
+    const pRaw = Array.isArray(rawFilters.parking)
+      ? rawFilters.parking[0]
+      : String(rawFilters.parking).split(',')[0]
+    if (pRaw && pRaw !== 'any') {
+      const pMin = pRaw.endsWith('+') ? parseInt(pRaw) : parseInt(pRaw)
+      if (!Number.isNaN(pMin)) params.parking_min = pMin
+    }
+  }
+
   // 删除空值
   Object.keys(params).forEach((k) => {
     if (params[k] === '' || params[k] === null || typeof params[k] === 'undefined') {

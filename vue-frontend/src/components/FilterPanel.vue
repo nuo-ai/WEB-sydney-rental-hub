@@ -137,6 +137,7 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
+import { useRouter, useRoute } from 'vue-router'
 
 // 组件属性
 const props = defineProps({
@@ -148,6 +149,10 @@ const props = defineProps({
 
 // 组件事件
 const emit = defineEmits(['update:modelValue', 'filtersChanged'])
+
+/* 路由：用于 URL Query 同步（P1-5） */
+const router = useRouter()
+const route = useRoute()
 
 // 状态管理
 const propertiesStore = usePropertiesStore()
@@ -163,8 +168,79 @@ const filters = ref({
   isFurnished: false,
 })
 
-// 本地计算的筛选结果数量
+/* 本地计算的筛选结果数量 */
 const localFilteredCount = ref(0)
+
+/* 将筛选参数写入 URL 的 Query（只写非空参数；保持 V1 键名，最小改动） */
+const buildQueryFromFilters = (filterParams) => {
+  const q = {}
+  const put = (k, v) => {
+    if (v !== null && v !== undefined && v !== '') q[k] = v
+  }
+  put('minPrice', filterParams.minPrice)
+  put('maxPrice', filterParams.maxPrice)
+  put('bedrooms', filterParams.bedrooms)
+  put('bathrooms', filterParams.bathrooms)
+  put('parking', filterParams.parking)
+  put('date_from', filterParams.date_from)
+  put('date_to', filterParams.date_to)
+  if (filterParams.isFurnished === true) q.isFurnished = '1'
+  put('suburb', filterParams.suburb)
+  return q
+}
+
+/* 从 URL Query 恢复筛选状态（刷新/直链可复现） */
+const applyQueryToState = (query) => {
+  try {
+    // 价格
+    const min = query.minPrice ? Number(query.minPrice) : 0
+    const max = query.maxPrice ? Number(query.maxPrice) : 5000
+    if (!Number.isNaN(min) || !Number.isNaN(max)) {
+      filters.value.priceRange = [Number.isNaN(min) ? 0 : min, Number.isNaN(max) ? 5000 : max]
+    }
+    // 卧室（单选）
+    if (query.bedrooms) {
+      const b = String(query.bedrooms)
+      filters.value.bedrooms = [b]
+    }
+    // 浴室/车位（单选）
+    if (query.bathrooms) {
+      filters.value.bathrooms = [String(query.bathrooms)]
+    }
+    if (query.parking) {
+      filters.value.parking = [String(query.parking)]
+    }
+    // 日期
+    if (query.date_from) {
+      filters.value.startDate = new Date(String(query.date_from))
+    }
+    if (query.date_to) {
+      filters.value.endDate = new Date(String(query.date_to))
+    }
+    // 家具
+    if (query.isFurnished === '1' || query.furnished === '1' || String(query.furnished) === 'true') {
+      filters.value.isFurnished = true
+    }
+    // 区域（仅 suburb 名称 CSV）
+    const suburbsCsv = query.suburb || query.suburbs
+    if (suburbsCsv) {
+      const names = String(suburbsCsv)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+      if (names.length) {
+        propertiesStore.selectedLocations = names.map((name) => ({
+          id: `suburb_${name}`,
+          type: 'suburb',
+          name,
+          fullName: name,
+        }))
+      }
+    }
+  } catch (e) {
+    console.warn('URL 查询解析失败:', e)
+  }
+}
 
 // 辅助函数：格式化日期为YYYY-MM-DD
 const formatDateToYYYYMMDD = (date) => {
@@ -388,6 +464,14 @@ const applyFiltersToStore = async () => {
 
     await propertiesStore.applyFilters(filterParams)
     emit('filtersChanged', filterParams)
+
+    // 将当前筛选写入 URL，便于刷新/分享复现
+    try {
+      const query = buildQueryFromFilters(filterParams)
+      await router.replace({ query })
+    } catch (e) {
+      console.warn('同步 URL 查询参数失败:', e)
+    }
   } catch (error) {
     console.error('筛选应用失败:', error)
     ElMessage.error('筛选失败，请稍后重试')
@@ -441,8 +525,11 @@ watch(visible, (newValue) => {
 
 // 初始化时设置默认计数
 onMounted(() => {
-  // 如果有选中的区域，更新计数；否则显示总数
-  if (propertiesStore.selectedLocations.length > 0) {
+  // 先从 URL 恢复筛选状态（刷新/直链）
+  applyQueryToState(route.query)
+
+  // 若存在筛选或已有选区，则刷新计数；否则显示总数
+  if (propertiesStore.selectedLocations.length > 0 || hasAppliedFilters.value) {
     updateFilteredCount()
   } else {
     localFilteredCount.value =
