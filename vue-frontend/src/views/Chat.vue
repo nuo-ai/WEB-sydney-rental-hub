@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'ChatView' })
 import { useRouter } from 'vue-router'
 import { ChatDotRound } from '@element-plus/icons-vue'
 

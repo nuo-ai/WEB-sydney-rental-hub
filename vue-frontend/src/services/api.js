@@ -271,73 +271,8 @@ export const locationAPI = {
 }
 
 // 交通API服务
-// 计算两点之间的直线距离（Haversine公式）
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // 地球半径（公里）
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
 
-// 根据距离和交通方式估算通勤时间
-function estimateCommute(distance, mode) {
-  // 悉尼市区的平均速度估算
-  const speeds = {
-    DRIVING: 30,    // 30 km/h（考虑交通拥堵）
-    TRANSIT: 25,    // 25 km/h（包括等车和换乘）
-    WALKING: 5      // 5 km/h
-  };
 
-  // 路线弯曲系数（实际路线通常比直线距离长）
-  const routeFactors = {
-    DRIVING: 1.4,
-    TRANSIT: 1.3,
-    WALKING: 1.2
-  };
-
-  const speed = speeds[mode] || speeds.DRIVING;
-  const factor = routeFactors[mode] || routeFactors.DRIVING;
-  const actualDistance = distance * factor;
-  const hours = actualDistance / speed;
-  const minutes = Math.round(hours * 60);
-
-  // 格式化时间显示
-  let duration;
-  if (minutes < 60) {
-    duration = `${minutes} min`;
-  } else {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    duration = m > 0 ? `${h} hr ${m} min` : `${h} hr`;
-  }
-
-  // 格式化距离显示
-  const distanceStr = actualDistance < 1
-    ? `${Math.round(actualDistance * 1000)} m`
-    : `${actualDistance.toFixed(1)} km`;
-
-  return {
-    duration,
-    distance: distanceStr,
-    estimatedMinutes: minutes
-  };
-}
-
-// 解析地址中的坐标（如果是坐标格式）
-function parseCoordinates(location) {
-  // 检查是否是 "lat,lng" 格式
-  const coordPattern = /^-?\d+\.\d+,-?\d+\.\d+$/;
-  if (coordPattern.test(location)) {
-    const [lat, lng] = location.split(',').map(Number);
-    return { lat, lng };
-  }
-  return null;
-}
 
 export const transportAPI = {
   // 获取通勤路线（调用后端Google Maps API）

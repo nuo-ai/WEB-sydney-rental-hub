@@ -11,7 +11,7 @@
     >
       <!-- 虚拟化的房源卡片 -->
       <div
-        v-for="(item, index) in visibleItems"
+        v-for="item in visibleItems"
         :key="`row-${item.index}`"
         class="virtual-row-wrapper"
         :style="{
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import PropertyCard from './PropertyCard.vue'
 
 const props = defineProps({
@@ -49,7 +49,6 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['property-click', 'contact-property'])
 
 // 响应式引用
 const containerRef = ref(null)
@@ -90,7 +89,7 @@ const totalHeight = computed(() => {
 const visibleRange = computed(() => {
   const start = Math.floor(scrollTop.value / rowHeight.value)
   const end = Math.ceil((scrollTop.value + containerHeight.value) / rowHeight.value)
-  
+
   return {
     start: Math.max(0, start - OVERSCAN),
     end: Math.min(totalRows.value, end + OVERSCAN)
@@ -101,12 +100,12 @@ const visibleRange = computed(() => {
 const visibleItems = computed(() => {
   const items = []
   const { start, end } = visibleRange.value
-  
+
   for (let i = start; i < end; i++) {
     const startIdx = i * columns.value
     const endIdx = Math.min(startIdx + columns.value, props.properties.length)
     const rowProperties = props.properties.slice(startIdx, endIdx)
-    
+
     if (rowProperties.length > 0) {
       items.push({
         index: i,
@@ -116,7 +115,7 @@ const visibleItems = computed(() => {
       })
     }
   }
-  
+
   return items
 })
 

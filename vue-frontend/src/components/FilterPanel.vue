@@ -351,10 +351,6 @@ const updateFilteredCount = async () => {
   }
 }
 
-// 检查是否选择了所有选项
-const isAllOptionsSelected = (selectedValues, allOptions) => {
-  return allOptions.every(option => selectedValues.includes(option))
-}
 
 // 本地计算备用方案 - 基于总数进行估算
 const calculateLocalCount = () => {
@@ -497,21 +493,6 @@ const resetFilters = () => {
   }
 }
 
-// 初始化 - 默认不选中任何选项
-const initializeFilters = () => {
-  // 重置筛选条件为默认值
-  filters.value = {
-    priceRange: [0, 5000],
-    bedrooms: [],
-    bathrooms: [],
-    parking: [],
-    startDate: null,
-    endDate: null,
-    isFurnished: false
-  }
-  // 重置本地计数为总数
-  localFilteredCount.value = propertiesStore.totalCount || propertiesStore.allProperties.length
-}
 
 // 暴露方法给父组件以同步状态
 defineExpose({

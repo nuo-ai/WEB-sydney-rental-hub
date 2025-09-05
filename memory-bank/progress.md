@@ -4,6 +4,16 @@
 
 ## 关键里程碑
 
+### 2025年9月5日：图片计数器复刻与 ESLint 清理
+
+- 主要成果：复刻图片计数器 Photos pill（min-width 118px、22×22 徽标、two-digits 胶囊、支持 99+），模板新增 two-digits 动态类以稳定多位数显示；清理 api.js 未使用函数，消除 ESLint no-unused-vars。
+- 细节：
+  - UI：容器 inline-flex 居中，背景 #fefefe、边框 #cfd1d7、文本 #3c475b、圆角 4px；数字使用 tabular-nums 防抖动；two-digits 时自动胶囊（padding: 0 4px, radius: 11px）。
+  - 模板：当 images.length ≥ 10 添加 two-digits 类；99+ 场景显示“99+”。
+  - 代码质量：移除 calculateDistance/estimateCommute/parseCoordinates，前端完全依赖后端 Google Directions。
+- 影响与价值：保障视觉稳定并与历史“成功过”版本一致；前端通勤实现与后端契约一致，去除误导性本地估算路径。
+- 溯源：activeContext 2025-09-05｜UI-PILL-COUNTER / API-CLEANUP
+
 ### 2025年9月4日：通勤时间计算准确性问题修复
 
 - **主要成果**: 彻底解决了通勤时间计算严重不准的问题。前端现在能够可靠地调用后端API，获取并展示来自Google Maps的真实、准确的通勤数据。

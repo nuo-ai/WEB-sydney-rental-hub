@@ -14,7 +14,7 @@
         <h2 class="modal-title">Add location</h2>
       </div>
     </template>
-    
+
     <div class="modal-content">
       <!-- 搜索区域 -->
       <div class="search-section">
@@ -28,7 +28,7 @@
             placeholder="Address"
             @input="handleInput"
           />
-          <button 
+          <button
             v-if="searchQuery"
             class="clear-btn"
             @click="clearSearch"
@@ -38,7 +38,7 @@
         </div>
         <p class="search-hint">Search for your location's address</p>
       </div>
-      
+
       <!-- 搜索结果 -->
       <div class="search-results">
         <!-- 预设地址 -->
@@ -59,7 +59,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 搜索建议 -->
         <div v-else-if="searchResults.length > 0" class="results-list">
           <div
@@ -74,13 +74,13 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 搜索中 -->
         <div v-else-if="isSearching" class="searching-state">
           <i class="fas fa-spinner fa-spin"></i>
           <span>Searching...</span>
         </div>
-        
+
         <!-- 无结果 -->
         <div v-else-if="searchQuery && !isSearching" class="no-results">
           <i class="fas fa-search"></i>
@@ -143,7 +143,7 @@ const searchPlaces = async (query) => {
     if (!sessionToken) {
       sessionToken = placesService.createSessionToken()
     }
-    
+
     const results = await placesService.searchPlaces(query, sessionToken)
     return results
   } catch (error) {
@@ -159,14 +159,14 @@ const handleInput = () => {
   if (searchTimeout.value) {
     clearTimeout(searchTimeout.value)
   }
-  
+
   // 如果搜索框为空，显示预设地址
   if (!searchQuery.value.trim()) {
     searchResults.value = []
     isSearching.value = false
     return
   }
-  
+
   // 延迟搜索（防抖）
   isSearching.value = true
   searchTimeout.value = setTimeout(async () => {
@@ -211,10 +211,10 @@ const selectLocation = (location) => {
 const selectResult = async (result) => {
   try {
     isSearching.value = true
-    
+
     // Get full place details including coordinates
     const placeDetails = await placesService.getPlaceDetails(result.place_id)
-    
+
     const formattedLocation = {
       place_id: placeDetails.place_id,
       formatted_address: placeDetails.formatted_address,
@@ -226,10 +226,10 @@ const selectResult = async (result) => {
         }
       }
     }
-    
+
     // Reset session token after selection (Google billing optimization)
     sessionToken = null
-    
+
     emit('select', formattedLocation)
     handleClose()
   } catch (error) {
@@ -259,12 +259,12 @@ onMounted(async () => {
     placeId: loc.place_id, // Keep both formats for compatibility
     address: loc.formatted_address
   }))
-  
+
   // Pre-load Google Maps API
   try {
     await placesService.loadGoogleMaps()
     // Google Places API加载成功
-  } catch (error) {
+  } catch {
     // Google Places API未加载 - 使用开发模式
   }
 })

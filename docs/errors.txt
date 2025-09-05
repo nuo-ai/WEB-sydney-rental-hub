@@ -1,0 +1,63 @@
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\inspect-image-viewer.js
+    1:22  error  'require' is not defined       no-undef
+   39:16  error  'e' is defined but never used  no-unused-vars
+  112:18  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\CommuteCalculator.vue
+  468:1  error  Parsing error: x-invalid-end-tag  vue/no-parsing-error
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\FilterPanel.vue
+  355:7  error  'isAllOptionsSelected' is assigned a value but never used  no-unused-vars
+  501:7  error  'initializeFilters' is assigned a value but never used     no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\Navigation.vue
+  1:1  error  Component name "Navigation" should always be multi-word  vue/multi-word-component-names
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\SimpleMap.vue
+  66:9  error  'latRad' is assigned a value but never used             no-unused-vars
+  87:7  error  'handleIframeError' is assigned a value but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\VirtualPropertyList.vue
+  14:23  error  'index' is defined but never used          vue/no-unused-vars
+  41:25  error  'watch' is defined but never used          no-unused-vars
+  52:7   error  'emit' is assigned a value but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\commute\TransportModes.vue
+  16:10  error  'ref' is defined but never used             no-unused-vars
+  18:7   error  'props' is assigned a value but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\modals\AddLocationModal.vue
+  267:12  error  'error' is defined but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\modals\AuthModal.vue
+  91:15  error  'computed' is defined but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\components\modals\EmailVerifyModal.vue
+  150:12  error  'error' is defined but never used  no-unused-vars
+  178:12  error  'error' is defined but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\stores\auth.js
+  266:19  error  'removed' is assigned a value but never used  no-unused-vars
+  286:17  error  'removed' is assigned a value but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\stores\commute.js
+  111:18  error  'error' is defined but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\views\Chat.vue
+  1:1  error  Component name "Chat" should always be multi-word  vue/multi-word-component-names
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\views\Favorites.vue
+  1:1  error  Component name "Favorites" should always be multi-word  vue/multi-word-component-names
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\views\HomeView.vue
+  185:39  error  'location' is defined but never used                      no-unused-vars
+  261:7   error  'applyCurrentFilters' is assigned a value but never used  no-unused-vars
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\views\Map.vue
+  1:1  error  Component name "Map" should always be multi-word  vue/multi-word-component-names
+
+C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\vue-frontend\src\views\Profile.vue
+    1:1  error  Component name "Profile" should always be multi-word  vue/multi-word-component-names
+  260:7  error  'router' is assigned a value but never used           no-unused-vars
+
+✖ 28 problems (28 errors, 0 warnings)

@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'MapView' })
 import { useRouter } from 'vue-router'
 import { MapLocation } from '@element-plus/icons-vue'
 

@@ -14,38 +14,38 @@
         <h2 class="modal-title">{{ isLogin ? 'Sign in' : 'Create an account' }}</h2>
       </div>
     </template>
-    
+
     <div class="auth-content">
-      <el-form 
+      <el-form
         ref="authFormRef"
-        :model="authForm" 
+        :model="authForm"
         :rules="authRules"
         label-position="top"
         class="auth-form"
       >
         <el-form-item label="Email address" prop="email">
-          <el-input 
-            v-model="authForm.email" 
+          <el-input
+            v-model="authForm.email"
             placeholder="Enter your email"
             size="large"
             @keyup.enter="handleSubmit"
           />
         </el-form-item>
-        
+
         <el-form-item label="Password" prop="password">
-          <el-input 
-            v-model="authForm.password" 
-            type="password" 
+          <el-input
+            v-model="authForm.password"
+            type="password"
             placeholder="Enter password"
             size="large"
             show-password
             @keyup.enter="handleSubmit"
           />
         </el-form-item>
-        
-        <el-button 
-          type="danger" 
-          size="large" 
+
+        <el-button
+          type="danger"
+          size="large"
           :loading="loading"
           @click="handleSubmit"
           class="submit-btn"
@@ -53,18 +53,18 @@
           {{ isLogin ? 'Sign in' : 'Create account' }}
         </el-button>
       </el-form>
-      
+
       <div class="switch-mode">
         <span>{{ isLogin ? "Don't have an account?" : 'Already have an account?' }}</span>
         <a @click="toggleMode" class="switch-link">
           {{ isLogin ? 'Create account' : 'Sign in' }}
         </a>
       </div>
-      
+
       <div class="divider">
         <span>or continue with</span>
       </div>
-      
+
       <div class="social-buttons">
         <button class="social-btn google-btn" @click="handleGoogleAuth">
           <i class="fab fa-google"></i>
@@ -77,9 +77,9 @@
       </div>
     </div>
   </el-dialog>
-  
+
   <!-- Email Verification Modal -->
-  <EmailVerifyModal 
+  <EmailVerifyModal
     v-if="showVerifyModal"
     v-model="showVerifyModal"
     :email="authForm.email"
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 import EmailVerifyModal from './EmailVerifyModal.vue'
@@ -162,9 +162,9 @@ const handleSubmit = async () => {
   // 验证表单
   const valid = await authFormRef.value.validate().catch(() => false)
   if (!valid) return
-  
+
   loading.value = true
-  
+
   try {
     if (isLogin.value) {
       // 登录逻辑
@@ -385,7 +385,7 @@ const handleFacebookAuth = () => {
   .auth-content {
     padding: 24px 16px;
   }
-  
+
   .modal-header {
     padding: 16px;
   }

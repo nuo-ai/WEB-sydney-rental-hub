@@ -57,15 +57,15 @@ export const useCommuteStore = defineStore('commute', {
 
       const selectedMode = mode || this.selectedMode
       const cacheKey = `${this.currentProperty.coordinates.lat},${this.currentProperty.coordinates.lng}-${destination.id}-${selectedMode}`
-      
+
       // 检查缓存
       const cached = this.getFromCache(cacheKey)
       if (cached) {
         return cached
       }
-      
+
       this.isCalculating = true
-      
+
       try {
         // 调用API
         const origin = `${this.currentProperty.coordinates.lat},${this.currentProperty.coordinates.lng}`
@@ -74,20 +74,20 @@ export const useCommuteStore = defineStore('commute', {
           destination.address,
           selectedMode
         )
-        
+
         if (result.error) {
           throw new Error(result.error)
         }
-        
+
         const commuteData = {
           duration: result.duration,
           distance: result.distance,
           mode: selectedMode
         }
-        
+
         // 缓存结果
         this.setCache(cacheKey, commuteData)
-        
+
         return commuteData
       } catch (error) {
         console.error('Failed to calculate commute:', error)
@@ -100,7 +100,7 @@ export const useCommuteStore = defineStore('commute', {
     async calculateMultiple(destinations, mode = null) {
       const selectedMode = mode || this.selectedMode
       const results = []
-      
+
       for (const destination of destinations) {
         try {
           const result = await this.calculateCommute(destination, selectedMode)
@@ -108,7 +108,7 @@ export const useCommuteStore = defineStore('commute', {
             destinationId: destination.id,
             ...result
           })
-        } catch (error) {
+        } catch {
           results.push({
             destinationId: destination.id,
             error: true,
@@ -117,7 +117,7 @@ export const useCommuteStore = defineStore('commute', {
           })
         }
       }
-      
+
       return results
     }
   },

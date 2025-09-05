@@ -80,8 +80,8 @@
         <section class="content-section">
           <!-- 标签导航 -->
           <div class="tabs">
-            <button 
-              v-for="tab in tabs" 
+            <button
+              v-for="tab in tabs"
               :key="tab.id"
               :class="['tab', { active: activeTab === tab.id }]"
               @click="activeTab = tab.id"
@@ -252,12 +252,11 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'ProfileView' })
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritesStore } from '@/stores/favorites'
 
-const router = useRouter()
 const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
 
@@ -361,11 +360,11 @@ const formatDate = (date) => {
   const now = new Date()
   const diff = now - date
   const hours = Math.floor(diff / (1000 * 60 * 60))
-  
+
   if (hours < 1) return '刚刚'
   if (hours < 24) return `${hours}小时前`
   if (hours < 48) return '昨天'
-  
+
   return date.toLocaleDateString('zh-CN')
 }
 </script>
@@ -824,24 +823,24 @@ const formatDate = (date) => {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .user-stats {
     justify-content: center;
   }
-  
+
   .action-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .property-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .history-property {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .history-image {
     width: 100%;
     height: 200px;

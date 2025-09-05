@@ -39,6 +39,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'FavoritesView' })
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'

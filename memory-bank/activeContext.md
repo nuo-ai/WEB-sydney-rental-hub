@@ -5,6 +5,8 @@
 ---
 
 2025-09-05｜DOCS-ALIGN｜对齐 Memory Bank：更新 /api/directions 为“后端 Google Directions（生产）+ Haversine 回退”，统一详情缓存 30min；纯文档，无代码改动
+2025-09-05｜UI-PILL-COUNTER｜复刻图片计数器样式（min-width 118px、22×22 徽标、two-digits 胶囊、tabular-nums），模板支持 99+；纯样式与模板微调
+2025-09-05｜API-CLEANUP｜移除 api.js 未使用的本地通勤估算函数（calculateDistance/estimateCommute/parseCoordinates），消除 ESLint 警告；统一依赖后端 Google Directions
 
 ## 当前项目运行状态
 

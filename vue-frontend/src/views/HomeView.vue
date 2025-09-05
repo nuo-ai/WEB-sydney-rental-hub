@@ -13,10 +13,10 @@
       </div>
 
       <!-- 搜索和筛选区域 - Domain风格全屏容器 -->
-      <div 
+      <div
         ref="searchBarElement"
         class="search-filter-section"
-        :class="{ 
+        :class="{
           'is-fixed': isSearchBarFixed,
           'nav-hidden': isNavHidden && windowWidth > 768
         }"
@@ -24,19 +24,19 @@
         <div class="search-content-container">
           <!-- PC端：搜索框和筛选标签在同一行 -->
           <div class="search-filter-row">
-            <SearchBar 
+            <SearchBar
               class="search-bar"
               @search="handleSearch"
               @locationSelected="handleLocationSelected"
             />
-            <FilterTabs 
+            <FilterTabs
               class="filter-tabs-right"
               :filter-panel-open="showFilterPanel"
               @toggleFullPanel="handleToggleFullPanel"
               @filtersChanged="handleQuickFiltersChanged"
             />
           </div>
-          
+
           <!-- 结果统计 -->
           <div class="results-summary chinese-text">
             <p class="results-count">
@@ -47,9 +47,9 @@
       </div>
 
       <!-- 布局偏移补偿 -->
-      <div 
-        v-if="isSearchBarFixed" 
-        class="search-bar-spacer" 
+      <div
+        v-if="isSearchBarFixed"
+        class="search-bar-spacer"
         :style="{ height: searchBarHeight + 'px' }"
       ></div>
 
@@ -96,7 +96,7 @@
               @property-click="goToPropertyDetail"
               @contact-property="handleContactProperty"
             />
-            
+
             <!-- 普通网格：小数据量保持原有交互体验，避免滚动条跳动 -->
             <div v-else class="properties-grid">
               <PropertyCard
@@ -126,7 +126,7 @@
     </main>
 
     <!-- 筛选面板 -->
-    <FilterPanel 
+    <FilterPanel
       ref="filterPanelRef"
       v-model="showFilterPanel"
       @filtersChanged="handleFiltersChanged"
@@ -182,10 +182,10 @@ const handleSearch = () => {
   // 搜索逻辑已在SearchBar组件中处理，这里主要是响应搜索事件
 }
 
-const handleLocationSelected = async (location) => {
+const handleLocationSelected = async () => {
   // 当选择或移除区域后，调用API进行服务端筛选
   const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
-  
+
   try {
     if (selectedSuburbs.length > 0) {
       // 有选中的区域，进行筛选
@@ -228,7 +228,7 @@ const handleFiltersChanged = () => {
 
 const handlePageChange = async (page) => {
   await propertiesStore.setCurrentPage(page)
-  
+
   // 滚动到顶部
   window.scrollTo({
     top: 0,
@@ -258,18 +258,6 @@ const clearFilters = () => {
   showFilterPanel.value = false
 }
 
-const applyCurrentFilters = () => {
-  // 应用当前的筛选条件
-  propertiesStore.applyFilters({
-    minPrice: null,
-    maxPrice: null,
-    bedrooms: 'any',
-    bathrooms: 'any',
-    parking: 'any',
-    availableDate: 'any',
-    isFurnished: false
-  })
-}
 
 const loadProperties = async () => {
   try {
@@ -287,20 +275,20 @@ const handleResize = () => {
 // 滚动处理逻辑
 const handleScroll = () => {
   if (!searchBarElement.value) return
-  
+
   const currentScrollY = window.scrollY
   const scrollDelta = currentScrollY - lastScrollY.value
   const isMobileView = windowWidth.value <= 768
-  
+
   // 搜索栏固定逻辑 - 改进移动端逻辑
   const searchBarRect = searchBarElement.value.getBoundingClientRect()
-  
+
   if (isMobileView) {
     // 移动端：更精确的固定逻辑，考虑logo区域高度
     const logoSection = document.querySelector('.mobile-logo-section')
     const logoHeight = logoSection ? logoSection.offsetHeight : 32 // fallback高度
     const shouldBeFixed = currentScrollY > logoHeight
-    
+
     if (shouldBeFixed && !isSearchBarFixed.value) {
       searchBarHeight.value = searchBarElement.value.offsetHeight
       isSearchBarFixed.value = true
@@ -311,7 +299,7 @@ const handleScroll = () => {
   } else {
     // 桌面端：保持原有逻辑
     const shouldBeFixed = searchBarRect.top <= 0
-    
+
     if (shouldBeFixed && !isSearchBarFixed.value) {
       searchBarHeight.value = searchBarElement.value.offsetHeight
       isSearchBarFixed.value = true
@@ -320,11 +308,11 @@ const handleScroll = () => {
       searchBarHeight.value = 0
     }
   }
-  
+
   // 导航栏显示/隐藏逻辑（仅在桌面端）
   if (!isMobileView) {
     const scrollThreshold = 5
-    
+
     // 回到顶部附近时强制重置导航栏状态
     if (currentScrollY < 50) {
       if (isNavHidden.value) {
@@ -353,7 +341,7 @@ const handleScroll = () => {
       // 不发送emit事件，避免影响App组件
     }
   }
-  
+
   lastScrollY.value = currentScrollY
 }
 
@@ -446,7 +434,7 @@ onUnmounted(() => {
   .page-title {
     font-size: 36px;
   }
-  
+
   .page-subtitle {
     font-size: 20px;
   }
@@ -568,20 +556,20 @@ onUnmounted(() => {
   .search-filter-section {
     margin-bottom: 12px; /* 进一步减少移动端间距 */
   }
-  
+
   .search-content-container {
     padding: 12px 24px 8px 24px; /* 减少移动端搜索内容padding */
   }
-  
+
   .search-filter-row {
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .search-bar {
     width: 100%;
   }
-  
+
   .filter-tabs-right {
     width: 100%;
   }
@@ -689,17 +677,17 @@ onUnmounted(() => {
     max-width: none;
     margin-bottom: 16px;
   }
-  
+
   .search-filter-container {
     flex-direction: column;
     gap: 12px;
     width: 100%;
   }
-  
+
   .search-bar {
     width: 100%;
   }
-  
+
   .filter-trigger-btn {
     width: 100%;
     height: 48px;

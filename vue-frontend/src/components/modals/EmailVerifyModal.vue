@@ -14,27 +14,27 @@
         <h2 class="modal-title">Check your email</h2>
       </div>
     </template>
-    
+
     <div class="verify-content">
       <div class="verify-icon">
         <i class="fas fa-envelope-open-text"></i>
       </div>
-      
+
       <h3 class="verify-title">Verify your email address</h3>
-      
+
       <p class="verify-description">
         We've sent a verification email to:
       </p>
-      
+
       <div class="email-display">{{ email }}</div>
-      
+
       <p class="verify-instructions">
         Please check your inbox and click the verification link to activate your account.
       </p>
-      
+
       <div class="verify-actions">
-        <el-button 
-          type="primary" 
+        <el-button
+          type="primary"
           size="large"
           :loading="checking"
           @click="checkVerification"
@@ -42,18 +42,18 @@
         >
           {{ checking ? 'Checking...' : 'I\'ve verified my email' }}
         </el-button>
-        
-        <button 
-          class="resend-link" 
+
+        <button
+          class="resend-link"
           @click="resendEmail"
           :disabled="resendCountdown > 0"
         >
           {{ resendCountdown > 0 ? `Resend in ${resendCountdown}s` : 'Resend verification email' }}
         </button>
       </div>
-      
+
       <div class="divider"></div>
-      
+
       <div class="help-section">
         <h4>Didn't receive the email?</h4>
         <ul class="help-list">
@@ -117,7 +117,7 @@ const startAutoCheck = () => {
       handleVerified()
     }
   }, 3000) // 每3秒检查一次
-  
+
   // 5分钟后停止自动检查
   setTimeout(() => {
     stopAutoCheck()
@@ -138,16 +138,16 @@ const handleBack = () => {
 
 const checkVerification = async () => {
   checking.value = true
-  
+
   try {
     const verified = await authStore.checkEmailVerification()
-    
+
     if (verified) {
       handleVerified()
     } else {
       ElMessage.warning('Email not verified yet. Please check your inbox.')
     }
-  } catch (error) {
+  } catch {
     ElMessage.error('Failed to check verification status')
   } finally {
     checking.value = false
@@ -162,11 +162,11 @@ const handleVerified = () => {
 
 const resendEmail = async () => {
   if (resendCountdown.value > 0) return
-  
+
   try {
     await authStore.resendVerificationEmail(props.email)
     ElMessage.success('Verification email sent!')
-    
+
     // 开始倒计时
     resendCountdown.value = 60
     countdownInterval = setInterval(() => {
@@ -175,7 +175,7 @@ const resendEmail = async () => {
         clearInterval(countdownInterval)
       }
     }, 1000)
-  } catch (error) {
+  } catch {
     ElMessage.error('Failed to resend email. Please try again.')
   }
 }
@@ -378,7 +378,7 @@ onUnmounted(() => {
   .verify-content {
     padding: 24px 16px;
   }
-  
+
   .modal-header {
     padding: 16px;
   }

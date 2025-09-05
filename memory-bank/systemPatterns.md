@@ -171,3 +171,18 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
     - 使用 `<i>` 标签或图像文件作为图标。
     - 在组件内硬编码图标的 `width`, `height`, `color` 样式，破坏全局一致性。
 - **溯源**: 本次从 `PropertyCard.vue` 到 `PropertyDetail.vue` 的图标统一重构工作。
+
+## 计数器徽标（Pill/Badge）统一模式
+
+- 原则：计数器应在不同位数（单位数/双位数/99+）下保持布局稳定，不产生横向抖动；组件为“非交互”视觉，不响应 hover。
+- 结构：图标（可选）+ 文案（pill-label）+ 数字徽标（pill-badge）。推荐容器类名 `.image-counter`。
+- 样式规范（像素复刻基线）：
+  - 容器：display:inline-flex; align-items:center; justify-content:center; gap:8px; min-width:118px; height:40px; padding:0 14px; background:#fefefe; color:#3c475b; border:1px solid #cfd1d7; border-radius:4px; cursor:default; line-height:1; box-shadow:none; box-sizing:border-box。
+  - 文案 `.pill-label`：white-space:nowrap; line-height:1;（避免垂直偏移）。
+  - 数字 `.pill-badge`（默认）：22×22 圆形（width/height:22px; border-radius:100%），字体 12px/600；使用 `font-variant-numeric: tabular-nums`；`flex-shrink:0` 防止压缩。
+  - 两位及以上（含 99+）：为 `.pill-badge.two-digits` 设置 `width:auto; padding:0 4px; border-radius:11px`，自动切换为椭圆胶囊。
+- 数字规则：当计数 ≥ 100 时，显示 `99+`；当计数 ≥ 10 时，给数字徽标附加 `two-digits` 类。
+- 可访问性：容器需提供 `aria-label` 描述（如“照片数量”），图标 `aria-hidden="true"`。
+- 令牌化（可选）：若需与全局设计系统对齐，可将 #fefefe/#3c475b/#cfd1d7/#e6e9ed 替换为 `var(--color-bg-card) / var(--color-text-secondary) / var(--color-border-default) / var(--bg-secondary)` 等项目 tokens。
+- 适用范围：图片计数器、收藏计数、通知气泡等具有相同特征的计数场景。
+- 溯源：activeContext 2025-09-05｜UI-PILL-COUNTER（基于历史“成功过”的实现复刻与沉淀）

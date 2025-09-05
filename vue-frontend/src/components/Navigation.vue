@@ -2,8 +2,8 @@
   <!-- 移动端底部导航 -->
   <nav v-if="isMobile" class="bottom-nav">
     <div class="nav-container">
-      <router-link 
-        v-for="item in navItems" 
+      <router-link
+        v-for="item in navItems"
         :key="item.name"
         :to="item.path"
         class="nav-item"
@@ -26,10 +26,10 @@
           </div>
           <span class="chinese-text">JUWO 桔屋找房</span>
         </router-link>
-        
+
         <div class="main-nav">
-          <router-link 
-            v-for="item in mainNavItems" 
+          <router-link
+            v-for="item in mainNavItems"
             :key="item.name"
             :to="item.path"
             class="main-nav-item"
@@ -40,11 +40,11 @@
           </router-link>
         </div>
       </div>
-      
+
       <!-- 右侧用户导航 -->
       <div class="nav-right">
-        <router-link 
-          v-for="item in userNavItems" 
+        <router-link
+          v-for="item in userNavItems"
           :key="item.name"
           :to="item.path"
           class="user-nav-item"
@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'MainNavigation' })
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -367,15 +368,15 @@ onUnmounted(() => {
   .top-nav-content {
     padding: 0 20px;
   }
-  
+
   .nav-left {
     gap: 20px;
   }
-  
+
   .main-nav {
     gap: 16px;
   }
-  
+
   .nav-right {
     gap: 12px;
   }
