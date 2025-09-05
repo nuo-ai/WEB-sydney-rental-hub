@@ -126,6 +126,9 @@ import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 
+// 建议列表最大返回条数（覆盖 36 条邮编）
+const SUGGESTION_LIMIT = 100
+
 // 组件事件
 const emit = defineEmits(['search', 'locationSelected', 'openFilterPanel']) // 说明：新增 openFilterPanel，用于在搜索框内图标触发统一筛选面板
 
@@ -169,8 +172,20 @@ const searchLocationSuggestions = async (query) => {
 
   isLoadingSuggestions.value = true
   try {
-    const results = await locationAPI.getSuggestions(query, 10)
-    locationSuggestions.value = results
+    const results = await locationAPI.getSuggestions(query, SUGGESTION_LIMIT)
+    // 排序（方案B）：无论数字/字母，主排序按名称首字母，其次按邮编数值
+    let items = Array.isArray(results) ? results.slice() : []
+    items.sort((a, b) => {
+      const fa = String(a.fullName ?? a.name ?? '').toLowerCase()
+      const fb = String(b.fullName ?? b.name ?? '').toLowerCase()
+      const cmp = fa.localeCompare(fb, 'en-AU', { sensitivity: 'base' })
+      if (cmp !== 0) return cmp
+      const pa = Number(a.postcode ?? a.name)
+      const pb = Number(b.postcode ?? b.name)
+      if (!Number.isNaN(pa) && !Number.isNaN(pb)) return pa - pb
+      return 0
+    })
+    locationSuggestions.value = items
   } catch (error) {
     console.error('搜索失败:', error)
     locationSuggestions.value = []

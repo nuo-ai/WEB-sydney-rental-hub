@@ -235,8 +235,8 @@ export const locationAPI = {
     }
   },
 
-  // 搜索区域建议
-  async getSuggestions(query, limit = 20) {
+  // 搜索区域建议（默认上限提升至 100，覆盖“2*”邮编等全量场景）
+  async getSuggestions(query, limit = 100) {
     try {
       const response = await apiClient.get('/locations/suggestions', {
         params: { q: query, limit },
