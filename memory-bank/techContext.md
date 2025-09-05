@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-03
+**最后更新**: 2025-09-05
 
 ---
 
@@ -72,7 +72,7 @@ python scripts/run_backend.py  # localhost:8000
 - ✅ CORS代理: 配置完成
 - ✅ 地图服务: OpenStreetMap备选
 - ✅ 认证系统: JWT + 邮箱验证框架
-- ✅ 通勤计算: 本地算法 (无需外部API)
+- ✅ 通勤计算: 后端 Google Directions（生产）+ Haversine 回退；前端无本地估算
 
 ---
 
@@ -106,3 +106,28 @@ python scripts/run_backend.py  # localhost:8000
 - 潜在风险/注意：
   - 若后续修改 --section-padding-x，需同时验证分隔线、标题与卡片边缘是否仍一致
   - 长段落 measure 仅对 p 生效，富文本内其他块级元素（如 ul/ol、表格）如需限制应另行评估
+
+---
+
+## 运行与集成增补（2025-09-05）
+
+- 变更文件与路径
+  - src/stores/properties.js：引入参数映射层（mapFilterStateToApiParams），统一 applyFilters/getFilteredCount 入参；分页/排序透传；性能埋点
+  - src/components/FilterPanel.vue：URL Query 同步（读写）；错误 Toast（ElMessage）；文案 i18n（$t）；suburbs/postcodes 区分；挂载期作用域修复
+  - src/components/FilterTabs.vue：触发器模式（仅 emit('toggleFullPanel', true) 打开面板），隐藏所有下拉/预设；移动端/桌面端统一入口
+  - src/components/SearchBar.vue：撤回移动端“筛选”按钮（仅保留搜索）
+  - src/views/HomeView.vue：FilterTabs 在移动端也渲染；统一绑定 @toggleFullPanel ↔ FilterPanel v-model
+  - src/i18n/index.js：轻量 i18n 插件（无依赖），默认 zh-CN，提供 $t 与 inject('t')
+  - src/main.js：挂载 i18n（app.use(i18n)）
+- 特性开关
+  - enableFilterV2 = false（默认关闭，零风险回滚）；开启后输出 V2 契约参数（suburbs/price_min/price_max/bedrooms/...），并可扩展 furnished/bathrooms_min/parking_min/postcodes 等
+- URL 状态同步
+  - 应用筛选后写入 URL；进入页面时从 URL 恢复（刷新/直链可复现）
+  - 仅写入非空参数；写入前做幂等判断，避免 replace 循环
+  - 支持 suburbs 与 postcodes 两类 CSV 参数
+- 错误处理
+  - 快速失败 + 就近 Toast；移除本地估算与静默置 0，所有数据以后端返回为准
+- 性能观测
+  - fetchProperties / applyFilters / getFilteredCount 超过 800ms 打印 [FILTER-PERF] 警告，用于观察 p95 并驱动后续优化（如轻量 count 端点或索引）
+- 其它注意
+  - FilterPanel 关闭图标改为内联 SVG，统一走 SVG 路线（后续全站逐步迁移至 lucide-vue-next）

@@ -1195,7 +1195,7 @@ async def get_properties(
         listing_id, property_url, address, suburb, state, postcode, 
         property_type, rent_pw, bond, bedrooms, bathrooms, parking_spaces,
         available_date, inspection_times, agency_name, agent_name,
-        property_headline, latitude, longitude, images, cover_image,
+        property_headline, latitude, longitude, images,
         is_active, status, created_at, last_updated,
         has_air_conditioning, is_furnished, has_balcony, has_dishwasher,
         has_laundry, has_parking, has_pool, has_gym

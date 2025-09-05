@@ -16,7 +16,6 @@
       <el-input
         v-model="searchQuery"
         :placeholder="searchPlaceholder"
-        clearable
         size="large"
         class="search-input"
         @input="handleInput"
@@ -25,6 +24,20 @@
       >
         <template #prefix>
           <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </template>
+        <template #suffix>
+          <!-- 说明：按“单一入口”策略，将筛选入口迁移到搜索框右侧；24×24px，距右边界12px，点击仅触发打开 FilterPanel -->
+          <button
+            class="filter-icon-btn"
+            type="button"
+            aria-label="筛选"
+            @click="emit('openFilterPanel')"
+          >
+            <!-- 采用 sliders-horizontal 内联 SVG，24×24，继承 currentColor，保持 tokens 与交互一致 -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+              <path d="M21 4H14M10 4H3M21 12H12M8 12H3M21 20H16M12 20H3M14 2V6M8 10V14M16 18V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </template>
       </el-input>
 
@@ -102,7 +115,7 @@ import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 
 // 组件事件
-const emit = defineEmits(['search', 'locationSelected'])
+const emit = defineEmits(['search', 'locationSelected', 'openFilterPanel']) // 说明：新增 openFilterPanel，用于在搜索框内图标触发统一筛选面板
 
 // 状态管理
 const propertiesStore = usePropertiesStore()
@@ -381,9 +394,12 @@ watch(
 
 
 .search-input :deep(.el-input__wrapper) {
+  position: relative; /* 作为绝对定位锚点，保证按钮贴右且不遮挡文字 */
   border-radius: 6px;
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
+  /* 预留右侧空间：右边距(12px) + 命中区域(32px)；可由 token 控制 */
+  padding-right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px));
 }
 
 .search-input :deep(.el-input__wrapper):hover {
@@ -398,6 +414,57 @@ watch(
 .search-icon {
   color: var(--color-text-secondary);
   font-size: 16px;
+}
+
+/* 说明：控制后缀区域的右内边距，确保图标距输入框右边界为 12px */
+.search-input :deep(.el-input__suffix) {
+  /* 取消锚点，让 wrapper 成为定位参照，避免文本被覆盖 */
+  position: static;
+  padding-right: var(--search-suffix-right, 12px); /* icon 右缘距输入框内侧 12px */
+}
+
+/* 让后缀内容贴右对齐，避免看起来“靠左” */
+.search-input :deep(.el-input__suffix-inner) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+/* 说明：筛选图标容器采用绝对定位贴右；视觉尺寸 16×16，命中区域放大到 32×32 增强可点性 */
+.filter-icon-btn {
+  position: absolute;
+  right: var(--space-3, 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--search-suffix-hit, 32px);   /* 命中区域 */
+  height: var(--search-suffix-hit, 32px);  /* 命中区域 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.filter-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+}
+
+.filter-icon-btn:hover svg,
+.filter-icon-btn:focus svg {
+  color: var(--juwo-primary);
+}
+
+.filter-icon-btn:focus {
+  outline: 2px solid var(--juwo-primary-50);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* 自动补全建议列表 */

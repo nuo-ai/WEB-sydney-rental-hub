@@ -28,8 +28,10 @@
               class="search-bar"
               @search="handleSearch"
               @locationSelected="handleLocationSelected"
+              @openFilterPanel="handleOpenFilterPanel"
             />
             <FilterTabs
+              v-if="false"
               class="filter-tabs-right"
               :filter-panel-open="showFilterPanel"
               @toggleFullPanel="handleToggleFullPanel"
@@ -203,6 +205,11 @@ const handleLocationSelected = async () => {
 
 const handleToggleFullPanel = (show) => {
   showFilterPanel.value = show
+}
+
+const handleOpenFilterPanel = () => {
+  // 说明：从 SearchBar 右侧图标触发，打开统一筛选面板（保持“单一入口”）
+  showFilterPanel.value = true
 }
 
 const handleQuickFiltersChanged = (filterParams) => {

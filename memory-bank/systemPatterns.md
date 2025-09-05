@@ -1,4 +1,4 @@
-# 系统设计模式与最佳实践
+![1757075026513](image/systemPatterns/1757075026513.png)# 系统设计模式与最佳实践
 
 ---
 
@@ -80,33 +80,6 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 ### 变量化与可配置
 - 关键变量：--section-padding-x（默认 50px）、--paragraph-measure（默认 68ch）。
 - 调整对齐或行长时优先改变量，避免散点修改。
-- 反模式** ❌: 不同容器的对齐方式不一致
-
----
-
-## 状态管理原则
-
-**单一数据源**: 组件负责触发action，业务逻辑在store actions中处理
-
-**反模式** ❌: 在action中混合传入参数和未同步的旧state
-
----
-
-## 移动端响应式模式
-
-### 1. 渐进式间距系统
-匀速递增的间距级别：`8px → 12px → 16px`
-从核心元素到区域再到容器的视觉层次递增
-
-### 2. 移动端滚动逻辑隔离
-桌面端 vs 移动端使用不同的滚动判断机制：
-- **桌面端**: `getBoundingClientRect()` 视窗位置判断
-- **移动端**: `offsetHeight` 实际DOM高度判断
-
-### 3. 性能优化的高度计算策略
-使用缓存的DOM高度信息而非实时计算，以避免强制布局重计算
-
----
 
 ## 经验教训总结
 
@@ -149,7 +122,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 为什么：避免在各视图重复手写 v-html，降低 XSS 风险；实现一致的列表/段落/强调/链接样式；便于全局升级与样式统一。
 - 技术权衡：不额外引入新依赖，优先复用既有组件；在保持体积可控的同时兼顾可读性与安全性。
 - 适用范围：PropertyDetail.description 以及后续所有富文本字段（如房源须知、注意事项等）。
-- 溯源：任务#TBD
+- 溯源：activeContext 2025-09-05｜DOCS-ALIGN-FINAL（任务 RICH-TEXT-UNIFY）
 
 ## 图标系统与组件化 (Icon System & Componentization)
 
@@ -171,6 +144,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
     - 使用 `<i>` 标签或图像文件作为图标。
     - 在组件内硬编码图标的 `width`, `height`, `color` 样式，破坏全局一致性。
 - **溯源**: 本次从 `PropertyCard.vue` 到 `PropertyDetail.vue` 的图标统一重构工作。
+- **迁移状态**: 进行中；允许过渡期例外，不作为阻断项。
 
 ## 计数器徽标（Pill/Badge）统一模式
 
@@ -186,3 +160,72 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 令牌化（可选）：若需与全局设计系统对齐，可将 #fefefe/#3c475b/#cfd1d7/#e6e9ed 替换为 `var(--color-bg-card) / var(--color-text-secondary) / var(--color-border-default) / var(--bg-secondary)` 等项目 tokens。
 - 适用范围：图片计数器、收藏计数、通知气泡等具有相同特征的计数场景。
 - 溯源：activeContext 2025-09-05｜UI-PILL-COUNTER（基于历史“成功过”的实现复刻与沉淀）
+
+---
+
+## 筛选入口一致性（新增）
+
+- 原则：全站筛选入口单一；桌面芯片仅作为“打开 FilterPanel”的触发器，不承载预设/下拉；移动端仅保留“筛选”入口。
+- 为什么：避免“快捷项 vs 面板”双通道引发的状态不一致；统一心智模型、简化回滚路径。
+- 实施：
+  - FilterTabs 隐藏所有下拉/预设，仅 emit('toggleFullPanel', true) 打开统一 FilterPanel。
+  - SearchBar 不再承载筛选入口（移动端筛选按钮已撤回，SearchBar 仅负责搜索）。
+  - HomeView 统一绑定 @toggleFullPanel ↔ FilterPanel v-model，并在移动端也渲染 FilterTabs 作为唯一入口。
+- 向后兼容：旧直链 `parking=0` 视为 Any（不传）。
+- 溯源：activeContext 2025-09-05｜UI-FILTER-ENTRY-UNIFY｜commit 6926962
+
+## 前端状态同步与特性开关（新增）
+
+- 原则：以“映射函数 + 特性开关”的方式进行 V1 → V2 契约演进，默认关闭新契约，保障回滚路径。
+- 为什么：避免一次性切换导致的全站耦合风险；在验证窗口期内可快速切换回旧契约。
+- 实施：
+  - 在 store 层集中构造参数（mapFilterStateToApiParams），组件仅触发 action；
+  - 通过 enableFilterV2 控制输出参数集合（V1: suburb/minPrice/...；V2: suburbs/price_min/...）；
+  - 任何异常场景下可一键回退，确保向后兼容。
+- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## URL 状态同步（新增）
+
+- 原则：筛选应用后将状态写入 URL；进入页面时从 URL 恢复（刷新/直链可复现）。
+- 为什么：便于分享筛选结果与回溯问题；保证可观测与可复现。
+- 实施建议：
+  - 仅持久化“非空参数”，避免污染 URL；
+  - 写入前做“幂等比对”，避免无穷 replace 循环；
+  - 解析时对异常/空值做兜底（try/catch + 判空）。
+- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## 错误处理与降级策略（新增）
+
+- 原则：快速失败 + 就近 Toast 提示，禁止静默失败与本地估算。
+- 为什么：静默/伪数据会掩盖真实错误源，降低可观测性与用户信任。
+- 实施：
+  - 计数/列表失败时弹出 ElMessage；不将计数强行置 0；
+  - 去除本地估算逻辑，所有数据以后端真实值为准。
+- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## 地域筛选契约（新增）
+
+- 原则：suburbs 与 postcodes 分离为两类 CSV 参数，分别表达“区域名”与“邮编”。
+- 为什么：避免语义混淆；便于后端针对性索引与过滤。
+- 实施：
+  - URL 与筛选透传区分 suburb/suburbs 与 postcodes；
+  - V2 映射开启后输出 postcodes=CSV；未开启时可忽略不传，保持兼容。
+- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## 轻量 i18n 策略（新增）
+
+- 原则：默认 zh-CN，以轻量 $t 访问（可平滑切换至 vue-i18n）。
+- 为什么：在不引入新依赖前提下消除硬编码文案，便于未来多语言。
+- 实施：
+  - 提供 src/i18n/index.js 轻量插件，暴露 $t 与 inject('t')；
+  - 新增文案以命名空间组织（如 filter.*），组件使用 $t('ns.key')。
+- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## 性能观测（新增）
+
+- 原则：以简易埋点监控关键接口耗时阈值（如 p95 800ms）。
+- 为什么：在无后端 APM 的情况下，前端仍需具备“足够的现场证据”进行优化闭环。
+- 实施：
+  - 在 fetchProperties/applyFilters/getFilteredCount 处打印超过阈值的警告日志 [FILTER-PERF]；
+  - 若持续超阈，考虑后端提供轻量 count 端点或索引优化。
+- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK

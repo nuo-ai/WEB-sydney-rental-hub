@@ -20,13 +20,17 @@
   * 若 lint/测试失败 → 必须中止并产出诊断报告。
   * 若需求模糊 → 必须回问用户，不得自行假设。
   * 若外部依赖缺失 → 提供解决方案，由用户决策。
-* **等待验收** ：任务完成后，用户必须亲自验证。确认通过后，任务才算完成。
+* **等待验收** ：任务完成后，用户亲自验证。
+* **验收通过：用户回复“ok” --> 提交中文 commit message， 并 update memory bank** 
+* **用户手动提交 git** 
+* 流程结束
+
 
 ---
 
 ## 3. Git 提交规范
 
-* **Commit Message** ：完成功能或修复后，AI 必须提供清晰、规范的 Commit Message。
+* **Commit Message** ：完成功能或修复后，AI 必须提供清晰、规范的中文Commit Message。
 * **手动提交** ：所有 `git add` 和 `git commit` 由用户执行，AI 不得代替。
 
 ---
@@ -83,3 +87,17 @@
   - Diff-first：优先 replace_in_file，禁止整文件回写无关行
   - No service ops by AI：AI 不装依赖/不起停服务/不开浏览器（除非明确授权）
   - Plan budget：单任务预算 ≤45 分钟；单消息一屏可读
+
+---
+
+## 8. 验收与沉淀流程（固定流程）
+
+1) 任务完成 → 用户验收：用户明确回复“ok”
+2) 提交信息：AI 提供中文 Commit Message（遵循 Conventional Commits）
+3) Git 提交：由用户手动执行 git add / commit / push
+4) 回填提交号：用户提供 commit hash
+5) 
+
+注意：
+- 未收到 commit 号，不更新 Memory Bank
+- 仅记录有复用价值的变化；像素/格式化/拼写等仅记 activeContext 一行，不进 progress
