@@ -16,8 +16,8 @@ def _create_connection_pool():
     global _db_pool
     try:
         # 从环境变量获取连接池配置
-        min_conn = int(os.getenv("DB_POOL_MIN_SIZE", "2"))
-        max_conn = int(os.getenv("DB_POOL_MAX_SIZE", "10"))
+        min_conn = int(os.getenv("DB_POOL_MIN_SIZE", "1"))
+        max_conn = int(os.getenv("DB_POOL_MAX_SIZE", "4"))
         
         # 优先使用 DATABASE_URL
         database_url = os.getenv("DATABASE_URL")
@@ -113,32 +113,41 @@ async def close_db_pool():
         logging.info("数据库连接池已关闭")
     _db_pool = None
 
-def get_db_conn_dependency():
-    """FastAPI 依赖项：获取数据库连接
+async def get_db_conn_dependency():
+    """FastAPI 依赖项（生成器）：获取数据库连接，并在请求结束后归还/关闭
     
-    注意：这个函数返回一个上下文管理器，需要在使用时用 with 语句
+    重要：
+    - 使用 yield 作为生成器依赖，FastAPI 会在响应发送后执行 finally 代码块。
+    - 避免连接泄漏，解决 Supabase Session 模式下 MaxClients 超限问题。
     """
-    # 直接返回连接对象供 FastAPI 使用
     global _db_pool
-    
-    # 如果连接池不存在，创建它
+
+    # 确保连接池已初始化
     if _db_pool is None:
         _create_connection_pool()
-    
+
+    conn = None
     try:
-        conn = _db_pool.getconn()
-        return conn
-    except pool.PoolError as e:
-        logging.error(f"连接池错误: {e}")
-        # 降级：直接创建连接
-        database_url = os.getenv("DATABASE_URL")
-        if database_url:
-            return psycopg2.connect(database_url)
-        else:
-            return psycopg2.connect(
-                dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USER"),
-                password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT")
-            )
+        try:
+            conn = _db_pool.getconn()
+        except pool.PoolError as e:
+            logging.error(f"连接池错误: {e}")
+            logging.warning("连接池已耗尽，创建临时直连（将于 finally 中关闭）")
+            database_url = os.getenv("DATABASE_URL")
+            if database_url:
+                conn = psycopg2.connect(database_url)
+            else:
+                conn = psycopg2.connect(
+                    dbname=os.getenv("DB_NAME"),
+                    user=os.getenv("DB_USER"),
+                    password=os.getenv("DB_PASSWORD"),
+                    host=os.getenv("DB_HOST"),
+                    port=os.getenv("DB_PORT")
+                )
+        # 将连接提供给依赖的调用方
+        yield conn
+    finally:
+        try:
+            release_db_connection(conn)
+        except Exception as e:
+            logging.error(f"归还/关闭连接失败: {e}")

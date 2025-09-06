@@ -7,7 +7,7 @@
 
 ## 1. 当前技术栈
 
-- **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia
+- **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia + lucide-vue-next（图标）
 - **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
 - **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL；详情端点 /api/properties/{id} 为 30 分钟）
 - **地图**: OpenStreetMap（底图）+ 后端 Google Directions（生产）+ Haversine（测试回退）
@@ -111,6 +111,15 @@ python scripts/run_backend.py  # localhost:8000
 
 ## 运行与集成增补（2025-09-06）
 
+- 部署（Netlify）配置
+  - netlify.toml：
+    - [build] base="vue-frontend"、command="npm run build"、publish="dist"
+    - [[redirects]] from="/*" to="/index.html" status=200（SPA 重写）
+  - Functions：未使用时保持为空，避免误判为函数项目
+  - 环境变量：VITE_GOOGLE_MAPS_API_KEY（限制到 *.netlify.app 与自定义域），可选 VITE_API_BASE_URL、NODE_VERSION（遵循 package.json engines: 20.19.x 或 22.x）
+  - 触发：push 到生产分支自动部署；若未触发，检查 Repository 绑定/Branch to deploy/Auto publish/Lock/Ignore/GitHub App 权限；必要时以 Build Hook 兜底
+
+
 - 搜索框内嵌筛选入口（SearchBar.vue / HomeView.vue）
   - 在 el-input 的 suffix 内嵌 sliders-horizontal SVG（16×16，stroke: currentColor），颜色使用 var(--color-text-secondary) 与搜索 icon 一致；
   - 绝对定位相对 .el-input__wrapper：right: var(--search-suffix-right, 12px); top: 50%; transform: translateY(-50%);
@@ -129,14 +138,21 @@ python scripts/run_backend.py  # localhost:8000
   - --search-suffix-right: 12px（后缀右间距）
   - --search-suffix-hit: 32px（后缀命中区域宽高，可收紧为 24–28px）
 
+### 数据库连接与池化（补充）
+- 建议：Supabase 使用 PgBouncer “事务池”端口 6543，避免 Session Pool 的 MaxClients 上限阻塞。推荐 .env 示例：
+  - DATABASE_URL=postgres://USER:PASSWORD@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres?sslmode=require
+  - DB_POOL_MIN_SIZE=1；DB_POOL_MAX_SIZE=4（可按环境覆盖）
+- 连接释放：FastAPI 依赖 get_db_conn_dependency 采用 yield + finally 确保归还；若 _db_pool.getconn() 抛 PoolError，回退直接连接，finally 统一 release_db_connection(conn)。
+- 缓存键与 TTL：/api/properties 采用 URL 作为缓存键（cache_key_by_url）并设置 expire=900，彻底隔离计数（page_size=1）与列表缓存；位置统计（suggestions/all/nearby）TTL 同为 900，且查询统一 is_active = TRUE 与 COUNT(DISTINCT listing_id)。
+
 ## 运行与集成增补（2025-09-05）
 
 - 变更文件与路径
   - src/stores/properties.js：引入参数映射层（mapFilterStateToApiParams），统一 applyFilters/getFilteredCount 入参；分页/排序透传；性能埋点
   - src/components/FilterPanel.vue：URL Query 同步（读写）；错误 Toast（ElMessage）；文案 i18n（$t）；suburbs/postcodes 区分；挂载期作用域修复
-  - src/components/FilterTabs.vue：触发器模式（仅 emit('toggleFullPanel', true) 打开面板），隐藏所有下拉/预设；移动端/桌面端统一入口
+  - src/components/FilterTabs.vue：已弃用（不渲染）；统一入口=搜索框后缀图标；组件文件仅保留历史兼容说明
   - src/components/SearchBar.vue：撤回移动端“筛选”按钮（仅保留搜索）
-  - src/views/HomeView.vue：FilterTabs 在移动端也渲染；统一绑定 @toggleFullPanel ↔ FilterPanel v-model
+  - src/views/HomeView.vue：监听来自 SearchBar 的 openFilterPanel 打开 FilterPanel；FilterTabs 显式隐藏（v-if=false）
   - src/i18n/index.js：轻量 i18n 插件（无依赖），默认 zh-CN，提供 $t 与 inject('t')
   - src/main.js：挂载 i18n（app.use(i18n)）
 - 特性开关
@@ -151,3 +167,21 @@ python scripts/run_backend.py  # localhost:8000
   - fetchProperties / applyFilters / getFilteredCount 超过 800ms 打印 [FILTER-PERF] 警告，用于观察 p95 并驱动后续优化（如轻量 count 端点或索引）
 - 其它注意
   - FilterPanel 关闭图标改为内联 SVG，统一走 SVG 路线（后续全站逐步迁移至 lucide-vue-next）
+
+## 分页参数加固与 UI 回显（2025-09-06）
+
+- 背景：计数请求为提速使用 `page_size=1`，曾污染列表请求，出现“总数正确，但每页仅 1 条、第二页异常”的问题。
+- Pinia 加固（stores/properties.js）：
+  - applyFilters：保存 `currentFilterParams` 前，强制写入 `page=1`、`page_size=this.pageSize`（使用当前每页设置，禁止硬编码）。
+  - fetchProperties：合并 `currentFilterParams` 与本次 `paginationParams` 后，显式覆盖：
+    ```js
+    requestParams.page = paginationParams.page
+    requestParams.page_size = paginationParams.page_size
+    ```
+    以“本次分页”为最高优先级，防止任何历史值（含 1）污染。
+  - setCurrentPage / setPageSize：调用 fetchProperties 时显式传 `{ page, page_size }`。
+- 入口一致化（HomeView.vue）：
+  - `handleLocationSelected` 统一走 `applyFilters({})` 或 `resetFilters()`，不再直接 `fetchProperties(params)`，避免绕开 Store 守卫与统一映射。
+- UI 回显：
+  - FilterPanel 顶部常驻 Location 区：chips 回显/单项移除/清空；清空后显示空态提示，避免“区域信息消失”；`include_nearby` 勾选常驻，URL 写入/恢复（透传参数，后端未识别时无副作用）；i18n 回退修复（`filter.location/clearAll/searchNearby` 等 key 缺失时使用中文）。
+  - 搜索框内部浅灰标签（Inline Chips）：未聚焦/未输入/未打开移动 Overlay 时在输入框内部回显所选区域（前 2 项 + “+N” 汇总）；`pointer-events: none`，仅占位回显，不拦截交互。

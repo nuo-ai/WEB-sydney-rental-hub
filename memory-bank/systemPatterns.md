@@ -144,6 +144,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 技术权衡：不额外引入新依赖，优先复用既有组件；在保持体积可控的同时兼顾可读性与安全性。
 - 适用范围：PropertyDetail.description 以及后续所有富文本字段（如房源须知、注意事项等）。
 - 溯源：activeContext 2025-09-05｜DOCS-ALIGN-FINAL（任务 RICH-TEXT-UNIFY）
+- 落地状态：已在 PropertyDetail.description 应用；其它富文本按需迁移中。
 
 ## 图标系统与组件化 (Icon System & Componentization)
 
@@ -189,9 +190,9 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 原则：全站筛选入口单一；桌面芯片仅作为“打开 FilterPanel”的触发器，不承载预设/下拉；移动端仅保留“筛选”入口。
 - 为什么：避免“快捷项 vs 面板”双通道引发的状态不一致；统一心智模型、简化回滚路径。
 - 实施：
-  - FilterTabs 隐藏所有下拉/预设，仅 emit('toggleFullPanel', true) 打开统一 FilterPanel。
-  - SearchBar 不再承载筛选入口（移动端筛选按钮已撤回，SearchBar 仅负责搜索）。
-  - HomeView 统一绑定 @toggleFullPanel ↔ FilterPanel v-model，并在移动端也渲染 FilterTabs 作为唯一入口。
+  - 搜索框后缀图标为唯一入口，点击 emit('open-filter-panel') 打开统一 FilterPanel；FilterTabs 已弃用（不再渲染）。
+  - 移动端与桌面端保持同一入口（搜索框后缀图标），不再渲染 FilterTabs。
+  - HomeView 监听 open-filter-panel 打开 FilterPanel，保持入口一致。
 - 向后兼容：旧直链 `parking=0` 视为 Any（不传）。
 - 溯源：activeContext 2025-09-05｜UI-FILTER-ENTRY-UNIFY｜commit 6926962
 
@@ -204,6 +205,67 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 通过 enableFilterV2 控制输出参数集合（V1: suburb/minPrice/...；V2: suburbs/price_min/...）；
   - 任何异常场景下可一键回退，确保向后兼容。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## 分页参数防串扰（新增）
+
+- 原则：计数请求（page_size=1）与列表请求必须彻底解耦；列表请求的 page/page_size 由“当前分页状态”显式决定，任何历史参数与缓存不得覆盖。
+- 为什么：计数端为了性能采用 page_size=1，若污染到列表端会出现“总数正确、每页仅 1 条”的异常。
+- 实施模式（Pinia）：
+  1) applyFilters(filters) 在保存 currentFilterParams 前强制写入：`page=1`、`page_size=this.pageSize`（使用当前每页设置，禁止硬编码）。
+  2) fetchProperties(params) 合并 `currentFilterParams` 与本次 `paginationParams` 后，显式覆盖：
+     ```js
+     requestParams.page = paginationParams.page
+     requestParams.page_size = paginationParams.page_size
+     ```
+     以本次分页为最高优先级，防止历史值（含 1）污染。
+  3) setCurrentPage(page) 与 setPageSize(size) 调用 fetchProperties 时显式传 `{ page, page_size }`。
+- 反模式 ❌：在组件侧直接拼接部分参数调用列表接口，绕开 store 的统一构造与守卫。
+- 溯源：activeContext 2025-09-06｜FILTER-PAGINATION-GUARD｜commit 23f186f
+
+## Location 回显与空态规则（新增）
+
+- 原则：FilterPanel 顶部常驻“区域 Location”区，保证用户在筛选面板内始终能看到当前区域选择的上下文。
+- 行为：
+  - 有选区：以灰色 chips 回显，支持单项移除与“清空全部”。
+  - 无选区：显示友好空态（提示“未选择区域”与弱链接“去选择区域”），避免清空后整块消失造成心智断裂。
+  - include_nearby：勾选项常驻该区，写入/恢复 URL（include_nearby=1/0），作为透传参数（后端未识别时无副作用）。
+  - i18n 回退：`filter.location/clearAll/searchNearby` 等 key 缺失时使用中文回退，禁止直出 key。
+- 事件命名：统一采用 kebab-case `open-filter-panel`（必要时兼容 camelCase），避免 DOM 事件大小写差异带来的监听失败。
+- 溯源：activeContext 2025-09-06｜FILTER-PANEL-LOCATION-SECTION｜commit 23f186f
+
+## 搜索框内嵌标签（Inline Chips）规则（新增）
+
+- 目的：在首页搜索框“内部”低调回显所选区域，避免在搜索框“上方”使用品牌色条幅干扰版面。
+- 展示条件：未聚焦、未输入、未打开移动 Overlay 且存在选区。
+- 视觉与交互：
+  - 浅灰 chip（中性边框/文字），前 2 项 + “+N” 汇总；单行，右侧渐变遮罩避免硬切。
+  - `pointer-events: none`，只做占位与信息回显，不拦截输入与点击（交互仍由输入框接管）。
+- 数据真相源：仅回显 Pinia `selectedLocations`；实际请求以 applyFilters 确认并持久化到 `currentFilterParams` 为准。
+- 溯源：activeContext 2025-09-06｜SEARCHBAR-INLINE-CHIPS｜commit 23f186f
+
+## Netlify 部署与发布模式（新增）
+- 原则：Monorepo 子目录构建；生产为 SPA 应用需启用 200 重写。
+- 配置：
+  - netlify.toml:
+    - [build] base="vue-frontend"、command="npm run build"、publish="dist"
+    - [[redirects]] from="/*" to="/index.html" status=200（SPA 重写）
+  - Functions：未使用时保持为空，避免误判为函数项目。
+  - Node 版本：遵循 package.json engines（20.19.x 或 22.x），必要时在 Netlify 环境变量中声明 NODE_VERSION。
+- 触发策略：
+  - 生产分支 push 自动构建与发布；若未触发，优先检查 Repository 绑定/Branch to deploy/Auto publish/Lock/Ignore/GitHub App 权限；必要时以 Build Hook 兜底。
+- 溯源：activeContext 2025-09-06｜DEPLOY-NETLIFY-CONFIG｜commit f375181..b227da3
+
+## 构建红线：Vue SFC 单模板（新增）
+- 原则：单文件组件（SFC）仅允许一个 <template> 块。
+- 违例后果：Vite 在解析阶段报错，中断 Rollup，CI/CD 失败。
+- 检查建议：提交前本地执行 vite build 验证；若需附加模板片段，请合并到主模板或拆分为子组件。
+- 溯源：activeContext 2025-09-06｜BUILD-FIX-SFC｜commit f375181..b227da3
+
+## 图标系统一致性（补充）
+- 原则：全站优先使用 lucide-vue-next 组件化 SVG；避免混用字体图标与多套风格。
+- 好处：视觉一致、可摇树优化、CSS 可控（stroke/fill）。
+- 迁移策略：对既有页面按需增量迁移，跨页面替换须评审；临时替换为其它图标库仅作为应急措施，修复后需恢复为 lucide。
+- 溯源：activeContext 2025-09-06｜UI-ICON-LIB｜commit f375181..b227da3
 
 ## URL 状态同步（新增）
 

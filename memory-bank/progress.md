@@ -10,31 +10,26 @@
 - [X] 移动端房源卡片 Full-bleed（贴边但保持高度不变）
 - [X] 列表接口 500 修复（移除 cover_image）
 - [X] 虚拟滚动性能优化与筛选体验收束（V1→V2 基线）
+- [X] FilterPanel 顶部 Location 回显区（chips/移除/清空/空态）+ include_nearby 透传 + i18n 回退修复
+- [X] 搜索框内部浅灰标签回显已选区域（未聚焦/未输入/未打开 Overlay 显示；前 2 项 + “+N”）
+- [X] 筛选分页参数加固（Pinia currentFilterParams + 显式覆盖 page/page_size，修复“每页仅 1 条/第二页异常”）
 
 ### 下一步规划 (What's left to build)
 
-- [ ] [P0/快修] 强制“先选区域后筛选”（UI 禁用+Store 守卫+提示）
+- [X] [P0/快修] 强制“先选区域后筛选”（UI 禁用+Store 守卫+提示）
 
 - 地图与通勤
-  - [ ] 放大时保持中心（固定住坐标在屏幕中心范围）
-  - [ ] 点击“通勤”后呈现路径
-  - [ ] 地图样式贴近 Google Maps 外观
-  - [ ] 通勤常用地址：1. 去除非大学的地址；2. 增加悉尼所有的学校地址（如有）；3. 只能选择一所大学，更符合学生单人使用的搜索需求，也防止滥用通勤查询（需先讨论）4. 即便选择地址，也只能选择一个地址；5. 地址没有连通谷歌的地址自动完成，能查到的地址很有限
+  - [X] 放大时保持中心（固定住坐标在屏幕中心范围）
+  - [X] 点击“通勤”后呈现路径
+  - [X] 地图样式贴近 Google Maps 外观
+  - [X] 通勤常用地址：1. 去除非大学的地址；2. 增加悉尼所有的学校地址（如有）；3. 只能选择一所大学，更符合学生单人使用的搜索需求，也防止滥用通勤查询（需先讨论）4. 即便选择地址，也只能选择一个地址；5. 地址没有连通谷歌的地址自动完成，能查到的地址很有限
 
 - [ ] 将 “找到xxx 套房源” 移出搜索框的容器，在”搜索框“下方新增一个容器，对齐不变，然后在右面加上“排序“按钮，增加：按最小价格、按空出时间、按最早看房时间、按区域（首字母）排序选项
-
-  
-
 - [ ] [P0/页面] 我的中心初步改造（收藏/历史两卡 + 统一卡片变体，先结构与样式基线）
-
 - [ ] [P0/快修] 搜索条件保存与恢复（localStorage + URL 优先级）
-
 - [ ] [P0/发布] MVP 部署上线（前端/后端流水线、环境变量、CORS、健康检查、README 指南）
-
 - [ ] [P0/基础] 筛选 UI 升级（先讨论再定方案，产出 1 页 RFC：触发/层级/分组折叠/清空&应用/键盘可达/空态/移动端优先）
-
 - [ ] [P0/基础] Design Tokens 基线统一（focus/btn/input/icon/filter-chip），消除局部硬编码
-
 
 ### 已知问题 (Known Issues)
 
@@ -61,6 +56,28 @@
   - [ ] 学校地址缺失（对齐 backend/config/university_data.py 或后端透传字段）
 
 ## 关键里程碑
+
+### 2025年9月6日：筛选回显与分页加固（Location 区 + Inline Chips + Pagination Guard）
+
+- 主要成果：
+  - FilterPanel 顶部常驻 Location 区，支持 chips 回显/单项移除/清空；清空后显示空态提示，避免用户失去“区域”上下文；include_nearby 勾选写入/恢复 URL；i18n 回退修复（filter.location/clearAll/searchNearby）。
+  - 搜索框内部浅灰标签回显所选区域（未聚焦/未输入/未打开 Overlay 时显示；pointer-events: none；前 2 项 + “+N” 汇总），替代早期“品牌色条幅”方案。
+  - Pinia 分页参数加固：持久化 currentFilterParams；fetchProperties 合并并显式覆盖 page/page_size；HomeView 入口统一走 applyFilters/resetFilters。修复 page_size=1 泄漏导致“每页仅 1 条/第二页异常”，23 条场景恢复为 20 + 3。
+- 影响与价值：
+  - 信息连贯：区域选择→筛选面板→应用后分页，心智连续且可复现（URL）。
+  - 稳定性：计数请求与列表请求彻底解耦，分页与每页条数与期望一致。
+- 溯源：activeContext 2025-09-06｜FILTER-PANEL-LOCATION-SECTION / SEARCHBAR-INLINE-CHIPS / FILTER-PAGINATION-GUARD｜commit 23f186f
+
+### 2025年9月6日：Netlify 部署与构建修复 + 图标库一致化
+
+- 主要成果：
+  - 部署：对齐 Netlify 配置（monorepo 子目录构建）— base=vue-frontend、command="npm run build"、publish="dist"，并新增 SPA 重写（/* → /index.html）。
+  - 构建修复：删除 PropertyDetailNew.vue 多余的第二个 `<template>`，符合 Vue SFC 单模板规范，解除 Vite 构建失败。
+  - 图标库：恢复详情页使用 lucide-vue-next，新增依赖，撤回临时的 Element Plus 图标替换，保持全站视觉一致。
+- 影响与价值：
+  - 部署链路稳定：推送即构建上线（前提：仓库绑定/分支/Auto publish 正常），SPA 路由直刷不再 404。
+  - 代码规范收敛：显式记录 SFC 单模板为“构建红线”，避免类似错误再次发生。
+  - 设计一致性：图标系统统一为 lucide-vue-next，便于树摇优化与样式一致。
 
 ### 2025年9月6日：搜索内嵌筛选入口 + 移动端卡片满屏 + 列表接口 500 修复
 

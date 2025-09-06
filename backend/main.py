@@ -359,6 +359,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Rental MCP Server", version="1.0.0", lifespan=lifespan)
 app.state.limiter = limiter
 
+# 自定义缓存键：使用完整URL（含查询参数）作为缓存键，确保分页/筛选（尤其 page/page_size、价格/日期）不会相互污染
+# 为什么：计数请求（page_size=1）与列表请求（page_size=20）参数不同，默认键可能未包含查询，导致命中相同缓存条目
+from fastapi import Request
+def cache_key_by_url(func, namespace, request: Request, response, *args, **kwargs):
+    return f"{namespace}:{str(request.url)}"
+
 # Cache helper functions for selective invalidation
 async def invalidate_property_cache(property_id: str = None):
     """Invalidate cache for a specific property or all properties"""
@@ -382,24 +388,55 @@ async def invalidate_all_cache():
         await redis.delete(key)
     logger.info("All cache entries invalidated")
 
-# CORS Middleware Configuration
-origins = [
-    "http://localhost",
-    "http://localhost:5500",    # Standard Live Server
-    "http://127.0.0.1:5500",
-    "http://localhost:8080",    # Python http.server
-    "http://127.0.0.1:8080",
-    "http://localhost:8888",    # Netlify Dev Server
-    "http://127.0.0.1:8888",
-]
+# CORS 中间件配置（动态化）
+# 说明（为什么这么做）：
+# - 生产环境仅放行明确的前端域名（安全优先）
+# - 开发/非生产环境放宽（使用正则）以便于本地调试与临时域名验证
+# - 允许通过环境变量 FRONTEND_URL 与 ADDITIONAL_CORS 配置额外来源（逗号分隔）
+env = os.getenv("ENVIRONMENT", "development").lower()
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+additional_cors = os.getenv("ADDITIONAL_CORS", "").strip()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 收集允许的来源（生产使用）
+allowed_origins = {
+    # 常见本地来源（用于生产时也可保留以便临时联调）
+    "http://localhost",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://localhost:8888",
+    "http://127.0.0.1:8888",
+}
+
+if frontend_url:
+    allowed_origins.add(frontend_url)
+
+if additional_cors:
+    for origin in [x.strip() for x in additional_cors.split(",") if x.strip()]:
+        allowed_origins.add(origin)
+
+if env == "production" and allowed_origins:
+    # 生产：白名单明确域名；保持 allow_credentials=True
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(allowed_origins),
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # 开发/非生产：使用正则允许任意来源，便于本地与临时公网域调试
+    # 说明：使用 allow_origin_regex 可与 allow_credentials=True 共存，并回显具体 Origin
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=".*",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Exception Handlers
 @app.exception_handler(RateLimitExceeded)
@@ -1169,7 +1206,7 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
 
 
 @app.get("/api/properties", tags=["Properties"], response_model=APIResponse[List[Dict]])
-@cache(expire=900) # Cache for 15 minutes
+@cache(expire=900, key_builder=cache_key_by_url)  # Cache for 15 minutes（包含URL查询参数到缓存键）
 async def get_properties(
     pagination: PaginationParams = Depends(), 
     db: Any = Depends(get_db_conn_dependency),
@@ -1394,7 +1431,7 @@ async def get_properties(
 # ========================================
 
 @app.get("/api/locations/suggestions", tags=["Locations"])
-@cache(expire=3600)  # Cache for 1 hour
+@cache(expire=900)  # Cache for 15 minutes
 async def get_location_suggestions(
     q: Optional[str] = Query(None, description="Search query"),
     limit: int = Query(20, ge=1, le=100),
@@ -1413,9 +1450,10 @@ async def get_location_suggestions(
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as clean_postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IS NOT NULL
+                AND is_active = TRUE
                 AND (
                     LOWER(suburb) LIKE %s
                     OR REPLACE(postcode, '.0', '') LIKE %s
@@ -1469,9 +1507,10 @@ async def get_location_suggestions(
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IS NOT NULL
+              AND is_active = TRUE
             GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
             ORDER BY property_count DESC
             LIMIT %s
@@ -1509,7 +1548,7 @@ async def get_location_suggestions(
 
 
 @app.get("/api/locations/all", tags=["Locations"])
-@cache(expire=3600)  # Cache for 1 hour
+@cache(expire=900)  # Cache for 15 minutes
 async def get_all_locations(
     db: Any = Depends(get_db_conn_dependency)
 ):
@@ -1522,9 +1561,10 @@ async def get_all_locations(
         SELECT 
             suburb,
             REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-            COUNT(*) as property_count
+            COUNT(DISTINCT listing_id) as property_count
         FROM properties
         WHERE suburb IS NOT NULL
+          AND is_active = TRUE
         GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
         ORDER BY property_count DESC
         """
@@ -1588,7 +1628,7 @@ async def get_all_locations(
 
 
 @app.get("/api/locations/nearby", tags=["Locations"])
-@cache(expire=3600)  # Cache for 1 hour
+@cache(expire=900)  # Cache for 15 minutes
 async def get_nearby_suburbs(
     suburb: str = Query(..., description="Suburb name"),
     limit: int = Query(6, ge=1, le=20),
@@ -1637,9 +1677,10 @@ async def get_nearby_suburbs(
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IS NOT NULL AND suburb != %s
+              AND is_active = TRUE
             GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
             ORDER BY property_count DESC
             LIMIT %s
@@ -1659,9 +1700,10 @@ async def get_nearby_suburbs(
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IN ({placeholders})
+              AND is_active = TRUE
             GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
             ORDER BY property_count DESC
             """

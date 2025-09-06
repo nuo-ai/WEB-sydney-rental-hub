@@ -3,10 +3,18 @@
 **最后更新**: 2025-09-06
 
 ---
-
+ 
+2025-09-06｜DB-POOL-6543｜techContext 增补：事务池 6543 / cache_key_by_url / TTL=900；准备 backend/.env.example 事务池示例；QA：清缓存或15分钟后核对地区统计｜待提交
+2025-09-06｜DOCS-ALIGN｜统一筛选入口=SearchBar 后缀；FilterTabs 标注弃用（仅文档调整，无代码改动）｜待提交
+2025-09-06｜FILTER-PANEL-LOCATION-SECTION｜FilterPanel 顶部常驻 Location 区，chips 回显/移除/清空；空态提示避免清空后“区域信息消失”；include_nearby 勾选（URL include_nearby=1/0 透传）；i18n 回退修复（filter.location/clearAll/searchNearby 等）；事件名统一 open-filter-panel（同时兼容 camelCase）｜commit 23f186f
+2025-09-06｜SEARCHBAR-INLINE-CHIPS｜搜索框内部浅灰 chip 占位回显所选区域（未聚焦/未输入/未打开 Overlay 时显示；pointer-events:none，不改变交互；前 2 项 +“+N” 汇总）｜commit 23f186f
+2025-09-06｜FILTER-PAGINATION-GUARD｜Pinia：持久化 currentFilterParams；fetchProperties 合并并显式覆盖 page/page_size；HomeView.handleLocationSelected 统一走 applyFilters/resetFilters；修复 page_size=1 泄漏导致“每页仅 1 条/第二页异常”，23 条场景分页恢复为 20+3｜commit 23f186f
 2025-09-06｜UI-SEARCH-FILTER-SUFFIX｜SearchBar 在 el-input 内嵌 sliders-horizontal 16×16，右距 12px；相对 .el-input__wrapper 绝对定位；令牌化 --search-suffix-right=12px、--search-suffix-hit=32px；移除 clearable；HomeView 隐藏 FilterTabs，监听 openFilterPanel｜commit 2deb50c
 2025-09-06｜UI-CARD-FULLBLEED-MOBILE｜移动端房源卡片 @media≤767px：width/max-width:100vw；左右 margin: calc(50% - 50vw) 实现 full-bleed；border-radius:0；图片/轮播高度 250px 不变｜commit 2deb50c
 2025-09-06｜API-LIST-500-FIX｜移除 /api/properties SELECT 中 cover_image（数据库无此列），修复 500｜commit 2deb50c
+2025-09-06｜DEPLOY-NETLIFY-CONFIG｜netlify.toml 对齐 monorepo：base=vue-frontend；command="npm run build"；publish="dist"；新增 SPA 重写（/* → /index.html）｜commit f375181..b227da3
+2025-09-06｜BUILD-FIX-SFC｜修复 PropertyDetailNew.vue 存在第二个 <template> 导致 Vite 构建失败；删除冗余模板块，保持单模板规范｜commit f375181..b227da3
+2025-09-06｜UI-ICON-LIB｜恢复详情页 lucide-vue-next 图标库，新增依赖；移除临时 Element Plus 图标替换，维持全站图标一致性｜commit f375181..b227da3
 
 2025-09-05｜PATCH-FILTER-MIN｜移除筛选失败时的本地回退递归；统一计数入口为 store.getFilteredCount；不改后端契约；影响文件 FilterPanel.vue / stores/properties.js｜commit 504304d（range dc68225..504304d）
 2025-09-05｜DOC-FILTER-PLAN｜新增 docs/filter-upgrade-plan.md：筛选功能与面板升级技术方案；仅文档，无代码改动
