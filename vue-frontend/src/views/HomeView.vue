@@ -193,19 +193,17 @@ const handleSearch = () => {
 }
 
 const handleLocationSelected = async () => {
-  // 当选择或移除区域后，调用API进行服务端筛选
-  const selectedSuburbs = propertiesStore.selectedLocations.map((loc) => loc.name)
-
   try {
-    if (selectedSuburbs.length > 0) {
-      // 有选中的区域，进行筛选
-      const params = {
-        suburb: selectedSuburbs.join(','),
-      }
-      await propertiesStore.fetchProperties(params)
+    const hasSel =
+      Array.isArray(propertiesStore.selectedLocations) &&
+      propertiesStore.selectedLocations.length > 0
+
+    if (hasSel) {
+      // 统一走 applyFilters：内部会用 selectedLocations 构造并保存 currentFilterParams，保证翻页/改每页大小不丢条件
+      await propertiesStore.applyFilters({})
     } else {
-      // 没有选中的区域，加载所有房源
-      await propertiesStore.fetchProperties()
+      // 无选区：重置筛选并回到无筛选列表（同时清空 currentFilterParams，保持行为一致）
+      await propertiesStore.resetFilters()
     }
   } catch (error) {
     console.error('筛选房源失败:', error)

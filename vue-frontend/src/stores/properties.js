@@ -204,6 +204,9 @@ export const usePropertiesStore = defineStore('properties', {
     featureFlags: {
       requireRegionBeforeFilter: true,
     },
+
+    // 当前已应用的筛选参数（用于翻页/改每页大小时保持筛选条件）
+    currentFilterParams: {},
   }),
 
   getters: {
@@ -291,8 +294,28 @@ export const usePropertiesStore = defineStore('properties', {
           ...params,
         }
 
+        // 若已有“已应用的筛选条件”，翻页/改每页大小时需要与之合并，保持条件不丢失
+        let requestParams = paginationParams
+        if (this.currentFilterParams && Object.keys(this.currentFilterParams).length) {
+          // Store 守卫：当强制要求先选区域时，未选区域直接短路返回，避免无意义请求
+          if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+            this.filteredProperties = []
+            this.totalCount = 0
+            this.totalPages = 0
+            this.hasNext = false
+            this.hasPrev = false
+            this.currentPage = 1
+            this.loading = false
+            return
+          }
+          requestParams = { ...this.currentFilterParams, ...paginationParams }
+        }
+        // 显式以本次分页为最高优先级，防止任何历史值（含 page_size=1）污染
+        requestParams.page = paginationParams.page
+        requestParams.page_size = paginationParams.page_size
+
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
-        const response = await propertyAPI.getListWithPagination(paginationParams)
+        const response = await propertyAPI.getListWithPagination(requestParams)
         const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const dur = t1 - t0
         if (dur > 800) {
@@ -427,7 +450,7 @@ export const usePropertiesStore = defineStore('properties', {
         const mappedParams = mapFilterStateToApiParams(
           filters,
           this.selectedLocations,
-          { page: 1, page_size: 20 },
+          { page: 1, page_size: this.pageSize },
           { enableFilterV2 },
         )
 
@@ -441,6 +464,9 @@ export const usePropertiesStore = defineStore('properties', {
             delete mappedParams[key]
           }
         })
+
+        // 记录“当前已应用的筛选条件”，供翻页/改每页大小复用
+        this.currentFilterParams = { ...mappedParams }
 
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
@@ -602,8 +628,8 @@ export const usePropertiesStore = defineStore('properties', {
       if (page < 1 || page > this.totalPages) return
 
       this.currentPage = page
-      // 重新获取当前页数据，传递页码参数
-      await this.fetchProperties({ page: this.currentPage })
+      // 重新获取当前页数据，显式传递页码与每页大小（防止遗留参数覆盖）
+      await this.fetchProperties({ page: this.currentPage, page_size: this.pageSize })
     },
 
     // 下一页
@@ -624,7 +650,8 @@ export const usePropertiesStore = defineStore('properties', {
     async setPageSize(size) {
       this.pageSize = size
       this.currentPage = 1 // 重置到第一页
-      await this.fetchProperties()
+      // 保留当前筛选条件，带上新的分页大小
+      await this.fetchProperties({ page: 1, page_size: this.pageSize })
     },
 
     // 清空错误
@@ -638,6 +665,7 @@ export const usePropertiesStore = defineStore('properties', {
       this.searchQuery = ''
       this.selectedLocations = []
       this.currentPage = 1
+      this.currentFilterParams = {} // 清空已应用的筛选参数
 
       // 重新获取未筛选的数据
       await this.fetchProperties()

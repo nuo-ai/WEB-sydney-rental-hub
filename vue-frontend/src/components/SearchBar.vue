@@ -23,6 +23,7 @@
         @input="handleInput"
         @keydown="handleKeydown"
         @focus="handleFocus"
+        @blur="handleBlur"
       >
         <template #prefix>
           <Search class="spec-icon search-icon" />
@@ -41,6 +42,23 @@
         </template>
       </el-input>
 
+      <!-- 内嵌低调区域标签（占位显示），仅在未聚焦/未输入且有选区时展示 -->
+      <div
+        v-if="showInlineChips"
+        class="inline-chips-overlay"
+        aria-hidden="true"
+      >
+        <span
+          v-for="loc in displayedLocations"
+          :key="'inline-' + loc.id"
+          class="inline-chip"
+          :title="formatInlineLocation(loc)"
+        >
+          <MapPin class="inline-chip-icon" aria-hidden="true" />
+          <span class="inline-chip-text">{{ formatInlineLocation(loc) }}</span>
+        </span>
+        <span v-if="hiddenCount > 0" class="inline-chip inline-chip-more">+{{ hiddenCount }}</span>
+      </div>
 
       <!-- 自动补全建议列表 -->
       <div
@@ -186,6 +204,27 @@ const selectedLocations = computed(() => propertiesStore.selectedLocations)
 
 const searchPlaceholder = computed(() => t('search.ph'))
 
+/* 输入焦点与内嵌标签可见性控制 */
+const isInputFocused = ref(false)
+const showInlineChips = computed(() => {
+  // 未聚焦 + 未输入 + 未打开 Overlay（移动端） + 有选区
+  return (
+    !isInputFocused.value &&
+    !showOverlay.value &&
+    !searchQuery.value &&
+    (selectedLocations.value?.length || 0) > 0
+  )
+})
+/* 格式化标签文案：Suburb, NSW, 2017 / 2017 */
+const formatInlineLocation = (loc) => {
+  if (!loc) return ''
+  if (loc.type === 'suburb') {
+    const pc = loc.postcode ? `, NSW, ${loc.postcode}` : ''
+    return `${loc.name}${pc}`
+  }
+  return `${loc.name}`
+}
+
 // 删除这行，改为使用响应式数据
 // const locationSuggestions = computed(() => propertiesStore.locationSuggestions)
 
@@ -272,6 +311,7 @@ const debouncedSearch = debounce((query) => {
 
 // 事件处理
 const handleFocus = () => {
+  isInputFocused.value = true
   // 若由筛选按钮触发，抑制本次 Overlay 打开
   if (suppressNextOverlayOpen.value) {
     suppressNextOverlayOpen.value = false
@@ -287,6 +327,10 @@ const handleFocus = () => {
   if (!searchQuery.value && selectedLocations.value.length > 0) {
     loadNearbySuggestions()
   }
+}
+
+const handleBlur = () => {
+  isInputFocused.value = false
 }
 
 const onFilterClick = () => {
@@ -617,6 +661,57 @@ watch(
   overflow-y: auto;
   z-index: 1000;
   margin-top: 4px;
+}
+
+/* 内嵌低调标签（覆盖在输入框可视区域，不拦截事件） */
+.inline-chips-overlay {
+  position: absolute;
+  left: 40px; /* 与前缀图标对齐（16px 图标 + 内补白） */
+  right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px) + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none; /* 不遮挡输入/点击 */
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* 渐变遮罩，避免文字硬切（仅在必要时出现） */
+.inline-chips-overlay::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
+}
+
+/* 单个浅灰 chip */
+.inline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: var(--color-text-primary, #374151);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.inline-chip-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.inline-chip-more {
+  color: var(--color-text-secondary, #6b7280);
 }
 
 .suggestion-item {
