@@ -4,6 +4,11 @@
 
 ---
  
+2025-09-06｜UI-NAV-GLOBAL-RULES｜src/style.css 追加“导航通用规则”：hover 橙色（#FF5824）不加粗/不灰底；focus/click 无外框；图标随 currentColor；作用范围限定于导航容器；覆写导航内 .el-menu-item:hover 灰底为透明｜pending commit
+2025-09-06｜EP-GUARDRAIL-2ND-PASS｜Element Plus 交互灰阶护栏（二轮）：Select/Dropdown/Cascader/DatePicker/Input 清除/聚焦态统一中性灰，CTA 仍用品牌橙；仅样式层覆盖，最小 diff｜pending commit
+2025-09-06｜LIST-PAGE-SPLIT-PLAN｜列表页拆分路线：P0 新增 ResultsSummary/PaginationBar/SearchHeader；P1 抽象 PropertiesListContainer；P2 预留 Grid 两栏（列表+地图）开关；不改行为，易回滚｜plan
+
+ 
 2025-09-06｜DB-POOL-6543｜techContext 增补：事务池 6543 / cache_key_by_url / TTL=900；准备 backend/.env.example 事务池示例；QA：清缓存或15分钟后核对地区统计｜待提交
 2025-09-06｜DOCS-ALIGN｜统一筛选入口=SearchBar 后缀；FilterTabs 标注弃用（仅文档调整，无代码改动）｜待提交
 2025-09-06｜FILTER-PANEL-LOCATION-SECTION｜FilterPanel 顶部常驻 Location 区，chips 回显/移除/清空；空态提示避免清空后“区域信息消失”；include_nearby 勾选（URL include_nearby=1/0 透传）；i18n 回退修复（filter.location/clearAll/searchNearby 等）；事件名统一 open-filter-panel（同时兼容 camelCase）｜commit 23f186f

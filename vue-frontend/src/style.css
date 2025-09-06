@@ -680,6 +680,125 @@ header nav .el-menu-item:hover,
   margin-bottom: 16px;
 }
 
+/* ===== Element Plus Image Viewer · 全局覆盖（移动端优先）=====
+   目的：按设计实现
+   - 背景：纯黑（保持）
+   - 关闭：仅 X，无圆形底
+   - 箭头：更靠屏幕边缘
+   - 计数器：右上角“当前/总数”
+   注：viewer 为 teleported 到 body 的节点，必须放在全局样式而非 scoped 内。
+*/
+
+/* 背景保持纯黑 */
+.el-image-viewer__mask {
+  background-color: #000000 !important;
+  opacity: 0.95 !important;
+}
+
+/* 去除圆底，仅保留图标 */
+.el-image-viewer__btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 关闭按钮：左上角，命中区 44×44 */
+.el-image-viewer__close {
+  top: 12px !important;
+  left: 12px !important;
+  right: auto !important;
+  width: 44px !important;
+  height: 44px !important;
+  background: transparent !important;
+}
+
+/* 左右箭头：外移、垂直居中 */
+.el-image-viewer__prev,
+.el-image-viewer__next {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+}
+
+.el-image-viewer__prev { left: 12px !important; }
+.el-image-viewer__next { right: 12px !important; }
+
+/* 顶部计数器样式（由运行时注入 .custom-image-counter） */
+.custom-image-counter {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 100000; /* 高于 viewer 内部按钮 */
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+
+/* 可选：仅在移动端强制这些位置；若要全平台统一，可移除该媒体查询 */
+@media (max-width: 767px) {
+  .el-image-viewer__close { top: 12px !important; left: 12px !important; }
+  .el-image-viewer__prev { left: 12px !important; }
+  .el-image-viewer__next { right: 12px !important; }
+}
+
+/* ===== Viewer 交互兜底 + 箭头灰底（提高层级与可点击性） ===== */
+.el-image-viewer__wrapper {
+  z-index: 99999 !important;              /* 提层，避免被其他 fixed/overlay 覆盖 */
+}
+
+/* 提升各按钮与工具栏层级，确保在遮罩之上可点击 */
+.el-image-viewer__btn,
+.el-image-viewer__prev,
+.el-image-viewer__next,
+.el-image-viewer__close,
+.el-image-viewer__actions {
+  z-index: 100001 !important;
+}
+
+/* 工具栏图标统一白色，提高可读性 */
+.el-image-viewer__actions__inner {
+  color: #fff !important;
+}
+
+.el-image-viewer__btn,
+.el-image-viewer__prev,
+.el-image-viewer__next,
+.el-image-viewer__close,
+.el-image-viewer__actions {
+  pointer-events: auto !important;        /* 按钮可点击 */
+}
+
+.custom-image-counter {
+  pointer-events: none !important;        /* 计数器不拦截点击 */
+}
+
+/* 恢复左右箭头的半透明灰底（提高在浅色图上的可读性） */
+.el-image-viewer__prev,
+.el-image-viewer__next {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 9999px !important;
+  background-color: rgba(0, 0, 0, 0.35) !important; /* 半透明灰底 */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 箭头图标颜色统一为白色，hover 稍微加强对比 */
+.el-image-viewer__btn i,
+.el-image-viewer__btn svg {
+  color: #fff !important;
+  stroke: #fff !important;
+  fill: #fff !important;
+}
+
+.el-image-viewer__prev:hover,
+.el-image-viewer__next:hover {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
 /* ================== 中性化护栏 · 变体兜底（第二轮） ==================
    目的：覆盖 Element Plus 仍可能使用 primary 的“hover/active/keyboard 导航/快捷项/清除图标”等场景
    说明：仅样式层覆盖，不影响任何逻辑；全部使用 !important，防止主题内部优先级反盖

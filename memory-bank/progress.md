@@ -13,6 +13,8 @@
 - [X] FilterPanel 顶部 Location 回显区（chips/移除/清空/空态）+ include_nearby 透传 + i18n 回退修复
 - [X] 搜索框内部浅灰标签回显已选区域（未聚焦/未输入/未打开 Overlay 显示；前 2 项 + “+N”）
 - [X] 筛选分页参数加固（Pinia currentFilterParams + 显式覆盖 page/page_size，修复“每页仅 1 条/第二页异常”）
+- [X] 导航交互统一：hover 橙色、不加粗、不灰底；点击/键盘 focus 无外框（仅导航链接）
+- [X] Element Plus 交互灰阶护栏（二轮）：Select/Dropdown/快捷项/清除图标/聚焦态走中性灰；CTA 按钮保留品牌橙
 
 ### 下一步规划 (What's left to build)
 
@@ -78,6 +80,16 @@
   - 部署链路稳定：推送即构建上线（前提：仓库绑定/分支/Auto publish 正常），SPA 路由直刷不再 404。
   - 代码规范收敛：显式记录 SFC 单模板为“构建红线”，避免类似错误再次发生。
   - 设计一致性：图标系统统一为 lucide-vue-next，便于树摇优化与样式一致。
+
+### 2025年9月6日：导航交互统一 + EP 护栏二轮
+
+- 主要成果：
+  - 在 `src/style.css` 末尾新增“导航通用规则”，仅作用于导航容器内链接：hover 橙色（不加粗/不灰底）、focus/click 无外框、图标随 currentColor；覆写导航内 `.el-menu-item:hover` 灰底为透明
+  - 强化 Element Plus 交互护栏（二轮）：Select/Dropdown/Cascader/DatePicker/Input 清除/聚焦态走中性灰，CTA 按钮保留品牌橙
+- 影响与价值：
+  - 品牌色使用聚焦于 CTA，降低页面“橙色噪声”
+  - 导航可读性更好；键盘交互在导航处移除外框，其它表单仍保留克制的灰色焦点
+- 溯源：activeContext 2025-09-06｜UI-NAV-GLOBAL-RULES / EP-GUARDRAIL-2ND-PASS｜pending commit
 
 ### 2025年9月6日：搜索内嵌筛选入口 + 移动端卡片满屏 + 列表接口 500 修复
 

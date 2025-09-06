@@ -206,6 +206,21 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 任何异常场景下可一键回退，确保向后兼容。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
+## 导航交互统一（新增）
+
+- 作用范围：仅在“导航容器”内的链接生效（nav / header nav / .nav / .navbar / .navigation / .top-nav / .bottom-nav / [class*="nav"]）
+- 行为准则：
+  - hover：color: var(--juwo-primary)；font-weight: inherit（不加粗）；background: transparent（不要灰底）
+  - focus / focus-visible：outline: none；box-shadow: none（仅导航链接移除，表单控件仍保留灰色可见焦点）
+  - 图标：color/fill/stroke: currentColor（图标随文字颜色变化）
+- 变量：在 :root 定义 `--nav-hover-color: var(--juwo-primary)` 统一管理
+- 与 Element Plus 的关系：覆盖导航容器内 `.el-menu-item:hover` 默认灰底为透明，仅改文字颜色
+- 可访问性权衡：满足“点击后不要浅灰外框”的品牌要求，仍保证表单/输入等交互组件的可见焦点与键盘可达性
+- 风险与回滚：
+  - 若个别非导航模块类名包含“nav”被误伤，可通过更精确选择器限定或在局部覆写
+  - 该规则块为追加内容，可整体删除快速回退
+- 溯源：activeContext 2025-09-06｜UI-NAV-GLOBAL-RULES｜pending commit
+
 ## 分页参数防串扰（新增）
 
 - 原则：计数请求（page_size=1）与列表请求必须彻底解耦；列表请求的 page/page_size 由“当前分页状态”显式决定，任何历史参数与缓存不得覆盖。

@@ -145,6 +145,16 @@ python scripts/run_backend.py  # localhost:8000
 - 连接释放：FastAPI 依赖 get_db_conn_dependency 采用 yield + finally 确保归还；若 _db_pool.getconn() 抛 PoolError，回退直接连接，finally 统一 release_db_connection(conn)。
 - 缓存键与 TTL：/api/properties 采用 URL 作为缓存键（cache_key_by_url）并设置 expire=900，彻底隔离计数（page_size=1）与列表缓存；位置统计（suggestions/all/nearby）TTL 同为 900，且查询统一 is_active = TRUE 与 COUNT(DISTINCT listing_id)。
 
+## 样式系统增补（2025-09-06）
+
+- :root 新增 `--nav-hover-color: var(--juwo-primary)`，统一导航 hover 颜色令牌。
+- 在 `src/style.css` 末尾追加“导航通用规则”块，仅作用于导航容器内链接：
+  - hover 橙色（不加粗/不灰底）；focus/click 无外框；图标随 `currentColor`。
+  - 覆写导航容器内 `.el-menu-item:hover` 灰底为透明，仅改文字颜色。
+- Element Plus 交互护栏（二轮）：Select/Dropdown/Cascader/DatePicker/Input 清除/聚焦等交互态统一中性灰，CTA 按钮保留品牌橙；仅样式层，最小 diff。
+- 风险与回滚：如误伤带 nav 的非导航容器，可局部覆写或精确选择器限定；整段追加块可整体删除回退。
+- 溯源：activeContext 2025-09-06｜UI-NAV-GLOBAL-RULES / EP-GUARDRAIL-2ND-PASS｜pending commit
+
 ## 运行与集成增补（2025-09-05）
 
 - 变更文件与路径

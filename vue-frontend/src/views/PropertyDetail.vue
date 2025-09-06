@@ -271,7 +271,7 @@
 <script setup>
 import photoIcon from '../assets/photo.svg'
 import { onMounted, computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
 import {
@@ -305,6 +305,7 @@ const showAllFeatures = ref(false)
 const showAuthModal = ref(false)
 /* 中文注释：为顶部图片容器提供引用，用于根据原图分辨率动态限制高度，避免放大导致模糊 */
 const imageContainerRef = ref(null)
+let viewerCleanup = null
 
 /* 中文注释：根据图片原始分辨率与容器宽度，计算清晰显示的最大高度，设置到 CSS 变量，避免 1:1 以上的放大 */
 const handleHeroImageLoad = (event) => {
@@ -521,14 +522,98 @@ const handleImageError = (event) => {
 }
 
 const handleImageClick = () => {
-  // Fix lightbox styles
-  setTimeout(() => {
+  // 进入预览层后：1) 黑底保持 2) 右上角计数器 3) 强化等待，避免 teleported DOM 未就绪
+  const MAX_TRIES = 40
+  const INTERVAL = 50
+  let tries = 0
+
+  const apply = () => {
+    tries++
+
+    // 1) 保持黑色背景
     const mask = document.querySelector('.el-image-viewer__mask')
     if (mask) {
       mask.style.backgroundColor = '#000000'
       mask.style.opacity = '0.95'
     }
-  }, 50)
+
+    // 2) 注入/更新计数器
+    const wrapper = document.querySelector('.el-image-viewer__wrapper')
+    if (!wrapper) {
+      if (tries < MAX_TRIES) setTimeout(apply, INTERVAL)
+      return
+    }
+
+    let counter = document.querySelector('.custom-image-counter')
+    if (!counter) {
+      counter = document.createElement('div')
+      counter.className = 'custom-image-counter'
+      document.body.appendChild(counter)
+    }
+
+    const updateCounter = () => {
+      const img = wrapper.querySelector('.el-image-viewer__img')
+      const list = Array.isArray(images.value) ? images.value : []
+      if (!img || !img.src || list.length === 0) {
+        counter.textContent = ''
+        return
+      }
+      // 同时尝试 endsWith/包含匹配，适配不同 URL 形式
+      const idx = list.findIndex((u) => u && (img.src.endsWith(u) || img.src.includes(u)))
+      const current = idx >= 0 ? idx + 1 : currentImageIndex.value + 1
+      counter.textContent = `${current} / ${list.length}`
+    }
+
+    // 初次设置
+    updateCounter()
+
+    // 使用轻量观察：仅跟踪当前展示图片的 src 变化；若 img 被替换则重绑
+    let rafId = 0
+    const scheduleUpdate = () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(updateCounter)
+    }
+
+    let imgObserver
+    const rebindImgObserver = () => {
+      if (imgObserver) imgObserver.disconnect()
+      const imgEl = wrapper.querySelector('.el-image-viewer__img')
+      if (imgEl) {
+        imgObserver = new MutationObserver(() => scheduleUpdate())
+        imgObserver.observe(imgEl, { attributes: true, attributeFilter: ['src'] })
+      }
+      scheduleUpdate()
+    }
+    rebindImgObserver()
+
+    // 仅监听子节点变更，以便在视图内部替换 img 时重绑，不观察 attributes 以避免高频回调
+    const wrapperObserver = new MutationObserver(() => rebindImgObserver())
+    wrapperObserver.observe(wrapper, { childList: true, subtree: true })
+
+    // 交互兜底：左右箭头点击后刷新计数（若实现不更换 img[src]）
+    const prevBtn = document.querySelector('.el-image-viewer__prev')
+    const nextBtn = document.querySelector('.el-image-viewer__next')
+    if (prevBtn) prevBtn.addEventListener('click', scheduleUpdate, { passive: true })
+    if (nextBtn) nextBtn.addEventListener('click', scheduleUpdate, { passive: true })
+
+    // 关闭时清理（并暴露路由离开兜底清理）
+    const closeBtn = document.querySelector('.el-image-viewer__close')
+    viewerCleanup = () => {
+      if (imgObserver) imgObserver.disconnect()
+      if (wrapperObserver) wrapperObserver.disconnect()
+      if (rafId) cancelAnimationFrame(rafId)
+      const c = document.querySelector('.custom-image-counter')
+      if (c && c.parentNode) c.parentNode.removeChild(c)
+      if (prevBtn) prevBtn.removeEventListener('click', scheduleUpdate)
+      if (nextBtn) nextBtn.removeEventListener('click', scheduleUpdate)
+      viewerCleanup = null
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => viewerCleanup && viewerCleanup(), { once: true })
+    }
+  }
+
+  setTimeout(apply, INTERVAL)
 }
 
 
@@ -589,6 +674,10 @@ onMounted(async () => {
   }
   propertiesStore.logHistory(propertyId)
 
+})
+
+onBeforeRouteLeave(() => {
+  if (viewerCleanup) viewerCleanup()
 })
 </script>
 
@@ -1745,6 +1834,52 @@ onMounted(async () => {
 :deep(.el-image-viewer__mask) {
   background-color: #000000 !important;
   opacity: 0.95 !important;
+}
+
+/* 预览层控制：去圆底，仅图标，位置按移动端设计靠边 */
+:deep(.el-image-viewer__btn) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 关闭按钮：顶左角，仅 X，无圆底；保留命中区 */
+:deep(.el-image-viewer__close) {
+  top: 12px !important;
+  left: 12px !important;
+  right: auto !important;
+  width: 44px !important;
+  height: 44px !important;
+  background: transparent !important;
+}
+
+/* 左右箭头：外移到更靠边位置，垂直居中 */
+:deep(.el-image-viewer__prev),
+:deep(.el-image-viewer__next) {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+}
+
+:deep(.el-image-viewer__prev) {
+  left: 12px !important;
+}
+
+:deep(.el-image-viewer__next) {
+  right: 12px !important;
+}
+
+/* 顶部右侧计数器：白字、轻阴影，稳定不抖动 */
+:deep(.custom-image-counter) {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 100000; /* 高于 viewer 内部按钮 */
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 /* 单张白卡一体化容器：由父容器统一承载白底与分隔线 */
 .content-card {
