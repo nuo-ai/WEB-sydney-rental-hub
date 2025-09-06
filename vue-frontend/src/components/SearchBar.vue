@@ -305,14 +305,23 @@ const selectLocation = async (location) => {
   const existingIndex = selectedLocations.value.findIndex((loc) => loc.id === location.id)
   if (existingIndex !== -1) return
 
+  // 1) 添加选中区域为标签
   propertiesStore.addSelectedLocation(location)
-  // 不清空输入与不关闭建议列表，支持连续多选
+
+  // 2) 按产品期望：清空输入内容，关闭下拉，重置高亮索引（避免手动删除）
+  searchQuery.value = ''
+  showSuggestions.value = false
   currentSuggestionIndex.value = -1
+
+  // 3) 立即清空当前候选，避免残留闪烁；后续再次输入会重新搜索
+  locationSuggestions.value = []
+  nearbySuggestions.value = []
+  isLoadingSuggestions.value = false
 
   emit('locationSelected', location)
 
-  // 加载相邻区域建议（当 searchQuery 为空时用于“你可能还喜欢”）
-  await loadNearbySuggestions()
+  // 保持输入框可继续操作的连贯性（不 blur）
+  // 如需在选择后展示“相邻区域推荐”，可在下一次 focus 且 searchQuery 为空时由 handleFocus 触发
 }
 
 // 判断某建议是否已被选中
