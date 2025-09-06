@@ -725,20 +725,3 @@ onMounted(async () => {
   }
 }
 </style>
-
-<template>
-  <div class="features-row spec-row">
-    <div class="feature spec-item">
-      <el-icon class="spec-icon"><House /></el-icon>
-      <span class="spec-text">{{ property?.bedrooms || 0 }}</span>
-    </div>
-    <div class="feature spec-item">
-      <el-icon class="spec-icon"><Van /></el-icon>
-      <span class="spec-text">{{ property?.bathrooms || 0 }}</span>
-    </div>
-    <div class="feature spec-item">
-      <el-icon class="spec-icon"><Ticket /></el-icon>
-      <span class="spec-text">{{ property?.parking_spaces || 0 }}</span>
-    </div>
-  </div>
-</template>
