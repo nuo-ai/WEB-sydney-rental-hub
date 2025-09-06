@@ -1,19 +1,21 @@
 <template>
   <div class="search-bar-container">
     <!-- 选中的区域标签 -->
-    <div v-if="selectedLocations.length > 0" class="location-tags">
-      <span v-for="location in selectedLocations" :key="location.id" class="location-tag">
-        <i class="fa-solid fa-map-marker-alt"></i>
+    <div v-if="!isMobile && selectedLocations.length > 0" class="location-tags">
+      <span v-for="location in displayedLocations" :key="location.id" class="location-tag">
+        <MapPin class="spec-icon" />
         <span>{{ location.name }}</span>
         <button class="remove-location-btn" @click="removeLocation(location.id)">
-          <i class="fa-solid fa-times"></i>
+          <X class="spec-icon" />
         </button>
       </span>
+      <button v-if="hiddenCount > 0" class="more-chip" @click="onMoreClick">+{{ hiddenCount }}</button>
     </div>
 
     <!-- 搜索输入框 -->
     <div class="search-input-container">
       <el-input
+        ref="searchInputRef"
         v-model="searchQuery"
         :placeholder="searchPlaceholder"
         size="large"
@@ -23,7 +25,7 @@
         @focus="handleFocus"
       >
         <template #prefix>
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <Search class="spec-icon search-icon" />
         </template>
         <template #suffix>
           <!-- 说明：按“单一入口”策略，将筛选入口迁移到搜索框右侧；24×24px，距右边界12px，点击仅触发打开 FilterPanel -->
@@ -31,12 +33,10 @@
             class="filter-icon-btn"
             type="button"
             aria-label="筛选"
-            @click="emit('openFilterPanel')"
+            @mousedown.prevent.stop
+            @click.stop="onFilterClick"
           >
-            <!-- 采用 sliders-horizontal 内联 SVG，24×24，继承 currentColor，保持 tokens 与交互一致 -->
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-              <path d="M21 4H14M10 4H3M21 12H12M8 12H3M21 20H16M12 20H3M14 2V6M8 10V14M16 18V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <SlidersHorizontal class="spec-icon" aria-hidden="true" />
           </button>
         </template>
       </el-input>
@@ -53,7 +53,7 @@
         <!-- 搜索结果 -->
         <div v-if="searchQuery && (filteredSuggestions.length > 0 || isLoadingSuggestions)">
           <div v-if="filteredSuggestions.length > 0" class="suggestions-section-title">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <Search class="spec-icon" aria-hidden="true" />
             搜索结果
           </div>
           <div
@@ -64,14 +64,8 @@
             @click="toggleSuggestion(suggestion)"
           >
             <div class="suggestion-content">
-              <i
-                :class="
-                  suggestion.type === 'suburb'
-                    ? 'fa-solid fa-map-marker-alt'
-                    : 'fa-solid fa-hashtag'
-                "
-                class="suggestion-icon"
-              ></i>
+              <MapPin v-if="suggestion.type === 'suburb'" class="suggestion-icon" />
+              <Hash v-else class="suggestion-icon" />
               <div class="suggestion-text">
                 <div class="suggestion-name">{{ suggestion.fullName }}</div>
                 <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
@@ -95,7 +89,7 @@
         <!-- 相邻区域推荐 -->
         <div v-if="!searchQuery && nearbySuggestions.length > 0">
           <div class="suggestions-section-title">
-            <i class="fa-solid fa-lightbulb"></i>
+            <Lightbulb class="spec-icon" aria-hidden="true" />
             SUGGESTED FOR YOU
           </div>
           <div class="nearby-suggestions-grid">
@@ -105,7 +99,7 @@
               class="nearby-suggestion-item"
               @click="selectLocation(suggestion)"
             >
-              <i class="fa-solid fa-circle-dot"></i>
+              <MapPin class="suggestion-icon" />
               <span class="nearby-name">{{ suggestion.name }}, NSW, {{ suggestion.postcode }}</span>
             </div>
           </div>
@@ -113,11 +107,16 @@
 
         <!-- 加载中状态 -->
         <div v-if="isLoadingSuggestions" class="loading-suggestions">
-          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span class="spinner" aria-hidden="true"></span>
           搜索中...
         </div>
       </div>
     </div>
+    <SearchOverlay
+      v-if="showOverlay"
+      @close="showOverlay = false"
+      @open-filter-panel="onOverlayOpenFilter"
+    />
   </div>
 </template>
 
@@ -125,6 +124,8 @@
 import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
+import SearchOverlay from './SearchOverlay.vue'
+import { Search, MapPin, Hash, X, SlidersHorizontal, Lightbulb } from 'lucide-vue-next'
 
 // 建议列表最大返回条数（覆盖 36 条邮编）
 const SUGGESTION_LIMIT = 100
@@ -145,6 +146,40 @@ const currentSuggestionIndex = ref(-1)
 const locationSuggestions = ref([])
 const nearbySuggestions = ref([])
 const isLoadingSuggestions = ref(false)
+
+/* 移动端全屏 Overlay 开关（回滚：设为 false 即恢复旧行为） */
+const enableSearchOverlayMobile = true
+const showOverlay = ref(false)
+/* 抑制下一次 Overlay 打开（用于筛选按钮点击场景） */
+const suppressNextOverlayOpen = ref(false)
+/* 引用输入框实例，便于手动 blur 避免 focus 触发 */
+const searchInputRef = ref(null)
+
+/* 视口断点：移动端不常驻 chips（仅在 Overlay/Filter 内显示） */
+const isMobile = ref(false)
+const checkIsMobile = () => {
+  if (typeof window !== 'undefined') {
+    isMobile.value = window.innerWidth <= 767
+  }
+}
+checkIsMobile()
+
+/* 桌面端 chips：最多展示 2 个，其余以 +N 摘要 */
+const displayedLocations = computed(() => selectedLocations.value.slice(0, 2))
+const hiddenCount = computed(() =>
+  Math.max(0, (selectedLocations.value?.length || 0) - 2),
+)
+
+/* 点击 +N：聚焦输入框以便继续添加（桌面保留下拉行为） */
+const onMoreClick = () => {
+  try {
+    searchInputRef.value?.focus?.()
+    const el = searchInputRef.value?.$el?.querySelector('input')
+    el?.focus?.()
+  } catch {
+    /* no-op */
+  }
+}
 
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.selectedLocations)
@@ -237,11 +272,47 @@ const debouncedSearch = debounce((query) => {
 
 // 事件处理
 const handleFocus = () => {
+  // 若由筛选按钮触发，抑制本次 Overlay 打开
+  if (suppressNextOverlayOpen.value) {
+    suppressNextOverlayOpen.value = false
+    return
+  }
+  // 移动端采用全屏 Overlay
+  if (enableSearchOverlayMobile && typeof window !== 'undefined' && window.innerWidth <= 767) {
+    showOverlay.value = true
+    return
+  }
   showSuggestions.value = true
   // 如果没有输入内容且有选中的区域，加载相邻区域推荐
   if (!searchQuery.value && selectedLocations.value.length > 0) {
     loadNearbySuggestions()
   }
+}
+
+const onFilterClick = () => {
+  // 标记抑制下次 focus 的 Overlay 打开
+  suppressNextOverlayOpen.value = true
+  // 关闭 Overlay（如已打开）
+  showOverlay.value = false
+  // 尝试 blur 输入框，避免触发 focus 流程
+  try {
+    searchInputRef.value?.blur?.()
+  } catch {
+    /* no-op: ref 可能尚未就绪或被销毁，忽略 */
+  }
+  try {
+    const el = searchInputRef.value?.$el?.querySelector('input')
+    el?.blur?.()
+  } catch {
+    /* no-op: DOM 查询失败时忽略 */
+  }
+  emit('openFilterPanel')
+}
+
+/* 承接 SearchOverlay 内“筛选”按钮事件：关闭 Overlay 并打开筛选面板 */
+const onOverlayOpenFilter = () => {
+  showOverlay.value = false
+  emit('openFilterPanel')
 }
 
 const handleInput = (value) => {
@@ -364,13 +435,20 @@ const handleClickOutside = (event) => {
 // 生命周期
 onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
-
+  // 视口监听：桌面/移动切换
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', checkIsMobile)
+    checkIsMobile()
+  }
   // 初始化时不再加载所有区域数据，改为按需搜索
   // 这样可以避免加载大量数据到前端
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', checkIsMobile)
+  }
 })
 
 // 监听属性变化
@@ -394,18 +472,23 @@ watch(
 /* 区域标签样式 */
 .location-tags {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;              /* 单行，不换行 */
+  overflow-x: auto;               /* 横向滚动 */
+  white-space: nowrap;
   gap: 8px;
   margin-bottom: 8px;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .location-tag {
-  background: var(--juwo-primary);
-  color: white;
-  border-radius: 6px;
+  background: var(--color-bg-card, #fff);
+  color: var(--color-text-primary, #111827);
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  border-radius: 999px;
   font-size: 13px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 6px 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -413,17 +496,19 @@ watch(
 }
 
 .location-tag:hover {
-  background: var(--juwo-primary-dark);
+  background: var(--juwo-primary-50, #fff6f1);
+  border-color: var(--juwo-primary, #ff5824);
+  color: var(--juwo-primary, #ff5824);
 }
 
 .remove-location-btn {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-secondary, #6b7280);
   cursor: pointer;
   font-size: 12px;
   padding: 2px;
-  border-radius: 2px;
+  border-radius: 999px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -433,8 +518,8 @@ watch(
 }
 
 .remove-location-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: #f3f4f6;
+  color: var(--color-text-primary, #111827);
 }
 
 /* 搜索输入框 */
@@ -463,7 +548,8 @@ watch(
 
 .search-icon {
   color: var(--color-text-secondary);
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 /* 说明：控制后缀区域的右内边距，确保图标距输入框右边界为 12px */
@@ -559,8 +645,8 @@ watch(
 
 .suggestion-icon {
   color: var(--juwo-primary);
-  font-size: 14px;
   width: 16px;
+  height: 16px;
   text-align: center;
 }
 
@@ -624,6 +710,21 @@ watch(
   color: #999;
 }
 
+/* +N 摘要 pill（桌面） */
+.more-chip {
+  border: 1px solid var(--color-border-default, #e5e7eb);
+  background: var(--color-bg-card, #fff);
+  color: var(--color-text-secondary, #6b7280);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.more-chip:hover {
+  background: #f3f4f6;
+  color: var(--color-text-primary, #111827);
+}
+
 /* 新增：相邻区域网格布局 */
 .nearby-suggestions-grid {
   padding: 12px;
@@ -651,8 +752,9 @@ watch(
   color: var(--juwo-primary);
 }
 
-.nearby-suggestion-item i {
-  font-size: 8px;
+.nearby-suggestion-item .suggestion-icon {
+  width: 12px;
+  height: 12px;
   color: var(--juwo-primary);
 }
 
@@ -670,9 +772,17 @@ watch(
   font-size: 13px;
 }
 
-.loading-suggestions i {
+.loading-suggestions .spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
   margin-right: 8px;
+  border: 2px solid #e5e7eb;
+  border-top-color: var(--juwo-primary);
+  border-radius: 50%;
+  animation: sb-spin 1s linear infinite;
 }
+@keyframes sb-spin { to { transform: rotate(360deg); } }
 
 /* 响应式适配 */
 @media (max-width: 767px) {
@@ -686,6 +796,11 @@ watch(
     border-radius: 0;
     border-left: none;
     border-right: none;
+  }
+
+  /* 移动端不常驻 chips（只在 Overlay/筛选面板内管理） */
+  .location-tags {
+    display: none;
   }
 
   .location-tags {

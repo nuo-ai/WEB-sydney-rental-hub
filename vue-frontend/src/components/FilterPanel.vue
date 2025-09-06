@@ -5,7 +5,7 @@
     <div class="filter-overlay" @click="closePanel"></div>
 
     <!-- 筛选面板 -->
-    <div class="domain-filter-panel" :class="{ visible: visible }">
+    <div ref="panelRef" class="domain-filter-panel" :class="{ visible: visible }" tabindex="-1">
       <!-- 面板头部 -->
       <div class="panel-header">
         <h3 class="panel-title chinese-text">{{ $t('filter.title') }}</h3>
@@ -98,6 +98,10 @@
               :placeholder="$t('filter.dateStart')"
               size="large"
               class="date-picker-start"
+              :editable="false"
+              :input-attrs="{ inputmode: 'none' }"
+              :teleported="true"
+              placement="top-start"
               @change="handleStartDateChange"
             />
             <span class="date-separator">{{ $t('filter.to') }}</span>
@@ -107,6 +111,10 @@
               :placeholder="$t('filter.dateEnd')"
               size="large"
               class="date-picker-end"
+              :editable="false"
+              :input-attrs="{ inputmode: 'none' }"
+              :teleported="true"
+              placement="top-start"
               @change="handleEndDateChange"
             />
           </div>
@@ -157,10 +165,12 @@ const route = useRoute()
 // 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
 const t = inject('t') || ((k) => k)
 
-// 状态管理
+/* 状态管理 */
 const propertiesStore = usePropertiesStore()
+/* 面板容器引用：打开时将焦点置于非输入容器，避免 iOS Safari 自动放大 */
+const panelRef = ref(null)
 
-// 响应式数据
+/* 响应式数据 */
 const filters = ref({
   priceRange: [0, 5000],
   bedrooms: [],
@@ -573,6 +583,21 @@ watch(visible, (newValue) => {
   if (newValue) {
     // 打开面板时，更新筛选计数
     updateFilteredCount()
+    // iOS 防自动放大：清理当前任何活动焦点，并把焦点转移到非输入容器
+    nextTick(() => {
+      try {
+        if (typeof document !== 'undefined' && document.activeElement) {
+          document.activeElement.blur?.()
+        }
+      } catch {
+        // 忽略非关键错误
+      }
+      try {
+        panelRef.value?.focus?.()
+      } catch {
+        // 忽略非关键错误
+      }
+    })
   }
 })
 
@@ -908,21 +933,53 @@ onMounted(() => {
 @media (max-width: 767px) {
   .domain-filter-panel {
     width: 100%;
-    height: 100vh;
-    max-height: 100vh;
+    /* 使用 100dvh 适配 iOS 可见视口，避免地址栏导致的“超出屏幕” */
+    height: 100dvh;
+    max-height: 100dvh;
     top: 0;
     right: 0;
     bottom: auto;
     transform: translateX(100%);
     transition: transform 0.3s ease;
+    /* 防止 iOS 文本自动缩放触发放大 */
+    -webkit-text-size-adjust: 100%;
   }
 
   .domain-filter-panel.visible {
     transform: translateX(0);
   }
 
+  /* 让容器可被聚焦但无可见描边，配合 tabindex="-1" */
+  .domain-filter-panel:focus {
+    outline: none;
+  }
+
+  /* Fallback：部分旧 iOS 不支持 dvh，使用 -webkit-fill-available，其次回退到 100vh */
+  @supports not (height: 100dvh) {
+    .domain-filter-panel {
+      height: -webkit-fill-available;
+      max-height: -webkit-fill-available;
+    }
+  }
+  @supports not (height: -webkit-fill-available) {
+    .domain-filter-panel {
+      height: 100vh;
+      max-height: 100vh;
+    }
+  }
+
   .panel-content {
     padding: 20px;
+  }
+
+  /* iOS Safari 输入框 auto-zoom 规避：保证输入相关元素字号 ≥16px，避免聚焦触发页面放大 */
+  .domain-filter-panel :deep(input),
+  .domain-filter-panel :deep(textarea),
+  .domain-filter-panel :deep(select),
+  .domain-filter-panel :deep(.el-input__inner),
+  .domain-filter-panel :deep(.el-input__wrapper) {
+    /* iOS 自动放大阈值：确保输入字号 ≥16px；使用 !important 覆盖库内部样式 */
+    font-size: 16px !important;
   }
 
   .filter-section {
@@ -943,6 +1000,10 @@ onMounted(() => {
 
   .panel-footer {
     padding: 20px;
+    /* 为 iOS 底部 Home Bar 预留安全区，确保按钮不被遮挡 */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    background: white;
+    /* 说明：footer 位于滚动容器(panel-content)之外，天然常驻，无需 sticky；此处仅做安全区留白 */
   }
 }
 </style>

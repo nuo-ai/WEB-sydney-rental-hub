@@ -2,8 +2,27 @@
 
 import axios from 'axios'
 
-// API基础配置 - 使用代理路径解决CORS问题
-const API_BASE_URL = '/api'
+/**
+ * API基础配置
+ * 说明（为什么这么做）：
+ * - 本地开发：走 '/api'，由 Vite 代理转发到本机 FastAPI，避免 CORS
+ * - 生产部署：从环境变量 VITE_API_BASE_URL 读取后端基址；为降低出错率，若未带 '/api' 则自动补上
+ *  （这样 Netlify 只需设置后端根域名或完整 /api 前缀均可）
+ */
+const API_BASE_URL = (() => {
+  const raw = (import.meta.env && import.meta.env.VITE_API_BASE_URL)
+    ? String(import.meta.env.VITE_API_BASE_URL).trim()
+    : ''
+  if (raw) {
+    let base = raw.replace(/\/+$/, '') // 去掉末尾多余斜杠，防止出现双斜杠
+    if (!/\/api$/.test(base)) {
+      base += '/api' // 若未包含 /api，自动补齐以匹配后端路由前缀
+    }
+    return base
+  }
+  // 回退：本地开发默认 '/api' 由 Vite 代理处理
+  return '/api'
+})()
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
