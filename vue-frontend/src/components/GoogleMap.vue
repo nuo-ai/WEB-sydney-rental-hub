@@ -54,6 +54,51 @@ const props = defineProps({
     type: String,
     default: 'Property Location',
   },
+  // 新增：是否锁定地图中心（锁定后缩放/拖拽都会回到锁定中心）
+  lockCenter: {
+    type: Boolean,
+    default: false,
+  },
+  // 新增：锁定的中心点（不传则默认使用 latitude/longitude）
+  focusCenter: {
+    type: Object,
+    default: null,
+  },
+  // 新增：路线数据（[{lat,lng}, ...] 或 { encodedPolyline: '...' } 或 { path: [{lat,lng}] }）
+  route: {
+    type: [Array, Object],
+    default: null,
+  },
+  // 新增：路线样式
+  routeOptions: {
+    type: Object,
+    default: () => ({
+      strokeColor: '#4285F4',
+      strokeOpacity: 0.9,
+      strokeWeight: 5,
+      zIndex: 999,
+    }),
+  },
+  // 新增：在有路线时是否自动缩放以完整展示路径（默认开启，移动端体验更好）
+  autoFit: {
+    type: Boolean,
+    default: true,
+  },
+  // 新增：fitBounds 的像素内边距（移动端建议 24）
+  fitPadding: {
+    type: Number,
+    default: 24,
+  },
+  // 新增：可选的起终点，用于绘制端点标记或参与 fitBounds
+  routeEndpoints: {
+    type: Object,
+    default: null,
+  },
+  // 新增：路线标签文本（显示在路径附近的气泡）
+  routeLabelText: {
+    type: String,
+    default: '',
+  },
 })
 
 const mapRef = ref(null)
@@ -65,6 +110,201 @@ let marker = null
 let googleMapsLoaded = false
 let isInitializing = false
 let isDestroyed = false // 跟踪组件是否已销毁
+let polyline = null // 路径 Polyline 实例
+let listeners = [] // 已注册的地图事件监听器
+let lastRoutePath = null // 记录最近一次路线点列，便于 resize 重新自适应
+let isFitting = false // 正在执行 fitBounds，避免与锁定中心冲突
+let resizeTimer = null // 节流 resize
+let routeLabelInfoWindow = null // 路线标签 InfoWindow 实例
+
+// 计算当前应当锁定的中心点
+const getLockCenter = () => {
+  // 说明：优先使用外部传入的 focusCenter，其次回退到 props 的经纬度
+  if (
+    props.focusCenter &&
+    typeof props.focusCenter.lat === 'number' &&
+    typeof props.focusCenter.lng === 'number'
+  ) {
+    return { lat: props.focusCenter.lat, lng: props.focusCenter.lng }
+  }
+  return { lat: props.latitude, lng: props.longitude }
+}
+
+// 应用中心锁定：将地图中心回到目标点
+const applyCenterLock = () => {
+  // 说明：仅在用户显式开启锁定时生效；且在自动适配期间不回弹中心，避免与 fitBounds 抢焦点
+  if (map && googleMapsLoaded && !isDestroyed && props.lockCenter && !isFitting) {
+    const c = getLockCenter()
+    map.setCenter(c)
+  }
+}
+
+// 清空已绘制的路线
+const clearRoute = () => {
+  // 说明：避免重复绘制或内存泄漏
+  if (polyline) {
+    polyline.setMap(null)
+    polyline = null
+  }
+  // 同步清理路线标签
+  if (routeLabelInfoWindow) {
+    try {
+      routeLabelInfoWindow.close()
+    } catch {
+      // 忽略关闭异常
+    }
+    routeLabelInfoWindow = null
+  }
+}
+
+// 解码 Google Encoded Polyline 字符串
+function decodePolyline(str) {
+  // 说明：采用标准 Google Polyline 解码算法，兼容服务端返回的压缩路径
+  let index = 0,
+    lat = 0,
+    lng = 0
+  const coordinates = []
+  while (index < str.length) {
+    let b, shift = 0, result = 0
+    do {
+      b = str.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    const dlat = (result & 1) ? ~(result >> 1) : (result >> 1)
+    lat += dlat
+
+    shift = 0
+    result = 0
+    do {
+      b = str.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    const dlng = (result & 1) ? ~(result >> 1) : (result >> 1)
+    lng += dlng
+
+    coordinates.push({ lat: lat / 1e5, lng: lng / 1e5 })
+  }
+  return coordinates
+}
+
+const fitRouteBounds = (path) => {
+  // 说明：将整条路线纳入视野，含起终点（若提供），并留出安全内边距
+  if (!map || !path || path.length < 2) return
+  const bounds = new google.maps.LatLngBounds()
+  path.forEach((p) => bounds.extend(new google.maps.LatLng(p.lat, p.lng)))
+  if (
+    props.routeEndpoints &&
+    props.routeEndpoints.origin &&
+    typeof props.routeEndpoints.origin.lat === 'number' &&
+    typeof props.routeEndpoints.origin.lng === 'number'
+  ) {
+    bounds.extend(new google.maps.LatLng(props.routeEndpoints.origin.lat, props.routeEndpoints.origin.lng))
+  }
+  if (
+    props.routeEndpoints &&
+    props.routeEndpoints.destination &&
+    typeof props.routeEndpoints.destination.lat === 'number' &&
+    typeof props.routeEndpoints.destination.lng === 'number'
+  ) {
+    bounds.extend(
+      new google.maps.LatLng(props.routeEndpoints.destination.lat, props.routeEndpoints.destination.lng),
+    )
+  }
+  try {
+    isFitting = true
+    map.fitBounds(bounds, {
+      top: props.fitPadding,
+      right: props.fitPadding,
+      bottom: props.fitPadding,
+      left: props.fitPadding,
+    })
+  } finally {
+    // 小延迟后恢复，以便地图 idle 后不会被锁定中心立刻拉回
+    setTimeout(() => {
+      isFitting = false
+    }, 300)
+  }
+}
+
+// 在路径中点放置/更新路线标签 InfoWindow
+const updateRouteLabel = (path) => {
+  // 说明：仅当提供了标签文本且路径有效时才展示；定位到路径中点
+  if (!map || !googleMapsLoaded || isDestroyed) return
+  if (!path || path.length < 2) return
+
+  const text = props.routeLabelText
+  if (!text) {
+    // 若文本为空则移除已有标签
+    if (routeLabelInfoWindow) {
+      try {
+        routeLabelInfoWindow.close()
+      } catch {
+        // 忽略关闭异常
+      }
+      routeLabelInfoWindow = null
+    }
+    return
+  }
+
+  const mid = path[Math.floor(path.length / 2)]
+  if (!routeLabelInfoWindow) {
+    routeLabelInfoWindow = new google.maps.InfoWindow({
+      content: text,
+      position: mid,
+      disableAutoPan: true, // 说明：不触发自动平移，避免影响用户交互
+    })
+    // 兼容旧版 open(map) 签名
+    try {
+      routeLabelInfoWindow.open(map)
+    } catch {
+      routeLabelInfoWindow.open({ map })
+    }
+  } else {
+    try {
+      routeLabelInfoWindow.setContent(text)
+      routeLabelInfoWindow.setPosition(mid)
+      // 确保已打开
+      routeLabelInfoWindow.open({ map })
+    } catch {
+      // 忽略异常
+    }
+  }
+}
+
+// 渲染路线 Polyline
+const renderRoute = () => {
+  // 说明：允许传入多种数据格式；空值直接跳过以避免误绘制
+  if (!map || !googleMapsLoaded || isDestroyed) return
+  clearRoute()
+  if (!props.route) return
+
+  let path = []
+  if (Array.isArray(props.route)) {
+    path = props.route
+  } else if (props.route && typeof props.route === 'object') {
+    if (props.route.encodedPolyline) {
+      path = decodePolyline(props.route.encodedPolyline)
+    } else if (Array.isArray(props.route.path)) {
+      path = props.route.path
+    }
+  }
+
+  if (!path || path.length < 2) return
+  polyline = new google.maps.Polyline({
+    path,
+    ...props.routeOptions,
+    map,
+  })
+  // 记录并自动自适应视野
+  lastRoutePath = path
+  if (props.autoFit) {
+    fitRouteBounds(path)
+  }
+  // 更新路线标签展示
+  updateRouteLabel(path)
+}
 
 // 静态地图URL（作为备用）
 const staticMapUrl = computed(() => {
@@ -184,6 +424,25 @@ const initMap = async () => {
     // 创建地图
     map = new google.maps.Map(mapRef.value, mapOptions)
 
+    // 若开启中心锁定则立即应用一次，并注册事件监听在缩放/拖拽/空闲后回到锁定中心
+    if (props.lockCenter) {
+      applyCenterLock()
+    }
+    listeners.push(
+      map.addListener('zoom_changed', () => {
+        applyCenterLock()
+      }),
+      map.addListener('dragend', () => {
+        applyCenterLock()
+      }),
+      map.addListener('idle', () => {
+        if (props.lockCenter) applyCenterLock()
+      }),
+    )
+
+    // 若提供路线则渲染 Polyline
+    renderRoute()
+
     if (props.showMarker) {
       marker = new google.maps.Marker({
         position: { lat: props.latitude, lng: props.longitude },
@@ -213,25 +472,112 @@ watch(
   () => [props.latitude, props.longitude],
   ([newLat, newLng]) => {
     if (map && googleMapsLoaded && !isDestroyed) {
-      const newCenter = { lat: newLat, lng: newLng }
-      map.setCenter(newCenter)
-
-      if (marker) {
-        marker.setPosition(newCenter)
+      // 说明：当开启中心锁定时，以锁定中心为准；否则跟随传入经纬度
+      if (props.lockCenter) {
+        applyCenterLock()
+      } else {
+        const newCenter = { lat: newLat, lng: newLng }
+        map.setCenter(newCenter)
+        if (marker) {
+          marker.setPosition(newCenter)
+        }
       }
     }
   },
 )
 
+// 当锁定开关或锁定中心变化时，重新应用中心锁定
+watch(
+  () => [props.lockCenter, props.focusCenter],
+  () => {
+    applyCenterLock()
+  },
+  { deep: true },
+)
+
+// 当路线或样式变更时，重新渲染路线
+watch(
+  () => props.route,
+  () => {
+    renderRoute()
+  },
+  { deep: true },
+)
+
+watch(
+  () => props.routeOptions,
+  () => {
+    renderRoute()
+  },
+  { deep: true },
+)
+
+// 当路线标签文本变化时，刷新 InfoWindow
+watch(
+  () => props.routeLabelText,
+  () => {
+    if (lastRoutePath && lastRoutePath.length > 1) {
+      updateRouteLabel(lastRoutePath)
+    } else if (routeLabelInfoWindow) {
+      try {
+        routeLabelInfoWindow.close()
+      } catch {
+        // 忽略
+      }
+      routeLabelInfoWindow = null
+    }
+  },
+)
+
+const onResize = () => {
+  if (!props.autoFit || !map || !polyline || !lastRoutePath) return
+  clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(() => {
+    fitRouteBounds(lastRoutePath)
+    // 重新定位路线标签
+    updateRouteLabel(lastRoutePath)
+  }, 150)
+}
+
 onMounted(() => {
   initMap()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', onResize)
+  }
 })
 
 onUnmounted(() => {
   isDestroyed = true
+  // 清理标记
   if (marker) {
     marker.setMap(null)
     marker = null
+  }
+  // 清理路线
+  if (polyline) {
+    polyline.setMap(null)
+    polyline = null
+  }
+  // 清理路线标签
+  if (routeLabelInfoWindow) {
+    try {
+      routeLabelInfoWindow.close()
+    } catch {
+      // 忽略
+    }
+    routeLabelInfoWindow = null
+  }
+  // 移除事件监听，避免内存泄漏
+  try {
+    if (listeners && listeners.length && google && google.maps && google.maps.event) {
+      listeners.forEach(l => google.maps.event.removeListener(l))
+    }
+  } catch {
+    // 忽略清理异常
+  }
+  listeners = []
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', onResize)
   }
   map = null
   mapLoaded.value = false

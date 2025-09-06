@@ -138,22 +138,15 @@
           <section class="location-section">
             <h2 class="section-title">Location</h2>
             <div class="map-wrapper">
-              <!-- 优先使用SimpleMap，避免Google Maps API问题 -->
+              <!-- 使用 GoogleMap 渲染位置，默认锁定中心，保持向后兼容 -->
               <div v-if="property.latitude && property.longitude" class="map-container">
-                <SimpleMap
+                <GoogleMap
                   :latitude="property.latitude"
                   :longitude="property.longitude"
                   :zoom="15"
                   :height="mapHeight"
                   :marker-title="property.address"
-                />
-                <!-- 静态地图作为后备 -->
-                <img
-                  v-if="showStaticMap"
-                  :src="staticMapUrl"
-                  alt="Property Location"
-                  class="static-map-image"
-                  @error="handleStaticMapError"
+                  :lock-center="true"
                 />
               </div>
               <div v-else class="map-placeholder">
@@ -292,7 +285,7 @@ import {
 } from '@element-plus/icons-vue'
 import { BedDouble, Bath, CarFront } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
-import SimpleMap from '@/components/SimpleMap.vue'
+import GoogleMap from '@/components/GoogleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 import MarkdownContent from '@/components/MarkdownContent.vue'
 
@@ -309,7 +302,6 @@ const currentImageIndex = ref(0)
 const photoIconFailed = ref(false)
 const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
-const showStaticMap = ref(false)
 const showAuthModal = ref(false)
 /* 中文注释：为顶部图片容器提供引用，用于根据原图分辨率动态限制高度，避免放大导致模糊 */
 const imageContainerRef = ref(null)
@@ -462,23 +454,6 @@ const mapHeight = computed(() => {
   return '250px'
 })
 
-// 生成静态地图 URL（使用环境变量中的 API 密钥）
-const staticMapUrl = computed(() => {
-  if (!property.value) return ''
-
-  // 从环境变量获取 API 密钥（安全实践：不硬编码密钥）
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-
-  if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
-    console.warn(
-      'Google Maps API key not configured. Please set VITE_GOOGLE_MAPS_API_KEY in .env file',
-    )
-    return ''
-  }
-
-  const { latitude, longitude } = property.value
-  return `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x250&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`
-})
 
 // 方法
 const goBack = () => {
@@ -556,10 +531,6 @@ const handleImageClick = () => {
   }, 50)
 }
 
-const handleStaticMapError = () => {
-  console.error('Static map failed to load')
-  showStaticMap.value = false
-}
 
 const handleSeeTravelTimes = () => {
   // 测试模式：直接跳转，不需要登录
@@ -618,10 +589,6 @@ onMounted(async () => {
   }
   propertiesStore.logHistory(propertyId)
 
-  // 3秒后显示静态地图作为后备方案
-  setTimeout(() => {
-    showStaticMap.value = true
-  }, 3000)
 })
 </script>
 

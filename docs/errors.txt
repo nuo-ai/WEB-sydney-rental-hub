@@ -1,5 +1,5 @@
 index.iife.js:1 [WIREFRAMEIT] - Content Core Script loaded
-api.js:121  GET http://localhost:5173/api/properties?page=1&page_size=20 500 (Internal Server Error)
+api.js:121 XHR 已完成加载：GET“http://localhost:5173/api/properties?listing_id=4198699”。
 dispatchXhrRequest @ axios.js?v=26cd8775:1672
 xhr @ axios.js?v=26cd8775:1552
 dispatchRequest @ axios.js?v=26cd8775:2027
@@ -9,11 +9,10 @@ request @ axios.js?v=26cd8775:2139
 Axios.<computed> @ axios.js?v=26cd8775:2267
 wrap @ axios.js?v=26cd8775:8
 getListWithPagination @ api.js:121
-fetchProperties @ properties.js:276
+fetchPropertyDetail @ properties.js:357
 wrappedAction @ pinia.js?v=26cd8775:5504
 store.<computed> @ pinia.js?v=26cd8775:5198
-loadProperties @ HomeView.vue:270
-（匿名） @ HomeView.vue:366
+（匿名） @ PropertyDetail.vue:584
 （匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
 callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
 callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
@@ -37,104 +36,7 @@ push @ vue-router.js?v=26cd8775:2481
 install @ vue-router.js?v=26cd8775:2836
 use @ chunk-SMV7IH7P.js?v=26cd8775:6010
 （匿名） @ main.js:32
-api.js:72 ❌ API错误: 500 Request failed with status code 500
-（匿名） @ api.js:72
-Promise.then
-_request @ axios.js?v=26cd8775:2230
-request @ axios.js?v=26cd8775:2139
-Axios.<computed> @ axios.js?v=26cd8775:2267
-wrap @ axios.js?v=26cd8775:8
-getListWithPagination @ api.js:121
-fetchProperties @ properties.js:276
-wrappedAction @ pinia.js?v=26cd8775:5504
-store.<computed> @ pinia.js?v=26cd8775:5198
-loadProperties @ HomeView.vue:270
-（匿名） @ HomeView.vue:366
-（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
-callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
-callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
-hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
-flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
-flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
-Promise.then
-queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
-queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
-effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
-trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
-endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
-notify @ chunk-SMV7IH7P.js?v=26cd8775:853
-trigger @ chunk-SMV7IH7P.js?v=26cd8775:827
-set value @ chunk-SMV7IH7P.js?v=26cd8775:1705
-finalizeNavigation @ vue-router.js?v=26cd8775:2677
-（匿名） @ vue-router.js?v=26cd8775:2587
-Promise.then
-pushWithRedirect @ vue-router.js?v=26cd8775:2555
-push @ vue-router.js?v=26cd8775:2481
-install @ vue-router.js?v=26cd8775:2836
-use @ chunk-SMV7IH7P.js?v=26cd8775:6010
-（匿名） @ main.js:32
-api.js:136 获取房源列表失败: AxiosError {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
-getListWithPagination @ api.js:136
-await in getListWithPagination
-fetchProperties @ properties.js:276
-wrappedAction @ pinia.js?v=26cd8775:5504
-store.<computed> @ pinia.js?v=26cd8775:5198
-loadProperties @ HomeView.vue:270
-（匿名） @ HomeView.vue:366
-（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
-callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
-callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
-hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
-flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
-flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
-Promise.then
-queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
-queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
-effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
-trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
-endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
-notify @ chunk-SMV7IH7P.js?v=26cd8775:853
-trigger @ chunk-SMV7IH7P.js?v=26cd8775:827
-set value @ chunk-SMV7IH7P.js?v=26cd8775:1705
-finalizeNavigation @ vue-router.js?v=26cd8775:2677
-（匿名） @ vue-router.js?v=26cd8775:2587
-Promise.then
-pushWithRedirect @ vue-router.js?v=26cd8775:2555
-push @ vue-router.js?v=26cd8775:2481
-install @ vue-router.js?v=26cd8775:2836
-use @ chunk-SMV7IH7P.js?v=26cd8775:6010
-（匿名） @ main.js:32
-properties.js:301 ❌ 房源数据加载失败: AxiosError {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
-fetchProperties @ properties.js:301
-await in fetchProperties
-wrappedAction @ pinia.js?v=26cd8775:5504
-store.<computed> @ pinia.js?v=26cd8775:5198
-loadProperties @ HomeView.vue:270
-（匿名） @ HomeView.vue:366
-（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
-callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
-callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
-hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
-flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
-flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
-Promise.then
-queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
-queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
-effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
-trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
-endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
-notify @ chunk-SMV7IH7P.js?v=26cd8775:853
-trigger @ chunk-SMV7IH7P.js?v=26cd8775:827
-set value @ chunk-SMV7IH7P.js?v=26cd8775:1705
-finalizeNavigation @ vue-router.js?v=26cd8775:2677
-（匿名） @ vue-router.js?v=26cd8775:2587
-Promise.then
-pushWithRedirect @ vue-router.js?v=26cd8775:2555
-push @ vue-router.js?v=26cd8775:2481
-install @ vue-router.js?v=26cd8775:2836
-use @ chunk-SMV7IH7P.js?v=26cd8775:6010
-（匿名） @ main.js:32
-api.js:121 XHR 加载失败：GET“http://localhost:5173/api/properties?page=1&page_size=20”。
+api.js:151 XHR 已完成加载：GET“http://localhost:5173/api/properties/4198699”。
 dispatchXhrRequest @ axios.js?v=26cd8775:1672
 xhr @ axios.js?v=26cd8775:1552
 dispatchRequest @ axios.js?v=26cd8775:2027
@@ -143,12 +45,218 @@ _request @ axios.js?v=26cd8775:2230
 request @ axios.js?v=26cd8775:2139
 Axios.<computed> @ axios.js?v=26cd8775:2267
 wrap @ axios.js?v=26cd8775:8
-getListWithPagination @ api.js:121
-fetchProperties @ properties.js:276
+getDetail @ api.js:151
+fetchPropertyDetail @ properties.js:369
+await in fetchPropertyDetail
 wrappedAction @ pinia.js?v=26cd8775:5504
 store.<computed> @ pinia.js?v=26cd8775:5198
-loadProperties @ HomeView.vue:270
-（匿名） @ HomeView.vue:366
+（匿名） @ PropertyDetail.vue:584
+（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
+callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
+callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
+hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
+flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
+flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
+Promise.then
+queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
+queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
+effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
+endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
+notify @ chunk-SMV7IH7P.js?v=26cd8775:853
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:827
+set value @ chunk-SMV7IH7P.js?v=26cd8775:1705
+finalizeNavigation @ vue-router.js?v=26cd8775:2677
+（匿名） @ vue-router.js?v=26cd8775:2587
+Promise.then
+pushWithRedirect @ vue-router.js?v=26cd8775:2555
+push @ vue-router.js?v=26cd8775:2481
+install @ vue-router.js?v=26cd8775:2836
+use @ chunk-SMV7IH7P.js?v=26cd8775:6010
+（匿名） @ main.js:32
+js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1413 Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+cda @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1413
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:14
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1683
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1683
+js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1316 As of February 21st, 2024, google.maps.Marker is deprecated. Please use google.maps.marker.AdvancedMarkerElement instead. At this time, google.maps.Marker is not scheduled to be discontinued, but google.maps.marker.AdvancedMarkerElement is recommended over google.maps.Marker. While google.maps.Marker will continue to receive bug fixes for any major regressions, existing bugs in google.maps.Marker will not be addressed. At least 12 months notice will be given before support is discontinued. Please see https://developers.google.com/maps/deprecations for additional details and https://developers.google.com/maps/documentation/javascript/advanced-markers/migration for the migration guide.
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1316
+initMap @ GoogleMap.vue:323
+await in initMap
+（匿名） @ GoogleMap.vue:392
+（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
+callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
+callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
+hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
+flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
+flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
+Promise.then
+queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
+queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
+effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
+endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:980
+set @ chunk-SMV7IH7P.js?v=26cd8775:1267
+set value @ chunk-SMV7IH7P.js?v=26cd8775:1795
+set @ chunk-SMV7IH7P.js?v=26cd8775:1251
+set @ pinia.js?v=26cd8775:5194
+fetchPropertyDetail @ properties.js:365
+await in fetchPropertyDetail
+wrappedAction @ pinia.js?v=26cd8775:5504
+store.<computed> @ pinia.js?v=26cd8775:5198
+（匿名） @ PropertyDetail.vue:584
+（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
+callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
+callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
+hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
+flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
+flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
+Promise.then
+queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
+queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
+effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
+endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
+notify @ chunk-SMV7IH7P.js?v=26cd8775:853
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:827
+set value @ chunk-SMV7IH7P.js?v=26cd8775:1705
+finalizeNavigation @ vue-router.js?v=26cd8775:2677
+（匿名） @ vue-router.js?v=26cd8775:2587
+Promise.then
+pushWithRedirect @ vue-router.js?v=26cd8775:2555
+push @ vue-router.js?v=26cd8775:2481
+install @ vue-router.js?v=26cd8775:2836
+use @ chunk-SMV7IH7P.js?v=26cd8775:6010
+（匿名） @ main.js:32
+js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1443 XHR 已完成加载：GET“https://maps.googleapis.com/maps/api/mapsjs/gen_204?csp_test=true”。
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1443
+ada @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1422
+cda @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1414
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:14
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1683
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1683
+js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1289 Google Maps JavaScript API error: BillingNotEnabledMapError
+https://developers.google.com/maps/documentation/javascript/error-messages#billing-not-enabled-map-error
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1289
+qta @ map.js:47
+nta @ map.js:46
+ota @ map.js:44
+await in ota
+（匿名） @ map.js:105
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1556
+setTimeout
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1342
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1556
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1343
+changed @ map.js:105
+Zm @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1303
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1472
+zua @ map.js:67
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1370
+Promise.then
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1370
+initMap @ GoogleMap.vue:301
+await in initMap
+（匿名） @ GoogleMap.vue:392
+（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
+callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
+callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
+hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
+flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
+flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
+Promise.then
+queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
+queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
+effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
+endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:980
+set @ chunk-SMV7IH7P.js?v=26cd8775:1267
+set value @ chunk-SMV7IH7P.js?v=26cd8775:1795
+set @ chunk-SMV7IH7P.js?v=26cd8775:1251
+set @ pinia.js?v=26cd8775:5194
+fetchPropertyDetail @ properties.js:365
+await in fetchPropertyDetail
+wrappedAction @ pinia.js?v=26cd8775:5504
+store.<computed> @ pinia.js?v=26cd8775:5198
+（匿名） @ PropertyDetail.vue:584
+（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
+callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
+callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
+hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
+flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
+flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
+Promise.then
+queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
+queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
+effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
+endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
+notify @ chunk-SMV7IH7P.js?v=26cd8775:853
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:827
+set value @ chunk-SMV7IH7P.js?v=26cd8775:1705
+finalizeNavigation @ vue-router.js?v=26cd8775:2677
+（匿名） @ vue-router.js?v=26cd8775:2587
+Promise.then
+pushWithRedirect @ vue-router.js?v=26cd8775:2555
+push @ vue-router.js?v=26cd8775:2481
+install @ vue-router.js?v=26cd8775:2836
+use @ chunk-SMV7IH7P.js?v=26cd8775:6010
+（匿名） @ main.js:32
+js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1443 XHR 已完成加载：POST“https://maps.googleapis.com/$rpc/google.internal.maps.mapsjs.v1.MapsJsInternalService/GetViewportInfo”。
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1443
+fba @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1276
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1452
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1452
+（匿名） @ common.js:202
+intercept @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1677
+await in intercept
+intercept @ common.js:202
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1274
+Hg @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1453
+Fg @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1453
+hta @ map.js:41
+mta @ map.js:45
+ota @ map.js:44
+（匿名） @ map.js:105
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1556
+setTimeout
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1342
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1556
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1343
+changed @ map.js:105
+Zm @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1303
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1472
+zua @ map.js:67
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1370
+Promise.then
+（匿名） @ js?key=AIzaSyAlHeF5zSAu_-E2goJX9nsVZnPITHXCDJ8&libraries=places:1370
+initMap @ GoogleMap.vue:301
+await in initMap
+（匿名） @ GoogleMap.vue:392
+（匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
+callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
+callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302
+hook.__weh.hook.__weh @ chunk-SMV7IH7P.js?v=26cd8775:4948
+flushPostFlushCbs @ chunk-SMV7IH7P.js?v=26cd8775:2480
+flushJobs @ chunk-SMV7IH7P.js?v=26cd8775:2522
+Promise.then
+queueFlush @ chunk-SMV7IH7P.js?v=26cd8775:2417
+queueJob @ chunk-SMV7IH7P.js?v=26cd8775:2412
+effect2.scheduler @ chunk-SMV7IH7P.js?v=26cd8775:7608
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:533
+endBatch @ chunk-SMV7IH7P.js?v=26cd8775:591
+trigger @ chunk-SMV7IH7P.js?v=26cd8775:980
+set @ chunk-SMV7IH7P.js?v=26cd8775:1267
+set value @ chunk-SMV7IH7P.js?v=26cd8775:1795
+set @ chunk-SMV7IH7P.js?v=26cd8775:1251
+set @ pinia.js?v=26cd8775:5194
+fetchPropertyDetail @ properties.js:365
+await in fetchPropertyDetail
+wrappedAction @ pinia.js?v=26cd8775:5504
+store.<computed> @ pinia.js?v=26cd8775:5198
+（匿名） @ PropertyDetail.vue:584
 （匿名） @ chunk-SMV7IH7P.js?v=26cd8775:4968
 callWithErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2295
 callWithAsyncErrorHandling @ chunk-SMV7IH7P.js?v=26cd8775:2302

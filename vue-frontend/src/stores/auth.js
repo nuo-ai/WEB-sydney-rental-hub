@@ -167,26 +167,11 @@ export const useAuthStore = defineStore('auth', {
               id: 'preset-1',
               address: 'University of Sydney, Camperdown NSW 2006',
               label: 'School',
+              category: 'university',
               latitude: -33.8888,
               longitude: 151.1873,
-              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o',
-            },
-            {
-              id: 'preset-2',
-              address: 'Central Station, Sydney NSW 2000',
-              label: 'Transit',
-              latitude: -33.883,
-              longitude: 151.2067,
-              placeId: 'ChIJN1t_tDeuEmsRGYPVA4xwBA8',
-            },
-            {
-              id: 'preset-3',
-              address: 'Sydney CBD, Sydney NSW 2000',
-              label: 'Work',
-              latitude: -33.8688,
-              longitude: 151.2093,
-              placeId: 'ChIJP3Sa8ziYEmsRUKgyFmh9AQM',
-            },
+              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o'
+            }
           ]
           addresses = presetAddresses
           localStorage.setItem('juwo-addresses', JSON.stringify(presetAddresses))
@@ -228,14 +213,17 @@ export const useAuthStore = defineStore('auth', {
           const savedAddress = {
             id: Date.now().toString(),
             ...address,
+            category: address.category || 'university',
             createdAt: new Date().toISOString(),
           }
 
-          this.savedAddresses.push(savedAddress)
+          // 单一目的地策略（测试模式）：覆盖旧记录，仅保留一个地址
+          let addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
+          addresses = []
+          this.savedAddresses = []
 
-          // Save to localStorage
-          const addresses = JSON.parse(localStorage.getItem('juwo-addresses') || '[]')
           addresses.push(savedAddress)
+          this.savedAddresses.push(savedAddress)
           localStorage.setItem('juwo-addresses', JSON.stringify(addresses))
 
           return savedAddress

@@ -92,6 +92,7 @@
 import { ref, watch, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import placesService from '@/services/places'
+import universities from '@/data/universities.sydney.json'
 
 const props = defineProps({
   modelValue: {
@@ -171,7 +172,24 @@ const handleInput = () => {
   searchTimeout.value = setTimeout(async () => {
     try {
       const results = await searchPlaces(searchQuery.value)
-      searchResults.value = results
+      // 仅保留“大学”类型；若无，则用本地大学清单做模糊匹配降级
+      let filtered = (results || []).filter(
+        (r) => Array.isArray(r.types) && r.types.includes('university'),
+      )
+      if (filtered.length === 0) {
+        const q = searchQuery.value.toLowerCase()
+        filtered = universities
+          .filter((u) =>
+            (u.name + ' ' + (u.campus || '') + ' ' + u.address).toLowerCase().includes(q),
+          )
+          .slice(0, 8)
+          .map((u) => ({
+            place_id: u.placeId || `local-${u.id}`,
+            description: `${u.name}${u.campus ? ' (' + u.campus + ')' : ''}, ${u.address}`,
+            types: ['university'],
+          }))
+      }
+      searchResults.value = filtered
     } catch (error) {
       console.error('Search failed:', error)
       searchResults.value = []
@@ -211,8 +229,31 @@ const selectResult = async (result) => {
   try {
     isSearching.value = true
 
-    // Get full place details including coordinates
-    const placeDetails = await placesService.getPlaceDetails(result.place_id)
+    let placeDetails
+    // 本地大学项（无 Google placeId）走离线详情
+    if (String(result.place_id).startsWith('local-')) {
+      const localId = String(result.place_id).replace('local-', '')
+      const u = universities.find((x) => x.id === localId)
+      if (!u) {
+        throw new Error('Local university not found')
+      }
+      placeDetails = {
+        place_id: u.placeId || `local-${u.id}`,
+        name: u.campus ? `${u.name} (${u.campus})` : u.name,
+        formatted_address: u.address,
+        latitude: u.lat,
+        longitude: u.lng,
+        types: ['university'],
+      }
+    } else {
+      // 在线详情，且仅允许 university
+      placeDetails = await placesService.getPlaceDetails(result.place_id)
+      if (!Array.isArray(placeDetails.types) || !placeDetails.types.includes('university')) {
+        ElMessage.warning('Please select a university')
+        isSearching.value = false
+        return
+      }
+    }
 
     const formattedLocation = {
       place_id: placeDetails.place_id,
@@ -252,19 +293,23 @@ const handleClose = () => {
 
 // 生命周期
 onMounted(async () => {
-  // Load preset locations
-  presetLocations.value = placesService.getPresetLocations().map((loc) => ({
-    ...loc,
-    placeId: loc.place_id, // Keep both formats for compatibility
-    address: loc.formatted_address,
+  // 加载本地“大学/校区”清单作为热门项（只含大学，去除非大学）
+  presetLocations.value = universities.map((u) => ({
+    place_id: u.placeId || `local-${u.id}`,
+    placeId: u.placeId || `local-${u.id}`,
+    name: u.campus ? `${u.name} (${u.campus})` : u.name,
+    formatted_address: u.address,
+    address: u.address,
+    latitude: u.lat,
+    longitude: u.lng,
+    type: 'university',
   }))
 
-  // Pre-load Google Maps API
+  // 预加载 Google Maps API（若可用）
   try {
     await placesService.loadGoogleMaps()
-    // Google Places API加载成功
   } catch {
-    // Google Places API未加载 - 使用开发模式
+    // Google Places API未加载 - 使用本地热门清单降级
   }
 })
 </script>

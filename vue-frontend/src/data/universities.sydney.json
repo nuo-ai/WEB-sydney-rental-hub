@@ -1,0 +1,98 @@
+[
+  {
+    "id": "usyd-camperdown",
+    "name": "University of Sydney",
+    "alias": ["USYD", "Sydney University"],
+    "campus": "Camperdown/Darlington",
+    "address": "Camperdown NSW 2006, Australia",
+    "lat": -33.8886,
+    "lng": 151.1873,
+    "placeId": "ChIJVXealLmuEmsRUduC5Wd-6XQ",
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "unsw-kensington",
+    "name": "University of New South Wales",
+    "alias": ["UNSW", "UNSW Sydney"],
+    "campus": "Kensington",
+    "address": "Kensington NSW 2052, Australia",
+    "lat": -33.9173,
+    "lng": 151.2313,
+    "placeId": "ChIJTbYYkVOxEmsRAO6ykvoWKgI",
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "uts-ultimo",
+    "name": "University of Technology Sydney",
+    "alias": ["UTS"],
+    "campus": "Ultimo",
+    "address": "Ultimo NSW 2007, Australia",
+    "lat": -33.8832,
+    "lng": 151.2005,
+    "placeId": "ChIJrRNl1jCuEmsRMOwrvs3vkLg",
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "mq-north-ryde",
+    "name": "Macquarie University",
+    "alias": ["MQ"],
+    "campus": "North Ryde",
+    "address": "Macquarie Park NSW 2109, Australia",
+    "lat": -33.7738,
+    "lng": 151.1126,
+    "placeId": "ChIJDy-wPOauEmsRGQ4he8OZRj4",
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "wsu-parramatta-city",
+    "name": "Western Sydney University",
+    "alias": ["WSU"],
+    "campus": "Parramatta City",
+    "address": "Parramatta NSW 2150, Australia",
+    "lat": -33.8153,
+    "lng": 151.0047,
+    "placeId": null,
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "acu-north-sydney",
+    "name": "Australian Catholic University",
+    "alias": ["ACU"],
+    "campus": "North Sydney",
+    "address": "North Sydney NSW 2060, Australia",
+    "lat": -33.8399,
+    "lng": 151.2092,
+    "placeId": null,
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "unda-broadway",
+    "name": "The University of Notre Dame Australia",
+    "alias": ["UNDA", "Notre Dame"],
+    "campus": "Broadway/Chippendale",
+    "address": "Broadway, Chippendale NSW 2008, Australia",
+    "lat": -33.8847,
+    "lng": 151.1987,
+    "placeId": null,
+    "tag": "university",
+    "type": "university"
+  },
+  {
+    "id": "uow-sydney-cbd",
+    "name": "University of Wollongong",
+    "alias": ["UOW"],
+    "campus": "Sydney CBD (Haymarket)",
+    "address": "Haymarket NSW 2000, Australia",
+    "lat": -33.8787,
+    "lng": 151.2051,
+    "placeId": null,
+    "tag": "university",
+    "type": "university"
+  }
+]

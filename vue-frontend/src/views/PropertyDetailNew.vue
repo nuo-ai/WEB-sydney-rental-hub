@@ -60,13 +60,14 @@
           <div class="map-section">
             <h2>Location</h2>
             <div class="map-container">
-              <SimpleMap
+              <GoogleMap
                 v-if="property?.latitude && property?.longitude"
                 :latitude="property.latitude"
                 :longitude="property.longitude"
                 :zoom="15"
-                height="360px"
+                :height="'360px'"
                 :marker-title="property.address"
+                :lock-center="true"
               />
             </div>
 
@@ -231,7 +232,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
 import { ArrowLeft, House, Ticket, Van, Calendar, Plus } from '@element-plus/icons-vue'
-import SimpleMap from '@/components/SimpleMap.vue'
+import GoogleMap from '@/components/GoogleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 
 const route = useRoute()

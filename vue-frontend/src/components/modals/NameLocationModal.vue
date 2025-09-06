@@ -67,28 +67,18 @@ const emit = defineEmits(['update:modelValue', 'confirm', 'skip', 'back'])
 
 // 响应式状态
 const visible = ref(props.modelValue)
-const selectedLabel = ref('Work')
+const selectedLabel = ref('学校')
 
 // 标签选项
 const labelOptions = [
   {
-    value: 'Work',
-    label: 'Work',
-    icon: 'fas fa-briefcase',
-  },
-  {
-    value: 'School',
-    label: 'School',
+    value: '学校',
+    label: '学校',
     icon: 'fas fa-graduation-cap',
   },
   {
-    value: 'Home',
-    label: 'Home',
-    icon: 'fas fa-home',
-  },
-  {
-    value: 'Other',
-    label: 'Other',
+    value: '其他',
+    label: '其他',
     icon: 'fas fa-map-pin',
   },
 ]
@@ -105,8 +95,8 @@ watch(
   (newVal) => {
     visible.value = newVal
     if (newVal) {
-      // 重置选择
-      selectedLabel.value = 'Work'
+      // 重置选择（默认选“学校”）
+      selectedLabel.value = '学校'
     }
   },
 )
@@ -127,10 +117,10 @@ const handleBack = () => {
 
 const handleSkip = () => {
   // 跳过按钮被点击
-  // Skip时默认使用Other标签
+  // Skip时默认使用“其他”标签
   const data = {
     address: props.address,
-    label: 'Other',
+    label: '其他',
   }
   emit('skip', data)
   emit('confirm', data) // 也触发confirm事件
@@ -212,7 +202,7 @@ const handleConfirm = () => {
   right: 20px;
   background: none;
   border: none;
-  color: #dc2626;
+  color: var(--brand-primary, #dc2626);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -278,7 +268,7 @@ const handleConfirm = () => {
 }
 
 .label-option:hover {
-  border-color: #dc2626;
+  border-color: var(--brand-primary, #dc2626);
   background: #fef2f2;
 }
 
@@ -307,13 +297,13 @@ const handleConfirm = () => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #dc2626;
+  background: var(--brand-primary, #dc2626);
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.2s;
 }
 
 .label-option input:checked ~ .radio-circle {
-  border-color: #dc2626;
+  border-color: var(--brand-primary, #dc2626);
 }
 
 .label-option input:checked ~ .radio-circle::after {
@@ -322,7 +312,7 @@ const handleConfirm = () => {
 
 .label-option input:checked ~ .label-text {
   font-weight: 600;
-  color: #dc2626;
+  color: var(--brand-primary, #dc2626);
 }
 
 .label-text {
@@ -339,7 +329,7 @@ const handleConfirm = () => {
 }
 
 .label-option input:checked ~ .label-icon {
-  color: #dc2626;
+  color: var(--brand-primary, #dc2626);
 }
 
 /* 操作区域 */
@@ -354,13 +344,13 @@ const handleConfirm = () => {
   font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
-  background: #dc2626 !important;
-  border-color: #dc2626 !important;
+  background: var(--brand-primary, #dc2626) !important;
+  border-color: var(--brand-primary, #dc2626) !important;
 }
 
 .confirm-btn:hover:not(:disabled) {
-  background: #b91c1c !important;
-  border-color: #b91c1c !important;
+  background: var(--brand-primary-dark, #b91c1c) !important;
+  border-color: var(--brand-primary-dark, #b91c1c) !important;
 }
 
 .confirm-btn:disabled {
