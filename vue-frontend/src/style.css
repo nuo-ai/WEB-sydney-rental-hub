@@ -12,15 +12,15 @@
   --juwo-primary-600: #e64100;
   --juwo-primary-700: #cc3700;
 
-  /* Element Plus主题定制 */
-  --el-color-primary: #ff5824;
-  --el-color-primary-light-1: #ff7851;
-  --el-color-primary-light-3: #ffb399;
-  --el-color-primary-light-5: #ffd1bf;
-  --el-color-primary-light-7: #ffe5d9;
-  --el-color-primary-light-8: #ffebe0;
-  --el-color-primary-light-9: #fff3f0;
-  --el-color-primary-dark-2: #e64100;
+  /* Element Plus主题定制（中性化 primary，保留按钮用 juwo-primary） */
+  --el-color-primary: #5b6472;
+  --el-color-primary-light-1: #6b7583;
+  --el-color-primary-light-3: #8a93a0;
+  --el-color-primary-light-5: #c7ccd3;
+  --el-color-primary-light-7: #e6e9ed;
+  --el-color-primary-light-8: #eff1f4;
+  --el-color-primary-light-9: #f7f8fa;
+  --el-color-primary-dark-2: #3c475b;
 
   /* 从现有设计系统继承的颜色 */
   --color-text-primary: #2d2d2d;
@@ -144,10 +144,8 @@ body {
   border-color: var(--color-border-default) !important;
 }
 
-/* 确保没有意外的黄色样式 */
-* {
-  border-color: currentColor;
-}
+/* 移除全局“边框跟随文字颜色”的规则
+   原因：会导致品牌色/文本色渗透为边框色，出现“彩色描边/下划线”，不符合中性化边界。 */
 
 /*
 *:not(.el-button):not(.el-slider):not(.logo-icon):not(.favorite-btn) {
@@ -397,14 +395,14 @@ body {
 }
 
 .filter-btn:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .filter-btn.active {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-  color: white;
+  background: #ffefe9; /* 极弱浅橙，仅作轻提示 */
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 /* ========== 响应式设计系统 ========== */
@@ -503,8 +501,8 @@ body {
 }
 
 .suggestion-item:hover {
-  background-color: var(--juwo-primary-50);
-  color: var(--juwo-primary);
+  background-color: #f7f8fa;
+  color: var(--color-text-primary);
 }
 
 /* 区域标签样式 */
@@ -550,6 +548,109 @@ body {
 
 /* ========== 导航组件样式已移至Navigation.vue组件内 ========== */
 
+/* ===== 导航通用规则（全站仅作用导航容器）=====
+   目的：hover 橙色、不加粗、不灰底；focus/click 无外框；图标随文字；圆角统一 2px
+   范围：nav/header nav/.nav/.navbar/.navigation/.top-nav/.bottom-nav/[class*="nav"] 内的链接，不影响按钮/表单
+   说明：使用更高选择器特异性 + !important，安全覆盖 Element Plus 的灰底/描边护栏
+*/
+:root {
+  /* 导航 hover 颜色令牌，使用品牌橙 */
+  --nav-hover-color: var(--juwo-primary);
+}
+
+/* 基础链接规范（仅在导航容器中生效） */
+nav a,
+header nav a,
+.nav a,
+.navbar a,
+.navigation a,
+.top-nav a,
+.bottom-nav a,
+[class*="nav"] a {
+  text-decoration: none;
+  font-weight: inherit !important;      /* 不加粗 */
+  border-radius: 2px;                   /* 圆角一致 */
+  background: transparent !important;   /* 禁止灰底 */
+  transition: color .15s ease;
+  outline: none;                        /* 点击/键盘 focus 无外框 */
+  box-shadow: none;
+}
+
+/* 悬浮态：仅变文字/图标为品牌橙 */
+nav a:hover,
+header nav a:hover,
+.nav a:hover,
+.navbar a:hover,
+.navigation a:hover,
+.top-nav a:hover,
+.bottom-nav a:hover,
+[class*="nav"] a:hover {
+  color: var(--nav-hover-color) !important;   /* 橙色 */
+  background: transparent !important;         /* 不要灰底 */
+  font-weight: inherit !important;            /* 不加粗 */
+}
+
+/* 焦点态（点击/键盘）明确移除外框/外发光，仅针对导航链接 */
+nav a:focus,
+nav a:focus-visible,
+header nav a:focus,
+header nav a:focus-visible,
+.nav a:focus,
+.nav a:focus-visible,
+.navbar a:focus,
+.navbar a:focus-visible,
+.navigation a:focus,
+.navigation a:focus-visible,
+.top-nav a:focus,
+.top-nav a:focus-visible,
+.bottom-nav a:focus,
+.bottom-nav a:focus-visible,
+[class*="nav"] a:focus,
+[class*="nav"] a:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 图标随文字颜色（常见 i/svg） */
+nav a i,
+header nav a i,
+.nav a i,
+.navbar a i,
+.navigation a i,
+.top-nav a i,
+.bottom-nav a i,
+[class*="nav"] a i,
+nav a svg,
+header nav a svg,
+.nav a svg,
+.navbar a svg,
+.navigation a svg,
+.top-nav a svg,
+.bottom-nav a svg,
+[class*="nav"] a svg {
+  color: currentColor !important;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* 覆写 Element Plus 菜单项在“导航容器内”的灰底规则，仅改色不落灰底 */
+nav .el-menu-item:hover,
+header nav .el-menu-item:hover,
+.nav .el-menu-item:hover,
+.navbar .el-menu-item:hover,
+.navigation .el-menu-item:hover,
+.top-nav .el-menu-item:hover,
+.bottom-nav .el-menu-item:hover,
+[class*="nav"] .el-menu-item:hover {
+  background: transparent !important;         /* 不要灰底 */
+  color: var(--nav-hover-color) !important;   /* 橙色 */
+}
+
+/* 风险与回滚：
+   - 若某些非导航模块的外层类名包含“nav”，可能被误伤（概率低）。可为该容器加更精确选择器排除。
+   - 回滚：删除本规则块即可完全回退。
+*/
+
 /* ========== 加载和状态样式 ========== */
 
 .loading-spinner {
@@ -577,6 +678,238 @@ body {
   font-size: 48px;
   color: var(--color-border-default);
   margin-bottom: 16px;
+}
+
+/* ================== 中性化护栏 · 变体兜底（第二轮） ==================
+   目的：覆盖 Element Plus 仍可能使用 primary 的“hover/active/keyboard 导航/快捷项/清除图标”等场景
+   说明：仅样式层覆盖，不影响任何逻辑；全部使用 !important，防止主题内部优先级反盖
+*/
+
+/* Select 下拉项键盘导航态（hover 类名变体） */
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item.is-hovering {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Dropdown 菜单项 active 变体 */
+.el-dropdown-menu__item.is-active {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Cascader（如使用）选中/活动/路径高亮中性化 */
+.el-cascader-node.is-selectable.in-checked > .el-cascader-node__label,
+.el-cascader-node.is-active > .el-cascader-node__label,
+.el-cascader-node.in-active-path > .el-cascader-node__label {
+  color: var(--color-text-primary) !important;
+}
+.el-cascader-node.is-selectable.in-checked > .el-cascader-node__postfix,
+.el-cascader-node.is-active > .el-cascader-node__postfix {
+  color: var(--color-text-primary) !important;
+}
+
+/* Switch 全局选中态中性化（局部已在 FilterPanel 处理，这里做全局兜底） */
+.el-switch.is-checked .el-switch__core {
+  background-color: var(--color-border-strong) !important;
+}
+
+/* DatePicker 快捷项 hover */
+.el-picker-panel__shortcut:hover {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* DatePicker 单元 hover（非选中范围，仅悬浮） */
+.el-date-table-cell:hover .el-date-table-cell__text {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Input 清除图标 hover（默认会跟随 primary） */
+.el-input__suffix .el-input__clear:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* Select 聚焦态兜底（键盘导航时） */
+.el-select .el-input.is-focus .el-input__wrapper {
+  border-color: var(--color-border-strong) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,.04) !important;
+}
+
+/* 其他通用菜单项（如上下文菜单）hover 中性化 */
+.el-menu-item:hover,
+.el-menu-item.is-active {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ================== UI 统一中性化覆盖（SearchBar / FilterPanel / 表单） ==================
+   目标：
+   1) 禁用品牌橙色在“边框/下划线/分隔线/聚焦态”上的使用，仅保留在主CTA按钮
+   2) SearchBar 与 FilterPanel 的标签/悬浮/聚焦走中性灰阶，聚焦态“边框加深 + 轻微外发光”
+   3) 改动均为样式层，最小diff，可随时回滚
+*/
+
+/* 补充强边框色变量（中性） */
+:root {
+  --color-border-strong: #c7ccd3;
+}
+
+/* Element Plus 输入/选择/日期等控件：圆角收紧 + 聚焦中性化 */
+.el-input__wrapper { border-radius: 2px !important; }
+.el-input.is-focus .el-input__wrapper,
+.el-select .el-input.is-focus .el-input__wrapper,
+.el-textarea__inner:focus,
+.el-date-editor.is-active {
+  border-color: var(--color-border-strong) !important; /* 中性加深 */
+  box-shadow: 0 0 0 2px rgba(0,0,0,.04) !important;   /* 轻微外发光 */
+  outline: none !important;
+}
+
+/* 自动补全建议项：悬浮改为中性灰，不使用品牌色 */
+.suggestion-item:hover {
+  background-color: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* SearchBar 选区标签：统一中性风（浅灰底 + 中性边框 + 次级文字；圆角2px） */
+.location-tag {
+  background: #fafbfc !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 2px !important;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 10px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+.location-tag:hover {
+  background: #f7f8fa !important;
+  border-color: var(--color-border-strong) !important;
+}
+
+/* 标签内“移除”按钮：改为中性灰阶 */
+.remove-location-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary) !important;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+.remove-location-btn:hover {
+  background: #eef1f4 !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* 分隔线/卡头等“细线”统一中性（如遇到组件内覆盖，可按需补更具体选择器） */
+.el-divider,
+.el-card,
+.el-drawer__header {
+  border-color: var(--color-border-default) !important;
+}
+
+/* 交互态中性化护栏：彻底移除“点击后橙色边框/橙色下拉高亮”
+   为什么：Element Plus 默认将 primary 主题色用于 hover/focus/selected/active，
+   与我们“品牌色仅用于 CTA”的规范冲突。以下覆盖仅中性化交互态，不影响主按钮。 */
+
+/* 1) Checkbox/Radio 选中态中性化 */
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox.is-checked .el-checkbox__inner {
+  background-color: var(--color-text-primary) !important;
+  border-color: var(--color-text-primary) !important;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: var(--color-text-primary) !important;
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: var(--color-text-primary) !important;
+  border-color: var(--color-text-primary) !important;
+}
+.el-radio.is-checked .el-radio__label {
+  color: var(--color-text-primary) !important;
+}
+
+/* 2) Radio Button 组（去橙底/橙描边） */
+.el-radio-button.is-active .el-radio-button__inner {
+  background: #f7f8fa !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text-primary) !important;
+}
+.el-radio-button__inner:hover {
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* 3) Select 下拉项（选中/悬浮走灰阶） */
+.el-select-dropdown__item.selected {
+  color: var(--color-text-primary) !important;
+  background: #f7f8fa !important;
+}
+.el-select-dropdown__item:hover {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* 4) Dropdown 菜单项（悬浮/聚焦中性化） */
+.el-dropdown-menu__item:focus,
+.el-dropdown-menu__item:not(.is-disabled):hover {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* 5) Pagination 当前页（去橙底） */
+.el-pagination.is-background .el-pager li.is-active,
+.el-pagination .el-pager li.is-active {
+  background: #fff !important;
+  border: 1px solid var(--color-border-strong) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* 6) Tabs 活动条与文字（补充） */
+.el-tabs__active-bar {
+  background-color: var(--color-border-strong) !important;
+}
+.el-tabs__item.is-active {
+  color: var(--color-text-primary) !important;
+}
+
+/* 7) DatePicker 选中/范围/今日（去橙色高亮） */
+.el-date-table-cell.is-selected .el-date-table-cell__text,
+.el-date-table-cell.is-in-range .el-date-table-cell__text {
+  background: #f7f8fa !important;
+  color: var(--color-text-primary) !important;
+}
+.el-date-table-cell.is-today .el-date-table-cell__text {
+  box-shadow: inset 0 0 0 1px var(--color-border-strong) !important;
+}
+
+/* 8) Select 多选 Tag（中性风） */
+.el-select__tags .el-tag {
+  background: #fafbfc !important;
+  border-color: var(--color-border-default) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* 9) Slider（全局补充，避免出现橙色轨道/按钮） */
+.el-slider__bar {
+  background-color: var(--color-border-strong) !important;
+}
+.el-slider__button {
+  border-color: var(--color-border-strong) !important;
+}
+
+/* 10) 通用可见焦点（兜底，克制的外发光） */
+:focus-visible {
+  outline: 2px solid rgba(0,0,0,.06) !important;
+  outline-offset: 2px !important;
 }
 
 /* 自定义消息样式：二级黑色（用于“请先输入区域或邮编”提示） */
@@ -850,8 +1183,8 @@ body {
 }
 
 .suggestion-item:hover {
-  background-color: var(--juwo-primary-50);
-  color: var(--juwo-primary);
+  background-color: #f7f8fa;
+  color: var(--color-text-primary);
 }
 
 /* 区域标签样式 */
@@ -863,12 +1196,13 @@ body {
 }
 
 .location-tag {
-  background: var(--juwo-primary);
-  color: white;
-  border-radius: 6px;
+  background: #fafbfc;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: 2px;
   font-size: 13px;
   font-weight: 500;
-  padding: 4px 12px;
+  padding: 4px 10px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -876,7 +1210,9 @@ body {
 }
 
 .location-tag:hover {
-  background: var(--juwo-primary-dark);
+  background: #f7f8fa;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .remove-location-btn {
@@ -891,8 +1227,8 @@ body {
 }
 
 .remove-location-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: #f3f4f6;
+  color: var(--color-text-primary);
 }
 
 /* ========== 导航组件样式已移至Navigation.vue组件内 ========== */

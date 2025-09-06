@@ -798,7 +798,7 @@ onMounted(() => {
 .reset-link {
   background: none;
   border: none;
-  color: var(--juwo-primary);
+  color: var(--color-text-secondary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -807,7 +807,7 @@ onMounted(() => {
 }
 
 .reset-link:hover {
-  color: var(--juwo-primary-dark);
+  color: var(--color-text-primary);
 }
 
 .close-btn {
@@ -861,7 +861,7 @@ onMounted(() => {
 .price-display {
   font-size: 14px;
   font-weight: 600;
-  color: var(--juwo-primary);
+  color: var(--color-text-secondary);
 }
 
 /* 价格滑块 */
@@ -875,19 +875,19 @@ onMounted(() => {
 }
 
 .price-slider :deep(.el-slider__bar) {
-  background-color: var(--juwo-primary);
+  background-color: var(--color-border-strong);
   height: 6px;
 }
 
 .price-slider :deep(.el-slider__button) {
-  border: 3px solid var(--juwo-primary);
+  border: 3px solid var(--color-border-strong);
   background-color: white;
   width: 20px;
   height: 20px;
 }
 
 .price-slider :deep(.el-slider__button:hover) {
-  border-color: var(--juwo-primary-light);
+  border-color: var(--color-border-strong);
 }
 
 /* 筛选按钮组 */
@@ -907,7 +907,7 @@ onMounted(() => {
 .filter-btn {
   padding: 12px 18px;
   border: 1px solid var(--color-border-default);
-  border-radius: 8px;
+  border-radius: 2px;
   background: white;
   font-size: 14px;
   font-weight: 500;
@@ -918,15 +918,15 @@ onMounted(() => {
 }
 
 .filter-btn:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
 }
 
 .filter-btn.active {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-  color: white;
+  background: #ffefe9; /* 极弱浅橙，非品牌强底色 */
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 /* 日期选择器 */
@@ -951,12 +951,12 @@ onMounted(() => {
 }
 
 .date-picker :deep(.el-input__wrapper):hover {
-  border-color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
 }
 
 .date-picker :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--juwo-primary);
-  box-shadow: 0 0 0 3px rgba(255, 88, 36, 0.1);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .04);
 }
 
 /* 确保日期选择器弹出层在最上层 */
@@ -994,7 +994,7 @@ onMounted(() => {
 }
 
 .furnished-toggle :deep(.el-switch.is-checked .el-switch__core) {
-  background-color: var(--juwo-primary);
+  background-color: var(--color-border-strong);
 }
 
 /* 面板底部 */
@@ -1014,8 +1014,8 @@ onMounted(() => {
 }
 
 .cancel-btn:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .apply-btn {
@@ -1041,8 +1041,8 @@ onMounted(() => {
   justify-content: space-between;
   padding: 8px 12px;
   border: 1px solid var(--color-border-default);
-  border-radius: 12px;
-  background: #f3f4f6;
+  border-radius: 2px;
+  background: #fafbfc;
 }
 .location-chip .chip-text {
   font-size: 14px;
@@ -1096,7 +1096,7 @@ onMounted(() => {
 .location-empty .go-select {
   background: none;
   border: none;
-  color: var(--juwo-primary, #ff5824);
+  color: var(--color-text-secondary);
   font-size: 13px;
   text-decoration: underline;
   cursor: pointer;

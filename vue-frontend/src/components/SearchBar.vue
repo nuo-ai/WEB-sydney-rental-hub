@@ -529,7 +529,7 @@ watch(
   background: var(--color-bg-card, #fff);
   color: var(--color-text-primary, #111827);
   border: 1px solid var(--color-border-default, #e5e7eb);
-  border-radius: 999px;
+  border-radius: 2px;
   font-size: 13px;
   font-weight: 500;
   padding: 6px 10px;
@@ -540,9 +540,9 @@ watch(
 }
 
 .location-tag:hover {
-  background: var(--juwo-primary-50, #fff6f1);
-  border-color: var(--juwo-primary, #ff5824);
-  color: var(--juwo-primary, #ff5824);
+  background: #f7f8fa;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .remove-location-btn {
@@ -574,7 +574,7 @@ watch(
 
 .search-input :deep(.el-input__wrapper) {
   position: relative; /* 作为绝对定位锚点，保证按钮贴右且不遮挡文字 */
-  border-radius: 6px;
+  border-radius: 2px;
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
   /* 预留右侧空间：右边距(12px) + 命中区域(32px)；可由 token 控制 */
@@ -582,12 +582,12 @@ watch(
 }
 
 .search-input :deep(.el-input__wrapper):hover {
-  border-color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
 }
 
 .search-input :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--juwo-primary);
-  box-shadow: 0 0 0 4px rgba(255, 88, 36, 0.1);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, .04);
 }
 
 .search-icon {
@@ -631,20 +631,20 @@ watch(
 }
 
 .filter-icon-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   color: var(--color-text-secondary);
 }
 
 .filter-icon-btn:hover svg,
 .filter-icon-btn:focus svg {
-  color: var(--juwo-primary);
+  color: var(--color-text-primary);
 }
 
 .filter-icon-btn:focus {
-  outline: 2px solid var(--juwo-primary-50);
+  outline: 2px solid rgba(0,0,0,.06);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 /* 自动补全建议列表 */
@@ -655,7 +655,7 @@ watch(
   right: 0;
   background: white;
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
+  border-radius: 2px;
   box-shadow: var(--shadow-lg);
   max-height: 300px;
   overflow-y: auto;
@@ -697,8 +697,8 @@ watch(
   gap: 4px;
   padding: 4px 8px;
   border: 1px solid var(--color-border-default, #e5e7eb);
-  border-radius: 999px;
-  background: #f3f4f6;
+  border-radius: 2px;
+  background: #fafbfc;
   color: var(--color-text-primary, #374151);
   font-size: 12px;
   line-height: 1;
@@ -727,8 +727,8 @@ watch(
 
 .suggestion-item:hover,
 .suggestion-item.active {
-  background-color: var(--juwo-primary-50);
-  color: var(--juwo-primary);
+  background-color: #f7f8fa;
+  color: var(--color-text-primary);
 }
 
 .suggestion-content {
@@ -739,7 +739,7 @@ watch(
 }
 
 .suggestion-icon {
-  color: var(--juwo-primary);
+  color: var(--color-text-secondary);
   width: 16px;
   height: 16px;
   text-align: center;
@@ -775,8 +775,8 @@ watch(
   background: white;
 }
 .suggestion-checkbox.checked {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
   color: #fff;
 }
 
@@ -831,7 +831,7 @@ watch(
 .nearby-suggestion-item {
   padding: 10px 12px;
   border: 1px solid #e5e5e5;
-  border-radius: 20px;
+  border-radius: 2px;
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -842,15 +842,15 @@ watch(
 }
 
 .nearby-suggestion-item:hover {
-  background: var(--juwo-primary-50);
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
+  background: #f7f8fa;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .nearby-suggestion-item .suggestion-icon {
   width: 12px;
   height: 12px;
-  color: var(--juwo-primary);
+  color: var(--color-text-secondary);
 }
 
 .nearby-name {
@@ -873,7 +873,7 @@ watch(
   height: 16px;
   margin-right: 8px;
   border: 2px solid #e5e7eb;
-  border-top-color: var(--juwo-primary);
+  border-top-color: var(--color-border-strong);
   border-radius: 50%;
   animation: sb-spin 1s linear infinite;
 }

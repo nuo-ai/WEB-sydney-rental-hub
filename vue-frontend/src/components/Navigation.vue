@@ -203,14 +203,14 @@ onUnmounted(() => {
   color: var(--color-text-secondary);
   text-decoration: none;
   transition: all 0.2s ease;
-  border-radius: 8px;
+  border-radius: 2px;
   min-width: 60px;
 }
 
 .nav-item:hover,
 .nav-item.active {
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
 }
 
 .nav-item i {
@@ -280,7 +280,7 @@ onUnmounted(() => {
   width: 32px;
   height: 32px;
   background: var(--juwo-primary);
-  border-radius: 8px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,8 +314,8 @@ onUnmounted(() => {
 
 .main-nav-item:hover,
 .main-nav-item.active {
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
 }
 
 .main-nav-item i {
@@ -336,15 +336,15 @@ onUnmounted(() => {
   padding: 8px 16px;
   color: var(--color-text-secondary);
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 2px;
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .user-nav-item:hover,
 .user-nav-item.active {
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
 }
 
 .user-nav-item i {
@@ -362,6 +362,19 @@ onUnmounted(() => {
   .bottom-nav {
     display: none;
   }
+}
+
+/* 导航点击后不显示外框（去除浅灰外框），悬停可用品牌橙，点击无 outline */
+.main-nav-item:focus,
+.main-nav-item:focus-visible,
+.nav-item:focus,
+.nav-item:focus-visible,
+.user-nav-item:focus,
+.user-nav-item:focus-visible,
+.logo:focus,
+.logo:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 @media (max-width: 1023px) {
