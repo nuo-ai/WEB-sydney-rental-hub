@@ -22,6 +22,51 @@
 
       <!-- 筛选内容 -->
       <div class="panel-content">
+        <!-- Location（已选区域回显 + 清空 + 附近勾选） -->
+        <div class="filter-section location-section">
+          <h4 class="section-title chinese-text">{{ locationLabel }}</h4>
+
+          <template v-if="selectedLocations.length">
+            <div class="location-list">
+              <div
+                v-for="loc in selectedLocations"
+                :key="loc.id"
+                class="location-chip"
+                :title="loc.fullName || loc.name"
+              >
+                <span class="chip-text">{{ formatLocation(loc) }}</span>
+                <button
+                  class="chip-remove"
+                  :aria-label="'移除 ' + (loc.fullName || loc.name)"
+                  @click="removeLocation(loc.id)"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="location-actions">
+              <button class="clear-all" type="button" @click="clearAllLocations">
+                {{ clearAllLabel }}
+              </button>
+            </div>
+          </template>
+
+          <div v-else class="location-empty">
+            <div class="empty-box" role="note" aria-live="polite">
+              <span class="empty-text">{{ locationEmptyLabel }}</span>
+              <button type="button" class="go-select" @click="closePanel">{{ goSelectLabel }}</button>
+            </div>
+          </div>
+
+          <div class="nearby-toggle">
+            <el-checkbox v-model="includeNearby" @change="handleIncludeNearbyChange">
+              {{ searchNearbyLabel }}
+            </el-checkbox>
+          </div>
+        </div>
+
         <!-- 价格范围滑块 -->
         <div class="filter-section">
           <div class="section-header">
@@ -181,6 +226,52 @@ const filters = ref({
   isFurnished: false,
 })
 
+/* 选区与“附近区域”开关 */
+const selectedLocations = computed(() => propertiesStore.selectedLocations || [])
+const includeNearby = ref(true)
+/* 文案回退，避免显示未注册的 key */
+const searchNearbyLabel = computed(() => {
+  const v = t('filter.searchNearby')
+  return v && v !== 'filter.searchNearby' ? v : '包含周边区域'
+})
+/* 标题/按钮/空态文案回退，避免显示 key */
+const locationLabel = computed(() => {
+  const v = t('filter.location')
+  return v && v !== 'filter.location' ? v : '区域'
+})
+const clearAllLabel = computed(() => {
+  const v = t('filter.clearAll')
+  return v && v !== 'filter.clearAll' ? v : '清空全部'
+})
+const locationEmptyLabel = computed(() => {
+  const v = t('filter.locationEmpty')
+  return v && v !== 'filter.locationEmpty' ? v : '未选择任何区域，请先从搜索栏选择区域'
+})
+const goSelectLabel = computed(() => {
+  const v = t('filter.goSelect')
+  return v && v !== 'filter.goSelect' ? v : '去选择区域'
+})
+/* 显示格式化：Suburb, NSW, 2017 / 2017 */
+const formatLocation = (loc) => {
+  if (!loc) return ''
+  if (loc.type === 'suburb') {
+    const pc = loc.postcode ? `, NSW, ${loc.postcode}` : ''
+    return `${loc.name}${pc}`
+  }
+  return `${loc.name}`
+}
+const removeLocation = (id) => {
+  propertiesStore.removeSelectedLocation(id)
+  nextTick(() => updateFilteredCount())
+}
+const clearAllLocations = () => {
+  propertiesStore.setSelectedLocations([])
+  nextTick(() => updateFilteredCount())
+}
+const handleIncludeNearbyChange = () => {
+  nextTick(() => updateFilteredCount())
+}
+
 /* 本地计算的筛选结果数量 */
 const localFilteredCount = ref(0)
 
@@ -200,6 +291,7 @@ const buildQueryFromFilters = (filterParams) => {
   if (filterParams.isFurnished === true) q.isFurnished = '1'
   put('suburb', filterParams.suburb)
   put('postcodes', filterParams.postcodes)
+  put('include_nearby', includeNearby.value ? '1' : '0')
   return q
 }
 
@@ -279,6 +371,11 @@ const applyQueryToState = (query, store) => {
           })),
         )
       }
+    }
+    // include_nearby
+    if (typeof query.include_nearby !== 'undefined') {
+      includeNearby.value =
+        String(query.include_nearby) === '1' || String(query.include_nearby) === 'true'
     }
   } catch (e) {
     console.warn('URL 查询解析失败:', e)
@@ -445,6 +542,8 @@ const updateFilteredCount = async () => {
   if (selectedPostcodes.length > 0) {
     filterParams.postcodes = selectedPostcodes.join(',')
   }
+  // include_nearby 作为透传参数（后端未识别时无副作用）
+  filterParams.include_nearby = includeNearby.value ? '1' : '0'
 
   // 移除 null 值
   Object.keys(filterParams).forEach((key) => {
@@ -524,6 +623,8 @@ const applyFiltersToStore = async () => {
     if (selectedPostcodes.length > 0) {
       filterParams.postcodes = selectedPostcodes.join(',')
     }
+    // include_nearby 透传
+    filterParams.include_nearby = includeNearby.value ? '1' : '0'
 
     await propertiesStore.applyFilters(filterParams)
     emit('filtersChanged', filterParams)
@@ -926,6 +1027,79 @@ onMounted(() => {
 .apply-btn:hover {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
+}
+
+/* Location 区样式 */
+.location-section .location-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.location-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+  background: #f3f4f6;
+}
+.location-chip .chip-text {
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+.location-chip .chip-remove {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.location-chip .chip-remove:hover {
+  background: #e5e7eb;
+  color: var(--color-text-primary);
+}
+.location-actions {
+  margin-top: 6px;
+}
+.clear-all {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+}
+.nearby-toggle {
+  margin-top: 10px;
+}
+
+/* Location 空态提示 */
+.location-empty .empty-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px dashed var(--color-border-default, #e5e7eb);
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.location-empty .empty-text {
+  font-size: 13px;
+  color: var(--color-text-secondary, #6b7280);
+}
+.location-empty .go-select {
+  background: none;
+  border: none;
+  color: var(--juwo-primary, #ff5824);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 
