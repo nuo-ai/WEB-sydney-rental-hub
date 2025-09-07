@@ -203,7 +203,7 @@ const computePosition = (el, panel) => {
   const vw = window.innerWidth
   // 中文注释：PC 下仅“卧室”面板缩窄到 380，其它保持 520；移动端保持至少与触发等宽
   const desktop = typeof window !== 'undefined' ? window.innerWidth >= 768 : true
-  const width = desktop ? (panel === 'bedrooms' ? 380 : 520) : Math.max(rect.width, 280)
+  const width = desktop ? ((panel === 'bedrooms' || panel === 'price') ? 380 : 520) : Math.max(rect.width, 280)
   let left = rect.left
   // 边缘保护：左右至少 10px 余量
   if (left + width > vw - 10) left = Math.max(10, vw - width - 10)

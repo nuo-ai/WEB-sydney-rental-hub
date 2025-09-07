@@ -141,8 +141,36 @@ const closeDropdown = () => {
 
 // 中文注释：处理ESC键关闭
 const handleKeyDown = (e) => {
-  if (props.closeOnEsc && e.key === 'Escape' && isOpen.value) {
+  if (!isOpen.value) return
+  // 中文注释：ESC 关闭
+  if (props.closeOnEsc && e.key === 'Escape') {
+    e.stopPropagation()
     closeDropdown()
+    return
+  }
+  // 中文注释：Tab 焦点陷阱，焦点在面板内部循环，不逃逸到页面
+  if (e.key === 'Tab') {
+    const focusables = getFocusableElements()
+    if (focusables.length === 0) {
+      // 中文注释：无可聚焦子元素时将焦点停留在容器
+      e.preventDefault()
+      dropdownRef.value?.focus?.()
+      return
+    }
+    const first = focusables[0]
+    const last = focusables[focusables.length - 1]
+    const active = document.activeElement
+    if (e.shiftKey) {
+      if (active === first || active === dropdownRef.value) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
   }
 }
 
@@ -167,12 +195,23 @@ const unlockBodyScroll = () => {
 const focusFirstInteractive = () => {
   const root = dropdownRef.value
   if (!root) return
-  const first = root.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  // 中文注释：排除 tabindex="-1"（如右上角关闭按钮），避免首焦点落在“关闭”
+  const first = root.querySelector('button:not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
   if (first && typeof first.focus === 'function') {
     first.focus()
   } else {
     root.focus?.()
   }
+}
+
+// 中文注释：获取面板内可聚焦元素集合（用于焦点陷阱）
+const getFocusableElements = () => {
+  const root = dropdownRef.value
+  if (!root) return []
+  // 中文注释：与 focusFirstInteractive 一致，排除 tabindex="-1" 的按钮（如右上角关闭按钮）
+  const selector = 'button:not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  const nodes = Array.from(root.querySelectorAll(selector)).filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
+  return nodes
 }
 
  // 中文注释：监听面板打开状态（锁滚 + 焦点首控件 + 定位确认）

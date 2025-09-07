@@ -1,27 +1,28 @@
 <template>
   <div class="price-filter-panel">
-    <!-- 面板头部 -->
-    <div class="panel-header">
-      <h3 class="panel-title chinese-text">{{ priceLabel }}</h3>
-      <button class="close-btn" @click="$emit('close')" aria-label="关闭价格筛选面板">
-        <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-
     <!-- 面板内容 -->
     <div class="panel-content">
-      <!-- 价格范围显示 -->
-      <div class="price-display">{{ priceRangeText }}</div>
+      <!-- 数字展示（只读） -->
+      <div class="price-cards">
+        <div class="price-card">
+          <div class="card-label chinese-text">最低价格</div>
+          <div class="card-value">{{ minDisplay }}<span class="unit">/周</span></div>
+        </div>
+        <div class="dash">—</div>
+        <div class="price-card">
+          <div class="card-label chinese-text">最高价格</div>
+          <div class="card-value">{{ maxDisplay }}<span class="unit">/周</span></div>
+        </div>
+      </div>
+      <span class="sr-only" aria-live="polite">{{ priceRangeText }}</span>
 
       <!-- 价格范围滑块 -->
       <el-slider
         v-model="localPriceRange"
         range
-        :min="0"
-        :max="5000"
-        :step="50"
+        :min="MIN_PRICE"
+        :max="MAX_PRICE"
+        :step="STEP"
         :show-stops="false"
         class="price-slider"
         @change="handlePriceChange"
@@ -29,11 +30,9 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="default" @click="$emit('close')">
-          {{ cancelLabel }}
-        </el-button>
-        <el-button type="primary" class="apply-btn" size="default" @click="applyFilters">
-          {{ applyLabel }}
+        <button type="button" class="link-clear" @click="clearAll">清除</button>
+        <el-button type="primary" class="apply-btn" size="default" :loading="countLoading" @click="applyFilters">
+          {{ applyText }}
         </el-button>
       </div>
     </div>
@@ -41,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, inject, computed } from 'vue'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 
@@ -56,24 +55,12 @@ const router = useRouter()
 const t = inject('t') || ((k) => k)
 
 // 文案回退，避免显示未注册的 key
-const priceLabel = computed(() => {
-  const v = t('filter.priceSection')
-  return v && v !== 'filter.priceSection' ? v : '价格'
-})
 
-const applyLabel = computed(() => {
-  const v = t('filter.apply')
-  return v && v !== 'filter.apply' ? v : '应用'
-})
 
-const cancelLabel = computed(() => {
-  const v = t('filter.cancel')
-  return v && v !== 'filter.cancel' ? v : '取消'
-})
 
 const anyPriceLabel = computed(() => {
   const v = t('filter.anyPrice')
-  return v && v !== 'filter.anyPrice' ? v : '任意价格'
+  return v && v !== 'filter.anyPrice' ? v : '不限价格'
 })
 
 // 状态管理
@@ -90,21 +77,69 @@ const initialPriceRange = computed(() => {
 // 本地状态（用于保存用户选择，但不立即应用）
 const localPriceRange = ref([...initialPriceRange.value])
 
+// 中文注释：价格常量与步长（周租 AUD）
+const MIN_PRICE = 0
+const MAX_PRICE = 5000
+const STEP = 25
+
+/* 极简：无输入框/直方图，仅展示两枚数字卡片 + 滑轨 + 清除/应用（N） */
+const minDisplay = computed(() => `$${Number(localPriceRange.value[0]).toLocaleString()}`)
+const maxDisplay = computed(() => `$${Number(localPriceRange.value[1]).toLocaleString()}`)
+
+/* 实时计数：应用（N） */
+const previewCount = ref(null)
+const countLoading = ref(false)
+let _countTimer = null
+const applyText = computed(() => {
+  if (typeof previewCount.value === 'number') return `应用（${previewCount.value}）`
+  return '应用'
+})
+
+const computePreviewCount = async () => {
+  try {
+    countLoading.value = true
+    const params = buildFilterParams()
+    const n = await propertiesStore.getFilteredCount(params)
+    previewCount.value = Number.isFinite(n) ? n : 0
+  } catch (err) {
+    previewCount.value = null
+    console.warn('获取价格预估数量失败', err)
+  } finally {
+    countLoading.value = false
+  }
+}
+
+/* 监听滑轨，防抖触发计数 */
+watch(localPriceRange, () => {
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
+})
+
+onMounted(() => {
+  computePreviewCount()
+})
+
+
+
+
 // 价格范围文本显示
 const priceRangeText = computed(() => {
   const [min, max] = localPriceRange.value
-  if (min === 0 && max === 5000) {
-    return anyPriceLabel.value
-  } else if (max === 5000) {
-    return `$${min}+`
-  } else {
-    return `$${min} - $${max}`
-  }
+  const fmt = (n) => Number(n).toLocaleString()
+  const isAny = min === MIN_PRICE && max === MAX_PRICE
+  if (isAny) return anyPriceLabel.value
+  if (min === MIN_PRICE) return `≤$${fmt(max)}/周`
+  if (max === MAX_PRICE) return `≥$${fmt(min)}/周`
+  return `$${fmt(min)} - $${fmt(max)}/周`
 })
 
 // 价格变更处理
 const handlePriceChange = () => {
-  // 仅局部更新UI，不向服务器请求数据
+  // 中文注释：滑轨已通过 watch 同步输入框，此处无需网络请求
+}
+
+const clearAll = () => {
+  localPriceRange.value = [MIN_PRICE, MAX_PRICE]
 }
 
 // 构建筛选参数
@@ -113,10 +148,10 @@ const buildFilterParams = () => {
 
   // 价格范围
   const [min, max] = localPriceRange.value
-  if (min > 0) {
+  if (min > MIN_PRICE) {
     filterParams.minPrice = min.toString()
   }
-  if (max < 5000) {
+  if (max < MAX_PRICE) {
     filterParams.maxPrice = max.toString()
   }
 
@@ -220,18 +255,61 @@ const applyFilters = async () => {
   padding: 16px;
 }
 
-/* 价格显示 */
+/* 价格显示（保留用于 aria-live 文案，不再单独居中显示） */
 .price-display {
   font-size: 16px;
   font-weight: 600;
   color: var(--color-text-secondary);
-  margin-bottom: 16px;
-  text-align: center;
+  margin: 0;
+}
+
+/* 数字展示卡片 */
+.price-cards {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.price-card {
+  flex: 1 1 0%;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  background: #fff;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+.card-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+.card-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.card-value .unit {
+  margin-left: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
 /* 价格滑块 */
 .price-slider {
-  margin: 24px 0;
+  margin: 16px 0 8px 0;
+}
+
+/* sr-only 用于无障碍播报 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .price-slider :deep(.el-slider__runway) {
@@ -255,24 +333,31 @@ const applyFilters = async () => {
   border-color: var(--color-border-strong);
 }
 
+/* 中间连字符 */
+.dash {
+  color: var(--color-text-secondary);
+}
+
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 16px;
 }
-
-.cancel-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid var(--color-border-default);
+.link-clear {
+  background: transparent;
+  border: none;
   color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-right: auto;
 }
-
-.cancel-btn:hover {
-  border-color: var(--color-border-strong);
+.link-clear:hover {
   color: var(--color-text-primary);
 }
+
+/* 取消按钮已移除，保留样式以兼容回滚 */
 
 .apply-btn {
   flex: 2;
