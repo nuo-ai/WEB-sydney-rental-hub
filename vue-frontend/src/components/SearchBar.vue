@@ -1,17 +1,5 @@
 <template>
   <div class="search-bar-container">
-    <!-- 选中的区域标签 -->
-    <div v-if="!isMobile && selectedLocations.length > 0" class="location-tags">
-      <span v-for="location in displayedLocations" :key="location.id" class="location-tag">
-        <MapPin class="spec-icon" />
-        <span>{{ location.name }}</span>
-        <button class="remove-location-btn" @click="removeLocation(location.id)">
-          <X class="spec-icon" />
-        </button>
-      </span>
-      <button v-if="hiddenCount > 0" class="more-chip" @click="onMoreClick">+{{ hiddenCount }}</button>
-    </div>
-
     <!-- 搜索输入框 -->
     <div class="search-input-container">
       <el-input
@@ -43,7 +31,6 @@
           class="inline-chip"
           :title="formatInlineLocation(loc)"
         >
-          <MapPin class="inline-chip-icon" aria-hidden="true" />
           <span class="inline-chip-text">{{ formatInlineLocation(loc) }}</span>
         </span>
         <span v-if="hiddenCount > 0" class="inline-chip inline-chip-more">+{{ hiddenCount }}</span>
@@ -60,7 +47,6 @@
         <!-- 搜索结果 -->
         <div v-if="searchQuery && (filteredSuggestions.length > 0 || isLoadingSuggestions)">
           <div v-if="filteredSuggestions.length > 0" class="suggestions-section-title">
-            <Search class="spec-icon" aria-hidden="true" />
             搜索结果
           </div>
           <div
@@ -70,35 +56,19 @@
             :class="{ active: currentSuggestionIndex === index, selected: isSelected(suggestion) }"
             @click="toggleSuggestion(suggestion)"
           >
-            <div class="suggestion-content">
-              <MapPin v-if="suggestion.type === 'suburb'" class="suggestion-icon" />
-              <Hash v-else class="suggestion-icon" />
-              <div class="suggestion-text">
-                <div class="suggestion-name">{{ suggestion.fullName }}</div>
-                <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
+              <div class="suggestion-content">
+                <div class="suggestion-text">
+                  <div class="suggestion-name">{{ suggestion.fullName }}</div>
+                  <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
+                </div>
+                <span class="suggestion-action">{{ isSelected(suggestion) ? '已选' : '添加' }}</span>
               </div>
-              <div
-                class="suggestion-checkbox"
-                :aria-checked="isSelected(suggestion) ? 'true' : 'false'"
-                role="checkbox"
-                @click.stop="toggleSuggestion(suggestion)"
-                :class="{ checked: isSelected(suggestion) }"
-                aria-label="多选"
-              >
-                <svg v-if="isSelected(suggestion)" width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- 相邻区域推荐 -->
         <div v-if="!searchQuery && nearbySuggestions.length > 0">
-          <div class="suggestions-section-title">
-            <Lightbulb class="spec-icon" aria-hidden="true" />
-            SUGGESTED FOR YOU
-          </div>
+          <div class="suggestions-section-title">SUGGESTED FOR YOU</div>
           <div class="nearby-suggestions-grid">
             <div
               v-for="suggestion in nearbySuggestions"
@@ -106,7 +76,6 @@
               class="nearby-suggestion-item"
               @click="selectLocation(suggestion)"
             >
-              <MapPin class="suggestion-icon" />
               <span class="nearby-name">{{ suggestion.name }}, NSW, {{ suggestion.postcode }}</span>
             </div>
           </div>
@@ -132,7 +101,7 @@ import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 import SearchOverlay from './SearchOverlay.vue'
-import { Search, MapPin, Hash, X, Lightbulb } from 'lucide-vue-next'
+import { Search } from 'lucide-vue-next'
 
 // 建议列表最大返回条数（覆盖 36 条邮编）
 const SUGGESTION_LIMIT = 100
@@ -177,16 +146,7 @@ const hiddenCount = computed(() =>
   Math.max(0, (selectedLocations.value?.length || 0) - 2),
 )
 
-/* 点击 +N：聚焦输入框以便继续添加（桌面保留下拉行为） */
-const onMoreClick = () => {
-  try {
-    searchInputRef.value?.focus?.()
-    const el = searchInputRef.value?.$el?.querySelector('input')
-    el?.focus?.()
-  } catch {
-    /* no-op */
-  }
-}
+/* 保留 +N 摘要仅在输入框内部回显，不提供顶部常驻 chips 与点击跳转 */
 
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.selectedLocations)
@@ -428,15 +388,6 @@ const toggleSuggestion = async (suggestion) => {
   await selectLocation(suggestion)
 }
 
-const removeLocation = async (locationId) => {
-  propertiesStore.removeSelectedLocation(locationId)
-
-  // 触发重新搜索，传递一个特殊标记表示是移除操作
-  emit('locationSelected', { removed: true })
-
-  // 重新加载相邻区域建议
-  await loadNearbySuggestions()
-}
 
 const handleClickOutside = (event) => {
   const container = document.querySelector('.search-bar-container')
@@ -496,23 +447,22 @@ watch(
 }
 
 .location-tag {
-  background: var(--color-bg-card, #fff);
-  color: var(--color-text-primary, #111827);
-  border: 1px solid var(--color-border-default, #e5e7eb);
-  border-radius: 2px;
+  background: var(--chip-bg, #f7f8fa);
+  color: var(--color-text-secondary, #374151);
+  border: none;
+  border-radius: 9999px;
   font-size: 13px;
   font-weight: 500;
-  padding: 6px 10px;
+  padding: 6px 12px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .location-tag:hover {
-  background: #f7f8fa;
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  background: var(--chip-bg-hover, #eef1f4);
+  color: var(--color-text-primary, #111827);
 }
 
 .remove-location-btn {
@@ -615,7 +565,7 @@ watch(
 .filter-icon-btn:focus {
   outline: 2px solid rgba(0,0,0,.06);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 0;
 }
 
 /* 自动补全建议列表 */
@@ -625,8 +575,8 @@ watch(
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid var(--color-border-default);
-  border-radius: 2px;
+  border: none;
+  border-radius: 8px;
   box-shadow: var(--shadow-lg);
   max-height: 300px;
   overflow-y: auto;
@@ -665,21 +615,17 @@ watch(
 .inline-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border: 1px solid var(--color-border-default, #e5e7eb);
-  border-radius: 2px;
-  background: #fafbfc;
-  color: var(--color-text-primary, #374151);
+  gap: 6px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 0;
+  background: var(--chip-bg, #f7f8fa);
+  color: var(--color-text-secondary, #374151);
   font-size: 12px;
   line-height: 1;
 }
 
-.inline-chip-icon {
-  width: 12px;
-  height: 12px;
-  color: var(--color-text-secondary, #6b7280);
-}
+.inline-chip-icon { display: none; }
 
 .inline-chip-more {
   color: var(--color-text-secondary, #6b7280);
@@ -733,27 +679,19 @@ watch(
 }
 
 /* 复选框样式（多选小方框） */
-.suggestion-checkbox {
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 3px;
+.suggestion-action {
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  background: white;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 12px;
 }
-.suggestion-checkbox.checked {
-  background: var(--color-text-primary);
-  border-color: var(--color-text-primary);
-  color: #fff;
+.suggestion-item.selected .suggestion-action {
+  color: var(--color-text-primary);
 }
 
 /* 选中行弱高亮（可按需调整） */
 .suggestion-item.selected {
-  background-color: #fffaf6;
+  background-color: var(--chip-bg-selected, #e9eef2);
 }
 
 /* 新增：区域标题样式 */
@@ -778,16 +716,16 @@ watch(
 
 /* +N 摘要 pill（桌面） */
 .more-chip {
-  border: 1px solid var(--color-border-default, #e5e7eb);
-  background: var(--color-bg-card, #fff);
+  border: none;
+  background: var(--chip-bg, #f7f8fa);
   color: var(--color-text-secondary, #6b7280);
-  border-radius: 999px;
+  border-radius: 0;
   padding: 6px 10px;
   font-size: 13px;
   cursor: pointer;
 }
 .more-chip:hover {
-  background: #f3f4f6;
+  background: var(--chip-bg-hover, #eef1f4);
   color: var(--color-text-primary, #111827);
 }
 
@@ -800,21 +738,20 @@ watch(
 }
 
 .nearby-suggestion-item {
-  padding: 10px 12px;
-  border: 1px solid #e5e5e5;
-  border-radius: 2px;
-  background: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 0;
+  background: var(--chip-bg, #f7f8fa);
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
 }
 
 .nearby-suggestion-item:hover {
-  background: #f7f8fa;
-  border-color: var(--color-border-strong);
+  background: var(--chip-bg-hover, #eef1f4);
   color: var(--color-text-primary);
 }
 

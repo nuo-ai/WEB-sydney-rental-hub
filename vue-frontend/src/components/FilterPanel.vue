@@ -23,7 +23,7 @@
       <!-- 筛选内容 -->
       <div class="panel-content">
         <!-- Location（已选区域回显 + 清空 + 附近勾选） -->
-        <div class="filter-section location-section">
+        <div class="filter-section location-section" ref="areaRef">
           <h4 class="section-title chinese-text">{{ locationLabel }}</h4>
 
           <template v-if="selectedLocations.length">
@@ -40,9 +40,7 @@
                   :aria-label="'移除 ' + (loc.fullName || loc.name)"
                   @click="removeLocation(loc.id)"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  ×
                 </button>
               </div>
             </div>
@@ -56,10 +54,14 @@
           <div v-else class="location-empty">
             <div class="empty-box" role="note" aria-live="polite">
               <span class="empty-text">{{ locationEmptyLabel }}</span>
-              <button type="button" class="go-select" @click="closePanel">{{ goSelectLabel }}</button>
             </div>
           </div>
 
+          <AreasSelector
+            :selected="selectedLocations"
+            @update:selected="onUpdateSelectedAreas"
+            @requestCount="debouncedRequestCount"
+          />
           <div class="nearby-toggle">
             <el-checkbox v-model="includeNearby" @change="handleIncludeNearbyChange">
               {{ searchNearbyLabel }}
@@ -68,7 +70,7 @@
         </div>
 
         <!-- 价格范围滑块 -->
-        <div class="filter-section">
+        <div class="filter-section" ref="priceRef">
           <div class="section-header">
             <h4 class="section-title chinese-text">{{ $t('filter.priceSection') }}</h4>
             <span class="price-display">{{ priceRangeText }}</span>
@@ -86,7 +88,7 @@
         </div>
 
         <!-- 卧室数量 -->
-        <div class="filter-section">
+        <div class="filter-section" ref="bedroomsRef">
           <h4 class="section-title chinese-text">{{ $t('filter.bedrooms') }}</h4>
           <div class="filter-buttons-group">
             <button
@@ -102,7 +104,7 @@
         </div>
 
         <!-- 浴室数量 -->
-        <div class="filter-section">
+        <div class="filter-section" ref="moreRef">
           <h4 class="section-title chinese-text">{{ $t('filter.bathrooms') }}</h4>
           <div class="filter-buttons-group">
             <button
@@ -134,7 +136,7 @@
         </div>
 
         <!-- 空出日期 -->
-        <div class="filter-section">
+        <div class="filter-section" ref="availabilityRef">
           <h4 class="section-title chinese-text">{{ $t('filter.date') }}</h4>
           <div class="date-picker-group">
             <el-date-picker
@@ -191,12 +193,19 @@ import { ref, computed, watch, onMounted, nextTick, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
+import AreasSelector from '@/components/AreasSelector.vue'
 
 // 组件属性
 const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false,
+  },
+  // 中文注释：用于从外部（如 FilterTabs/Chips）指定打开面板后的聚焦分组，仅PC使用
+  focusSection: {
+    type: String,
+    default: null,
+    validator: (v) => ['area', 'bedrooms', 'price', 'availability', 'more', null].includes(v),
   },
 })
 
@@ -214,6 +223,13 @@ const t = inject('t') || ((k) => k)
 const propertiesStore = usePropertiesStore()
 /* 面板容器引用：打开时将焦点置于非输入容器，避免 iOS Safari 自动放大 */
 const panelRef = ref(null)
+/* 分组锚点引用：用于 PC 端 Chips 锚点打开后滚动/聚焦 */
+const areaRef = ref(null)
+const priceRef = ref(null)
+const bedroomsRef = ref(null)
+const availabilityRef = ref(null)
+/* “更多”锚点暂指向浴室分组，可按需迁移 */
+const moreRef = ref(null)
 
 /* 响应式数据 */
 const filters = ref({
@@ -247,10 +263,6 @@ const locationEmptyLabel = computed(() => {
   const v = t('filter.locationEmpty')
   return v && v !== 'filter.locationEmpty' ? v : '未选择任何区域，请先从搜索栏选择区域'
 })
-const goSelectLabel = computed(() => {
-  const v = t('filter.goSelect')
-  return v && v !== 'filter.goSelect' ? v : '去选择区域'
-})
 /* 显示格式化：Suburb, NSW, 2017 / 2017 */
 const formatLocation = (loc) => {
   if (!loc) return ''
@@ -270,6 +282,24 @@ const clearAllLocations = () => {
 }
 const handleIncludeNearbyChange = () => {
   nextTick(() => updateFilteredCount())
+}
+
+/* 区域目录交互：选择时仅刷新计数，不立即应用（分离选择与应用） */
+const debouncedRequestCount = (() => {
+  let tid = null
+  return () => {
+    if (tid) clearTimeout(tid)
+    tid = setTimeout(() => {
+      updateFilteredCount()
+      tid = null
+    }, 250)
+  }
+})()
+
+const onUpdateSelectedAreas = (newList) => {
+  // 中文注释：更新全局已选区域，但不触发 apply；仅刷新底部“显示结果 (N)”中的 N
+  propertiesStore.setSelectedLocations(Array.isArray(newList) ? newList : [])
+  nextTick(() => debouncedRequestCount())
 }
 
 /* 本地计算的筛选结果数量 */
@@ -441,7 +471,9 @@ const filteredCount = computed(() => {
 
 // 检查是否应用了筛选
 const hasAppliedFilters = computed(() => {
+  // 中文注释：将“已选区域”也视为筛选条件之一，确保当地区选择后即使计数为0也显示为0，而非回退到总数
   return (
+    selectedLocations.value.length > 0 ||
     filters.value.priceRange[0] > 0 ||
     filters.value.priceRange[1] < 5000 ||
     filters.value.bedrooms.length > 0 ||
@@ -715,11 +747,63 @@ defineExpose({
   },
 })
 
+/* 分组锚点滚动与聚焦（仅桌面启用聚焦，滚动始终可用） */
+const isDesktop = () => (typeof window !== 'undefined' ? window.innerWidth >= 1200 : true)
+
+const getFirstFocusable = (rootEl) => {
+  if (!rootEl) return null
+  const selector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  const el = rootEl.querySelector(selector)
+  if (el) return el
+  const inner = rootEl.querySelector('.el-input__inner')
+  return inner || null
+}
+
+const scrollAndFocus = (sectionRef) => {
+  const el = sectionRef?.value
+  if (!el) return
+  try {
+    el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  } catch {/* 忽略非关键错误 */}
+  if (!isDesktop()) return
+  nextTick(() => {
+    try {
+      const focusEl = getFirstFocusable(el)
+      focusEl?.focus?.({ preventScroll: true })
+    } catch {/* 忽略非关键错误 */}
+  })
+}
+
+/* 当面板打开且指定了 focusSection 时，滚动并尝试聚焦对应分组 */
+watch(
+  () => [visible.value, props.focusSection],
+  async ([vis, section]) => {
+    if (!vis || !section) return
+    await nextTick()
+    const map = {
+      area: areaRef,
+      bedrooms: bedroomsRef,
+      price: priceRef,
+      availability: availabilityRef,
+      more: moreRef,
+    }
+    const target = map[section]
+    if (target) scrollAndFocus(target)
+  },
+  { immediate: false }
+)
+
 // 生命周期
 watch(visible, (newValue) => {
   if (newValue) {
     // 打开面板时，更新筛选计数
     updateFilteredCount()
+    try {
+      // 预先加载区域目录，避免首次打开仅见“静态搜索框”
+      propertiesStore.getAllAreas?.()
+    } catch {
+      /* 忽略非关键错误 */
+    }
     // iOS 防自动放大：清理当前任何活动焦点，并把焦点转移到非输入容器
     nextTick(() => {
       try {
@@ -943,7 +1027,7 @@ onMounted(() => {
 .filter-btn {
   padding: 12px 18px;
   border: 1px solid var(--color-border-default);
-  border-radius: 2px;
+  border-radius: 0;
   background: white;
   font-size: 14px;
   font-weight: 500;
@@ -1077,9 +1161,9 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 2px;
-  background: #fafbfc;
+  border: none;
+  border-radius: 0;
+  background: var(--chip-bg, #f7f8fa);
 }
 .location-chip .chip-text {
   font-size: 14px;
@@ -1089,15 +1173,18 @@ onMounted(() => {
   background: transparent;
   border: none;
   color: var(--color-text-secondary);
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
 }
 .location-chip .chip-remove:hover {
-  background: #e5e7eb;
+  background: transparent;
   color: var(--color-text-primary);
 }
 .location-actions {
@@ -1121,9 +1208,9 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border: 1px dashed var(--color-border-default, #e5e7eb);
-  background: #fafafa;
-  border-radius: 12px;
+  border: none;
+  background: var(--chip-bg, #f7f8fa);
+  border-radius: 0;
   padding: 10px 12px;
 }
 .location-empty .empty-text {

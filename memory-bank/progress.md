@@ -9,6 +9,8 @@
 - [X] 新增 IconSort / IconBell（SVG 组件化，stroke: currentColor；size/aria 可配）
 - [X] 全站“焦点可见性基线”EP-GUARDRAIL-FOCUS-GLOBAL：移除 UA 橙框；输入类控件仅在 :focus-visible 时显示中性灰 ring；按钮/链接默认无 ring；Element Plus :focus 统一去除（src/style.css）
 - [X] PC 恢复 FilterTabs 为筛选面板入口（仅PC显示；不直接改筛选；HomeView 接线 @requestOpen + v-model）
+- [X] 移动端“筛选”药丸改造：IconFilterNarrow（自定义窄 SVG）、尺寸收紧（h=34 / px=12 / font=13 / gap=2）、去 suffix 占位 calc、移动端容器左右 16px、一致右缘对齐（margin-right=3px 补偿）
+- [X] 图标系统一致性：彻底弃用 Font Awesome，移动入口用 SVG 组件替代（stroke: currentColor）
 - [X] ProfileView 注释解析错误修复与 ESLint 清理（移除未使用变量/导入；不改业务逻辑）
 
 - [X] 搜索内嵌筛选入口（sliders-horizontal 16×16，右距 12px）
@@ -23,7 +25,8 @@
 
 ### 下一步规划 (What's left to build)
 
-- [X] [P0/快修] 强制“先选区域后筛选”（UI 禁用+Store 守卫+提示）
+- [P0/PC] 筛选入口重构：移除 PC “筛选”按钮；保留四分组 Chips（区域/卧室/价格/空出时间）+“更多”收纳高级项；点击仅打开对应面板，不直接改 store；按“筛选入口一致性 v2（PC）”规则实施，可回滚
+- [P0/PC] FilterPanel.focusSection：支持接收 section 并滚动/聚焦到分组首控件（配合 Chips 锚点）
 
 - 地图与通勤
   - [X] 放大时保持中心（固定住坐标在屏幕中心范围）

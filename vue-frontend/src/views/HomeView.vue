@@ -166,6 +166,7 @@
     <FilterPanel
       ref="filterPanelRef"
       v-model="showFilterPanel"
+      :focusSection="focusSection"
       @filtersChanged="handleFiltersChanged"
     />
   </div>
@@ -203,6 +204,7 @@ const lastScrollY = ref(0)
 const isNavHidden = ref(false)
 const windowWidth = ref(window.innerWidth)
 const filterPanelRef = ref(null) // 添加FilterPanel组件的引用
+const focusSection = ref(null) // 指定面板打开时的聚焦分组
 
 /* 排序入口：仅透传到后端；URL 状态同步，不做前端本地排序 */
 const sortValue = ref('')
@@ -286,12 +288,14 @@ const handleLocationSelected = async () => {
 
 
 const handleOpenFilterPanel = () => {
-  // 无需先选择区域，直接打开统一 FilterPanel
+  // 无需先选择区域，直接打开统一 FilterPanel；清空分组，保持通用入口
+  focusSection.value = null
   showFilterPanel.value = true
 }
-const onFilterTabsRequest = () => {
-  // 仅作为入口；分组聚焦后续由 FilterPanel 支持 focusSection 再接入
-  handleOpenFilterPanel()
+const onFilterTabsRequest = (payload) => {
+  // 从 Chips 入口打开指定分组
+  focusSection.value = payload?.section || null
+  showFilterPanel.value = true
 }
 
 

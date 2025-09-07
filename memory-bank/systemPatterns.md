@@ -203,6 +203,13 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 如需撤回 PC chips，移除 FilterTabs 渲染即可恢复“搜索后缀图标为唯一入口”的形态。
 - 溯源：activeContext 2025-09-07｜FILTER-TABS-PC-RETURN（代码已落地）；待补：FilterPanel.focusSection
 
+## 筛选入口一致性（v2·PC 专用，覆盖 v1 的 PC 策略）
+- 目标：PC 端移除“筛选”主按钮；仅保分组 Chips（区域/卧室/价格/空出时间）+“更多”承载高级项。
+- 交互：点击任一 Chip 打开对应独立面板；“更多”打开高级筛选面板；各面板只负责收集条件与应用/重置。
+- 数据真源：仍以 Pinia 为唯一真源（apply/reset 在 store 层统一处理），并按需同步 URL；禁止在 Chips 内直接改 store state。
+- 可达性：遵循 EP-GUARDRAIL-FOCUS-GLOBAL；打开时聚焦面板首交互控件；Esc/点击遮罩关闭。
+- 回滚策略：若需回退到“统一 FilterPanel”形态，仅需将 Chips 触发恢复为 requestOpen(section) 并渲染统一 FilterPanel。
+
 ## 前端状态同步与特性开关（新增）
 
 - 原则：以“映射函数 + 特性开关”的方式进行 V1 → V2 契约演进，默认关闭新契约，保障回滚路径。

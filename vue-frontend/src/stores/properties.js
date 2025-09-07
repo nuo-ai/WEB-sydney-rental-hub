@@ -1,7 +1,7 @@
 // JUWO桔屋找房 - 房源数据状态管理
 
 import { defineStore } from 'pinia'
-import { propertyAPI } from '@/services/api'
+import { propertyAPI, locationAPI } from '@/services/api'
 
 // 特性开关：V2 参数映射（默认关闭以保持向后兼容）
 // 说明：开启后将把前端筛选状态映射为统一的后端白名单参数（suburbs/price_min/...）
@@ -189,6 +189,9 @@ export const usePropertiesStore = defineStore('properties', {
     searchQuery: '',
     selectedLocations: [],
 
+    // 区域缓存（15分钟TTL）
+    areasCache: { list: [], ts: 0 },
+
     // 收藏状态 (localStorage作为临时方案)
     favoriteIds: JSON.parse(localStorage.getItem('juwo-favorites') || '[]'),
     favoritePropertiesData: [],
@@ -356,6 +359,88 @@ export const usePropertiesStore = defineStore('properties', {
         this.allProperties = baseData
       } catch (error) {
         console.warn('⚠️ 加载基础数据失败，搜索建议功能可能受影响:', error)
+      }
+    },
+
+    // 获取全量区域目录（A→Z），TTL=15分钟
+    // 为什么：AreasSelector 需要完整区域清单进行分组/多选；优先走后端接口，失败时从前端数据回退推导
+    async getAllAreas() {
+      try {
+        const now = Date.now()
+        const TTL = 15 * 60 * 1000
+        if (
+          this.areasCache?.ts &&
+          now - this.areasCache.ts < TTL &&
+          Array.isArray(this.areasCache.list) &&
+          this.areasCache.list.length
+        ) {
+          return this.areasCache.list
+        }
+
+        // 优先从后端接口获取
+        let list = []
+        try {
+          const remote = await locationAPI.getAllLocations()
+          if (Array.isArray(remote) && remote.length) {
+            list = remote
+          }
+        } catch {
+          // 忽略接口错误，采用前端回退
+        }
+
+        // 若本地无基础数据，尝试懒加载一批用于构建目录
+        if (!list.length && (!Array.isArray(this.allProperties) || this.allProperties.length === 0)) {
+          try {
+            await this.loadBaseDataAsync()
+          } catch (err) {
+            // 中文注释：忽略懒加载失败，仅用于区域目录兜底；不中断流程
+            console.warn('getAllAreas: loadBaseDataAsync failed (ignored)', err)
+          }
+        }
+
+        // 回退：从已加载的数据推导（优先 allProperties，其次 filteredProperties）
+        if (!list.length) {
+          const source = (Array.isArray(this.allProperties) && this.allProperties.length)
+            ? this.allProperties
+            : (Array.isArray(this.filteredProperties) ? this.filteredProperties : [])
+          if (source.length) {
+            const map = new Map()
+            for (const p of source) {
+              const suburb = p?.suburb && String(p.suburb).trim()
+              const postcode = p?.postcode != null ? String(Math.floor(p.postcode)) : ''
+              if (suburb) {
+                const id = `suburb_${suburb}`
+                if (!map.has(id)) {
+                  map.set(id, {
+                    id,
+                    type: 'suburb',
+                    name: suburb,
+                    postcode,
+                    fullName: postcode ? `${suburb} NSW ${postcode}` : suburb,
+                  })
+                }
+              }
+              if (postcode) {
+                const id = `postcode_${postcode}`
+                if (!map.has(id)) {
+                  map.set(id, {
+                    id,
+                    type: 'postcode',
+                    name: postcode,
+                    fullName: postcode,
+                  })
+                }
+              }
+            }
+            list = Array.from(map.values())
+          }
+        }
+
+        // 写入缓存
+        this.areasCache = { list, ts: now }
+        return list
+      } catch {
+        return []
       }
     },
 

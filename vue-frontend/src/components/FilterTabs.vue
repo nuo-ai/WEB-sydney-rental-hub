@@ -6,7 +6,6 @@
       <div class="filter-tab-entry">
         <button class="filter-tab" @click.stop="openSection('area')">
           <span class="chinese-text">区域</span>
-          <i class="fa-solid fa-chevron-down"></i>
         </button>
       </div>
 
@@ -14,7 +13,6 @@
       <div class="filter-tab-entry">
         <button class="filter-tab" @click.stop="openSection('bedrooms')">
           <span class="chinese-text">卧室</span>
-          <i class="fa-solid fa-chevron-down"></i>
         </button>
       </div>
 
@@ -22,7 +20,6 @@
       <div class="filter-tab-entry">
         <button class="filter-tab" @click.stop="openSection('price')">
           <span class="chinese-text">价格</span>
-          <i class="fa-solid fa-chevron-down"></i>
         </button>
       </div>
 
@@ -30,7 +27,13 @@
       <div class="filter-tab-entry">
         <button class="filter-tab" @click.stop="openSection('availability')">
           <span class="chinese-text">空出时间</span>
-          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+      </div>
+
+      <!-- 更多（高级筛选） -->
+      <div class="filter-tab-entry">
+        <button class="filter-tab" @click.stop="openSection('more')">
+          <span class="chinese-text">更多</span>
         </button>
       </div>
     </div>
@@ -41,16 +44,6 @@
 // 说明：本组件仅作为“锚点入口”，不再渲染任何 quick dropdown 内容。
 // 点击 chip → 统一 emit 打开 FilterPanel，并传递希望聚焦的分组 section。
 
-const props = defineProps({
-  filterPanelOpen: {
-    type: Boolean,
-    default: false,
-  },
-  currentFilters: {
-    type: Object,
-    default: () => ({}),
-  },
-})
 
 const emit = defineEmits(['toggleFullPanel', 'requestOpen'])
 
@@ -120,24 +113,21 @@ const openSection = (section) => {
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  border-radius: 20px;
+  background: var(--chip-bg, #f7f8fa);
+  border: none;
+  border-radius: 0;
   font-size: 14px;
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   white-space: nowrap;
 }
 
 .filter-tab:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+  background: var(--chip-bg-hover, #eef1f4);
+  color: var(--color-text-primary);
 }
 
-.filter-tab i {
-  font-size: 12px;
-}
+/* 移除装饰性图标，保持纯文字标签 */
 </style>

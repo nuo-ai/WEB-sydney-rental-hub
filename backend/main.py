@@ -327,23 +327,43 @@ async def lifespan(app: FastAPI):
     app.state.db_pool_initialized = True
     logger.info("Database pool initialization completed.")
     
-    # 检查并优化数据库索引
-    # 仅在首次启动或每周执行一次，避免每次重启都执行
+    # 检查并优化数据库索引（增加可跳过与超时保护，避免启动卡死）
+    # 仅在生产环境执行，或当未显式跳过时执行
     try:
-        await check_and_optimize_indexes()
+        skip_opt = os.getenv("SKIP_INDEX_OPTIMIZATION", "").lower() in ("1", "true", "yes")
+        optimize_timeout = float(os.getenv("INDEX_OPTIMIZE_TIMEOUT", "8"))
+        if skip_opt or env != "production":
+            logger.info(f"跳过索引优化：SKIP_INDEX_OPTIMIZATION={skip_opt}，env={env}")
+        else:
+            logger.info(f"开始索引优化（超时 {optimize_timeout}s）...")
+            await asyncio.wait_for(check_and_optimize_indexes(), timeout=optimize_timeout)
+    except asyncio.TimeoutError:
+        logger.warning("索引优化超时，跳过并继续启动。")
     except Exception as e:
         logger.warning(f"索引优化检查失败: {e}. 继续启动...")
     
-    # Initialize Redis Cache with fallback to in-memory cache
+    # Initialize Redis Cache with fallback to in-memory cache（增加可配置与超时）
     try:
-        redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
-        # Test Redis connection
-        await redis.ping()
+        redis_url = os.getenv("REDIS_URL", "").strip()
+        if not redis_url:
+            raise RuntimeError("REDIS_URL 未配置，使用内存缓存")
+        connect_timeout = float(os.getenv("REDIS_CONNECT_TIMEOUT", "0.5"))
+        socket_timeout = float(os.getenv("REDIS_SOCKET_TIMEOUT", "0.5"))
+        ping_timeout = float(os.getenv("REDIS_PING_TIMEOUT", "1.0"))
+        redis = aioredis.from_url(
+            redis_url,
+            encoding="utf8",
+            decode_responses=True,
+            socket_connect_timeout=connect_timeout,
+            socket_timeout=socket_timeout
+        )
+        # Test Redis connection with timeout
+        await asyncio.wait_for(redis.ping(), timeout=ping_timeout)
         app.state.redis = redis  # Store redis client in app state for cache invalidation
         FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-        logger.info("FastAPI Cache initialized with Redis backend.")
+        logger.info(f"FastAPI Cache initialized with Redis backend ({redis_url}).")
     except Exception as e:
-        logger.warning(f"Redis not available: {e}. Using in-memory cache as fallback.")
+        logger.warning(f"Redis 不可用或未配置: {e}。使用内存缓存作为降级。")
         # 使用内存缓存作为降级方案
         from fastapi_cache.backends.inmemory import InMemoryBackend
         FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
@@ -369,6 +389,9 @@ def cache_key_by_url(func, namespace, request: Request, response, *args, **kwarg
 async def invalidate_property_cache(property_id: str = None):
     """Invalidate cache for a specific property or all properties"""
     redis = app.state.redis
+    if not redis:
+        logger.info("Cache invalidation skipped: Redis backend not configured.")
+        return
     if property_id:
         # Invalidate specific property detail cache
         pattern = f"fastapi-cache:get_property_by_id:property_id={property_id}*"
@@ -384,6 +407,9 @@ async def invalidate_property_cache(property_id: str = None):
 async def invalidate_all_cache():
     """Invalidate all cache entries"""
     redis = app.state.redis
+    if not redis:
+        logger.info("Cache invalidation skipped: Redis backend not configured.")
+        return
     async for key in redis.scan_iter(match="fastapi-cache:*"):
         await redis.delete(key)
     logger.info("All cache entries invalidated")
@@ -617,6 +643,15 @@ async def get_cache_stats():
     """Get cache statistics"""
     try:
         redis = app.state.redis
+        if not redis:
+            return {
+                "backend": "memory",
+                "total_keys": 0,
+                "property_list_cached": 0,
+                "property_details_cached": 0,
+                "memory_used": "N/A",
+                "connected_clients": 0
+            }
         info = await redis.info()
         keys_count = await redis.dbsize()
         

@@ -89,6 +89,11 @@
   /* 输入框后缀定位令牌（统一管理） */
   --search-suffix-right: 12px; /* 图标距输入框右边界 */
   --search-suffix-hit: 32px;   /* 命中区域尺寸，必要时可收紧为 24–28px */
+
+  /* Chip 中性化令牌（全站复用） */
+  --chip-bg: #f7f8fa;
+  --chip-bg-hover: #eef1f4;
+  --chip-bg-selected: #e9eef2;
 }
 
 /* ========== 全局重置样式 ========== */
@@ -514,20 +519,22 @@ body {
 }
 
 .location-tag {
-  background: var(--juwo-primary);
-  color: white;
-  border-radius: 6px;
+  background: var(--chip-bg);
+  color: var(--color-text-secondary);
+  border: none;
+  border-radius: 9999px;
   font-size: 13px;
   font-weight: 500;
-  padding: 4px 12px;
+  padding: 6px 12px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .location-tag:hover {
-  background: var(--juwo-primary-dark);
+  background: var(--chip-bg-hover);
+  color: var(--color-text-primary);
 }
 
 .remove-location-btn {
@@ -678,6 +685,54 @@ header nav .el-menu-item:hover,
   font-size: 48px;
   color: var(--color-border-default);
   margin-bottom: 16px;
+}
+
+/* ===== Element Plus 滚动指示器中性化（全局） =====
+   目的：移除非CTA处的品牌色渗透（如滚动条/指示器出现橙色），统一为中性灰
+   原则：仅样式层覆盖，不改动逻辑；全站可复用；必要时可在组件内再做 :deep 兜底
+   溯源：activeContext｜UI-NAV-GLOBAL-RULES（二次中性化）
+*/
+:root {
+  --neutral-scrollbar-color: #c0c4cc;
+  --neutral-scrollbar-hover-color: #909399;
+}
+
+/* 原生 WebKit 滚动条（全站） */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--neutral-scrollbar-color);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--neutral-scrollbar-hover-color);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Element Plus el-scrollbar 组件中性化 */
+.el-scrollbar__bar {
+  background: transparent !important;
+}
+.el-scrollbar__thumb {
+  background-color: var(--neutral-scrollbar-color) !important;
+}
+.el-scrollbar__thumb:hover {
+  background-color: var(--neutral-scrollbar-hover-color) !important;
+}
+
+/* FilterPanel 局部兜底（面板内不出现品牌橙） */
+.domain-filter-panel :deep(.el-scrollbar__bar) {
+  background: transparent !important;
+}
+.domain-filter-panel :deep(.el-scrollbar__thumb) {
+  background-color: var(--neutral-scrollbar-color) !important;
+}
+.domain-filter-panel :deep(.el-scrollbar__thumb:hover) {
+  background-color: var(--neutral-scrollbar-hover-color) !important;
 }
 
 /* ========== Utilities · 8pt Spacing / Type Scale / Weight / Muted ========== */
@@ -992,39 +1047,39 @@ header nav .el-menu-item:hover,
   color: var(--color-text-primary) !important;
 }
 
-/* SearchBar 选区标签：统一中性风（浅灰底 + 中性边框 + 次级文字；圆角2px） */
+/* SearchBar 选区标签：统一中性风（浅灰底，无描边，Pill） */
 .location-tag {
-  background: #fafbfc !important;
+  background: var(--chip-bg) !important;
   color: var(--color-text-secondary) !important;
-  border: 1px solid var(--color-border-default) !important;
-  border-radius: 2px !important;
+  border: none !important;
+  border-radius: 9999px !important;
   font-size: 13px;
   font-weight: 500;
-  padding: 4px 10px !important;
+  padding: 6px 12px !important;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .location-tag:hover {
-  background: #f7f8fa !important;
-  border-color: var(--color-border-strong) !important;
+  background: var(--chip-bg-hover) !important;
+  color: var(--color-text-primary) !important;
 }
 
 /* 标签内“移除”按钮：改为中性灰阶 */
 .remove-location-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary) !important;
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-size: 12px;
   padding: 2px;
-  border-radius: 2px;
-  transition: all 0.2s ease;
+  border-radius: 9999px;
+  transition: color 0.2s ease;
 }
 .remove-location-btn:hover {
-  background: #eef1f4 !important;
-  color: var(--color-text-primary) !important;
+  background: transparent;
+  color: var(--color-text-primary);
 }
 
 /* 分隔线/卡头等“细线”统一中性（如遇到组件内覆盖，可按需补更具体选择器） */
