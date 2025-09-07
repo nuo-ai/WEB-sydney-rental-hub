@@ -30,20 +30,10 @@
               @locationSelected="handleLocationSelected"
               @openFilterPanel="handleOpenFilterPanel"
             />
-            <!-- 桌面端筛选按钮：移动到搜索框右侧，≥768px 显示 -->
-            <button
-              class="filter-trigger-btn"
-              type="button"
-              @click="handleOpenFilterPanel"
-            >
-              <IconFilterNarrow :size="16" />
-              <span>筛选</span>
-            </button>
+            <!-- 桌面端使用分离式筛选面板，完全在 FilterTabs 组件内部处理 -->
             <FilterTabs
               class="filter-tabs-right"
-              :filterPanelOpen="showFilterPanel"
-              @toggleFullPanel="(val) => (showFilterPanel = val)"
-              @requestOpen="onFilterTabsRequest"
+              @requestOpenFullPanel="handleOpenFilterPanel"
             />
           </div>
 
@@ -185,7 +175,6 @@ import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import IconBell from '@/components/icons/IconBell.vue'
 import IconSort from '@/components/icons/IconSort.vue'
-import IconFilterNarrow from '@/components/icons/IconFilterNarrow.vue'
 
 /* 路由 */
 const router = useRouter()
@@ -288,13 +277,9 @@ const handleLocationSelected = async () => {
 
 
 const handleOpenFilterPanel = () => {
-  // 无需先选择区域，直接打开统一 FilterPanel；清空分组，保持通用入口
+  // 仅移动端打开统一 FilterPanel；PC 端采用分离式下拉面板（FilterTabs 内部处理）
+  if (windowWidth.value > 768) return
   focusSection.value = null
-  showFilterPanel.value = true
-}
-const onFilterTabsRequest = (payload) => {
-  // 从 Chips 入口打开指定分组
-  focusSection.value = payload?.section || null
   showFilterPanel.value = true
 }
 

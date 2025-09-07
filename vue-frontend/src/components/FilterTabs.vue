@@ -1,57 +1,203 @@
 <template>
-  <!-- 顶部筛选标签栏（仅作为统一 FilterPanel 的入口，不再弹出旧气泡面板） -->
-  <div class="filter-tabs-container">
+  <!-- 顶部筛选标签栏 - PC模式分离式面板 -->
+  <div v-if="!isMobile" class="filter-tabs-container">
     <div class="filter-tabs">
       <!-- 区域 -->
       <div class="filter-tab-entry">
-        <button class="filter-tab" @click.stop="openSection('area')">
+        <button
+          ref="areaTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'area' }"
+          @click.stop="togglePanel('area')"
+        >
           <span class="chinese-text">区域</span>
+          <svg v-if="activePanel !== 'area'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'area'"
+          @update:modelValue="val => !val && (activePanel = null)"
+          :trigger="areaTabRef"
+          @close="activePanel = null"
+        >
+          <AreaFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
       </div>
 
       <!-- 卧室 -->
       <div class="filter-tab-entry">
-        <button class="filter-tab" @click.stop="openSection('bedrooms')">
+        <button
+          ref="bedroomsTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'bedrooms' }"
+          @click.stop="togglePanel('bedrooms')"
+        >
           <span class="chinese-text">卧室</span>
+          <svg v-if="activePanel !== 'bedrooms'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'bedrooms'"
+          @update:modelValue="val => !val && (activePanel = null)"
+          :trigger="bedroomsTabRef"
+          @close="activePanel = null"
+        >
+          <BedroomsFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
       </div>
 
       <!-- 价格 -->
       <div class="filter-tab-entry">
-        <button class="filter-tab" @click.stop="openSection('price')">
+        <button
+          ref="priceTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'price' }"
+          @click.stop="togglePanel('price')"
+        >
           <span class="chinese-text">价格</span>
+          <svg v-if="activePanel !== 'price'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'price'"
+          @update:modelValue="val => !val && (activePanel = null)"
+          :trigger="priceTabRef"
+          @close="activePanel = null"
+        >
+          <PriceFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
       </div>
 
       <!-- 空出时间 -->
       <div class="filter-tab-entry">
-        <button class="filter-tab" @click.stop="openSection('availability')">
+        <button
+          ref="availabilityTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'availability' }"
+          @click.stop="togglePanel('availability')"
+        >
           <span class="chinese-text">空出时间</span>
+          <svg v-if="activePanel !== 'availability'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'availability'"
+          @update:modelValue="val => !val && (activePanel = null)"
+          :trigger="availabilityTabRef"
+          @close="activePanel = null"
+        >
+          <AvailabilityFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
       </div>
 
       <!-- 更多（高级筛选） -->
       <div class="filter-tab-entry">
-        <button class="filter-tab" @click.stop="openSection('more')">
+        <button
+          ref="moreTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'more' }"
+          @click.stop="togglePanel('more')"
+        >
           <span class="chinese-text">更多</span>
+          <svg v-if="activePanel !== 'more'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'more'"
+          @update:modelValue="val => !val && (activePanel = null)"
+          :trigger="moreTabRef"
+          @close="activePanel = null"
+        >
+          <div class="more-filter-placeholder">
+            <p>更多筛选选项</p>
+          </div>
+        </FilterDropdown>
       </div>
     </div>
+  </div>
+
+  <!-- 移动端触发统一面板的按钮 -->
+  <div v-else class="filter-tabs-mobile">
+    <button class="filter-button" @click="$emit('requestOpenFullPanel')">
+      <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>筛选</span>
+    </button>
   </div>
 </template>
 
 <script setup>
-// 说明：本组件仅作为“锚点入口”，不再渲染任何 quick dropdown 内容。
-// 点击 chip → 统一 emit 打开 FilterPanel，并传递希望聚焦的分组 section。
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import FilterDropdown from './FilterDropdown.vue'
+import AreaFilterPanel from './filter-panels/AreaFilterPanel.vue'
+import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
+import PriceFilterPanel from './filter-panels/PriceFilterPanel.vue'
+import AvailabilityFilterPanel from './filter-panels/AvailabilityFilterPanel.vue'
 
+// 中文注释：PC端改为分离式下拉面板，移动端保持统一大面板
+// 使用 requestOpenFullPanel 事件触发移动端的统一面板
 
-const emit = defineEmits(['toggleFullPanel', 'requestOpen'])
+// 定义事件（在模板中通过 $emit 使用）
+// eslint-disable-next-line no-unused-vars
+const emit = defineEmits(['requestOpenFullPanel'])
 
-// 打开统一筛选面板，并传递分组
-const openSection = (section) => {
-  emit('toggleFullPanel', true)
-  emit('requestOpen', { section })
+// 响应式状态
+const activePanel = ref(null) // 'area', 'bedrooms', 'price', 'availability', 'more' 或 null
+
+// 面板触发元素引用
+const areaTabRef = ref(null)
+const bedroomsTabRef = ref(null)
+const priceTabRef = ref(null)
+const availabilityTabRef = ref(null)
+const moreTabRef = ref(null)
+
+// 移动端判断
+const isMobile = computed(() => {
+  return typeof window !== 'undefined' ? window.innerWidth < 768 : false
+})
+
+// 切换面板显示状态
+const togglePanel = (panel) => {
+  activePanel.value = activePanel.value === panel ? null : panel
 }
+
+// 全局事件处理
+const handleResize = () => {
+  // 当切换到移动端视图时，自动关闭任何打开的面板
+  if (isMobile.value && activePanel.value) {
+    activePanel.value = null
+  }
+}
+
+// 生命周期钩子
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
@@ -129,5 +275,58 @@ const openSection = (section) => {
   color: var(--color-text-primary);
 }
 
-/* 移除装饰性图标，保持纯文字标签 */
+/* 激活状态样式 */
+.filter-tab.active {
+  background: #ffefe9; /* 极弱浅橙，非品牌强底色 */
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+/* 箭头图标 */
+.chevron-icon {
+  width: 16px;
+  height: 16px;
+  color: currentColor;
+}
+
+/* 移动端筛选按钮 */
+.filter-tabs-mobile {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 12px;
+  gap: 2px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.filter-button:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
+}
+
+.filter-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 更多筛选面板占位 */
+.more-filter-placeholder {
+  width: 280px;
+  padding: 20px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
 </style>

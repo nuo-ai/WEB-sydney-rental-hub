@@ -220,6 +220,47 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 任何异常场景下可一键回退，确保向后兼容。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
+---
+
+## 滚动与滚动条显示原则（新增）
+
+- 原则：抽屉/侧栏类容器仅保留“一个主纵向滚动条”；打开面板时锁定 body 滚动，避免出现页面滚动条与面板滚动条并列。
+- 滚动链控制：对面板与其内容区使用 `overscroll-behavior: contain`，阻断滚动穿透到底层页面或父级容器。
+- 内部长列表：允许局部滚动，但默认隐藏其滚动条条形（保留滚动能力），避免与主滚动条并列出现在右缘；或将滚动职责合并为面板主滚动。
+- 品牌色约束：滚动条/指示器统一中性灰，不得使用品牌色（品牌色仅用于 CTA）。
+- 变量化：统一使用 `--neutral-scrollbar-color / --neutral-scrollbar-hover-color` 管理滚动条颜色；必要时在组件内使用 `:deep` 精确覆盖。
+- 回滚策略：删除对应覆盖块即可回退；不影响逻辑层。
+- 实施建议：
+  - 样式（全局）：隐藏/中性化 Element Plus `el-scrollbar` 与原生滚动条条形
+    ```css
+    /* 全局中性化（已落地，摘录） */
+    :root {
+      --neutral-scrollbar-color: #c0c4cc;
+      --neutral-scrollbar-hover-color: #909399;
+    }
+    .el-scrollbar__thumb { background-color: var(--neutral-scrollbar-color) !important; }
+    .el-scrollbar__thumb:hover { background-color: var(--neutral-scrollbar-hover-color) !important; }
+    /* 面板内定向兜底：仅显示主滚动条，内部列表条形隐藏 */
+    .domain-filter-panel :deep(.el-scrollbar__bar) { background: transparent !important; }
+    .location-section :deep(.el-scrollbar__bar) { display: none !important; }
+    .location-section :deep(.el-scrollbar__thumb) { background: transparent !important; }
+    ```
+  - 逻辑（组件）：在面板显示时锁定 body 滚动，关闭时恢复
+    ```js
+    // 中文注释：锁定 body 滚动，防止页面滚动条与面板滚动条并列
+    const lockBodyScroll = () => {
+      document.documentElement.style.overflow = 'hidden'
+      document.body.style.overflow = 'hidden'
+    }
+    const unlockBodyScroll = () => {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+    watch(visible, (on) => { on ? lockBodyScroll() : unlockBodyScroll() })
+    onUnmounted(() => unlockBodyScroll())
+    ```
+- 溯源：activeContext 2025-09-08｜UI-EP-SCROLL-NEUTRAL-1
+
 ## 导航交互统一（新增）
 
 - 作用范围：仅在“导航容器”内的链接生效（nav / header nav / .nav / .navbar / .navigation / .top-nav / .bottom-nav / [class*="nav"]）
