@@ -7,10 +7,11 @@
 - UI-EP-SCROLL-NEUTRAL-1：全局/面板滚动指示器中性化已完成；下一步待定：统一“主滚动职责”
 - MB-SLIM-B：Memory Bank 采用“保6文件 + 硬阈值”方案；INDEX.md 已废弃占位（保留兼容链接）；activeContext 仅保当日 ≤8–10 行；progress 近30天里程碑单条 ≤3 行
 - MB-SLIM-B-APPLY：废弃 INDEX.md（写入指引与溯源）+ 修复 projectbrief.md 标题；溯源：TASK MB-SLIM-B-APPLY
+- FILTER-BEDROOMS-PANEL-EXT：卧室面板并入“浴室/车位”，统一“最少 N”语义；PC 宽度 380，面板内不滚动；“应用（N）”实时计数；URL 同步仅非空；溯源：TASK FILTER-BEDROOMS-PANEL-EXT 2025-09-08
 
 服务状态
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
-- [P0] “更多”面板（高级项）与可达性（初始焦点/Tab/ESC）
+- [P0] 无内滚与 380 宽度在多分辨率回归；键盘可达性复测（首控聚焦/Tab/ESC）；后续按需恢复 Studio
 - [Policy] 持续执行 MB-SLIM-B（不新增 MB 文件、强制溯源）

@@ -26,9 +26,43 @@
         </button>
       </div>
 
+      <!-- 浴室 -->
+      <div class="section">
+        <div class="section-label chinese-text">浴室</div>
+        <div class="filter-buttons-group">
+          <button
+            v-for="option in bathroomOptions"
+            :key="option.value"
+            class="filter-btn"
+            :class="{ active: isBathroomSelected(option.value) }"
+            :aria-pressed="isBathroomSelected(option.value)"
+            @click="toggleBathroom(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 车位 -->
+      <div class="section">
+        <div class="section-label chinese-text">车位</div>
+        <div class="filter-buttons-group">
+          <button
+            v-for="option in parkingOptions"
+            :key="option.value"
+            class="filter-btn"
+            :class="{ active: isParkingSelected(option.value) }"
+            :aria-pressed="isParkingSelected(option.value)"
+            @click="toggleParking(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
+
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <button type="button" class="link-clear" @click="clearBedrooms">{{ anyLabel }}</button>
+        <button type="button" class="link-clear" @click="clearAll">{{ anyLabel }}</button>
         <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ cancelLabel }}
         </el-button>
@@ -91,13 +125,44 @@ const propertiesStore = usePropertiesStore()
 
 // 选项数据
 const bedroomOptions = [
-  // 中文注释：Studio 采用值 0，对应“最少 0 间”
-  { value: '0', label: 'Studio' },
+  // 中文注释：最少卧室数（去除 Studio，后续按需再启用）
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },
   { value: '4+', label: '4+' },
 ]
+
+// 浴室与车位的选项（最少 N 语义）
+const bathroomOptions = [
+  { value: '1', label: '1' },
+  { value: '2', label: '2' },
+  { value: '3+', label: '3+' },
+]
+const parkingOptions = [
+  { value: '0', label: '0' },
+  { value: '1', label: '1' },
+  { value: '2+', label: '2+' },
+]
+
+// 初始值（从已应用参数恢复），兼容 V1（字符串）与 V2（*_min）
+const initialBathrooms = computed(() => {
+  const cur = propertiesStore.currentFilterParams || {}
+  if (cur.bathrooms) return String(cur.bathrooms).split(',')
+  if (cur.bathrooms_min != null) {
+    const n = Number(cur.bathrooms_min)
+    if (!Number.isNaN(n)) return [n >= 3 ? '3+' : String(n)]
+  }
+  return []
+})
+const initialParking = computed(() => {
+  const cur = propertiesStore.currentFilterParams || {}
+  if (cur.parking) return String(cur.parking).split(',')
+  if (cur.parking_min != null) {
+    const n = Number(cur.parking_min)
+    if (!Number.isNaN(n)) return [n >= 2 ? '2+' : String(n)]
+  }
+  return []
+})
 
 // 从 store 中获取当前筛选状态（仅用于初始化本地状态）
 const initialBedrooms = computed(() => {
@@ -110,6 +175,8 @@ const initialBedrooms = computed(() => {
 
 // 本地状态（用于保存用户选择，但不立即应用）
 const localBedrooms = ref([...initialBedrooms.value])
+const localBathrooms = ref([...initialBathrooms.value])
+const localParking = ref([...initialParking.value])
 
 // 结果数量预估（用于“应用（N）”）
 const previewCount = ref(null)
@@ -124,8 +191,10 @@ const applyText = computed(() => {
 })
 
 // 清空选择（不限）
-const clearBedrooms = () => {
+const clearAll = () => {
   localBedrooms.value = []
+  localBathrooms.value = []
+  localParking.value = []
   computePreviewCount()
 }
 
@@ -163,20 +232,50 @@ const isBedroomSelected = (value) => {
 // 切换卧室选择（单选逻辑）
 const toggleBedroom = (value) => {
   if (localBedrooms.value.includes(value)) {
-    // 如果已选中，则取消选择
     localBedrooms.value = []
   } else {
-    // 如果未选中，则选中（单选）
     localBedrooms.value = [value]
+  }
+}
+
+// 判断/切换 浴室
+const isBathroomSelected = (value) => {
+  return localBathrooms.value.includes(value)
+}
+const toggleBathroom = (value) => {
+  if (localBathrooms.value.includes(value)) {
+    localBathrooms.value = []
+  } else {
+    localBathrooms.value = [value]
+  }
+}
+
+// 判断/切换 车位
+const isParkingSelected = (value) => {
+  return localParking.value.includes(value)
+}
+const toggleParking = (value) => {
+  if (localParking.value.includes(value)) {
+    localParking.value = []
+  } else {
+    localParking.value = [value]
   }
 }
 
 // 构建筛选参数
 const buildFilterParams = () => {
   const filterParams = {}
-  // 卧室数量（最少 N 间；'4+' → '4' 在 store 映射层处理；Studio 使用 '0'）
+  // 卧室数量（最少 N；'4+' → '4' 在 Store 映射层处理）
   if (localBedrooms.value.length > 0) {
     filterParams.bedrooms = localBedrooms.value.join(',')
+  }
+  // 浴室（最少 N；'3+' → 3 在 Store 映射层处理）
+  if (localBathrooms.value.length > 0) {
+    filterParams.bathrooms = localBathrooms.value.join(',')
+  }
+  // 车位（最少 N；'2+' → 2 在 Store 映射层处理；'0' 有效）
+  if (localParking.value.length > 0) {
+    filterParams.parking = localParking.value.join(',')
   }
   return filterParams
 }
@@ -192,6 +291,20 @@ const updateUrlQuery = async (filterParams) => {
       newQuery.bedrooms = filterParams.bedrooms
     } else {
       delete newQuery.bedrooms
+    }
+
+    // 更新浴室参数
+    if (filterParams.bathrooms) {
+      newQuery.bathrooms = filterParams.bathrooms
+    } else {
+      delete newQuery.bathrooms
+    }
+
+    // 更新车位参数
+    if (filterParams.parking) {
+      newQuery.parking = filterParams.parking
+    } else {
+      delete newQuery.parking
     }
 
     // 仅当查询参数发生变化时才更新 URL
@@ -269,15 +382,15 @@ const applyFilters = async () => {
 
 /* 面板内容 */
 .panel-content {
-  padding: 16px;
+  padding: 12px; /* 压缩留白，避免内部滚动 */
 }
 
 /* 筛选按钮组 */
 .filter-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 16px; /* 压缩间距，控制面板总高 */
 }
 
 .filter-btn {
@@ -333,6 +446,16 @@ const applyFilters = async () => {
 .apply-btn:hover {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
+}
+
+/* 小节标题 */
+.section {
+  margin-top: 4px;
+}
+.section-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
 }
 
 /* 文本清空按钮（不限） */

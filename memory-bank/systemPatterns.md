@@ -301,6 +301,15 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
     ```
 - 溯源：activeContext 2025-09-08｜UI-EP-SCROLL-NEUTRAL-1
 
+## 分离式筛选面板尺寸与无内滚（新增）
+- 原则：PC 端分离式筛选面板内部不出现滚动条；通过控量与压缩留白控制高度，仍遵循“仅一个主纵向滚动条”的系统原则。
+- 尺寸：仅“卧室”面板宽度为 380px；其它筛选面板为 520px；移动端最小宽度不少于触发器宽度（≥280px）。
+- 实施：
+  - FilterTabs.computePosition(el, panel)：PC 下 `panel==='bedrooms' ? 380 : 520`，并做左右 10px 视口边缘保护。
+  - 面板内部通过压缩留白与间距控制总高（示例：panel-content padding 12px；按钮组 gap 8px；section margin-bottom 8/16；三组各一行），整体高度≈320–360px，确保不触发内部滚动。
+  - “应用（N）”计数采用 300ms 防抖，加载态禁点；错误快速失败，不做本地估算，保持可观测性。
+- 溯源：activeContext 2025-09-08｜FILTER-BEDROOMS-PANEL-EXT
+
 ## 导航交互统一（新增）
 
 - 作用范围：仅在“导航容器”内的链接生效（nav / header nav / .nav / .navbar / .navigation / .top-nav / .bottom-nav / [class*="nav"]）

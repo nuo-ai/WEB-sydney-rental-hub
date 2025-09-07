@@ -197,13 +197,13 @@ const getRef = (panel) => {
 }
 
 // 中文注释：从触发元素计算显式定位（fixed 参考视口坐标）
-const computePosition = (el) => {
+const computePosition = (el, panel) => {
   if (!el) return null
   const rect = el.getBoundingClientRect()
   const vw = window.innerWidth
-  // 中文注释：PC 固定更友好的面板宽度（避免细长条）；移动端保持至少与触发等宽
+  // 中文注释：PC 下仅“卧室”面板缩窄到 380，其它保持 520；移动端保持至少与触发等宽
   const desktop = typeof window !== 'undefined' ? window.innerWidth >= 768 : true
-  const width = desktop ? 520 : Math.max(rect.width, 280)
+  const width = desktop ? (panel === 'bedrooms' ? 380 : 520) : Math.max(rect.width, 280)
   let left = rect.left
   // 边缘保护：左右至少 10px 余量
   if (left + width > vw - 10) left = Math.max(10, vw - width - 10)
@@ -223,7 +223,7 @@ const togglePanel = (panel, evt) => {
   activePanel.value = wasOpen ? null : panel
   // 中文注释：优先使用事件的 currentTarget；退化到已保存的 ref
   const el = (evt && evt.currentTarget) || getRef(panel)?.value
-  positions[panel] = computePosition(el)
+  positions[panel] = computePosition(el, panel)
 }
 
 // 全局事件处理
@@ -236,7 +236,7 @@ const handleResize = () => {
   // PC 场景：若有面板打开，随窗口变化重新计算显式定位
   if (activePanel.value) {
     const el = getRef(activePanel.value)?.value
-    positions[activePanel.value] = computePosition(el)
+    positions[activePanel.value] = computePosition(el, activePanel.value)
   }
 }
 
