@@ -2098,7 +2098,7 @@ onBeforeRouteLeave(() => {
 @media (max-width: 767px) {
   /* 统一白卡内部左右边界与地图一致 */
   .content-card {
-    --mobile-gutter: 16px;
+    --mobile-gutter: 8px;
   }
   .content-card .info-card,
   .content-card .location-section,
