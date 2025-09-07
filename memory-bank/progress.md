@@ -25,8 +25,8 @@
 
 ### 下一步规划 (What's left to build)
 
-- [P0/PC] 筛选入口重构：移除 PC “筛选”按钮；保留四分组 Chips（区域/卧室/价格/空出时间）+“更多”收纳高级项；点击仅打开对应面板，不直接改 store；按“筛选入口一致性 v2（PC）”规则实施，可回滚
-- [P0/PC] FilterPanel.focusSection：支持接收 section 并滚动/聚焦到分组首控件（配合 Chips 锚点）
+- [X] [P0/PC] 筛选入口重构（v2·PC）：分离式下拉面板已落地；Mobile 端保留统一 FilterPanel（可回滚）
+- [P0/Mobile] FilterPanel.focusSection：仅用于移动端统一面板；PC 端不再需要
 
 - 地图与通勤
   - [X] 放大时保持中心（固定住坐标在屏幕中心范围）

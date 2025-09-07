@@ -1,7 +1,7 @@
-# 技术上下文 (Technical Context)
+![1757262958422](image/techContext/1757262958422.png)# 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-06
+**最后更新**: 2025-09-08
 
 ---
 
@@ -144,6 +144,22 @@ python scripts/run_backend.py  # localhost:8000
   - DB_POOL_MIN_SIZE=1；DB_POOL_MAX_SIZE=4（可按环境覆盖）
 - 连接释放：FastAPI 依赖 get_db_conn_dependency 采用 yield + finally 确保归还；若 _db_pool.getconn() 抛 PoolError，回退直接连接，finally 统一 release_db_connection(conn)。
 - 缓存键与 TTL：/api/properties 采用 URL 作为缓存键（cache_key_by_url）并设置 expire=900，彻底隔离计数（page_size=1）与列表缓存；位置统计（suggestions/all/nearby）TTL 同为 900，且查询统一 is_active = TRUE 与 COUNT(DISTINCT listing_id)。
+
+## 运行与集成增补（2025-09-08）
+
+- 新增组件与改造
+  - 新增：`src/components/FilterDropdown.vue`（通用下拉容器，teleport 到 body，支持点击外部/ESC 关闭，单例打开）
+  - 新增：`src/components/filter-panels/AreaFilterPanel.vue`、`BedroomsFilterPanel.vue`、`PriceFilterPanel.vue`、`AvailabilityFilterPanel.vue`（四个分离式专用筛选面板）
+  - 改造：`src/components/FilterTabs.vue`（PC 分离式下拉，内部管理 activePanel、触发 refs、:modelValue/@update:modelValue 对偶）、`src/views/HomeView.vue`（仅移动端触发统一 FilterPanel；PC 忽略该触发）
+- 行为与契约
+  - PC 分离式：FilterTabs 内部管理 activePanel（仅允许一个打开）；下拉定位基于触发元素 `getBoundingClientRect()`，`min-width ≥ 触发宽度`，`max-height: calc(100vh - 40px)`，`overscroll-behavior: contain` 防滚动穿透；点击外部/ESC 关闭；当切换至移动端断点（<768px）时强制关闭任何打开面板。
+  - Mobile 统一面板：FilterTabs 通过 `emit('requestOpenFullPanel')` 通知父组件；HomeView 在 `windowWidth ≤ 768` 时打开统一 FilterPanel；PC 忽略该触发，避免双通道。
+  - 状态与 URL：单一真源仍为 Pinia；面板内编辑仅在“应用”时调用 `applyFilters()` 提交；URL 同步仅持久化“非空参数”，进入页面从 URL 恢复；保持既有 V1→V2 渐进映射与回滚能力。
+- ESLint/可维护性
+  - 修复 `v-model` 左值（LHS）不合法：统一改为 `:modelValue` + `@update:modelValue`。
+  - 清理未使用变量（如 emit/import）；将文案抽至 `computed` 回退，避免 `$t` 未用告警。
+- 依赖与回滚
+  - 无新增依赖；与 Mobile 统一面板并存，按断点切换；若需回退，恢复 FilterTabs 触发统一 FilterPanel 即可。
 
 ## 样式系统增补（2025-09-06）
 

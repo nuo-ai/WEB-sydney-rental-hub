@@ -8,7 +8,7 @@
           ref="areaTabRef"
           class="filter-tab"
           :class="{ active: activePanel === 'area' }"
-          @click.stop="togglePanel('area')"
+          @click.stop="togglePanel('area', $event)"
         >
           <span class="chinese-text">区域</span>
           <svg v-if="activePanel !== 'area'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -22,6 +22,7 @@
           :modelValue="activePanel === 'area'"
           @update:modelValue="val => !val && (activePanel = null)"
           :trigger="areaTabRef"
+          :explicit-position="positions.area"
           @close="activePanel = null"
         >
           <AreaFilterPanel @close="activePanel = null" />
@@ -34,7 +35,7 @@
           ref="bedroomsTabRef"
           class="filter-tab"
           :class="{ active: activePanel === 'bedrooms' }"
-          @click.stop="togglePanel('bedrooms')"
+          @click.stop="togglePanel('bedrooms', $event)"
         >
           <span class="chinese-text">卧室</span>
           <svg v-if="activePanel !== 'bedrooms'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -48,6 +49,7 @@
           :modelValue="activePanel === 'bedrooms'"
           @update:modelValue="val => !val && (activePanel = null)"
           :trigger="bedroomsTabRef"
+          :explicit-position="positions.bedrooms"
           @close="activePanel = null"
         >
           <BedroomsFilterPanel @close="activePanel = null" />
@@ -60,7 +62,7 @@
           ref="priceTabRef"
           class="filter-tab"
           :class="{ active: activePanel === 'price' }"
-          @click.stop="togglePanel('price')"
+          @click.stop="togglePanel('price', $event)"
         >
           <span class="chinese-text">价格</span>
           <svg v-if="activePanel !== 'price'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -74,6 +76,7 @@
           :modelValue="activePanel === 'price'"
           @update:modelValue="val => !val && (activePanel = null)"
           :trigger="priceTabRef"
+          :explicit-position="positions.price"
           @close="activePanel = null"
         >
           <PriceFilterPanel @close="activePanel = null" />
@@ -86,7 +89,7 @@
           ref="availabilityTabRef"
           class="filter-tab"
           :class="{ active: activePanel === 'availability' }"
-          @click.stop="togglePanel('availability')"
+          @click.stop="togglePanel('availability', $event)"
         >
           <span class="chinese-text">空出时间</span>
           <svg v-if="activePanel !== 'availability'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -100,6 +103,7 @@
           :modelValue="activePanel === 'availability'"
           @update:modelValue="val => !val && (activePanel = null)"
           :trigger="availabilityTabRef"
+          :explicit-position="positions.availability"
           @close="activePanel = null"
         >
           <AvailabilityFilterPanel @close="activePanel = null" />
@@ -112,7 +116,7 @@
           ref="moreTabRef"
           class="filter-tab"
           :class="{ active: activePanel === 'more' }"
-          @click.stop="togglePanel('more')"
+          @click.stop="togglePanel('more', $event)"
         >
           <span class="chinese-text">更多</span>
           <svg v-if="activePanel !== 'more'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -126,6 +130,7 @@
           :modelValue="activePanel === 'more'"
           @update:modelValue="val => !val && (activePanel = null)"
           :trigger="moreTabRef"
+          :explicit-position="positions.more"
           @close="activePanel = null"
         >
           <div class="more-filter-placeholder">
@@ -148,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import FilterDropdown from './FilterDropdown.vue'
 import AreaFilterPanel from './filter-panels/AreaFilterPanel.vue'
 import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
@@ -172,14 +177,52 @@ const priceTabRef = ref(null)
 const availabilityTabRef = ref(null)
 const moreTabRef = ref(null)
 
+// 中文注释：显式坐标（由触发按钮计算），用于避免 ref/布局时序造成的 0,0 定位
+const positions = reactive({
+  area: null,
+  bedrooms: null,
+  price: null,
+  availability: null,
+  more: null,
+})
+
+const getRef = (panel) => {
+  switch (panel) {
+    case 'area': return areaTabRef
+    case 'bedrooms': return bedroomsTabRef
+    case 'price': return priceTabRef
+    case 'availability': return availabilityTabRef
+    case 'more': return moreTabRef
+    default: return null
+  }
+}
+
+// 中文注释：从触发元素计算显式定位（fixed 参考视口坐标）
+const computePosition = (el) => {
+  if (!el) return null
+  const rect = el.getBoundingClientRect()
+  const vw = window.innerWidth
+  const width = Math.max(rect.width, 280)
+  let left = rect.left
+  // 边缘保护：左右至少 10px 余量
+  if (left + width > vw - 10) left = Math.max(10, vw - width - 10)
+  if (left < 10) left = 10
+  const top = rect.bottom + 8
+  return { top, left, width }
+}
+
 // 移动端判断
 const isMobile = computed(() => {
   return typeof window !== 'undefined' ? window.innerWidth < 768 : false
 })
 
 // 切换面板显示状态
-const togglePanel = (panel) => {
-  activePanel.value = activePanel.value === panel ? null : panel
+const togglePanel = (panel, evt) => {
+  const wasOpen = activePanel.value === panel
+  activePanel.value = wasOpen ? null : panel
+  // 中文注释：优先使用事件的 currentTarget；退化到已保存的 ref
+  const el = (evt && evt.currentTarget) || getRef(panel)?.value
+  positions[panel] = computePosition(el)
 }
 
 // 全局事件处理
@@ -187,6 +230,12 @@ const handleResize = () => {
   // 当切换到移动端视图时，自动关闭任何打开的面板
   if (isMobile.value && activePanel.value) {
     activePanel.value = null
+    return
+  }
+  // PC 场景：若有面板打开，随窗口变化重新计算显式定位
+  if (activePanel.value) {
+    const el = getRef(activePanel.value)?.value
+    positions[activePanel.value] = computePosition(el)
   }
 }
 

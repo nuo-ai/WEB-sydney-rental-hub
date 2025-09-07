@@ -210,6 +210,21 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 可达性：遵循 EP-GUARDRAIL-FOCUS-GLOBAL；打开时聚焦面板首交互控件；Esc/点击遮罩关闭。
 - 回滚策略：若需回退到“统一 FilterPanel”形态，仅需将 Chips 触发恢复为 requestOpen(section) 并渲染统一 FilterPanel。
 
+### PC 分离式筛选实现细则（补充）
+- 容器与挂载
+  - 使用 FilterDropdown 作为通用下拉容器，teleport 到 body，避免层级干扰；overlay 支持 @click.self 关闭；仅允许单例面板同时打开（activePanel 单一）。
+  - 面板显隐采用 :modelValue 与 @update:modelValue 事件对偶，而非 v-model 布尔表达式（修复 v-model LHS 规范问题）。
+- 事件契约（PC/Mobile 分治）
+  - PC：FilterTabs 内部管理 activePanel 与触发 refs（area/bedrooms/price/availability/more），不对 store 与 URL 做直接写入。
+  - Mobile：FilterTabs 通过 emit('requestOpenFullPanel') 通知父级打开统一 FilterPanel；HomeView 接收后仅在移动端断点下打开；PC 忽略该触发。
+- 定位与滚动
+  - 下拉定位基于触发元素 getBoundingClientRect()，保证 minWidth≥触发宽度；max-height: calc(100vh - 40px)；overscroll-behavior: contain 防滚动穿透。
+  - 关闭条件：点击外部、Esc、断点切换到移动端时强制关闭。
+- 可达性
+  - 打开时将焦点置于面板首个可交互元素；Esc 关闭；Tab 流顺序仅在面板内可达（必要时增加焦点陷阱）。
+- 风险与回滚
+  - 该实现与 Mobile 统一面板并存，按断点切换；移除 FilterTabs 或改回触发统一面板即可回滚。
+
 ## 前端状态同步与特性开关（新增）
 
 - 原则：以“映射函数 + 特性开关”的方式进行 V1 → V2 契约演进，默认关闭新契约，保障回滚路径。

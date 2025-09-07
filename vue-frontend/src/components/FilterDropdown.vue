@@ -47,6 +47,11 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // 显式传入定位（优先使用），格式：{ top: number|string, left: number|string, width?: number|string }
+  explicitPosition: {
+    type: Object,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'close'])
@@ -61,7 +66,17 @@ const positionStyle = ref({})
 
 // 中文注释：计算下拉面板的位置，确保正确对齐在触发元素下方
 const calculatePosition = () => {
-  if (!props.trigger?.value) return { top: '0px', left: '0px' }
+  // 中文注释：若提供了显式坐标，则优先使用，避免任何时序问题
+  if (props.explicitPosition && (props.explicitPosition.top != null) && (props.explicitPosition.left != null)) {
+    const top = typeof props.explicitPosition.top === 'number' ? `${props.explicitPosition.top}px` : `${props.explicitPosition.top}`
+    const left = typeof props.explicitPosition.left === 'number' ? `${props.explicitPosition.left}px` : `${props.explicitPosition.left}`
+    const width = props.explicitPosition.width != null
+      ? (typeof props.explicitPosition.width === 'number' ? `${props.explicitPosition.width}px` : `${props.explicitPosition.width}`)
+      : (props.width || `${Math.max(props.trigger?.value?.getBoundingClientRect?.().width || 0, 280)}px`)
+    return { top, left, width }
+  }
+  // 中文注释：触发元素尚未就绪时，保持上一次定位（或空），避免写入 0,0 导致出现在左上角
+  if (!props.trigger?.value) return positionStyle.value || {}
 
   const rect = props.trigger.value.getBoundingClientRect()
   const viewportHeight = window.innerHeight
@@ -109,6 +124,9 @@ const calculatePosition = () => {
 // 中文注释：更新下拉面板位置
 const updatePosition = () => {
   nextTick(() => {
+    // 中文注释：若提供了显式坐标（explicitPosition），即使 trigger 未就绪也必须计算定位
+    const hasExplicit = props.explicitPosition && props.explicitPosition.top != null && props.explicitPosition.left != null
+    if (!hasExplicit && !props.trigger?.value) return
     positionStyle.value = calculatePosition()
   })
 }
@@ -136,17 +154,36 @@ const handleResize = () => {
 // 监听面板打开状态
 watch(() => isOpen.value, (newVal) => {
   if (newVal) {
+    // 中文注释：首次打开立即计算一次
     updatePosition()
     nextTick(() => {
       // 中文注释：面板打开时，将焦点移至面板以支持键盘访问
       dropdownRef.value?.focus?.()
+      // 中文注释：在布局/赋值可能慢一拍的场景下，追加 1–2 帧 rAF 进行轻量确认重算
+      const ensurePosition = (attempt = 0) => {
+        if (!positionStyle.value?.top || !positionStyle.value?.left) {
+          updatePosition()
+        }
+        if (attempt < 2) {
+          requestAnimationFrame(() => ensurePosition(attempt + 1))
+        }
+      }
+      requestAnimationFrame(() => ensurePosition(0))
     })
   }
 })
 
 // 中文注释：监听触发元素变化或窗口滚动，更新位置
-watch(() => props.trigger, () => {
-  if (isOpen.value) {
+watch(() => props.trigger?.value, (el) => {
+  // 中文注释：触发元素一旦就绪即尝试定位，不再依赖 isOpen，先准备好位置
+  if (el) {
+    updatePosition()
+  }
+}, { immediate: true })
+
+// 中文注释：当外部显式坐标变化时，若面板已打开则立即更新
+watch(() => props.explicitPosition, (pos) => {
+  if (isOpen.value && pos && pos.top != null && pos.left != null) {
     updatePosition()
   }
 }, { deep: true })
