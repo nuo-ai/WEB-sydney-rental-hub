@@ -201,7 +201,9 @@ const computePosition = (el) => {
   if (!el) return null
   const rect = el.getBoundingClientRect()
   const vw = window.innerWidth
-  const width = Math.max(rect.width, 280)
+  // 中文注释：PC 固定更友好的面板宽度（避免细长条）；移动端保持至少与触发等宽
+  const desktop = typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  const width = desktop ? 520 : Math.max(rect.width, 280)
   let left = rect.left
   // 边缘保护：左右至少 10px 余量
   if (left + width > vw - 10) left = Math.max(10, vw - width - 10)

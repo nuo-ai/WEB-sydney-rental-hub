@@ -219,7 +219,7 @@ onUnmounted(() => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1001;
-  max-height: calc(100vh - 40px);
+  max-height: 66vh;
   max-width: calc(100vw - 20px);
   overflow: hidden;
   outline: none; /* 移除焦点轮廓 */

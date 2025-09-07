@@ -27,9 +27,9 @@
           <h4 class="section-title chinese-text">{{ locationLabel }}</h4>
 
           <template v-if="selectedLocations.length">
-            <div class="location-list">
+            <div class="location-list" :style="chipsCollapsed ? chipsCollapsedStyle : null">
               <div
-                v-for="loc in selectedLocations"
+                v-for="loc in displaySelectedLocations"
                 :key="loc.id"
                 class="location-chip"
                 :title="loc.fullName || loc.name"
@@ -47,6 +47,9 @@
             <div class="location-actions">
               <button class="clear-all" type="button" @click="clearAllLocations">
                 {{ clearAllLabel }}
+              </button>
+              <button class="toggle-chips" type="button" @click="chipsCollapsed = !chipsCollapsed">
+                {{ chipsCollapsed ? '展开' : '收起' }}
               </button>
             </div>
           </template>
@@ -180,8 +183,15 @@
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
         <el-button class="cancel-btn" size="large" @click="closePanel"> {{ $t('filter.cancel') }} </el-button>
-        <el-button type="primary" class="apply-btn" size="large" @click="applyFilters" :disabled="!isDateRangeValid">
-          {{ $t('filter.showResults') }} ({{ filteredCount }})
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="large"
+          @click="applyFilters"
+          :disabled="!isDateRangeValid"
+          :aria-label="`确定（${filteredCount} 条结果）`"
+        >
+          确定
         </el-button>
       </div>
     </div>
@@ -244,6 +254,29 @@ const filters = ref({
 
 /* 选区与“附近区域”开关 */
 const selectedLocations = computed(() => propertiesStore.selectedLocations || [])
+
+// 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
+const displaySelectedLocations = computed(() => {
+  const map = new Map()
+  for (const loc of selectedLocations.value) {
+    if (!loc) continue
+    if (loc.type === 'suburb') {
+      const key = `suburb_${loc.name}`
+      if (!map.has(key)) map.set(key, { ...loc, fullName: loc.name })
+    } else {
+      map.set(loc.id, loc)
+    }
+  }
+  return Array.from(map.values())
+})
+
+// 中文注释：PC 收起2行、Mobile 收起1行；用近似像素高度控制，避免复杂测量
+const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 767 : false
+const chipsCollapsed = ref(true)
+const chipsCollapsedStyle = computed(() => ({
+  maxHeight: isMobile ? '36px' : '64px',
+  overflow: 'hidden',
+}))
 const includeNearby = ref(true)
 /* 文案回退，避免显示未注册的 key */
 const searchNearbyLabel = computed(() => {
@@ -263,14 +296,10 @@ const locationEmptyLabel = computed(() => {
   const v = t('filter.locationEmpty')
   return v && v !== 'filter.locationEmpty' ? v : '未选择任何区域，请先从搜索栏选择区域'
 })
-/* 显示格式化：Suburb, NSW, 2017 / 2017 */
+/* 显示格式化：仅 suburb 名称；postcode 仅显示自身 */
 const formatLocation = (loc) => {
   if (!loc) return ''
-  if (loc.type === 'suburb') {
-    const pc = loc.postcode ? `, NSW, ${loc.postcode}` : ''
-    return `${loc.name}${pc}`
-  }
-  return `${loc.name}`
+  return loc.type === 'suburb' ? String(loc.name || '') : String(loc.name || '')
 }
 const removeLocation = (id) => {
   propertiesStore.removeSelectedLocation(id)
@@ -1152,22 +1181,26 @@ onMounted(() => {
 
 /* Location 区样式 */
 .location-section .location-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* 自适应 2–3 列 */
   gap: 8px;
 }
 .location-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border: none;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-default);
   border-radius: 0;
   background: var(--chip-bg, #f7f8fa);
+  max-width: 140px; /* 中文注释：限制单个标签宽度，避免长词撑破布局 */
 }
 .location-chip .chip-text {
   font-size: 14px;
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .location-chip .chip-remove {
   background: transparent;
@@ -1224,6 +1257,16 @@ onMounted(() => {
   font-size: 13px;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.toggle-chips {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0 4px;
 }
 
 

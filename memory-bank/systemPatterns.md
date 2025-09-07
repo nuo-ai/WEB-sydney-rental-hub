@@ -1,4 +1,4 @@
-![1757075026513](image/systemPatterns/1757075026513.png)# 系统设计模式与最佳实践
+![1757267579081](image/systemPatterns/1757267579081.png)![1757075026513](image/systemPatterns/1757075026513.png)# 系统设计模式与最佳实践
 
 ---
 
@@ -235,6 +235,15 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 任何异常场景下可一键回退，确保向后兼容。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
+## 更多高级筛选模式（新增）
+- 原则：PC 端“更多”面板承载高级条件（furnished/bathrooms_min/parking_min）；仅在“应用”时提交到 Pinia；URL 仅写入非空参数。
+- 定位与交互：沿用分离式下拉（FilterDropdown）显式坐标策略、单例打开、ESC/外点关闭；打开时首控件获焦点，Tab 顺序在面板内闭环。
+- 数据契约：组件传入 isFurnished/bathrooms/parking 等键；Store 侧 mapFilterStateToApiParams 在 V2 下映射为 furnished/bathrooms_min/parking_min，V1 下透传且可被后端忽略。
+- 特性开关：默认 enableFilterV2=false；当检测到“高级键”（isFurnished/bathrooms/parking/postcodes）时，按需启用 V2 映射，保障无痛回滚。
+- URL 同步：仅写入 isFurnished=1、bathrooms=3+、parking=2+ 等非空值；刷新/直链可复现（读取逻辑可按需补充）。
+- 回滚策略：移除 FilterTabs 中对 MoreFilterPanel 的注册即可回退为占位；或关闭 V2 映射开关恢复旧契约。
+- 溯源：commit 7535437｜FILTER-MORE-PANEL-PC
+
 ## 分离式下拉定位模式（新增）
 - 原则：PC 分离式筛选使用“显式坐标优先”的定位策略，彻底规避 ref/布局时序导致的 0,0 问题。
 - 触发侧（FilterTabs）：
@@ -305,7 +314,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 风险与回滚：
   - 若个别非导航模块类名包含“nav”被误伤，可通过更精确选择器限定或在局部覆写
   - 该规则块为追加内容，可整体删除快速回退
-- 溯源：activeContext 2025-09-06｜UI-NAV-GLOBAL-RULES｜pending commit
+- 溯源：progress 2025-09-06｜UI-NAV-GLOBAL-RULES（已落地）
 
 ## 分页参数防串扰（新增）
 

@@ -14,9 +14,9 @@
     <div class="panel-content">
       <!-- 已选区域列表 -->
       <template v-if="selectedLocations.length">
-        <div class="location-list">
+        <div class="location-list" :class="{ collapsed: chipsCollapsed }" :style="chipsCollapsed ? chipsCollapsedStyle : null">
           <div
-            v-for="loc in selectedLocations"
+            v-for="loc in displaySelectedLocations"
             :key="loc.id"
             class="location-chip"
             :title="loc.fullName || loc.name"
@@ -34,6 +34,9 @@
         <div class="location-actions">
           <button class="clear-all" type="button" @click="clearAllLocations">
             {{ clearAllLabel }}
+          </button>
+          <button class="toggle-chips" type="button" @click="chipsCollapsed = !chipsCollapsed">
+            {{ chipsCollapsed ? '展开' : '收起' }}
           </button>
         </div>
       </template>
@@ -65,7 +68,7 @@
           {{ $t('filter.cancel') }}
         </el-button>
         <el-button type="primary" class="apply-btn" size="default" @click="applyFilters">
-          {{ $t('filter.apply') }}
+          确定
         </el-button>
       </div>
     </div>
@@ -97,6 +100,29 @@ const localIncludeNearby = ref(propertiesStore.includeNearby ?? true) // 包含�
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.selectedLocations || [])
 
+// 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
+const displaySelectedLocations = computed(() => {
+  const map = new Map()
+  for (const loc of selectedLocations.value) {
+    if (!loc) continue
+    if (loc.type === 'suburb') {
+      const key = `suburb_${loc.name}`
+      if (!map.has(key)) map.set(key, { ...loc, fullName: loc.name })
+    } else {
+      map.set(loc.id, loc)
+    }
+  }
+  return Array.from(map.values())
+})
+
+// 中文注释：PC 收起2行、Mobile 收起1行；用近似像素高度控制，避免复杂测量
+const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 767 : false
+const chipsCollapsed = ref(true)
+const chipsCollapsedStyle = computed(() => ({
+  maxHeight: isMobile ? '36px' : '64px',
+  overflow: 'hidden',
+}))
+
 // 文案回退，避免显示未注册的 key
 const searchNearbyLabel = computed(() => {
   const v = t('filter.searchNearby')
@@ -118,14 +144,10 @@ const locationEmptyLabel = computed(() => {
   return v && v !== 'filter.locationEmpty' ? v : '未选择任何区域'
 })
 
-// 格式化区域显示
+// 格式化区域显示（仅展示 suburb 名称；postcode 仅显示自身）
 const formatLocation = (loc) => {
   if (!loc) return ''
-  if (loc.type === 'suburb') {
-    const pc = loc.postcode ? `, NSW, ${loc.postcode}` : ''
-    return `${loc.name}${pc}`
-  }
-  return `${loc.name}`
+  return loc.type === 'suburb' ? String(loc.name || '') : String(loc.name || '')
 }
 
 // 移除单个区域
@@ -311,29 +333,37 @@ const applyFilters = async () => {
 /* 面板内容 */
 .panel-content {
   padding: 16px;
+  /* 中文注释：主体可滚动，底部按钮 sticky 常驻 */
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 /* 区域列表样式 */
 .location-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* 中文注释：自适应形成 2–3 列 */
   gap: 8px;
   margin-bottom: 12px;
 }
 
 .location-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border: none;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-default);
   border-radius: 0;
   background: var(--chip-bg, #f7f8fa);
+  max-width: 140px; /* 中文注释：限制单个标签宽度，避免长词撑破布局 */
 }
 
 .location-chip .chip-text {
   font-size: 14px;
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .location-chip .chip-remove {
@@ -402,6 +432,11 @@ const applyFilters = async () => {
   display: flex;
   gap: 12px;
   margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-default);
 }
 
 .cancel-btn {
@@ -425,5 +460,23 @@ const applyFilters = async () => {
 .apply-btn:hover {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
+}
+.toggle-chips {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* 中文注释：移除 chip 右侧的“均分”布局，改为内联，移出时保持命中区域小巧 */
+.location-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 12px;
 }
 </style>

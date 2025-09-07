@@ -7,7 +7,7 @@
         class="areas-search"
         :placeholder="placeholderText"
         @input="onSearch"
-        aria-label="搜索区域或邮编"
+        aria-label="搜索区域"
       />
       <button
         class="clear-btn"
@@ -82,7 +82,7 @@ const loading = ref(false)
 const allAreas = ref([]) // { id?, type?, name?, suburb?, postcode?, fullName? }
 const keyword = ref('')
 
-const placeholderText = '搜索区域/邮编'
+const placeholderText = '搜索区域'
 
 // 归一化：将任意后端/服务返回的区域对象，转为 store.selectedLocations 规范
 const normalizeArea = (raw) => {
@@ -139,10 +139,15 @@ const displayName = (raw) => {
 // A→Z 分组 + 关键字过滤
 const filteredAreas = computed(() => {
   const kw = keyword.value.trim().toLowerCase()
-  if (!kw) return allAreas.value
-  return allAreas.value.filter((raw) => {
+  // 中文注释：移除所有邮编，仅保留 suburb
+  const source = allAreas.value.filter((raw) => {
     const a = normalizeArea(raw)
-    const text = [a?.name, a?.postcode, a?.fullName].filter(Boolean).join(' ').toLowerCase()
+    return a && a.type !== 'postcode'
+  })
+  if (!kw) return source
+  return source.filter((raw) => {
+    const a = normalizeArea(raw)
+    const text = [a?.name, a?.fullName].filter(Boolean).join(' ').toLowerCase()
     return text.includes(kw)
   })
 })
@@ -212,7 +217,13 @@ const ensureAreasLoaded = async () => {
   try {
     loading.value = true
     const list = await store.getAllAreas?.()
-    allAreas.value = Array.isArray(list) ? list : []
+    // 中文注释：加载后即过滤掉所有邮编，仅保留 suburb
+    allAreas.value = Array.isArray(list)
+      ? list.filter((raw) => {
+          const a = normalizeArea(raw)
+          return a && a.type !== 'postcode'
+        })
+      : []
   } catch {
     allAreas.value = []
   } finally {

@@ -164,8 +164,9 @@ python scripts/run_backend.py  # localhost:8000
 
 - 新增组件与改造
   - 新增：`src/components/FilterDropdown.vue`（通用下拉容器，teleport 到 body，支持点击外部/ESC 关闭，单例打开）
-  - 新增：`src/components/filter-panels/AreaFilterPanel.vue`、`BedroomsFilterPanel.vue`、`PriceFilterPanel.vue`、`AvailabilityFilterPanel.vue`（四个分离式专用筛选面板）
-  - 改造：`src/components/FilterTabs.vue`（PC 分离式下拉，内部管理 activePanel、触发 refs、:modelValue/@update:modelValue 对偶）、`src/views/HomeView.vue`（仅移动端触发统一 FilterPanel；PC 忽略该触发）
+- 新增：`src/components/filter-panels/AreaFilterPanel.vue`、`BedroomsFilterPanel.vue`、`PriceFilterPanel.vue`、`AvailabilityFilterPanel.vue`（四个分离式专用筛选面板）
+- 新增：`src/components/filter-panels/MoreFilterPanel.vue`（PC 高级筛选“更多”面板；仅“应用”时提交；URL 仅写入非空）
+- 改造：`src/components/FilterTabs.vue`（PC 分离式下拉，内部管理 activePanel、触发 refs、:modelValue/@update:modelValue 对偶）、`src/views/HomeView.vue`（仅移动端触发统一 FilterPanel；PC 忽略该触发）
 - 行为与契约
   - PC 分离式：FilterTabs 内部管理 activePanel（仅允许一个打开）；下拉定位基于触发元素 `getBoundingClientRect()`，`min-width ≥ 触发宽度`，`max-height: calc(100vh - 40px)`，`overscroll-behavior: contain` 防滚动穿透；点击外部/ESC 关闭；当切换至移动端断点（<768px）时强制关闭任何打开面板。
   - Mobile 统一面板：FilterTabs 通过 `emit('requestOpenFullPanel')` 通知父组件；HomeView 在 `windowWidth ≤ 768` 时打开统一 FilterPanel；PC 忽略该触发，避免双通道。
@@ -174,7 +175,12 @@ python scripts/run_backend.py  # localhost:8000
   - 修复 `v-model` 左值（LHS）不合法：统一改为 `:modelValue` + `@update:modelValue`。
   - 清理未使用变量（如 emit/import）；将文案抽至 `computed` 回退，避免 `$t` 未用告警。
 - 依赖与回滚
-  - 无新增依赖；与 Mobile 统一面板并存，按断点切换；若需回退，恢复 FilterTabs 触发统一 FilterPanel 即可。
+- 无新增依赖；与 Mobile 统一面板并存，按断点切换；若需回退，恢复 FilterTabs 触发统一 FilterPanel 即可。
+
+- Store 与参数映射（补充）
+  - 按需启用 V2：当 filters 含 isFurnished/bathrooms/parking/postcodes 等“高级键”时，自动切换 mapFilterStateToApiParams 到 V2 白名单输出（furnished/bathrooms_min/parking_min 等）；否则维持 V1 直传。
+  - URL 同步：仅写入非空（例如 isFurnished=1、bathrooms=3+、parking=2+）；翻页与每页大小变化复用 currentFilterParams，保持幂等。
+  - 回滚：关闭 enableFilterV2 或去除“更多”面板注册即可恢复旧契约/旧入口。
 
 ## 样式系统增补（2025-09-06）
 
@@ -191,7 +197,7 @@ python scripts/run_backend.py  # localhost:8000
 - 变更文件与路径
   - src/stores/properties.js：引入参数映射层（mapFilterStateToApiParams），统一 applyFilters/getFilteredCount 入参；分页/排序透传；性能埋点
   - src/components/FilterPanel.vue：URL Query 同步（读写）；错误 Toast（ElMessage）；文案 i18n（$t）；suburbs/postcodes 区分；挂载期作用域修复
-  - src/components/FilterTabs.vue：已弃用（不渲染）；统一入口=搜索框后缀图标；组件文件仅保留历史兼容说明
+- src/components/FilterTabs.vue：PC 端启用分离式 Chips + 独立面板（内部管理 activePanel、显式坐标定位）；Mobile 端不渲染，统一走 FilterPanel 入口。为何：PC 需要就地多分组编辑与分离式定位，Mobile 保持单一入口降低拥挤与复杂度。参见 systemPatterns.md：“筛选入口一致性（v2·PC 专用）”与“分离式下拉定位模式”；回滚路径：移除 explicitPosition 或关闭 V2 映射可回退。
   - src/components/SearchBar.vue：撤回移动端“筛选”按钮（仅保留搜索）
   - src/views/HomeView.vue：监听来自 SearchBar 的 openFilterPanel 打开 FilterPanel；FilterTabs 显式隐藏（v-if=false）
   - src/i18n/index.js：轻量 i18n 插件（无依赖），默认 zh-CN，提供 $t 与 inject('t')

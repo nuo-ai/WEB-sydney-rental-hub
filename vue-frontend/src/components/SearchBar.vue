@@ -167,11 +167,8 @@ const showInlineChips = computed(() => {
 /* 格式化标签文案：Suburb, NSW, 2017 / 2017 */
 const formatInlineLocation = (loc) => {
   if (!loc) return ''
-  if (loc.type === 'suburb') {
-    const pc = loc.postcode ? `, NSW, ${loc.postcode}` : ''
-    return `${loc.name}${pc}`
-  }
-  return `${loc.name}`
+  // 中文注释：内联回显仅显示 suburb 名称；postcode 仅显示自身
+  return loc.type === 'suburb' ? String(loc.name || '') : String(loc.name || '')
 }
 
 // 删除这行，改为使用响应式数据
@@ -626,6 +623,13 @@ watch(
 }
 
 .inline-chip-icon { display: none; }
+
+.inline-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px; /* 中文注释：限制单个标签宽度，避免长词撑破输入框 */
+}
 
 .inline-chip-more {
   color: var(--color-text-secondary, #6b7280);
