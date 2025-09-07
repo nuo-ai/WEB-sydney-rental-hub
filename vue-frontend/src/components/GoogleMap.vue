@@ -456,6 +456,15 @@ const initMap = async () => {
     // 检查组件是否还存在
     if (!isDestroyed) {
       mapLoaded.value = true
+      // 初始化完成后触发一次 resize，修复首次渲染时 canvas 未填满容器的情况
+      setTimeout(() => {
+        try {
+          triggerMapResize()
+        } catch (err) {
+          // ignore
+          void err
+        }
+      }, 0)
     }
   } catch (error) {
     console.error('Error initializing Google Map:', error)
@@ -529,13 +538,44 @@ watch(
   },
 )
 
+// 高度变更时触发地图 resize，修复容器高度变化后的灰条
+watch(
+  () => props.height,
+  async () => {
+    await nextTick()
+    triggerMapResize()
+  }
+)
+
+/* 中文注释：统一触发地图 resize 并根据策略恢复视图，避免容器高度变化后出现灰条 */
+const triggerMapResize = () => {
+  if (!map || !googleMapsLoaded || isDestroyed) return
+  try {
+    if (google && google.maps && google.maps.event) {
+      google.maps.event.trigger(map, 'resize')
+    }
+  } catch {
+    // 忽略触发异常
+  }
+
+  if (props.autoFit && lastRoutePath && lastRoutePath.length > 1) {
+    // 有路线时优先自适应并更新标签
+    fitRouteBounds(lastRoutePath)
+    updateRouteLabel(lastRoutePath)
+  } else {
+    // 无路线时按中心策略恢复视图
+    if (props.lockCenter) {
+      applyCenterLock()
+    } else {
+      map.setCenter({ lat: props.latitude, lng: props.longitude })
+    }
+  }
+}
+
 const onResize = () => {
-  if (!props.autoFit || !map || !polyline || !lastRoutePath) return
   clearTimeout(resizeTimer)
   resizeTimer = setTimeout(() => {
-    fitRouteBounds(lastRoutePath)
-    // 重新定位路线标签
-    updateRouteLabel(lastRoutePath)
+    triggerMapResize()
   }, 150)
 }
 

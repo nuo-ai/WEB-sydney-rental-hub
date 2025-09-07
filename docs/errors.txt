@@ -1,57 +1,25 @@
-PS C:\Users\nuoai> cd C:\Users\nuoai\Desktop\WEB-sydney-rental-hub ; python scripts/run_backend.py
-INFO:     Will watch for changes in these directories: ['C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\backend']
-INFO:     Loading environment from 'C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\.env'
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [28836] using StatReload
-2025-09-06 18:31:52,191 - INFO - FastAPI应用启动中... 日志配置已设置为DEBUG级别 (如果之前未配置)。
-INFO:     Started server process [20956]
-INFO:     Waiting for application startup.
-2025-09-06 18:31:52,405 - INFO - FastAPI application startup event triggered...
-2025-09-06 18:31:52,405 - INFO - 创建连接池: min=1, max=4, 使用 DATABASE_URL
-2025-09-06 18:32:52,657 - ERROR - 创建连接池失败: connection to server at "aws-0-ap-southeast-2.pooler.supabase.com" (13.237.241.81), port 5432 failed: FATAL:  MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size
+[plugin:vite:import-analysis] Failed to resolve import "../assets/photo.svg" from "src/views/PropertyDetail.vue". Does the file exist?
+C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/views/PropertyDetail.vue:272:23
+14 |  function _createBlock(...args) { return _interopVNode(__createBlock(...args)) }
+15 |  /* Injection by vite-plugin-vue-inspector End */
+16 |  import photoIcon from '../assets/photo.svg'
+   |                         ^
+17 |  import { onMounted, onUnmounted, computed, ref } from 'vue'
+18 |  import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
+    at TransformPluginContext._formatLog (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31422:43)
+    at TransformPluginContext.error (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31419:14)
+    at normalizeUrl (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:29891:18)
+    at async file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:29949:32
+    at async Promise.all (index 1)
+    at async TransformPluginContext.transform (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:29917:4)
+    at async file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.BzUKaD4x.mjs:403:17
+    at async EnvironmentPluginContainer.transform (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31220:14)
+    at async loadAndTransform (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:26307:26)
+    at async viteTransformMiddleware (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:27392:20)
 
-ERROR:    Traceback (most recent call last):
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 692, in lifespan
-    async with self.lifespan_context(app) as maybe_state:
-               ~~~~~~~~~~~~~~~~~~~~~^^^^^
-  File "C:\Python313\Lib\contextlib.py", line 214, in __aenter__
-    return await anext(self.gen)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 133, in merged_lifespan
-    async with original_context(app) as maybe_original_state:
-               ~~~~~~~~~~~~~~~~^^^^^
-  File "C:\Python313\Lib\contextlib.py", line 214, in __aenter__
-    return await anext(self.gen)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 133, in merged_lifespan
-    async with original_context(app) as maybe_original_state:
-               ~~~~~~~~~~~~~~~~^^^^^
-  File "C:\Python313\Lib\contextlib.py", line 214, in __aenter__
-    return await anext(self.gen)
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\backend\main.py", line 326, in lifespan
-    await init_db_pool()
-  File "C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\backend\db.py", line 105, in init_db_pool
-    _create_connection_pool()
-    ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\Users\nuoai\Desktop\WEB-sydney-rental-hub\backend\db.py", line 26, in _create_connection_pool
-    _db_pool = pool.ThreadedConnectionPool(
-        min_conn, max_conn,
-        database_url
-    )
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\psycopg2\pool.py", line 161, in __init__
-    AbstractConnectionPool.__init__(
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        self, minconn, maxconn, *args, **kwargs)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\psycopg2\pool.py", line 59, in __init__
-    self._connect()
-    ~~~~~~~~~~~~~^^
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\psycopg2\pool.py", line 63, in _connect
-    conn = psycopg2.connect(*self._args, **self._kwargs)
-  File "C:\Users\nuoai\AppData\Roaming\Python\Python313\site-packages\psycopg2\__init__.py", line 135, in connect
-    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
-psycopg2.OperationalError: connection to server at "aws-0-ap-southeast-2.pooler.supabase.com" (13.237.241.81), port 5432 failed: FATAL:  MaxClientsInSessionMode: max clients reached - in Session mode max clients are limited to pool_size
-
-
-ERROR:    Application startup failed. Exiting.
+[fixed] 2025-09-07 09:12 AEST
+- 问题：Vite 无法解析 ../assets/photo.svg（src/views/PropertyDetail.vue）
+- 原因：项目缺少静态资源 photo.svg，导致编译期 import 失败
+- 处理：移除对静态文件的依赖，改用内联 SVG data URI（不受文件缺失影响）
+- 变更：删除 import photoIcon from '../assets/photo.svg'；新增 const photoIcon = 'data:image/svg+xml;utf8,...'
+- 影响：零运行时风险；视觉保持一致；仍保留 <Picture /> 兜底图标

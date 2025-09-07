@@ -269,8 +269,8 @@
 </template>
 
 <script setup>
-import photoIcon from '../assets/photo.svg'
-import { onMounted, computed, ref } from 'vue'
+const photoIcon = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" stroke="%233c475b" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="%233c475b" stroke-width="2"/></svg>'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
@@ -450,10 +450,26 @@ const inspectionTimes = computed(() => {
   return []
 })
 
-const mapHeight = computed(() => {
-  // Responsive map height - 使用固定值而不是动态计算
-  return '250px'
+/* 中文注释：根据断点动态决定地图高度，统一交由 GoogleMap 组件控制，避免外层容器与内部高度不一致导致灰条 */
+const isDesktop = ref(false)
+let mq
+let mqHandler
+onMounted(() => {
+  mq = window.matchMedia('(min-width: 1200px)')
+  mqHandler = () => {
+    isDesktop.value = mq.matches
+  }
+  mqHandler()
+  if (mq.addEventListener) mq.addEventListener('change', mqHandler)
+  else if (mq.addListener) mq.addListener(mqHandler)
 })
+onUnmounted(() => {
+  if (mq && mqHandler) {
+    if (mq.removeEventListener) mq.removeEventListener('change', mqHandler)
+    else if (mq.removeListener) mq.removeListener(mqHandler)
+  }
+})
+const mapHeight = computed(() => (isDesktop.value ? '360px' : '240px'))
 
 
 // 方法
@@ -1351,7 +1367,7 @@ onBeforeRouteLeave(() => {
 .map-container {
   position: relative;
   width: 100%;
-  height: 250px;
+  height: auto;
   border-radius: 0;
   overflow: hidden;
   background: #e8e8e8;
@@ -1361,7 +1377,7 @@ onBeforeRouteLeave(() => {
 /* PC端地图容器 */
 @media (min-width: 1200px) {
   .map-container {
-    height: 360px; /* Figma地图高度 */
+    height: auto; /* 高度由 GoogleMap 组件控制 */
     border-radius: 0;
   }
 }
@@ -2024,6 +2040,84 @@ onBeforeRouteLeave(() => {
   .content-card .description-text {
     max-width: none !important;
     width: auto !important;
+  }
+}
+/* ==== PC 端局部覆盖：隐藏指示点、移除价格下分隔线、去橙色线条、返回键白底灰箭头 ==== */
+@media (min-width: 1200px) {
+  /* 1) 隐藏轮播指示点（仅PC，移动端保留） */
+  .image-indicators {
+    display: none !important;
+  }
+
+  /* 2) 价格下方分隔线去除（保持原有外边距节奏） */
+  .info-card .price-wrapper {
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+  }
+
+  /* 3) 分隔线统一中性灰，仅影响线条，不改文字颜色 */
+  .property-detail-page hr,
+  .property-detail-page .el-divider,
+  .content-card > * + *::before {
+    background-color: #e5e5e5 !important;
+    border-color: #e5e5e5 !important;
+  }
+
+  /* 4) 返回按钮：白色圆底 + 灰色箭头（与移动端对齐，PC端） */
+  .back-btn {
+    background: rgba(255, 255, 255, 0.95) !important; /* 白色圆底，保持轻透明以适配浅/深背景 */
+    color: #808296 !important;                        /* 灰色箭头（随 currentColor） */
+  }
+  .back-btn:hover {
+    background: #ffffff !important;                   /* hover 保持白底，轻微高亮由上方默认阴影处理 */
+  }
+}
+/* ==== 全端统一：隐藏指示点 + 分隔线中性化（移动端与PC同时生效） ==== */
+/* 1) 移动端与PC：统一隐藏轮播指示点 */
+.image-indicators {
+  display: none !important;
+}
+
+/* 2) 为详情页作用域提供统一分隔线变量，并在所有断点生效 */
+.property-detail-page {
+  --divider-color: #e5e5e5; /* 中性灰 */
+}
+
+/* 3) 常见分隔元素统一为中性灰（避免品牌橙渗透到“线条/边框”） */
+.property-detail-page :is(hr, .el-divider, .action-divider) {
+  background-color: var(--divider-color) !important;
+  border-color: var(--divider-color) !important;
+}
+
+/* 4) 价格下划线彻底移除（所有断点） */
+.info-card .price-wrapper {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+/* ==== 移动端(≤767px)：地图尺寸与统一左右对齐（以 24px gutter 为基准） ==== */
+@media (max-width: 767px) {
+  /* 统一白卡内部左右边界与地图一致 */
+  .content-card {
+    --mobile-gutter: 16px;
+  }
+  .content-card .info-card,
+  .content-card .location-section,
+  .content-card .description-section,
+  .content-card .features-section,
+  .content-card .inspection-section {
+    padding-left: var(--mobile-gutter) !important;
+    padding-right: var(--mobile-gutter) !important;
+  }
+
+  /* 地图容器：固定高度240，1px中性灰边框，直角，溢出隐藏；宽度随父容器100% */
+  .map-container {
+    width: 100% !important;
+    height: 240px !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important; /* 边框计入宽度，确保与红线对齐 */
+    background: #e8e8e8; /* 兜底底色 */
   }
 }
 </style>

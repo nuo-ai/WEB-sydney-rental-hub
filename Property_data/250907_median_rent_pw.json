@@ -1,0 +1,476 @@
+{
+  "data": {
+    "medianRentBySuburb": [
+      {
+        "suburb": "Alexandria",
+        "bedrooms": 1,
+        "median_rent_pw": 730
+      },
+      {
+        "suburb": "Alexandria",
+        "bedrooms": 2,
+        "median_rent_pw": 900
+      },
+      {
+        "suburb": "Alexandria",
+        "bedrooms": 3,
+        "median_rent_pw": 1400
+      },
+      {
+        "suburb": "Ashfield",
+        "bedrooms": 1,
+        "median_rent_pw": 655
+      },
+      {
+        "suburb": "Ashfield",
+        "bedrooms": 2,
+        "median_rent_pw": 710
+      },
+      {
+        "suburb": "Ashfield",
+        "bedrooms": 3,
+        "median_rent_pw": 805
+      },
+      {
+        "suburb": "Beaconsfield",
+        "bedrooms": 1,
+        "median_rent_pw": 510
+      },
+      {
+        "suburb": "Burwood",
+        "bedrooms": 1,
+        "median_rent_pw": 750
+      },
+      {
+        "suburb": "Burwood",
+        "bedrooms": 2,
+        "median_rent_pw": 870
+      },
+      {
+        "suburb": "Burwood",
+        "bedrooms": 3,
+        "median_rent_pw": 1350
+      },
+      {
+        "suburb": "Camperdown",
+        "bedrooms": 1,
+        "median_rent_pw": 700
+      },
+      {
+        "suburb": "Camperdown",
+        "bedrooms": 2,
+        "median_rent_pw": 1050
+      },
+      {
+        "suburb": "Campsie",
+        "bedrooms": 1,
+        "median_rent_pw": 430
+      },
+      {
+        "suburb": "Campsie",
+        "bedrooms": 2,
+        "median_rent_pw": 625
+      },
+      {
+        "suburb": "Campsie",
+        "bedrooms": 3,
+        "median_rent_pw": 830
+      },
+      {
+        "suburb": "Centennial Park",
+        "bedrooms": 1,
+        "median_rent_pw": 575
+      },
+      {
+        "suburb": "Centennial Park",
+        "bedrooms": 2,
+        "median_rent_pw": 812
+      },
+      {
+        "suburb": "Chippendale",
+        "bedrooms": 1,
+        "median_rent_pw": 900
+      },
+      {
+        "suburb": "Chippendale",
+        "bedrooms": 2,
+        "median_rent_pw": 1240
+      },
+      {
+        "suburb": "Chippendale",
+        "bedrooms": 3,
+        "median_rent_pw": 1450
+      },
+      {
+        "suburb": "Eastgardens",
+        "bedrooms": 1,
+        "median_rent_pw": 875
+      },
+      {
+        "suburb": "Eastgardens",
+        "bedrooms": 2,
+        "median_rent_pw": 1150
+      },
+      {
+        "suburb": "Eastlakes",
+        "bedrooms": 2,
+        "median_rent_pw": 700
+      },
+      {
+        "suburb": "Eastlakes",
+        "bedrooms": 3,
+        "median_rent_pw": 750
+      },
+      {
+        "suburb": "Eastwood",
+        "bedrooms": 1,
+        "median_rent_pw": 588
+      },
+      {
+        "suburb": "Eastwood",
+        "bedrooms": 2,
+        "median_rent_pw": 720
+      },
+      {
+        "suburb": "Eastwood",
+        "bedrooms": 3,
+        "median_rent_pw": 950
+      },
+      {
+        "suburb": "Epping",
+        "bedrooms": 1,
+        "median_rent_pw": 665
+      },
+      {
+        "suburb": "Epping",
+        "bedrooms": 2,
+        "median_rent_pw": 820
+      },
+      {
+        "suburb": "Epping",
+        "bedrooms": 3,
+        "median_rent_pw": 900
+      },
+      {
+        "suburb": "Erskineville",
+        "bedrooms": 1,
+        "median_rent_pw": 778
+      },
+      {
+        "suburb": "Erskineville",
+        "bedrooms": 2,
+        "median_rent_pw": 1048
+      },
+      {
+        "suburb": "Forest Lodge",
+        "bedrooms": 1,
+        "median_rent_pw": 880
+      },
+      {
+        "suburb": "Forest Lodge",
+        "bedrooms": 2,
+        "median_rent_pw": 830
+      },
+      {
+        "suburb": "Glebe",
+        "bedrooms": 1,
+        "median_rent_pw": 525
+      },
+      {
+        "suburb": "Glebe",
+        "bedrooms": 2,
+        "median_rent_pw": 1100
+      },
+      {
+        "suburb": "Haymarket",
+        "bedrooms": 1,
+        "median_rent_pw": 860
+      },
+      {
+        "suburb": "Haymarket",
+        "bedrooms": 2,
+        "median_rent_pw": 1400
+      },
+      {
+        "suburb": "Haymarket",
+        "bedrooms": 3,
+        "median_rent_pw": 1680
+      },
+      {
+        "suburb": "Hurstville",
+        "bedrooms": 1,
+        "median_rent_pw": 650
+      },
+      {
+        "suburb": "Hurstville",
+        "bedrooms": 2,
+        "median_rent_pw": 750
+      },
+      {
+        "suburb": "Hurstville",
+        "bedrooms": 3,
+        "median_rent_pw": 950
+      },
+      {
+        "suburb": "Kensington",
+        "bedrooms": 1,
+        "median_rent_pw": 700
+      },
+      {
+        "suburb": "Kensington",
+        "bedrooms": 2,
+        "median_rent_pw": 850
+      },
+      {
+        "suburb": "Kensington",
+        "bedrooms": 3,
+        "median_rent_pw": 1162
+      },
+      {
+        "suburb": "Kingsford",
+        "bedrooms": 1,
+        "median_rent_pw": 650
+      },
+      {
+        "suburb": "Kingsford",
+        "bedrooms": 2,
+        "median_rent_pw": 800
+      },
+      {
+        "suburb": "Kingsford",
+        "bedrooms": 3,
+        "median_rent_pw": 1250
+      },
+      {
+        "suburb": "Macquarie Park",
+        "bedrooms": 1,
+        "median_rent_pw": 750
+      },
+      {
+        "suburb": "Macquarie Park",
+        "bedrooms": 2,
+        "median_rent_pw": 970
+      },
+      {
+        "suburb": "Macquarie Park",
+        "bedrooms": 3,
+        "median_rent_pw": 1200
+      },
+      {
+        "suburb": "Maroubra",
+        "bedrooms": 1,
+        "median_rent_pw": 735
+      },
+      {
+        "suburb": "Maroubra",
+        "bedrooms": 2,
+        "median_rent_pw": 890
+      },
+      {
+        "suburb": "Maroubra",
+        "bedrooms": 3,
+        "median_rent_pw": 950
+      },
+      {
+        "suburb": "Marsfield",
+        "bedrooms": 2,
+        "median_rent_pw": 702
+      },
+      {
+        "suburb": "Marsfield",
+        "bedrooms": 3,
+        "median_rent_pw": 800
+      },
+      {
+        "suburb": "Mascot",
+        "bedrooms": 1,
+        "median_rent_pw": 805
+      },
+      {
+        "suburb": "Mascot",
+        "bedrooms": 2,
+        "median_rent_pw": 1050
+      },
+      {
+        "suburb": "Mascot",
+        "bedrooms": 3,
+        "median_rent_pw": 1250
+      },
+      {
+        "suburb": "Newtown",
+        "bedrooms": 1,
+        "median_rent_pw": 670
+      },
+      {
+        "suburb": "Newtown",
+        "bedrooms": 2,
+        "median_rent_pw": 850
+      },
+      {
+        "suburb": "Newtown",
+        "bedrooms": 3,
+        "median_rent_pw": 1200
+      },
+      {
+        "suburb": "North Ryde",
+        "bedrooms": 1,
+        "median_rent_pw": 725
+      },
+      {
+        "suburb": "North Ryde",
+        "bedrooms": 2,
+        "median_rent_pw": 955
+      },
+      {
+        "suburb": "Parramatta",
+        "bedrooms": 1,
+        "median_rent_pw": 620
+      },
+      {
+        "suburb": "Parramatta",
+        "bedrooms": 2,
+        "median_rent_pw": 720
+      },
+      {
+        "suburb": "Parramatta",
+        "bedrooms": 3,
+        "median_rent_pw": 900
+      },
+      {
+        "suburb": "Randwick",
+        "bedrooms": 1,
+        "median_rent_pw": 800
+      },
+      {
+        "suburb": "Randwick",
+        "bedrooms": 2,
+        "median_rent_pw": 900
+      },
+      {
+        "suburb": "Randwick",
+        "bedrooms": 3,
+        "median_rent_pw": 1522
+      },
+      {
+        "suburb": "Redfern",
+        "bedrooms": 1,
+        "median_rent_pw": 700
+      },
+      {
+        "suburb": "Redfern",
+        "bedrooms": 2,
+        "median_rent_pw": 1050
+      },
+      {
+        "suburb": "Redfern",
+        "bedrooms": 3,
+        "median_rent_pw": 1400
+      },
+      {
+        "suburb": "Rosebery",
+        "bedrooms": 1,
+        "median_rent_pw": 798
+      },
+      {
+        "suburb": "Rosebery",
+        "bedrooms": 2,
+        "median_rent_pw": 1050
+      },
+      {
+        "suburb": "Rosebery",
+        "bedrooms": 3,
+        "median_rent_pw": 1400
+      },
+      {
+        "suburb": "Surry Hills",
+        "bedrooms": 1,
+        "median_rent_pw": 790
+      },
+      {
+        "suburb": "Surry Hills",
+        "bedrooms": 2,
+        "median_rent_pw": 1020
+      },
+      {
+        "suburb": "Surry Hills",
+        "bedrooms": 3,
+        "median_rent_pw": 2100
+      },
+      {
+        "suburb": "Sydney",
+        "bedrooms": 1,
+        "median_rent_pw": 880
+      },
+      {
+        "suburb": "Sydney",
+        "bedrooms": 2,
+        "median_rent_pw": 1300
+      },
+      {
+        "suburb": "Sydney",
+        "bedrooms": 3,
+        "median_rent_pw": 1800
+      },
+      {
+        "suburb": "Ultimo",
+        "bedrooms": 1,
+        "median_rent_pw": 672
+      },
+      {
+        "suburb": "Ultimo",
+        "bedrooms": 2,
+        "median_rent_pw": 950
+      },
+      {
+        "suburb": "Ultimo",
+        "bedrooms": 3,
+        "median_rent_pw": 1675
+      },
+      {
+        "suburb": "Waterloo",
+        "bedrooms": 1,
+        "median_rent_pw": 798
+      },
+      {
+        "suburb": "Waterloo",
+        "bedrooms": 2,
+        "median_rent_pw": 1100
+      },
+      {
+        "suburb": "Waterloo",
+        "bedrooms": 3,
+        "median_rent_pw": 1300
+      },
+      {
+        "suburb": "Wolli Creek",
+        "bedrooms": 1,
+        "median_rent_pw": 720
+      },
+      {
+        "suburb": "Wolli Creek",
+        "bedrooms": 2,
+        "median_rent_pw": 880
+      },
+      {
+        "suburb": "Wolli Creek",
+        "bedrooms": 3,
+        "median_rent_pw": 1175
+      },
+      {
+        "suburb": "Zetland",
+        "bedrooms": 1,
+        "median_rent_pw": 850
+      },
+      {
+        "suburb": "Zetland",
+        "bedrooms": 2,
+        "median_rent_pw": 1100
+      },
+      {
+        "suburb": "Zetland",
+        "bedrooms": 3,
+        "median_rent_pw": 1500
+      }
+    ]
+  }
+}

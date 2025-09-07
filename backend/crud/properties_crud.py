@@ -639,3 +639,52 @@ def fetch_university_commute_profile_data(
             release_db_connection(conn)
             
     return profile_result
+
+def get_median_rent_by_suburb(months_window: Optional[int] = None) -> List[Dict[str, Any]]:
+    """
+    计算每个 suburb 在 1/2/3 房的中位周租金。
+    可选 months_window: 仅统计最近 N 个月（基于 available_date）。
+    返回: [{'suburb': 'Zetland', 'bedrooms': 1, 'median_rent_pw': 720}, ...]
+    """
+    conn = get_db_connection()
+    results: List[Dict[str, Any]] = []
+    try:
+        with conn.cursor() as cur:
+            # 基础过滤条件：只统计在租、价格非空、限定 1/2/3 房、且 suburb 非空
+            where_clauses = [
+                "is_active = TRUE",
+                "rent_pw IS NOT NULL",
+                "bedrooms IN (1,2,3)",
+                "suburb IS NOT NULL"
+            ]
+            if months_window is not None and isinstance(months_window, int) and months_window > 0:
+                # 使用安全的整数插入到 INTERVAL 字面量，避免 SQL 注入
+                where_clauses.append(f"available_date >= CURRENT_DATE - INTERVAL '{int(months_window)} months'")
+
+            where_sql = " WHERE " + " AND ".join(where_clauses)
+
+            sql = f"""
+                SELECT
+                  suburb,
+                  bedrooms,
+                  CAST(ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY rent_pw)) AS INT) AS median_rent_pw
+                FROM properties
+                {where_sql}
+                GROUP BY suburb, bedrooms
+                ORDER BY suburb, bedrooms
+            """
+            logging.info(f"Executing median rent by suburb SQL: {sql}")
+            cur.execute(sql)
+            for row in cur.fetchall():
+                results.append({
+                    "suburb": row[0],
+                    "bedrooms": row[1],
+                    "median_rent_pw": row[2]
+                })
+    except psycopg2.Error as e:
+        logging.error(f"Error computing median rent by suburb: {e}")
+        return []
+    finally:
+        if conn:
+            release_db_connection(conn)
+    return results
