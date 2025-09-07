@@ -39,12 +39,7 @@
             />
           </div>
 
-          <!-- 结果统计 -->
-          <div class="results-summary chinese-text">
-            <p class="results-count">
-              找到 <strong>{{ propertiesStore.totalCount }}</strong> 套房源
-            </p>
-          </div>
+          <!-- 结果统计移至搜索容器下方的新容器中；此处移除以避免双处回显 -->
         </div>
       </div>
 
@@ -54,6 +49,39 @@
         class="search-bar-spacer"
         :style="{ height: searchBarHeight + 'px' }"
       ></div>
+
+      <!-- 标题区：面包屑 / H1 / 操作行（390 视口对齐参考站） -->
+      <div class="container title-block">
+        <nav class="breadcrumbs">Home › Rent › NSW › {{ suburb || '—' }}</nav>
+
+        <h1 class="page-h1">
+          {{ propertiesStore.totalCount }} Properties for rent in
+          {{ suburb || 'Sydney' }}, NSW<span v-if="postcode">, {{ postcode }}</span>
+        </h1>
+
+        <div class="actions-row">
+          <div class="alert-left">
+            <IconBell size="20" />
+            <span class="label">Property alert</span>
+            <el-switch v-model="alertOn" size="small" inactive-text="Off" />
+          </div>
+
+          <el-dropdown @command="onSortCommand" placement="bottom-end" :teleported="false">
+            <button class="sort-btn" type="button">
+              <IconSort size="20" />
+              <span class="label">Sort</span>
+            </button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="price_asc">按最小价格</el-dropdown-item>
+                <el-dropdown-item command="available_date_asc">按空出时间</el-dropdown-item>
+                <el-dropdown-item command="inspection_earliest">按最早看房时间</el-dropdown-item>
+                <el-dropdown-item command="suburb_az">按区域（首字母）</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </div>
 
       <!-- 房源列表 -->
       <div class="container">
@@ -137,7 +165,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, inject } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
@@ -146,9 +174,12 @@ import SearchBar from '@/components/SearchBar.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
+import IconBell from '@/components/icons/IconBell.vue'
+import IconSort from '@/components/icons/IconSort.vue'
 
 /* 路由 */
 const router = useRouter()
+const route = useRoute()
 
 /* 轻量 i18n：在脚本中访问文案（与全局 $t 一致） */
 const t = inject('t') || ((k) => k)
@@ -165,6 +196,46 @@ const lastScrollY = ref(0)
 const isNavHidden = ref(false)
 const windowWidth = ref(window.innerWidth)
 const filterPanelRef = ref(null) // 添加FilterPanel组件的引用
+
+/* 排序入口：仅透传到后端；URL 状态同步，不做前端本地排序 */
+const sortValue = ref('')
+const handleSortChange = async (val) => {
+  try {
+    const newQuery = { ...route.query }
+    if (val) newQuery.sort = val
+    else delete newQuery.sort
+    await router.replace({ query: newQuery })
+    await propertiesStore.setSort(val)
+  } catch (e) {
+    console.error('排序切换失败:', e)
+  }
+}
+/* 下拉命令转发至排序处理 */
+const onSortCommand = (val) => handleSortChange(val)
+
+/* 左侧通知开关占位（未来接入真实通知） */
+const alertOn = ref(false)
+
+/* 计算 suburb/postcode：从首个已选区域回显；无则优雅回退 */
+const suburb = computed(() => {
+  const list = propertiesStore.selectedLocations
+  if (Array.isArray(list) && list.length) {
+    const first = list[0]
+    // 优先使用 suburb 名称；若是 postcode 类型且带 suburb 字段则取其 suburb
+    return first?.type === 'suburb' ? first.name : (first.suburb || first.name) || ''
+  }
+  return ''
+})
+const postcode = computed(() => {
+  const list = propertiesStore.selectedLocations
+  if (Array.isArray(list) && list.length) {
+    const first = list[0]
+    // 常见 4 位邮编；若对象自带 postcode 字段优先
+    const pc = first?.postcode || first?.name
+    return typeof pc === 'string' && /^\d{4}$/.test(pc) ? pc : ''
+  }
+  return ''
+})
 
 // 定义事件发射器
 const emit = defineEmits(['updateNavVisibility'])
@@ -382,6 +453,14 @@ onMounted(async () => {
   if (propertiesStore.filteredProperties.length === 0) {
     loadProperties()
   }
+
+  // 从 URL 恢复排序（URL 状态同步）：存在 sort 时恢复并触发服务端排序透传
+  const sortQ = route.query?.sort
+  if (typeof sortQ === 'string' && sortQ) {
+    sortValue.value = sortQ
+    await propertiesStore.setSort(sortQ)
+  }
+
   await initSearchBarHeight()
   lastScrollY.value = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })
@@ -571,6 +650,23 @@ onUnmounted(() => {
 .results-count strong {
   color: var(--juwo-primary);
   font-weight: 600;
+}
+
+/* 标题区（面包屑/H1/操作行）——对齐参考站 390 规格 */
+.title-block { padding-top: 8px; }
+.breadcrumbs { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
+.page-h1 { font-size: 24px; line-height: 28px; font-weight: 700; color: var(--color-text-primary); margin: 0 0 14px; }
+
+.actions-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.alert-left { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text-secondary); }
+.alert-left .label { font-weight: 500; }
+
+.sort-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text-secondary); background: transparent; border: 0; padding: 8px 0; }
+.sort-btn .label { font-weight: 600; }
+
+/* 移动端下保持点击区可达性 */
+@media (max-width: 768px) {
+  .actions-row { gap: 10px; }
 }
 
 /* 移动端布局调整 */

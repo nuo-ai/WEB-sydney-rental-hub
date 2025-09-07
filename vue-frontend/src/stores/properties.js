@@ -207,6 +207,8 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 当前已应用的筛选参数（用于翻页/改每页大小时保持筛选条件）
     currentFilterParams: {},
+    // 排序状态（UI占位；后端暂不识别时仅透传且不做前端本地排序）
+    sort: '',
   }),
 
   getters: {
@@ -450,7 +452,7 @@ export const usePropertiesStore = defineStore('properties', {
         const mappedParams = mapFilterStateToApiParams(
           filters,
           this.selectedLocations,
-          { page: 1, page_size: this.pageSize },
+          { page: 1, page_size: this.pageSize, sort: this.sort },
           { enableFilterV2 },
         )
 
@@ -652,6 +654,14 @@ export const usePropertiesStore = defineStore('properties', {
       this.currentPage = 1 // 重置到第一页
       // 保留当前筛选条件，带上新的分页大小
       await this.fetchProperties({ page: 1, page_size: this.pageSize })
+    },
+
+    // 设置排序（仅透传到后端；后端未识别时保持UI一致且不做前端本地排序）
+    async setSort(sort) {
+      this.sort = sort || ''
+      this.currentPage = 1
+      // 将排序写入当前请求参数，遵守“单一数据源”：不在前端本地排序
+      await this.fetchProperties({ page: 1, page_size: this.pageSize, sort: this.sort })
     },
 
     // 清空错误

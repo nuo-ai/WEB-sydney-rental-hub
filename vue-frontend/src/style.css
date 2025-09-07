@@ -680,6 +680,66 @@ header nav .el-menu-item:hover,
   margin-bottom: 16px;
 }
 
+/* ================= EP-GUARDRAIL-FOCUS-GLOBAL =================
+   目的：一次性移除“橙色/默认焦点外框”，建立全站焦点可见性基线
+   原则：
+   - 统一重置 UA outline（避免浏览器默认橙框）
+   - 输入类控件采用 :focus-visible + 中性灰 ring（token 化），保证可达性
+   - 按场景（导航/标题区/卡片内图标按钮等）隐藏按钮/链接的焦点 ring
+   - Element Plus 组件轻量覆盖 :focus outline，避免与基线冲突
+   - 可选：对极少数按钮允许 .focus-visible-ring 强制启用灰 ring
+   溯源：activeContext｜UI-NAV-GLOBAL-RULES & 本次“全站统一焦点策略”
+*/
+
+/* 令牌：焦点 ring 风格（可按品牌调整） */
+:root {
+  --focus-ring-color: rgba(0, 0, 0, 0.25);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px; /* 目前未使用，如需 offset 可改为 box-shadow 双层实现 */
+}
+
+/* 1) 重置 UA outline（所有可聚焦元素） */
+:where(a, button, [role="button"], input, select, textarea, [tabindex]):focus {
+  outline: none;
+}
+
+/* 2) 输入类控件：仅在 focus-visible 时显示中性灰 ring（保证键盘可达性） */
+:where(input, select, textarea, .el-input__wrapper, .el-select, .el-switch):focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+}
+
+/* 3) 其它可点击元素（按钮/链接）：默认不显示 ring（避免“橙色框/灰框”） */
+:where(a, button, [role="button"], .el-button, .el-link):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 4) 场景兜底：导航/标题动作区/卡片图标按钮内的可点击项统一隐藏 ring */
+:where(nav, .navigation, .top-nav, .bottom-nav, [class*="nav"], .title-block, .actions-row, .properties-grid, .property-card)
+:is(a, button, [role="button"], .el-button):focus,
+:where(nav, .navigation, .top-nav, .bottom-nav, [class*="nav"], .title-block, .actions-row, .properties-grid, .property-card)
+:is(a, button, [role="button"], .el-button):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 5) Element Plus 组件：统一移除 :focus outline，使用上面的基线规则控制 */
+.el-button:focus,
+.el-dropdown-menu__item:focus,
+.el-link:focus,
+.el-menu-item:focus,
+.el-switch:focus,
+.el-input__wrapper:focus,
+.el-select:focus {
+  outline: none !important;
+}
+
+/* 6) （可选）个别按钮若需要键盘 ring，可加 .focus-visible-ring 类显式启用 */
+.focus-visible-ring:focus-visible {
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+}
+
 /* ===== Element Plus Image Viewer · 全局覆盖（移动端优先）=====
    目的：按设计实现
    - 背景：纯黑（保持）

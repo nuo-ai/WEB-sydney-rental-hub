@@ -5,6 +5,9 @@
 ## 当前状态与未来规划
 
 ### 已完成的功能
+- [X] 列表页“标题区”三段式（面包屑 → H1 → 操作行），390 视口对齐参考站（HomeView.vue）
+- [X] 新增 IconSort / IconBell（SVG 组件化，stroke: currentColor；size/aria 可配）
+- [X] 全站“焦点可见性基线”EP-GUARDRAIL-FOCUS-GLOBAL：移除 UA 橙框；输入类控件仅在 :focus-visible 时显示中性灰 ring；按钮/链接默认无 ring；Element Plus :focus 统一去除（src/style.css）
 
 - [X] 搜索内嵌筛选入口（sliders-horizontal 16×16，右距 12px）
 - [X] 移动端房源卡片 Full-bleed（贴边但保持高度不变）
@@ -26,7 +29,7 @@
   - [X] 地图样式贴近 Google Maps 外观
   - [X] 通勤常用地址：1. 去除非大学的地址；2. 增加悉尼所有的学校地址（如有）；3. 只能选择一所大学，更符合学生单人使用的搜索需求，也防止滥用通勤查询（需先讨论）4. 即便选择地址，也只能选择一个地址；5. 地址没有连通谷歌的地址自动完成，能查到的地址很有限
 
-- [ ] 将 “找到xxx 套房源” 移出搜索框的容器，在”搜索框“下方新增一个容器，对齐不变，然后在右面加上“排序“按钮，增加：按最小价格、按空出时间、按最早看房时间、按区域（首字母）排序选项
+- [X] 将 “找到xxx 套房源” 移出搜索框的容器，在”搜索框“下方新增一个容器，对齐不变，然后在右面加上“排序“按钮，增加：按最小价格、按空出时间、按最早看房时间、按区域（首字母）排序选项
 - [ ] [P0/页面] 我的中心初步改造（收藏/历史两卡 + 统一卡片变体，先结构与样式基线）
 - [ ] [P0/快修] 搜索条件保存与恢复（localStorage + URL 优先级）
 - [ ] [P0/发布] MVP 部署上线（前端/后端流水线、环境变量、CORS、健康检查、README 指南）
@@ -58,6 +61,17 @@
   - [ ] 学校地址缺失（对齐 backend/config/university_data.py 或后端透传字段）
 
 ## 关键里程碑
+
+### 2025年9月7日：列表页标题区与全站焦点基线
+
+- 主要成果：
+  - HomeView.vue 搜索容器下新增“标题区”：面包屑（弱化灰）→ H1（英文句式，含 suburb/NSW/postcode/total）→ 操作行（左：IconBell + Property alert + Switch Off；右：IconSort + Sort 下拉触发），布局与间距对齐参考站 390 视口。
+  - src/style.css 增加 EP-GUARDRAIL-FOCUS-GLOBAL：重置 UA outline；输入类控件在 :focus-visible 显示中性灰 ring（令牌化）；按钮/链接默认不显示 ring；针对导航/标题动作区/卡片可点击项做场景兜底；统一移除 Element Plus :focus outline；提供 .focus-visible-ring 作为少数按钮启用 ring 的开关。
+  - 新增 IconSort.vue / IconBell.vue，统一图标系统（stroke: currentColor；size/aria 可配置）。
+
+- 影响与价值：
+  - 彻底消除“点击出现橙色焦点框”的反复问题，建立可维护的全站焦点可见性基线；键盘可达性保留在输入类控件上。
+  - 标题区信息架构与参考站一致，支持 URL 同步的排序逻辑与后续扩展，UI 一致性和可读性明显提升。
 
 ### 2025年9月6日：筛选回显与分页加固（Location 区 + Inline Chips + Pagination Guard）
 

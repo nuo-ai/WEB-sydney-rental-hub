@@ -30,6 +30,10 @@
 2025-09-05｜FILTER-EXPERIENCE-STACK｜V1→V2 参数映射兼容层（开关 enableFilterV2= false 默认关闭）、错误 Toast（快速失败、无本地估算）、URL Query 同步（读写、刷新/直链可复现）、FilterPanel 文案 i18n 抽离（轻量 $t，默认 zh-CN）、postcodes 前端区分 suburbs/postcodes 并透传、mounted 期 propertiesStore 作用域修复、性能埋点（>800ms 警告）；影响文件：src/stores/properties.js / src/components/FilterPanel.vue / src/i18n/index.js / src/main.js｜commit d78d6def
 2025-09-05｜UI-FILTER-ENTRY-UNIFY｜PC/移动端统一仅保留“筛选”入口；FilterTabs 隐藏所有下拉，仅作触发器；撤回 SearchBar 移动端“筛选”按钮；HomeView 统一绑定 toggleFullPanel ↔ FilterPanel v-model；保留步长=50、车位 any/1/2/3+、'0'→Any 兼容｜commit 6926962（文件：FilterTabs.vue / SearchBar.vue / HomeView.vue）
 
+2025-09-07｜EP-GUARDRAIL-FOCUS-GLOBAL｜src/style.css 新增全站“焦点可见性基线”：重置 UA outline；输入类控件仅在 :focus-visible 时显示中性灰 ring（令牌化）；按钮/链接默认不显示 ring；对导航/标题动作区/卡片图标按钮做场景兜底；统一移除 Element Plus :focus outline；提供 .focus-visible-ring 作为个别按钮启用灰 ring 的开关｜pending commit
+2025-09-07｜LIST-H1-HEADER-BAR｜HomeView.vue 新增“标题区”三段式（面包屑 → H1 → 操作行），H1 英文句式与 suburb/postcode/total 数据映射，右侧 Sort 用 IconSort + 文案触发下拉，左侧 Property alert 占位（IconBell + Switch）；390 视口像素对齐参考站；不改数据流，易回滚｜pending commit
+2025-09-07｜ICON-ADD｜新增 IconSort.vue / IconBell.vue（SVG 组件化；stroke: currentColor；size 可配；ariaLabel 可配），统一图标系统供 SearchBar/标题区/导航等复用｜pending commit
+
 ## 当前项目运行状态
 
 ### 服务状态
