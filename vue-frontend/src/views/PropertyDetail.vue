@@ -160,7 +160,7 @@
                   <i class="fas fa-location-dot"></i>
                 </div>
                 <div class="travel-btn-content">
-                  <span class="travel-btn-title">See travel times</span>
+                  <span class="travel-btn-title">See your travel time</span>
                   <span class="travel-btn-subtitle"
                     >Find out travel times from this property to your destinations</span
                   >
@@ -2119,5 +2119,54 @@ onBeforeRouteLeave(() => {
     box-sizing: border-box !important; /* 边框计入宽度，确保与红线对齐 */
     background: #e8e8e8; /* 兜底底色 */
   }
+}
+/* ==== 精简“See your travel time”样式（PC 与移动端一致的简洁行项） ==== */
+/* 基础：单行、左右分布、上下分隔线、无卡片外观 */
+.see-travel-times-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: 12px 0 !important;              /* 水平由父 section 控制（与地图对齐） */
+  margin-top: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid var(--divider-color, #e5e5e5) !important;
+  border-bottom: 1px solid var(--divider-color, #e5e5e5) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  cursor: pointer;
+}
+
+/* 标题仅一行，副标题与图标隐藏 */
+.travel-icon-wrapper { display: none !important; }
+.travel-btn-subtitle { display: none !important; }
+
+.travel-btn-content {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.travel-btn-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+  line-height: 1.2 !important;
+}
+
+/* 右侧折叠提示箭头 */
+.see-travel-times-btn::after {
+  content: "▾";
+  font-size: 16px;
+  color: #808296;
+  margin-left: 8px;
+}
+
+/* PC 悬浮轻微高亮 & 行高略增 */
+@media (min-width: 1200px) {
+  .see-travel-times-btn { padding-block: 16px !important; }
+  .see-travel-times-btn:hover { background: #f7f8fa !important; }
 }
 </style>
