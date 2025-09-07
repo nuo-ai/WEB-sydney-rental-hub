@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-08｜MB-SLIM-B-APPLY  
+  废弃 INDEX.md（保留占位与指引）；修复 projectbrief.md 标题；activeContext 记录溯源 TASK MB-SLIM-B-APPLY
 - 2025-09-08｜FILTER-DROPDOWN-POSITION-FIX  
   修复 PC 分离式下拉定位落到左上角问题；Tabs 传 explicitPosition + Dropdown early-return 修正；溯源：commit 63ac851
 - 2025-09-08｜UI-EP-SCROLL-NEUTRAL-1  

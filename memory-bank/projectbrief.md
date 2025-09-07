@@ -1,4 +1,4 @@
-+# 项目简报 (Project Brief)
+# 项目简报 (Project Brief)
 
 **文档状态**: 生存文档 (Living Document)
 **最后更新**: 2025-08-19
