@@ -147,6 +147,21 @@ python scripts/run_backend.py  # localhost:8000
 
 ## 运行与集成增补（2025-09-08）
 
+### 分离式下拉定位实现（2025-09-08 修订）
+- 组件契约
+  - FilterDropdown.vue 新增 props: explicitPosition?: { top: number|string, left: number|string, width?: number|string }。若提供则优先用于定位。
+  - updatePosition() early-return 修正：仅当“无 explicitPosition 且无 trigger”时才早退，保证显式坐标生效。
+  - watch(explicitPosition, {deep:true})：面板打开时变化即触发 updatePosition。
+- 触发与坐标
+  - FilterTabs.vue 在 @click 时基于 event.currentTarget 计算显式坐标，存入 reactive positions，并以 :explicit-position 透传。
+  - 进行视口边界保护（左右各 10px），width 取 max(rect.width, 280)。
+  - 窗口 resize：若有面板打开则重算；≤768px 断点强制关闭。
+- 行为与体验
+  - 面板稳定定位在触发按钮正下方；滚动/缩放后位置跟随；首开追加 1–2 帧 rAF 轻量确认重算以稳住首帧。
+- 回滚路径
+  - 移除 explicit-position 绑定即回退到 trigger 测量模式；仍可运行但可能受 ref/布局时序影响出现 0,0。
+- 溯源：activeContext 2025-09-08｜FILTER-DROPDOWN-POSITION-FIX
+
 - 新增组件与改造
   - 新增：`src/components/FilterDropdown.vue`（通用下拉容器，teleport 到 body，支持点击外部/ESC 关闭，单例打开）
   - 新增：`src/components/filter-panels/AreaFilterPanel.vue`、`BedroomsFilterPanel.vue`、`PriceFilterPanel.vue`、`AvailabilityFilterPanel.vue`（四个分离式专用筛选面板）

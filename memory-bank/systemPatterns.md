@@ -235,6 +235,22 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 任何异常场景下可一键回退，确保向后兼容。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
+## 分离式下拉定位模式（新增）
+- 原则：PC 分离式筛选使用“显式坐标优先”的定位策略，彻底规避 ref/布局时序导致的 0,0 问题。
+- 触发侧（FilterTabs）：
+  - 在点击事件中使用 currentTarget.getBoundingClientRect() 计算 { top: rect.bottom + 8, left: rect.left, width: max(rect.width, 280) }；
+  - 做左右 10px 视口边缘保护；窗口 resize 时若面板打开则重算；切至移动端断点（≤768px）强制关闭。
+- 面板侧（FilterDropdown）：
+  - 新增 props explicitPosition（{top,left,width}），若提供则优先使用，忽略 trigger 未就绪的影响；
+  - 修正 updatePosition 的 early-return：仅当“无 explicitPosition 且无 trigger”时才早退；
+  - 仍保留 trigger + getBoundingClientRect() 作为回退；首开追加 1–2 帧 rAF 轻量确认重算，稳住首帧。
+- 布局与层级：
+  - teleport 到 body，容器 position: fixed；max-height: calc(100vh - 40px)；overscroll-behavior: contain 防穿透；
+  - 仅允许单实例打开；点击外部/ESC 关闭；断点切换时自动关闭。
+- 风险与回滚：
+  - 删除 explicitPosition 传参即可回退到 trigger 测量模式；early-return 恢复旧逻辑仍可运行但可能出现 0,0。
+- 溯源：activeContext 2025-09-08｜FILTER-DROPDOWN-POSITION-FIX
+
 ---
 
 ## 滚动与滚动条显示原则（新增）
