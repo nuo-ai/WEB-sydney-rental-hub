@@ -6,6 +6,8 @@
           ref="dropdownRef"
           class="filter-dropdown-container"
           :style="positionStyle"
+          role="dialog"
+          aria-modal="true"
           @click.stop
           tabindex="-1"
         >
@@ -151,14 +153,37 @@ const handleResize = () => {
   }
 }
 
-// 监听面板打开状态
+// 中文注释：锁定/恢复 body 滚动，避免出现页面滚动条与面板滚动条并列
+const lockBodyScroll = () => {
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+}
+const unlockBodyScroll = () => {
+  document.documentElement.style.overflow = ''
+  document.body.style.overflow = ''
+}
+
+// 中文注释：将焦点移动到面板内首个可交互控件，提升键盘可达性
+const focusFirstInteractive = () => {
+  const root = dropdownRef.value
+  if (!root) return
+  const first = root.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  if (first && typeof first.focus === 'function') {
+    first.focus()
+  } else {
+    root.focus?.()
+  }
+}
+
+ // 中文注释：监听面板打开状态（锁滚 + 焦点首控件 + 定位确认）
 watch(() => isOpen.value, (newVal) => {
   if (newVal) {
-    // 中文注释：首次打开立即计算一次
+    // 中文注释：首次打开立即计算一次，并锁定 body 滚动
+    lockBodyScroll()
     updatePosition()
     nextTick(() => {
-      // 中文注释：面板打开时，将焦点移至面板以支持键盘访问
-      dropdownRef.value?.focus?.()
+      // 中文注释：优先将焦点移至首个交互控件；如果不存在则聚焦容器
+      focusFirstInteractive()
       // 中文注释：在布局/赋值可能慢一拍的场景下，追加 1–2 帧 rAF 进行轻量确认重算
       const ensurePosition = (attempt = 0) => {
         if (!positionStyle.value?.top || !positionStyle.value?.left) {
@@ -170,6 +195,9 @@ watch(() => isOpen.value, (newVal) => {
       }
       requestAnimationFrame(() => ensurePosition(0))
     })
+  } else {
+    // 中文注释：关闭时恢复 body 滚动
+    unlockBodyScroll()
   }
 })
 
@@ -199,6 +227,11 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   window.removeEventListener('scroll', handleResize, true)
 })
+
+onUnmounted(() => {
+  // 中文注释：组件卸载时确保恢复页面滚动
+  unlockBodyScroll()
+})
 </script>
 
 <style scoped>
@@ -219,7 +252,7 @@ onUnmounted(() => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1001;
-  max-height: 66vh;
+  max-height: calc(100vh - 40px);
   max-width: calc(100vw - 20px);
   overflow: hidden;
   outline: none; /* 移除焦点轮廓 */

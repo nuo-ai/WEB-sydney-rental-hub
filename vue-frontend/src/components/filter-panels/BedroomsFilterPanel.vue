@@ -19,6 +19,7 @@
           :key="option.value"
           class="filter-btn"
           :class="{ active: isBedroomSelected(option.value) }"
+          :aria-pressed="isBedroomSelected(option.value)"
           @click="toggleBedroom(option.value)"
         >
           {{ option.label }}
@@ -27,19 +28,30 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
+        <button type="button" class="link-clear" @click="clearBedrooms">{{ anyLabel }}</button>
         <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ cancelLabel }}
         </el-button>
-        <el-button type="primary" class="apply-btn" size="default" @click="applyFilters">
-          {{ applyLabel }}
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
+          :loading="countLoading"
+          @click="applyFilters"
+        >
+          {{ applyText }}
         </el-button>
+        <!-- a11y：数量变化通过 aria-live 播报 -->
+        <span class="sr-only" aria-live="polite">
+          {{ previewCount !== null ? ('可用结果 ' + previewCount + ' 条') : '' }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, inject, computed } from 'vue'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 
@@ -63,6 +75,11 @@ const applyLabel = computed(() => {
   const v = t('filter.apply')
   return v && v !== 'filter.apply' ? v : '应用'
 })
+// “不限”/清空 文案
+const anyLabel = computed(() => {
+  const v = t('filter.any')
+  return v && v !== 'filter.any' ? v : '清空'
+})
 
 const cancelLabel = computed(() => {
   const v = t('filter.cancel')
@@ -74,6 +91,8 @@ const propertiesStore = usePropertiesStore()
 
 // 选项数据
 const bedroomOptions = [
+  // 中文注释：Studio 采用值 0，对应“最少 0 间”
+  { value: '0', label: 'Studio' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },
@@ -91,6 +110,50 @@ const initialBedrooms = computed(() => {
 
 // 本地状态（用于保存用户选择，但不立即应用）
 const localBedrooms = ref([...initialBedrooms.value])
+
+// 结果数量预估（用于“应用（N）”）
+const previewCount = ref(null)
+const countLoading = ref(false)
+let _countTimer = null
+
+const applyText = computed(() => {
+  if (typeof previewCount.value === 'number') {
+    return `${applyLabel.value}（${previewCount.value}）`
+  }
+  return applyLabel.value
+})
+
+// 清空选择（不限）
+const clearBedrooms = () => {
+  localBedrooms.value = []
+  computePreviewCount()
+}
+
+// 触发计数（防抖 300ms）
+const computePreviewCount = async () => {
+  try {
+    countLoading.value = true
+    const params = buildFilterParams()
+    const n = await propertiesStore.getFilteredCount(params)
+    previewCount.value = Number.isFinite(n) ? n : 0
+  } catch (e) {
+    // 中文注释：快速失败，不做本地估算
+    previewCount.value = null
+    console.warn('获取卧室筛选结果数失败', e)
+  } finally {
+    countLoading.value = false
+  }
+}
+
+watch(localBedrooms, () => {
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
+})
+
+// 初次打开时计算一次
+onMounted(() => {
+  computePreviewCount()
+})
 
 // 判断卧室选项是否被选中
 const isBedroomSelected = (value) => {
@@ -111,12 +174,10 @@ const toggleBedroom = (value) => {
 // 构建筛选参数
 const buildFilterParams = () => {
   const filterParams = {}
-
-  // 卧室数量
+  // 卧室数量（最少 N 间；'4+' → '4' 在 store 映射层处理；Studio 使用 '0'）
   if (localBedrooms.value.length > 0) {
     filterParams.bedrooms = localBedrooms.value.join(',')
   }
-
   return filterParams
 }
 
@@ -272,5 +333,32 @@ const applyFilters = async () => {
 .apply-btn:hover {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
+}
+
+/* 文本清空按钮（不限） */
+.link-clear {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-right: auto; /* 将清空靠左，其余按钮靠右 */
+}
+.link-clear:hover {
+  color: var(--color-text-primary);
+}
+
+/* 屏幕阅读器可见性辅助 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 </style>
