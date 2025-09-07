@@ -680,6 +680,46 @@ header nav .el-menu-item:hover,
   margin-bottom: 16px;
 }
 
+/* ========== Utilities · 8pt Spacing / Type Scale / Weight / Muted ========== */
+/* 纵向堆叠节奏（容器上使用），统一 8pt 系列 */
+.stack-xs > * + * { margin-top: 8px !important; }
+.stack-sm > * + * { margin-top: 12px !important; }
+.stack-md > * + * { margin-top: 16px !important; }
+.stack-lg > * + * { margin-top: 24px !important; }
+.stack-xl > * + * { margin-top: 32px !important; }
+
+/* 字号工具，映射到全局 tokens */
+.text-xs  { font-size: var(--text-xs) !important; }
+.text-sm  { font-size: var(--text-sm) !important; }
+.text-base{ font-size: var(--text-base) !important; }
+.text-lg  { font-size: var(--text-lg) !important; }
+/* 标题快捷（与模板一致） */
+.h1 { font-size: 24px !important; line-height: 28px !important; font-weight: 700 !important; }
+.h2 { font-size: 20px !important; line-height: 24px !important; font-weight: 700 !important; }
+
+/* 字重工具 */
+.font-400 { font-weight: 400 !important; }
+.font-500 { font-weight: 500 !important; }
+.font-600 { font-weight: 600 !important; }
+.font-700 { font-weight: 700 !important; }
+
+/* 语义色工具 */
+.text-primary   { color: var(--color-text-primary) !important; }
+.text-secondary { color: var(--color-text-secondary) !important; }
+.text-brand     { color: var(--juwo-primary) !important; }
+
+/* 统一卡片容器（轻边界 + 面背景），用于我的中心等信息区 */
+.section-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+}
+@media (min-width: 768px) {
+  .section-card { padding: 24px; }
+}
+
 /* ================= EP-GUARDRAIL-FOCUS-GLOBAL =================
    目的：一次性移除“橙色/默认焦点外框”，建立全站焦点可见性基线
    原则：

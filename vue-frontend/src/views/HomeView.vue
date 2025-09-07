@@ -30,13 +30,7 @@
               @locationSelected="handleLocationSelected"
               @openFilterPanel="handleOpenFilterPanel"
             />
-            <FilterTabs
-              v-if="false"
-              class="filter-tabs-right"
-              :filter-panel-open="showFilterPanel"
-              @toggleFullPanel="handleToggleFullPanel"
-              @filtersChanged="handleQuickFiltersChanged"
-            />
+            <!-- FilterTabs 已废弃：统一入口=SearchBar 后缀图标；保留代码请参考 Memory Bank -->
           </div>
 
           <!-- 结果统计移至搜索容器下方的新容器中；此处移除以避免双处回显 -->
@@ -171,7 +165,6 @@ import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
 import VirtualPropertyList from '@/components/VirtualPropertyList.vue'
 import SearchBar from '@/components/SearchBar.vue'
-import FilterTabs from '@/components/FilterTabs.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import IconBell from '@/components/icons/IconBell.vue'
@@ -281,14 +274,6 @@ const handleLocationSelected = async () => {
   }
 }
 
-const handleToggleFullPanel = (show) => {
-  // 入口拦截：若未选区域，直接轻提示并阻止打开
-  if (show && !hasRegionSelected()) {
-    ElMessage({ message: t('search.ph'), customClass: 'secondary-hint' })
-    return
-  }
-  showFilterPanel.value = show
-}
 
 const handleOpenFilterPanel = () => {
   // 入口拦截：若未选区域，直接轻提示并阻止打开
@@ -300,22 +285,6 @@ const handleOpenFilterPanel = () => {
   showFilterPanel.value = true
 }
 
-const handleQuickFiltersChanged = (filterParams) => {
-  // 同步快速筛选数据到FilterPanel
-  if (filterPanelRef.value) {
-    // 转换格式以同步到FilterPanel
-    const syncData = {
-      priceRange:
-        filterParams.minPrice !== null || filterParams.maxPrice !== null
-          ? [filterParams.minPrice || 0, filterParams.maxPrice || 5000]
-          : [0, 5000],
-      bedrooms: filterParams.bedrooms === 'any' ? [] : filterParams.bedrooms.split(','),
-      bathrooms: filterParams.bathrooms === 'any' ? [] : filterParams.bathrooms?.split(',') || [],
-      parking: filterParams.parking === 'any' ? [] : filterParams.parking?.split(',') || [],
-    }
-    filterPanelRef.value.setFilters(syncData)
-  }
-}
 
 const handleFiltersChanged = () => {
   // 筛选逻辑已在FilterPanel组件中处理
