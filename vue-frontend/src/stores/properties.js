@@ -201,9 +201,9 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 特性开关（集中管理回滚策略）
     // requireRegionBeforeFilter: 启用后，未选择区域（suburb/postcode）将禁用筛选并在 Store 侧早返回
-    featureFlags: {
-      requireRegionBeforeFilter: true,
-    },
+      featureFlags: {
+        requireRegionBeforeFilter: false,
+      },
 
     // 当前已应用的筛选参数（用于翻页/改每页大小时保持筛选条件）
     currentFilterParams: {},

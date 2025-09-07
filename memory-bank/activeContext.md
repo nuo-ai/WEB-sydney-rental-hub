@@ -36,6 +36,8 @@
 2025-09-07｜FILTER-TABS-PC-RETURN｜PC 恢复 FilterTabs 作为 FilterPanel 锚点入口；FilterTabs 不再直接改筛选值，仅 emit('requestOpen', { section }); HomeView 接入 @requestOpen 与 v-model；移动端仍仅保留“筛选”主按钮｜pending commit
 2025-09-07｜PROFILEVIEW-ESLINT-FIX｜修复 ProfileView.vue 注释中包含 “*/” 导致的解析错误；移除未使用变量与导入；catch 去除未使用参数；零业务改动与零视觉变化｜pending commit
 
+2025-09-07｜MB-ALIGN-SNAPSHOT｜activeContext 单行快照：对齐 Memory Bank 流程（仅文档；零代码改动）；触发：出现架构/契约决策或首个相关 commit 后同步 progress/systemPatterns；来源：无提交/流程对齐｜pending commit
+
 ## 当前项目运行状态
 
 ### 服务状态
@@ -66,7 +68,7 @@
 
 ---
 
-## 开发提醒
+![1757215696837](image/activeContext/1757215696837.png)![1757215736988](image/activeContext/1757215736988.png)![1757216008604](image/activeContext/1757216008604.png)## 开发提醒
 
 ### 代码质量
 

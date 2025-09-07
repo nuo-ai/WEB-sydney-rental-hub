@@ -178,7 +178,7 @@
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
         <el-button class="cancel-btn" size="large" @click="closePanel"> {{ $t('filter.cancel') }} </el-button>
-        <el-button type="primary" class="apply-btn" size="large" @click="applyFilters">
+        <el-button type="primary" class="apply-btn" size="large" @click="applyFilters" :disabled="!isDateRangeValid">
           {{ $t('filter.showResults') }} ({{ filteredCount }})
         </el-button>
       </div>
@@ -455,6 +455,16 @@ const hasAppliedFilters = computed(() => {
 
 
 
+const isDateRangeValid = computed(() => {
+  // 中文注释：当“从/到”都选择时，校验开始日期不能晚于结束日期；否则视为有效
+  const s = filters.value.startDate
+  const e = filters.value.endDate
+  if (s && e) {
+    return new Date(s).getTime() <= new Date(e).getTime()
+  }
+  return true
+})
+
 // 相邻多选逻辑
 const isBedroomSelected = (value) => {
   return filters.value.bedrooms.includes(value)
@@ -516,6 +526,15 @@ const toggleParking = (value) => {
 
 // 实时更新筛选数量（不立即应用到store）
 const updateFilteredCount = async () => {
+  // 中文注释：日期区间校验，非法时不发起计数请求，直接显示 0
+  if (filters.value.startDate && filters.value.endDate) {
+    const s = new Date(filters.value.startDate).getTime()
+    const e = new Date(filters.value.endDate).getTime()
+    if (s > e) {
+      localFilteredCount.value = 0
+      return
+    }
+  }
   // 准备筛选参数（先沿用现有键名，后续统一映射）
   const filterParams = {
     minPrice: filters.value.priceRange[0] > 0 ? filters.value.priceRange[0] : null,
@@ -577,12 +596,24 @@ const handlePriceChange = () => {
 }
 
 const handleStartDateChange = (date) => {
+  // 中文注释：若选中的开始日期晚于当前结束日期，立即“交换两端”，保持 start ≤ end（最少惊讶）
+  const currentEnd = filters.value.endDate
   filters.value.startDate = date
+  if (date && currentEnd && new Date(date).getTime() > new Date(currentEnd).getTime()) {
+    filters.value.startDate = currentEnd
+    filters.value.endDate = date
+  }
   nextTick(() => updateFilteredCount())
 }
 
 const handleEndDateChange = (date) => {
+  // 中文注释：若选中的结束日期早于当前开始日期，立即“交换两端”，保持 start ≤ end（最少惊讶）
+  const currentStart = filters.value.startDate
   filters.value.endDate = date
+  if (date && currentStart && new Date(date).getTime() < new Date(currentStart).getTime()) {
+    filters.value.endDate = currentStart
+    filters.value.startDate = date
+  }
   nextTick(() => updateFilteredCount())
 }
 
@@ -643,6 +674,11 @@ const applyFiltersToStore = async () => {
 }
 
 const applyFilters = async () => {
+  // 中文注释：提交前校验“从/到”日期合法性
+  if (!isDateRangeValid.value) {
+    ElMessage.error('开始日期不能晚于结束日期')
+    return
+  }
   await applyFiltersToStore()
   // 应用后更新计数为实际结果
   localFilteredCount.value = propertiesStore.totalCount
@@ -955,8 +991,9 @@ onMounted(() => {
 }
 
 .date-picker :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--color-border-strong);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, .04);
+  /* 去除点击后的灰色/橙色外框与高亮，保持无 ring */
+  border-color: var(--color-border-default);
+  box-shadow: none;
 }
 
 /* 确保日期选择器弹出层在最上层 */

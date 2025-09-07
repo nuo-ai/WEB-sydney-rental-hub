@@ -30,6 +30,15 @@
               @locationSelected="handleLocationSelected"
               @openFilterPanel="handleOpenFilterPanel"
             />
+            <!-- 桌面端筛选按钮：移动到搜索框右侧，≥768px 显示 -->
+            <button
+              class="filter-trigger-btn"
+              type="button"
+              @click="handleOpenFilterPanel"
+            >
+              <IconFilterNarrow :size="16" />
+              <span>筛选</span>
+            </button>
             <FilterTabs
               class="filter-tabs-right"
               :filterPanelOpen="showFilterPanel"
@@ -51,7 +60,7 @@
 
       <!-- 标题区：面包屑 / H1 / 操作行（390 视口对齐参考站） -->
       <div class="container title-block">
-        <nav class="breadcrumbs">Home › Rent › NSW › {{ suburb || '—' }}</nav>
+        <nav class="breadcrumbs">Home › NSW › {{ suburb || '—' }}</nav>
 
         <h1 class="page-h1">
           {{ propertiesStore.totalCount }} Properties for rent in
@@ -163,7 +172,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, inject } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
@@ -175,13 +184,12 @@ import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import IconBell from '@/components/icons/IconBell.vue'
 import IconSort from '@/components/icons/IconSort.vue'
+import IconFilterNarrow from '@/components/icons/IconFilterNarrow.vue'
 
 /* 路由 */
 const router = useRouter()
 const route = useRoute()
 
-/* 轻量 i18n：在脚本中访问文案（与全局 $t 一致） */
-const t = inject('t') || ((k) => k)
 
 /* 状态管理 */
 const propertiesStore = usePropertiesStore()
@@ -253,10 +261,6 @@ const useVirtualScroll = computed(() => {
 
 /* 方法 */
 // 工具：是否已选择区域（suburb/postcode）
-const hasRegionSelected = () => {
-  const list = propertiesStore.selectedLocations
-  return Array.isArray(list) && list.some((l) => l && (l.type === 'suburb' || l.type === 'postcode'))
-}
 
 const handleSearch = () => {
   // 搜索逻辑已在SearchBar组件中处理，这里主要是响应搜索事件
@@ -282,12 +286,7 @@ const handleLocationSelected = async () => {
 
 
 const handleOpenFilterPanel = () => {
-  // 入口拦截：若未选区域，直接轻提示并阻止打开
-  if (!hasRegionSelected()) {
-    ElMessage({ message: t('search.ph'), customClass: 'secondary-hint' })
-    return
-  }
-  // 从 SearchBar 右侧图标触发，打开统一 FilterPanel
+  // 无需先选择区域，直接打开统一 FilterPanel
   showFilterPanel.value = true
 }
 const onFilterTabsRequest = () => {
@@ -615,6 +614,32 @@ onUnmounted(() => {
   align-items: center;
 }
 
+/* 桌面端筛选按钮（与行内控件间距一致） */
+.filter-trigger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 12px;                 /* 更紧凑的药丸尺寸 */
+  gap: 2px;                        /* 图标与文字更紧凑 */
+  border: 1px solid var(--color-border-default);
+  border-radius: 9999px;           /* 强制药丸型 */
+  background: #fff;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;                  /* 垂直居中更稳 */
+}
+.filter-trigger-btn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
+}
+.filter-trigger-btn:focus {
+  outline: none;                   /* 去除浏览器默认 focus ring */
+  box-shadow: none;
+}
+
 .results-summary {
   max-width: 1200px;
   margin: 0 auto;
@@ -650,25 +675,39 @@ onUnmounted(() => {
 
 /* 移动端布局调整 */
 @media (max-width: 768px) {
+  .container { padding: 12px 16px; } /* 统一移动端左右 16px，与卡片内容区一致 */
   .search-filter-section {
     margin-bottom: 12px; /* 进一步减少移动端间距 */
   }
 
   .search-content-container {
-    padding: 12px 24px 8px 24px; /* 减少移动端搜索内容padding */
+    padding: 12px 16px 8px 16px; /* 与卡片内容区(16px)左右对齐 */
   }
 
   .search-filter-row {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row; /* 移动端与搜索框同排 */
+    align-items: center;
+    gap: 8px;
   }
 
   .search-bar {
     width: 100%;
+    flex: 1;
   }
 
   .filter-tabs-right {
-    width: 100%;
+    display: none; /* 移动端隐藏四个 Chips */
+  }
+
+  .filter-trigger-btn {
+    display: inline-flex; /* 仅移动端显示按钮 */
+    height: 34px;
+    padding: 0 12px;      /* 更紧凑但可点击 */
+    border-radius: 9999px;
+    gap: 2px;
+    font-size: 13px;
+    line-height: 1;
+    margin-right: 3px;    /* 对齐卡片“···”右缘（按钮右侧退 3px） */
   }
 }
 
@@ -786,9 +825,14 @@ onUnmounted(() => {
   }
 
   .filter-trigger-btn {
-    width: 100%;
-    height: 48px;
-    border-radius: 6px;
+    display: inline-flex;
+    width: auto;
+    height: 34px;
+    padding: 0 12px;      /* 与上方断点一致 */
+    border-radius: 9999px;
+    gap: 2px;
+    font-size: 13px;
+    line-height: 1;
   }
 }
 </style>

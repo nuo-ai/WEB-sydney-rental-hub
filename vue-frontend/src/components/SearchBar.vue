@@ -28,18 +28,7 @@
         <template #prefix>
           <Search class="spec-icon search-icon" />
         </template>
-        <template #suffix>
-          <!-- 说明：按“单一入口”策略，将筛选入口迁移到搜索框右侧；24×24px，距右边界12px，点击仅触发打开 FilterPanel -->
-          <button
-            class="filter-icon-btn"
-            type="button"
-            aria-label="筛选"
-            @mousedown.prevent.stop
-            @click.stop="onFilterClick"
-          >
-            <SlidersHorizontal class="spec-icon" aria-hidden="true" />
-          </button>
-        </template>
+        <template #suffix></template>
       </el-input>
 
       <!-- 内嵌低调区域标签（占位显示），仅在未聚焦/未输入且有选区时展示 -->
@@ -143,7 +132,7 @@ import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 import SearchOverlay from './SearchOverlay.vue'
-import { Search, MapPin, Hash, X, SlidersHorizontal, Lightbulb } from 'lucide-vue-next'
+import { Search, MapPin, Hash, X, Lightbulb } from 'lucide-vue-next'
 
 // 建议列表最大返回条数（覆盖 36 条邮编）
 const SUGGESTION_LIMIT = 100
@@ -333,25 +322,6 @@ const handleBlur = () => {
   isInputFocused.value = false
 }
 
-const onFilterClick = () => {
-  // 标记抑制下次 focus 的 Overlay 打开
-  suppressNextOverlayOpen.value = true
-  // 关闭 Overlay（如已打开）
-  showOverlay.value = false
-  // 尝试 blur 输入框，避免触发 focus 流程
-  try {
-    searchInputRef.value?.blur?.()
-  } catch {
-    /* no-op: ref 可能尚未就绪或被销毁，忽略 */
-  }
-  try {
-    const el = searchInputRef.value?.$el?.querySelector('input')
-    el?.blur?.()
-  } catch {
-    /* no-op: DOM 查询失败时忽略 */
-  }
-  emit('openFilterPanel')
-}
 
 /* 承接 SearchOverlay 内“筛选”按钮事件：关闭 Overlay 并打开筛选面板 */
 const onOverlayOpenFilter = () => {
@@ -578,7 +548,7 @@ watch(
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
   /* 预留右侧空间：右边距(12px) + 命中区域(32px)；可由 token 控制 */
-  padding-right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px));
+  padding-right: 12px;
 }
 
 .search-input :deep(.el-input__wrapper):hover {
@@ -586,8 +556,9 @@ watch(
 }
 
 .search-input :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--color-border-strong);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, .04);
+  /* 去除点击后的灰色/橙色外框与高亮，保持无 ring */
+  border-color: var(--color-border-default);
+  box-shadow: none;
 }
 
 .search-icon {
@@ -667,7 +638,7 @@ watch(
 .inline-chips-overlay {
   position: absolute;
   left: 40px; /* 与前缀图标对齐（16px 图标 + 内补白） */
-  right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px) + 6px);
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
   height: 20px;
