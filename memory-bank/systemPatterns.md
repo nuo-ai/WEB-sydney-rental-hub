@@ -185,16 +185,23 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 
 ---
 
-## 筛选入口一致性（新增）
+## 筛选入口一致性（更新 v1）
 
-- 原则：全站筛选入口单一；桌面芯片仅作为“打开 FilterPanel”的触发器，不承载预设/下拉；移动端仅保留“筛选”入口。
-- 为什么：避免“快捷项 vs 面板”双通道引发的状态不一致；统一心智模型、简化回滚路径。
-- 实施：
-  - 搜索框后缀图标为唯一入口，点击 emit('open-filter-panel') 打开统一 FilterPanel；FilterTabs 已弃用（不再渲染）。
-  - 移动端与桌面端保持同一入口（搜索框后缀图标），不再渲染 FilterTabs。
-  - HomeView 监听 open-filter-panel 打开 FilterPanel，保持入口一致。
-- 向后兼容：旧直链 `parking=0` 视为 Any（不传）。
-- 溯源：activeContext 2025-09-05｜UI-FILTER-ENTRY-UNIFY｜commit 6926962
+- 原则：筛选“单一真源”= FilterPanel + Pinia；FilterTabs 仅作为“入口/锚点”，不承载任何预设/快速选项/本地 applyFilters。
+- 平台策略：
+  - PC：显示 FilterTabs 分组 pill（区域/卧室/价格/空出时间）与“筛选”主按钮；点击任一项仅打开 FilterPanel，并传递分组意图。
+  - Mobile：仅保留“筛选”主按钮；不显示分组 pill，避免拥挤。
+- 事件契约：
+  - FilterTabs → emit('requestOpen', { section: 'area'|'bedrooms'|'price'|'availability'|null })
+  - 父(HomeView) → 接收后：showFilterPanel = true；focusSection = payload.section
+  - FilterPanel → props: focusSection（将滚动/聚焦到对应分组），v-model:open 控制显隐
+- 数据契约：
+  - 任何筛选更改仅在 FilterPanel 内部提交到 Pinia，并按需同步 URL；禁止在 FilterTabs 直接改 store 或 query。
+- 可达性与视觉：
+  - 遵循 EP-GUARDRAIL-FOCUS-GLOBAL；当 focusSection 变化时聚焦该分组首交互控件（仅PC）。
+- 回滚策略：
+  - 如需撤回 PC chips，移除 FilterTabs 渲染即可恢复“搜索后缀图标为唯一入口”的形态。
+- 溯源：activeContext 2025-09-07｜FILTER-TABS-PC-RETURN（代码已落地）；待补：FilterPanel.focusSection
 
 ## 前端状态同步与特性开关（新增）
 

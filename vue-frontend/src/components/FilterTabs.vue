@@ -154,7 +154,7 @@ const props = defineProps({
 })
 
 // 组件事件
-const emit = defineEmits(['toggleFullPanel', 'filtersChanged'])
+const emit = defineEmits(['toggleFullPanel', 'filtersChanged', 'requestOpen'])
 
 // 状态管理
 const propertiesStore = usePropertiesStore()
@@ -217,11 +217,13 @@ const priceRangeText = computed(() => {
 const toggleFullPanel = () => {
   closeDropdown()
   emit('toggleFullPanel', !props.filterPanelOpen)
+  emit('requestOpen', { section: null }) // PC端主按钮：仅打开面板，不做本地筛选
 }
 
-const toggleDropdown = () => {
-  // 一致性要求：触发器仅用于打开统一筛选面板（不再使用预设/下拉）
+const toggleDropdown = (section) => {
+  // 仅作为入口：打开统一筛选面板，并传递希望聚焦的分组
   emit('toggleFullPanel', true)
+  emit('requestOpen', { section })
   activeDropdown.value = null
 }
 
@@ -454,10 +456,16 @@ defineExpose({
   color: var(--juwo-primary);
 }
 
-/* 下拉框容器：PC/移动端都隐藏，仅保留“筛选”主触发按钮 */
+/* 下拉框容器：PC 显示、移动端隐藏；作为 FilterPanel 锚点入口（仍禁用下拉内容） */
 .filter-tab-dropdown {
   position: relative;
-  display: none;
+  display: none; /* 默认隐藏：由媒体查询在 PC 端显示 */
+}
+
+@media (min-width: 769px) {
+  .filter-tab-dropdown {
+    display: block;
+  }
 }
 
 /* 快速筛选下拉框 */

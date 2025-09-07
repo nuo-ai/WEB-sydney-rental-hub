@@ -30,7 +30,12 @@
               @locationSelected="handleLocationSelected"
               @openFilterPanel="handleOpenFilterPanel"
             />
-            <!-- FilterTabs 已废弃：统一入口=SearchBar 后缀图标；保留代码请参考 Memory Bank -->
+            <FilterTabs
+              class="filter-tabs-right"
+              :filterPanelOpen="showFilterPanel"
+              @toggleFullPanel="(val) => (showFilterPanel = val)"
+              @requestOpen="onFilterTabsRequest"
+            />
           </div>
 
           <!-- 结果统计移至搜索容器下方的新容器中；此处移除以避免双处回显 -->
@@ -166,6 +171,7 @@ import PropertyCard from '@/components/PropertyCard.vue'
 import VirtualPropertyList from '@/components/VirtualPropertyList.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
+import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import IconBell from '@/components/icons/IconBell.vue'
 import IconSort from '@/components/icons/IconSort.vue'
@@ -283,6 +289,10 @@ const handleOpenFilterPanel = () => {
   }
   // 从 SearchBar 右侧图标触发，打开统一 FilterPanel
   showFilterPanel.value = true
+}
+const onFilterTabsRequest = () => {
+  // 仅作为入口；分组聚焦后续由 FilterPanel 支持 focusSection 再接入
+  handleOpenFilterPanel()
 }
 
 

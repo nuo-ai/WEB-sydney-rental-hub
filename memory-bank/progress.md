@@ -8,6 +8,8 @@
 - [X] 列表页“标题区”三段式（面包屑 → H1 → 操作行），390 视口对齐参考站（HomeView.vue）
 - [X] 新增 IconSort / IconBell（SVG 组件化，stroke: currentColor；size/aria 可配）
 - [X] 全站“焦点可见性基线”EP-GUARDRAIL-FOCUS-GLOBAL：移除 UA 橙框；输入类控件仅在 :focus-visible 时显示中性灰 ring；按钮/链接默认无 ring；Element Plus :focus 统一去除（src/style.css）
+- [X] PC 恢复 FilterTabs 为筛选面板入口（仅PC显示；不直接改筛选；HomeView 接线 @requestOpen + v-model）
+- [X] ProfileView 注释解析错误修复与 ESLint 清理（移除未使用变量/导入；不改业务逻辑）
 
 - [X] 搜索内嵌筛选入口（sliders-horizontal 16×16，右距 12px）
 - [X] 移动端房源卡片 Full-bleed（贴边但保持高度不变）

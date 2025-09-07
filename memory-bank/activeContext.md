@@ -1,6 +1,6 @@
 # 当前上下文与紧急焦点
 
-**最后更新**: 2025-09-06
+**最后更新**: 2025-09-07
 
 ---
  
@@ -33,6 +33,8 @@
 2025-09-07｜EP-GUARDRAIL-FOCUS-GLOBAL｜src/style.css 新增全站“焦点可见性基线”：重置 UA outline；输入类控件仅在 :focus-visible 时显示中性灰 ring（令牌化）；按钮/链接默认不显示 ring；对导航/标题动作区/卡片图标按钮做场景兜底；统一移除 Element Plus :focus outline；提供 .focus-visible-ring 作为个别按钮启用灰 ring 的开关｜pending commit
 2025-09-07｜LIST-H1-HEADER-BAR｜HomeView.vue 新增“标题区”三段式（面包屑 → H1 → 操作行），H1 英文句式与 suburb/postcode/total 数据映射，右侧 Sort 用 IconSort + 文案触发下拉，左侧 Property alert 占位（IconBell + Switch）；390 视口像素对齐参考站；不改数据流，易回滚｜pending commit
 2025-09-07｜ICON-ADD｜新增 IconSort.vue / IconBell.vue（SVG 组件化；stroke: currentColor；size 可配；ariaLabel 可配），统一图标系统供 SearchBar/标题区/导航等复用｜pending commit
+2025-09-07｜FILTER-TABS-PC-RETURN｜PC 恢复 FilterTabs 作为 FilterPanel 锚点入口；FilterTabs 不再直接改筛选值，仅 emit('requestOpen', { section }); HomeView 接入 @requestOpen 与 v-model；移动端仍仅保留“筛选”主按钮｜pending commit
+2025-09-07｜PROFILEVIEW-ESLINT-FIX｜修复 ProfileView.vue 注释中包含 “*/” 导致的解析错误；移除未使用变量与导入；catch 去除未使用参数；零业务改动与零视觉变化｜pending commit
 
 ## 当前项目运行状态
 
