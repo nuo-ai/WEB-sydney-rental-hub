@@ -133,9 +133,7 @@
           :explicit-position="positions.more"
           @close="activePanel = null"
         >
-          <div class="more-filter-placeholder">
-            <p>更多筛选选项</p>
-          </div>
+          <MoreFilterPanel @close="activePanel = null" />
         </FilterDropdown>
       </div>
     </div>
@@ -159,6 +157,7 @@ import AreaFilterPanel from './filter-panels/AreaFilterPanel.vue'
 import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
 import PriceFilterPanel from './filter-panels/PriceFilterPanel.vue'
 import AvailabilityFilterPanel from './filter-panels/AvailabilityFilterPanel.vue'
+import MoreFilterPanel from './filter-panels/MoreFilterPanel.vue'
 
 // 中文注释：PC端改为分离式下拉面板，移动端保持统一大面板
 // 使用 requestOpenFullPanel 事件触发移动端的统一面板

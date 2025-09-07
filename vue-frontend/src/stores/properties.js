@@ -153,6 +153,24 @@ const mapFilterStateToApiParams = (
   return params
 }
 
+/**
+ * 特性开关：在未全局开启的情况下，检测是否包含 V2 扩展键以“按需启用”V2 映射
+ * 为什么：More 面板产生的是 isFurnished/bathrooms/parking 等键；当出现这些键时应切换到 V2 白名单映射，
+ * 避免以 V1 键名（如 isFurnished）请求导致后端不识别。
+ */
+const _hasAdvancedV2Keys = (obj = {}) => {
+  try {
+    if (!obj || typeof obj !== 'object') return false
+    if (obj.isFurnished === true) return true
+    if (obj.bathrooms && obj.bathrooms !== 'any' && String(obj.bathrooms).length) return true
+    if (obj.parking && obj.parking !== 'any' && String(obj.parking).length) return true
+    if (obj.postcodes && String(obj.postcodes).length) return true
+    return false
+  } catch {
+    return false
+  }
+}
+
 // 特性开关守卫工具：检测是否已选择“区域”（suburb/postcode）
 // 目的：在 UI 禁用之外，增加 Store 侧的早返回保护，避免无意义的接口请求
 const hasRegionSelected = (selectedLocations = []) => {
@@ -534,11 +552,12 @@ export const usePropertiesStore = defineStore('properties', {
         }
         // 统一通过映射层构造请求参数
         // 目的：维持 V1 行为（默认），并可通过开关无缝切至 V2 契约（suburbs/price_min/...）
+        const useV2 = enableFilterV2 || _hasAdvancedV2Keys(filters)
         const mappedParams = mapFilterStateToApiParams(
           filters,
           this.selectedLocations,
           { page: 1, page_size: this.pageSize, sort: this.sort },
-          { enableFilterV2 },
+          { enableFilterV2: useV2 },
         )
 
         // 移除 null/空串，避免无效参数污染缓存与后端白名单
@@ -689,11 +708,12 @@ export const usePropertiesStore = defineStore('properties', {
           return 0
         }
         // 计数亦走统一映射，确保与列表参数一致
+        const useV2 = enableFilterV2 || _hasAdvancedV2Keys(params)
         const mappedParams = mapFilterStateToApiParams(
           params,
           this.selectedLocations,
           { page: 1, page_size: 1 }, // 仅取总数
-          { enableFilterV2 },
+          { enableFilterV2: useV2 },
         )
 
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()

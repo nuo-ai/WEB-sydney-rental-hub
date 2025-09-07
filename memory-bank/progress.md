@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-08｜FILTER-MORE-PANEL-PC  
+  新增 PC 分离式“更多”面板；接入 FilterTabs；store 按需启用 V2 映射；URL 同步仅非空；可回滚占位恢复
 - 2025-09-08｜MB-SLIM-B-APPLY  
   废弃 INDEX.md（保留占位与指引）；修复 projectbrief.md 标题；activeContext 记录溯源 TASK MB-SLIM-B-APPLY
 - 2025-09-08｜FILTER-DROPDOWN-POSITION-FIX  
