@@ -1,14 +1,5 @@
 <template>
   <div class="availability-filter-panel">
-    <!-- 面板头部 -->
-    <div class="panel-header">
-      <h3 class="panel-title chinese-text">{{ availabilityLabel }}</h3>
-      <button class="close-btn" @click="$emit('close')" aria-label="关闭空出时间筛选面板">
-        <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
 
     <!-- 面板内容 -->
     <div class="panel-content">
@@ -19,7 +10,7 @@
           type="date"
           :placeholder="startDateLabel"
           size="large"
-          class="date-picker-start"
+          class="date-picker-start filter-field"
           :editable="false"
           :input-attrs="{ inputmode: 'none' }"
           :teleported="true"
@@ -32,7 +23,7 @@
           type="date"
           :placeholder="endDateLabel"
           size="large"
-          class="date-picker-end"
+          class="date-picker-end filter-field"
           :editable="false"
           :input-attrs="{ inputmode: 'none' }"
           :teleported="true"
@@ -51,8 +42,15 @@
         <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ cancelLabel }}
         </el-button>
-        <el-button type="primary" class="apply-btn" size="default" @click="applyFilters" :disabled="!isDateRangeValid">
-          {{ applyLabel }}
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
+          :loading="countLoading"
+          @click="applyFilters"
+          :disabled="!isDateRangeValid || countLoading"
+        >
+          {{ applyText }}
         </el-button>
       </div>
     </div>
@@ -60,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, inject, computed } from 'vue'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 
@@ -75,10 +73,6 @@ const router = useRouter()
 const t = inject('t') || ((k) => k)
 
 // 文案回退，避免显示未注册的 key
-const availabilityLabel = computed(() => {
-  const v = t('filter.date')
-  return v && v !== 'filter.date' ? v : '空出时间'
-})
 
 const startDateLabel = computed(() => {
   const v = t('filter.dateStart')
@@ -95,10 +89,6 @@ const toLabel = computed(() => {
   return v && v !== 'filter.to' ? v : '至'
 })
 
-const applyLabel = computed(() => {
-  const v = t('filter.apply')
-  return v && v !== 'filter.apply' ? v : '应用'
-})
 
 const cancelLabel = computed(() => {
   const v = t('filter.cancel')
@@ -145,6 +135,16 @@ const initialDates = computed(() => {
 const localStartDate = ref(initialDates.value.startDate)
 const localEndDate = ref(initialDates.value.endDate)
 
+/* 实时计数：应用（N） */
+const previewCount = ref(null)
+const countLoading = ref(false)
+let _countTimer = null
+const applyText = computed(() => {
+  // 中文注释：当有计数结果时展示“应用（N）”，否则显示“应用”
+  if (typeof previewCount.value === 'number') return `应用（${previewCount.value}）`
+  return '应用'
+})
+
 // 检查日期范围是否有效
 const isDateRangeValid = computed(() => {
   if (localStartDate.value && localEndDate.value) {
@@ -185,7 +185,7 @@ const formatDateToYYYYMMDD = (date) => {
   return `${year}-${month}-${day}`
 }
 
-// 构建筛选参数
+/* 构建筛选参数（仅空出时间草稿） */
 const buildFilterParams = () => {
   const filterParams = {}
 
@@ -199,6 +199,33 @@ const buildFilterParams = () => {
 
   return filterParams
 }
+
+/* 计算预估数量：与当前已应用条件合并，然后覆盖空出时间为草稿值 */
+const computePreviewCount = async () => {
+  try {
+    countLoading.value = true
+    const draft = buildFilterParams()
+    // 中文注释：将草稿日期覆盖到当前已应用条件，保证“必要关联”
+    const base = propertiesStore.currentFilterParams || {}
+    const merged = { ...base, ...draft }
+    const n = await propertiesStore.getFilteredCount(merged)
+    previewCount.value = Number.isFinite(n) ? n : 0
+  } catch (err) {
+    previewCount.value = null
+    console.warn('获取空出时间预估数量失败', err)
+  } finally {
+    countLoading.value = false
+  }
+}
+
+/* 监听日期变化，300ms 防抖后触发计数；挂载后也计算一次 */
+watch([localStartDate, localEndDate], () => {
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
+})
+onMounted(() => {
+  computePreviewCount()
+})
 
 // 将筛选参数添加到 URL
 const updateUrlQuery = async (filterParams) => {
@@ -315,6 +342,21 @@ const applyFilters = async () => {
 
 .date-separator {
   color: var(--color-text-secondary);
+  margin: 0 4px; /* 收紧“至”两侧间距 */
+}
+
+/* 焦点态：中性灰细边框，移除黑色外框 */
+:deep(.el-input.is-focus .el-input__wrapper) {
+  outline: none !important;
+  box-shadow: 0 0 0 1px var(--color-border-default) !important;
+}
+
+/* 收紧日期输入右侧内边距，避免右侧空白过大（改用 Filter Field 令牌，PC 作用域可被局部变量覆盖） */
+:deep(.el-date-editor .el-input__wrapper) {
+  padding-right: calc(
+    var(--filter-suffix-right, var(--search-suffix-right, 12px)) +
+    var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
+  ) !important;
 }
 
 :deep(.el-date-picker__popper) {

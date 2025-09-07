@@ -147,7 +147,7 @@
               type="date"
               :placeholder="$t('filter.dateStart')"
               size="large"
-              class="date-picker-start"
+              class="date-picker-start filter-field"
               :editable="false"
               :input-attrs="{ inputmode: 'none' }"
               :teleported="true"
@@ -160,7 +160,7 @@
               type="date"
               :placeholder="$t('filter.dateEnd')"
               size="large"
-              class="date-picker-end"
+              class="date-picker-end filter-field"
               :editable="false"
               :input-attrs="{ inputmode: 'none' }"
               :teleported="true"
@@ -1313,14 +1313,15 @@ onMounted(() => {
     padding: 20px;
   }
 
-  /* iOS Safari 输入框 auto-zoom 规避：保证输入相关元素字号 ≥16px，避免聚焦触发页面放大 */
-  .domain-filter-panel :deep(input),
-  .domain-filter-panel :deep(textarea),
-  .domain-filter-panel :deep(select),
-  .domain-filter-panel :deep(.el-input__inner),
-  .domain-filter-panel :deep(.el-input__wrapper) {
+  /* iOS Safari 输入框 auto-zoom 规避：保证输入相关元素字号 ≥16px，避免聚焦触发页面放大
+     收敛到筛选输入作用域（.filter-field），避免面板内其它元素被放大 */
+  .domain-filter-panel .filter-field :deep(input),
+  .domain-filter-panel .filter-field :deep(textarea),
+  .domain-filter-panel .filter-field :deep(select),
+  .domain-filter-panel .filter-field :deep(.el-input__inner),
+  .domain-filter-panel .filter-field :deep(.el-input__wrapper) {
     /* iOS 自动放大阈值：确保输入字号 ≥16px；使用 !important 覆盖库内部样式 */
-    font-size: 16px !important;
+    font-size: var(--filter-field-font-mob, 16px) !important;
   }
 
   .filter-section {

@@ -15,6 +15,8 @@
   统一全站/面板滚动指示器为中性灰；降低视觉噪声；下一步：统一“主滚动职责”
 - 2025-09-08｜FILTER-BEDROOMS-PANEL-EXT  
   卧室面板并入“浴室/车位”；PC 宽 380、面板内不滚动；“应用（N）”计数与 URL 同步
+- 2025-09-08｜FILTER-PRICE-SIMPLE-380  
+  价格面板极简（仅数字展示 + 双手柄滑轨 + 清除/应用（N））；PC 宽 380，无内滚；URL 仅写非空｜溯源：commit 5e4baf5
 - 2025-09-07｜TITLE-AREA & FOCUS-GUARDRAIL  
   列表页标题区重构；src/style.css 增加可见性护栏（:focus-visible 基线）；提升一致性与可达性
 - 2025-09-06｜FILTER-PANEL-LOCATION + PAGINATION-GUARD  

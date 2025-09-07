@@ -1186,6 +1186,123 @@ header nav .el-menu-item:hover,
   outline-offset: 2px !important;
 }
 
+/* ===== Filter Panels · Focus Override (PC Dropdown + Mobile Full Panel) =====
+   目标：在筛选面板作用域内彻底移除浏览器/全局的焦点外框（outline/box-shadow），
+   并以“1px 中性灰细边”作为唯一焦点反馈，避免出现黑色外框。
+   作用范围：
+   - PC 分离式下拉：.filter-dropdown-container
+   - 移动端统一面板：.domain-filter-panel
+   说明：仅面板作用域内覆盖，不影响全站其它表单控件的可达性。
+*/
+.filter-dropdown-container :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus,
+.filter-dropdown-container :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus-visible,
+.domain-filter-panel :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus,
+.domain-filter-panel :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 面板内输入类控件的“统一中性灰 1px 细边”反馈（Element Plus 包装器） */
+.filter-dropdown-container :is(.el-input.is-focus .el-input__wrapper, .el-select .el-input.is-focus .el-input__wrapper),
+.domain-filter-panel :is(.el-input.is-focus .el-input__wrapper, .el-select .el-input.is-focus .el-input__wrapper) {
+  outline: none !important;
+  box-shadow: 0 0 0 1px var(--color-border-default) !important;
+}
+
+/* 面板内 DatePicker 激活态去 2px 外发光，改为 1px 中性灰 */
+.filter-dropdown-container :is(.el-date-editor.is-active),
+.domain-filter-panel :is(.el-date-editor.is-active) {
+  border-color: var(--color-border-default) !important;
+  box-shadow: 0 0 0 1px var(--color-border-default) !important;
+}
+
+/* ===== Filter Field · Unified Tokens =====
+   说明：统一筛选输入尺寸/间距/字体与后缀命中区，避免逐面板打补丁
+*/
+:root {
+  --filter-field-height-pc: 40px;
+  --filter-field-height-mob: 44px;
+  --filter-field-font-pc: 14px;
+  --filter-field-font-mob: 16px; /* iOS 防缩放阈值 */
+  --filter-field-padding-x: 12px;
+  --filter-suffix-right: 12px; /* 若未定义则回退到 --search-suffix-right */
+  --filter-suffix-hit: 28px;   /* 若未定义则回退到 --search-suffix-hit */
+  --date-field-min-ch: 12ch;   /* YYYY-MM-DD 10ch 留余量，避免挤压 */
+}
+
+/* 仅在筛选面板作用域统一：PC 分离式 & 移动端全屏 */
+.filter-dropdown-container .filter-field :deep(.el-input__wrapper),
+.domain-filter-panel .filter-field :deep(.el-input__wrapper) {
+  height: var(--filter-field-height-pc) !important;
+  padding-left: var(--filter-field-padding-x) !important;
+  padding-right: calc(
+    var(--filter-suffix-right, var(--search-suffix-right, 12px)) +
+    var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
+  ) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 最小字符宽度 + 字号（PC） */
+.filter-dropdown-container .filter-field :deep(.el-input__inner),
+.domain-filter-panel .filter-field :deep(.el-input__inner) {
+  font-size: var(--filter-field-font-pc) !important;
+  min-inline-size: var(--date-field-min-ch);
+  min-width: var(--date-field-min-ch);
+  line-height: normal;
+}
+
+/* PC 分离式下拉：收紧后缀命中区与左右内边距，仅限筛选容器
+   说明：不改变容器宽度，仅通过内/外边距与后缀点击区瘦身，释放文本空间
+   风险可回滚：--filter-suffix-right 恢复 12px；--filter-suffix-hit 恢复 28px；删除本段覆盖
+*/
+.filter-dropdown-container {
+  --filter-suffix-right: 8px; /* 收紧右侧内距：x到右边界更近 */
+  --filter-suffix-hit: 20px;  /* 收紧命中区，仍可点击 */
+  --date-field-min-ch: 10ch;  /* PC面板内日期最小字符宽 */
+}
+
+/* 仅 PC Filter 作用域：输入包装内边距与盒模型 */
+.filter-dropdown-container .filter-field :deep(.el-input__wrapper) {
+  box-sizing: border-box;
+  padding-left: 8px !important; /* 基线 12px → 8px */
+}
+
+/* 后缀区域尺寸与右内边距（仅 PC Filter 作用域） */
+.filter-dropdown-container .filter-field :deep(.el-input__suffix) {
+  width: var(--filter-suffix-hit);
+  padding-right: var(--filter-suffix-right);
+}
+/* 收紧后缀内部间距（清除 x 与图标组之间的多余空隙） */
+.filter-dropdown-container .filter-field :deep(.el-input__suffix-inner) {
+  gap: 0 !important;
+}
+
+/* 日期双字段并排：不换行 + 紧凑间距（仅 PC Filter 作用域） */
+.filter-dropdown-container .date-picker-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  column-gap: 6px !important;
+}
+
+/* “至”分隔符间距收紧（仅 PC Filter 作用域） */
+.filter-dropdown-container .date-separator {
+  margin: 0 2px !important;
+  white-space: nowrap;
+}
+/* 移动端断点下切换尺寸/字号 */
+@media (max-width: 767px) {
+  .filter-dropdown-container .filter-field :deep(.el-input__wrapper),
+  .domain-filter-panel .filter-field :deep(.el-input__wrapper) {
+    height: var(--filter-field-height-mob) !important;
+  }
+  .filter-dropdown-container .filter-field :deep(.el-input__inner),
+  .domain-filter-panel .filter-field :deep(.el-input__inner) {
+    font-size: var(--filter-field-font-mob) !important; /* iOS ≥16px 防缩放 */
+  }
+}
+
 /* 自定义消息样式：二级黑色（用于“请先输入区域或邮编”提示） */
 .el-message.secondary-hint .el-message__content {
   color: var(--color-text-secondary) !important;

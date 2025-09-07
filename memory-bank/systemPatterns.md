@@ -167,6 +167,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
     - 在组件内硬编码图标的 `width`, `height`, `color` 样式，破坏全局一致性。
 - **溯源**: 本次从 `PropertyCard.vue` 到 `PropertyDetail.vue` 的图标统一重构工作。
 - **迁移状态**: 进行中；允许过渡期例外，不作为阻断项。
+- **迁移策略**: 对既有页面按需增量迁移，跨页面替换须评审；临时替换为其它图标库仅作为应急措施，修复后需恢复为 lucide。
 
 ## 计数器徽标（Pill/Badge）统一模式
 
@@ -204,6 +205,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 溯源：activeContext 2025-09-07｜FILTER-TABS-PC-RETURN（代码已落地）；待补：FilterPanel.focusSection
 
 ## 筛选入口一致性（v2·PC 专用，覆盖 v1 的 PC 策略）
+参见：分离式筛选面板尺寸与无内滚（卧室 380px，其他 520px；内部不出现滚动条）。
 - 目标：PC 端移除“筛选”主按钮；仅保分组 Chips（区域/卧室/价格/空出时间）+“更多”承载高级项。
 - 交互：点击任一 Chip 打开对应独立面板；“更多”打开高级筛选面板；各面板只负责收集条件与应用/重置。
 - 数据真源：仍以 Pinia 为唯一真源（apply/reset 在 store 层统一处理），并按需同步 URL；禁止在 Chips 内直接改 store state。
@@ -379,12 +381,6 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 违例后果：Vite 在解析阶段报错，中断 Rollup，CI/CD 失败。
 - 检查建议：提交前本地执行 vite build 验证；若需附加模板片段，请合并到主模板或拆分为子组件。
 - 溯源：activeContext 2025-09-06｜BUILD-FIX-SFC｜commit f375181..b227da3
-
-## 图标系统一致性（补充）
-- 原则：全站优先使用 lucide-vue-next 组件化 SVG；避免混用字体图标与多套风格。
-- 好处：视觉一致、可摇树优化、CSS 可控（stroke/fill）。
-- 迁移策略：对既有页面按需增量迁移，跨页面替换须评审；临时替换为其它图标库仅作为应急措施，修复后需恢复为 lucide。
-- 溯源：activeContext 2025-09-06｜UI-ICON-LIB｜commit f375181..b227da3
 
 ## URL 状态同步（新增）
 
