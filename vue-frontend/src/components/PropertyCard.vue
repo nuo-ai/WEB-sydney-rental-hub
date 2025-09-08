@@ -113,7 +113,7 @@
         </div>
 
         <!-- 开放时间 - 中文显示 -->
-        <div v-if="property.inspection_times" class="inspection-text chinese-text">
+        <div v-if="hasValidInspectionTime" class="inspection-text chinese-text">
           开放时间: {{ formatInspectionTime(property.inspection_times) }}
         </div>
       </div>
@@ -176,6 +176,20 @@ const isNewProperty = computed(() => {
   return props.property.listing_id > 2500
 })
 
+const hasValidInspectionTime = computed(() => {
+  const times = props.property.inspection_times
+  if (!times || typeof times !== 'string' || times.trim() === '') {
+    return false
+  }
+
+  // 检查是否包含有效的日期/时间信息
+  const hasValidContent = /\d/.test(times) &&
+    (times.includes('day') || times.includes('Day') ||
+     times.includes('周') || times.includes(':'))
+
+  return hasValidContent
+})
+
 // 方法
 const formatPrice = (price) => {
   if (!price) return 'Price TBA'
@@ -201,10 +215,20 @@ const formatAvailabilityDate = (dateString) => {
 }
 
 const formatInspectionTime = (timeString) => {
-  if (!timeString) return ''
+  // 严格验证输入
+  if (!timeString || typeof timeString !== 'string' || timeString.trim() === '') {
+    return ''
+  }
 
-  // 简单的英文到中文时间转换
-  let formatted = timeString
+  const trimmed = timeString.trim()
+
+  // 检查是否包含有效的时间信息
+  if (!/\d/.test(trimmed)) {
+    return ''
+  }
+
+  // 执行中文转换
+  let formatted = trimmed
   formatted = formatted.replace(/Monday/g, '周一')
   formatted = formatted.replace(/Tuesday/g, '周二')
   formatted = formatted.replace(/Wednesday/g, '周三')
