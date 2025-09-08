@@ -117,17 +117,26 @@ let isFitting = false // 正在执行 fitBounds，避免与锁定中心冲突
 let resizeTimer = null // 节流 resize
 let routeLabelInfoWindow = null // 路线标签 InfoWindow 实例
 
+// 数值校验与经纬度规范化：兼容字符串输入并过滤 NaN/Infinity
+const isFiniteNumber = (n) => typeof n === 'number' && Number.isFinite(n)
+const toNumber = (v) => (typeof v === 'string' ? Number(v) : v)
+const normalizeLatLng = (lat, lng) => {
+  const nLat = toNumber(lat)
+  const nLng = toNumber(lng)
+  if (isFiniteNumber(nLat) && isFiniteNumber(nLng)) {
+    return { lat: nLat, lng: nLng }
+  }
+  return null
+}
+
 // 计算当前应当锁定的中心点
 const getLockCenter = () => {
-  // 说明：优先使用外部传入的 focusCenter，其次回退到 props 的经纬度
-  if (
-    props.focusCenter &&
-    typeof props.focusCenter.lat === 'number' &&
-    typeof props.focusCenter.lng === 'number'
-  ) {
-    return { lat: props.focusCenter.lat, lng: props.focusCenter.lng }
+  // 优先使用 focusCenter（若提供），否则使用 props 的经纬度；均做数值规范化
+  if (props.focusCenter) {
+    const c = normalizeLatLng(props.focusCenter.lat, props.focusCenter.lng)
+    if (c) return c
   }
-  return { lat: props.latitude, lng: props.longitude }
+  return normalizeLatLng(props.latitude, props.longitude)
 }
 
 // 应用中心锁定：将地图中心回到目标点
@@ -135,7 +144,9 @@ const applyCenterLock = () => {
   // 说明：仅在用户显式开启锁定时生效；且在自动适配期间不回弹中心，避免与 fitBounds 抢焦点
   if (map && googleMapsLoaded && !isDestroyed && props.lockCenter && !isFitting) {
     const c = getLockCenter()
-    map.setCenter(c)
+    if (c) {
+      map.setCenter(c)
+    }
   }
 }
 
@@ -310,17 +321,17 @@ const renderRoute = () => {
 const staticMapUrl = computed(() => {
   const size = '600x300'
   const zoom = props.zoom
-  const center = `${props.latitude},${props.longitude}`
-  const marker = `markers=color:red%7C${center}`
-
+  const c = getLockCenter()
   // 从环境变量获取 API 密钥（安全实践）
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
 
-  if (!apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
-    console.warn('Google Maps API key not configured')
+  if (!c || !apiKey || apiKey === 'YOUR_NEW_API_KEY_HERE_REPLACE_ME') {
+    // 坐标或密钥无效时不返回 URL，交由组件显示兜底占位
     return ''
   }
 
+  const center = `${c.lat},${c.lng}`
+  const marker = `markers=color:red%7C${center}`
   return `https://maps.googleapis.com/maps/api/staticmap?center=${center}&zoom=${zoom}&size=${size}&${marker}&key=${apiKey}`
 })
 
@@ -406,8 +417,9 @@ const initMap = async () => {
       return
     }
 
+    const safeInitialCenter = getLockCenter() || { lat: 0, lng: 0 }
     const mapOptions = {
-      center: { lat: props.latitude, lng: props.longitude },
+      center: safeInitialCenter,
       zoom: props.zoom,
       mapTypeControl: false,
       streetViewControl: false,
@@ -444,12 +456,15 @@ const initMap = async () => {
     renderRoute()
 
     if (props.showMarker) {
-      marker = new google.maps.Marker({
-        position: { lat: props.latitude, lng: props.longitude },
-        map: map,
-        title: props.markerTitle,
-        animation: google.maps.Animation.DROP,
-      })
+      const c = getLockCenter()
+      if (c) {
+        marker = new google.maps.Marker({
+          position: c,
+          map: map,
+          title: props.markerTitle,
+          animation: google.maps.Animation.DROP,
+        })
+      }
       // 添加标记到地图
     }
 
@@ -481,14 +496,16 @@ watch(
   () => [props.latitude, props.longitude],
   ([newLat, newLng]) => {
     if (map && googleMapsLoaded && !isDestroyed) {
-      // 说明：当开启中心锁定时，以锁定中心为准；否则跟随传入经纬度
+      // 说明：当开启中心锁定时，以锁定中心为准；否则跟随传入经纬度（规范化并校验）
       if (props.lockCenter) {
         applyCenterLock()
       } else {
-        const newCenter = { lat: newLat, lng: newLng }
-        map.setCenter(newCenter)
-        if (marker) {
-          marker.setPosition(newCenter)
+        const c = normalizeLatLng(newLat, newLng)
+        if (c) {
+          map.setCenter(c)
+          if (marker) {
+            marker.setPosition(c)
+          }
         }
       }
     }
@@ -567,7 +584,8 @@ const triggerMapResize = () => {
     if (props.lockCenter) {
       applyCenterLock()
     } else {
-      map.setCenter({ lat: props.latitude, lng: props.longitude })
+      const c = getLockCenter()
+      if (c) map.setCenter(c)
     }
   }
 }

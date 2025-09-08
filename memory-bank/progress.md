@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-08｜REGION-FILTER-P0-FIX  
+  区域筛选彻底修复（V1 契约）：仅选“邮编”时自动展开为多个 suburb 注入 suburb CSV；计数与列表口径一致；本地目录聚合 postcode.suburbs 兜底｜溯源：commit a331c69..27b9cf6
 - 2025-09-08｜FURNISHED-FILTER-FIX-V1  
   前端按 V1 契约直接传 isFurnished=true（容错 true/'1'/1/'true'/'yes'）；添加 FILTER-DEBUG 打印映射后的请求参数；ESLint 修复｜溯源：commit bade186（范围 48bad16..bade186）
 - 2025-09-08｜PREVIEW-DRAFT-UNIFY-DONE  

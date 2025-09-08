@@ -1,25 +1,33 @@
-[plugin:vite:import-analysis] Failed to resolve import "../assets/photo.svg" from "src/views/PropertyDetail.vue". Does the file exist?
-C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/views/PropertyDetail.vue:272:23
-14 |  function _createBlock(...args) { return _interopVNode(__createBlock(...args)) }
-15 |  /* Injection by vite-plugin-vue-inspector End */
-16 |  import photoIcon from '../assets/photo.svg'
-   |                         ^
-17 |  import { onMounted, onUnmounted, computed, ref } from 'vue'
-18 |  import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
-    at TransformPluginContext._formatLog (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31422:43)
-    at TransformPluginContext.error (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31419:14)
-    at normalizeUrl (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:29891:18)
-    at async file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:29949:32
-    at async Promise.all (index 1)
-    at async TransformPluginContext.transform (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:29917:4)
-    at async file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite-plugin-inspect/dist/shared/vite-plugin-inspect.BzUKaD4x.mjs:403:17
-    at async EnvironmentPluginContainer.transform (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:31220:14)
-    at async loadAndTransform (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:26307:26)
-    at async viteTransformMiddleware (file:///C:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/node_modules/vite/dist/node/chunks/dep-Bj7gA1-0.js:27392:20)
-
-[fixed] 2025-09-07 09:12 AEST
-- 问题：Vite 无法解析 ../assets/photo.svg（src/views/PropertyDetail.vue）
-- 原因：项目缺少静态资源 photo.svg，导致编译期 import 失败
-- 处理：移除对静态文件的依赖，改用内联 SVG data URI（不受文件缺失影响）
-- 变更：删除 import photoIcon from '../assets/photo.svg'；新增 const photoIcon = 'data:image/svg+xml;utf8,...'
-- 影响：零运行时风险；视觉保持一致；仍保留 <Picture /> 兜底图标
+js?key=AIzaSyAwZa-eQ…braries=places:1289 InvalidValueError: setCenter: not a LatLng or LatLngLiteral with finite coordinates: in property lat: not a number
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1289
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1291
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1310
+applyCenterLock	@	GoogleMap.vue:138
+（匿名）	@	GoogleMap.vue:439
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1301
+b	@	map.js:37
+requestAnimationFrame		
+（匿名）	@	common.js:79
+ata	@	map.js:37
+（匿名）	@	map.js:101
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1556
+setTimeout		
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1342
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1556
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1343
+（匿名）	@	map.js:101
+iI	@	map.js:38
+mua	@	map.js:102
+zua	@	map.js:68
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1370
+Promise.then		
+（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1370
+initMap	@	GoogleMap.vue:425
+await in initMap		
+（匿名）	@	GoogleMap.vue:583
+Promise.then		
+fetchPropertyDetail	@	properties.js:513
+await in fetchPropertyDetail		
+（匿名）	@	PropertyDetail.vue:685
+Promise.then		
+（匿名）	@	main.js:32

@@ -141,8 +141,8 @@
               <!-- 使用 GoogleMap 渲染位置，默认锁定中心，保持向后兼容 -->
               <div v-if="property.latitude && property.longitude" class="map-container">
                 <GoogleMap
-                  :latitude="property.latitude"
-                  :longitude="property.longitude"
+                  :latitude="+property.latitude"
+                  :longitude="+property.longitude"
                   :zoom="15"
                   :height="mapHeight"
                   :marker-title="property.address"
@@ -165,6 +165,7 @@
                     >Find out travel times from this property to your destinations</span
                   >
                 </div>
+                <ChevronDown class="travel-chevron" :size="24" />
               </button>
             </div>
           </section>
@@ -204,15 +205,19 @@
                 {{ feature }}
               </div>
             </div>
-            <button @click="showAllFeatures = !showAllFeatures" class="view-less-btn">
+            <button
+              v-if="allFeatures.length > visibleFeaturesCount"
+              @click="showAllFeatures = !showAllFeatures"
+              class="view-less-btn"
+            >
               {{ showAllFeatures ? 'View less' : 'View all features' }}
             </button>
           </section>
 
           <!-- Inspection Times - 按Figma设计卡片式布局 -->
-          <section v-if="inspectionTimes.length > 0" class="inspection-section">
+          <section class="inspection-section">
             <h2 class="section-title">Inspection times</h2>
-            <div class="inspection-list">
+            <div v-if="inspectionTimes.length > 0" class="inspection-list">
               <div
                 v-for="(inspection, index) in inspectionTimes"
                 :key="index"
@@ -227,10 +232,9 @@
                 </button>
               </div>
             </div>
-            <button class="add-to-planner-btn">
-              <el-icon><Plus /></el-icon>
-              Add all to planner
-            </button>
+            <div v-else class="no-inspection-times">
+              暂无公开的看房时间
+            </div>
           </section>
 
           <!-- 通勤计算器 - 已移至独立页面 -->
@@ -281,9 +285,8 @@ import {
   Location,
   Calendar,
   Loading,
-  Plus,
 } from '@element-plus/icons-vue'
-import { BedDouble, Bath, CarFront } from 'lucide-vue-next'
+import { BedDouble, Bath, CarFront, ChevronDown } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
@@ -399,8 +402,8 @@ const displayedFeatures = computed(() => {
   if (showAllFeatures.value) {
     return allFeatures.value
   }
-  // 移动端2列，所以是 2 * 3 = 6
-  return allFeatures.value.slice(0, 6)
+  // 中文注释：默认折叠展示 2 行；移动端 2 列=4 项，≥768px 3 列=6 项
+  return allFeatures.value.slice(0, visibleFeaturesCount.value)
 })
 
 // 计算属性
@@ -470,6 +473,29 @@ onUnmounted(() => {
   }
 })
 const mapHeight = computed(() => (isDesktop.value ? '360px' : '240px'))
+
+/* 中文注释：特征网格列数（与 CSS 断点一致）：<768px 为 2 列，≥768px 为 3 列。
+   为什么：保证“默认折叠两行”的展示在不同断点下分别为 4 项和 6 项 */
+const isThreeCols = ref(false)
+let mqCols
+let mqColsHandler
+onMounted(() => {
+  mqCols = window.matchMedia('(min-width: 768px)')
+  mqColsHandler = () => {
+    isThreeCols.value = mqCols.matches
+  }
+  mqColsHandler()
+  if (mqCols.addEventListener) mqCols.addEventListener('change', mqColsHandler)
+  else if (mqCols.addListener) mqCols.addListener(mqColsHandler)
+})
+onUnmounted(() => {
+  if (mqCols && mqColsHandler) {
+    if (mqCols.removeEventListener) mqCols.removeEventListener('change', mqColsHandler)
+    else if (mqCols.removeListener) mqCols.removeListener(mqColsHandler)
+  }
+})
+/* 中文注释：默认折叠展示 2 行 → 2*2=4（移动端），3*2=6（≥768px） */
+const visibleFeaturesCount = computed(() => (isThreeCols.value ? 6 : 4))
 
 
 // 方法
@@ -2125,18 +2151,17 @@ onBeforeRouteLeave(() => {
 .see-travel-times-btn {
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  justify-content: flex-start !important;  /* 靠左对齐 */
   width: 100% !important;
-  padding: 12px 0 !important;              /* 水平由父 section 控制（与地图对齐） */
+  padding: 12px 16px 12px 0 !important;    /* 右侧留 16px 缓冲 */
   margin-top: 0 !important;
   background: transparent !important;
-  border: none !important;
-  border-top: 1px solid var(--divider-color, #e5e5e5) !important;
-  border-bottom: 1px solid var(--divider-color, #e5e5e5) !important;
+  border: none !important;                 /* 去除上下横线 */
   border-radius: 0 !important;
   box-shadow: none !important;
   text-align: left !important;
   cursor: pointer;
+  gap: 8px !important;                     /* 文案与箭头最小间距 */
 }
 
 /* 标题仅一行，副标题与图标隐藏 */
@@ -2144,9 +2169,11 @@ onBeforeRouteLeave(() => {
 .travel-btn-subtitle { display: none !important; }
 
 .travel-btn-content {
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
-  width: 100% !important;
+  flex: 0 0 auto !important;               /* 不占满整行，避免视觉居中 */
+  width: auto !important;
+  flex-direction: row !important;          /* 与标题在一行 */
 }
 
 .travel-btn-title {
@@ -2156,12 +2183,16 @@ onBeforeRouteLeave(() => {
   line-height: 1.2 !important;
 }
 
-/* 右侧折叠提示箭头 */
-.see-travel-times-btn::after {
-  content: "▾";
-  font-size: 16px;
-  color: #808296;
-  margin-left: 8px;
+/* 右侧折叠提示箭头（改用 Lucide 组件，去除伪元素） */
+.travel-btn-content { /* 不再将箭头推到最右 */
+}
+.travel-chevron {
+  width: 24px;
+  height: 24px;
+  color: #3c475b;          /* 更深的中性色 */
+  flex-shrink: 0;
+  margin-left: 8px;        /* 与标题间距 */
+  margin-right: 16px;      /* 与右侧边缘间距 */
 }
 
 /* PC 悬浮轻微高亮 & 行高略增 */
