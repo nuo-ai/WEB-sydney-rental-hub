@@ -207,6 +207,13 @@ def clean_data(df):
             lambda x: '0' + x if x.isdigit() and len(x) == 9 and not x.startswith('0') else x
         )
     
+    # 规范化邮编：统一为4位字符串，去除小数点等异常，例如 "2010.0" -> "2010"
+    if 'postcode' in df.columns:
+        # 转为字符串后提取首个4位数字；无匹配置为空字符串，避免出现 "nan"/"None"
+        df['postcode'] = df['postcode'].astype(str).str.extract(r'(\d{4})')[0].fillna('').str.strip()
+    else:
+        df['postcode'] = ''
+    
     db_columns_from_csv = [
         'listing_id', 'property_url', 'address', 'suburb', 'state', 'postcode',
         'property_type', 'rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces',
@@ -257,8 +264,17 @@ def load_data_to_db(df, conn):
         try:
             # 1. Get existing properties from DB for comparison
             logging.info("Fetching existing properties from database for comparison...")
-            cursor.execute("SELECT listing_id, rent_pw, is_active FROM properties")
-            db_properties = {row[0]: {'rent_pw': row[1], 'is_active': row[2]} for row in cursor.fetchall()}
+            cursor.execute("SELECT listing_id, rent_pw, is_active, available_date, inspection_times, postcode, property_headline FROM properties")
+            db_properties = {
+                row[0]: {
+                    'rent_pw': row[1],
+                    'is_active': row[2],
+                    'available_date': row[3],
+                    'inspection_times': row[4],
+                    'postcode': (str(row[5]) if row[5] is not None else ''),
+                    'property_headline': row[6],
+                } for row in cursor.fetchall()
+            }
             db_ids = set(db_properties.keys())
             logging.info(f"Found {len(db_ids)} existing properties in the database.")
 
@@ -272,8 +288,17 @@ def load_data_to_db(df, conn):
                 if listing_id not in db_ids:
                     new_listings.append(row)
                 else:
-                    # Check for changes (e.g., rent)
-                    if row['rent_pw'] != db_properties[listing_id]['rent_pw']:
+                    existing = db_properties[listing_id]
+                    new_postcode = str(row.get('postcode') or '').strip()
+                    # 中文注释：将关键字段纳入对比，确保看房时间/空出日期/邮编变化也会触发更新
+                    changed = (
+                        row['rent_pw'] != existing['rent_pw'] or
+                        (row.get('available_date') or None) != existing['available_date'] or
+                        (row.get('inspection_times') or None) != existing['inspection_times'] or
+                        new_postcode != existing['postcode'] or
+                        (row.get('property_headline') or None) != existing['property_headline']
+                    )
+                    if changed:
                         updated_listings.append(row)
                     else:
                         unchanged_listings_count += 1
@@ -301,8 +326,33 @@ def load_data_to_db(df, conn):
 
             # 4. Batch UPDATE updated listings
             if updated_listings:
-                update_query = f"UPDATE {table_name} SET rent_pw = %s, status = 'updated', status_changed_at = %s, is_active = TRUE WHERE listing_id = %s"
-                update_tuples = [(row['rent_pw'], datetime.now().isoformat(), row['listing_id']) for row in updated_listings]
+                update_query = f"""
+                UPDATE {table_name} SET
+                    rent_pw = %s,
+                    available_date = %s,
+                    inspection_times = %s,
+                    postcode = %s,
+                    property_headline = %s,
+                    status = 'updated',
+                    status_changed_at = %s,
+                    is_active = TRUE
+                WHERE listing_id = %s
+                """
+                update_tuples = []
+                for row in updated_listings:
+                    avail = row.get('available_date')
+                    # 中文注释：兼容 NaT/NaN/字符串 'NaT'，统一写入 NULL
+                    if pd.isna(avail) or str(avail) == 'NaT':
+                        avail = None
+                    update_tuples.append((
+                        row.get('rent_pw'),
+                        avail,
+                        row.get('inspection_times'),
+                        str(row.get('postcode') or '').strip(),
+                        row.get('property_headline'),
+                        datetime.now().isoformat(),
+                        row['listing_id'],
+                    ))
                 
                 cursor.executemany(update_query, update_tuples)
                 logging.info(f"Successfully updated {len(updated_listings)} properties.")

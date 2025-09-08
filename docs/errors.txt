@@ -1,1 +1,174 @@
-<div data-v-9d7dbe90="" class="search-overlay" role="dialog" aria-modal="true"><!-- 头部：返回 / 输入 / 清空 --><div data-v-9d7dbe90="" class="overlay-header"><button data-v-9d7dbe90="" class="icon-btn" aria-label="返回"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide spec-icon lucide-chevron-left-icon lucide-chevron-left spec-icon"><path d="m15 18-6-6 6-6"></path></svg></button><div data-v-9d7dbe90="" class="header-input"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide search-prefix lucide-search-icon lucide-search search-prefix" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg><input data-v-9d7dbe90="" type="search" placeholder="请先输入区域或邮编，例如 ‘Ultimo’ 或 ‘2000’" class="input" autocomplete="off" autocapitalize="none" spellcheck="false"><!--v-if--></div><div data-v-9d7dbe90="" class="header-actions"><button data-v-9d7dbe90="" class="filter-text-btn" type="button">筛选</button><button data-v-9d7dbe90="" class="icon-btn" aria-label="搜索"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide spec-icon lucide-search-icon lucide-search spec-icon"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button></div></div><!-- 已选 chips 标签区（横向滚动） --><div data-v-9d7dbe90="" class="chips-row"><div data-v-9d7dbe90="" class="chip active" title="Ashfield"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide chip-icon lucide-map-pin-icon lucide-map-pin chip-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><span data-v-9d7dbe90="" class="chip-text">Ashfield</span><button data-v-9d7dbe90="" class="chip-remove" aria-label="移除"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide chip-remove-icon lucide-x-icon lucide-x chip-remove-icon"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button><span data-v-9d7dbe90="" class="chip-caret" aria-hidden="true"></span></div></div><!-- 列表内容区（内部滚动） --><div data-v-9d7dbe90="" class="overlay-content"><!-- 匹配结果（Locations / Postcodes） --><!-- 推荐区域（nearby） --><section data-v-9d7dbe90=""><div data-v-9d7dbe90="" class="section-title"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide title-icon lucide-lightbulb-icon lucide-lightbulb title-icon" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path></svg><span data-v-9d7dbe90="">SUGGESTED FOR YOU</span></div><button data-v-9d7dbe90="" class="row"><div data-v-9d7dbe90="" class="row-left"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide row-icon lucide-map-pin-icon lucide-map-pin row-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div data-v-9d7dbe90="" class="row-text"><div data-v-9d7dbe90="" class="row-title">Sydney, NSW, 2000</div><div data-v-9d7dbe90="" class="row-sub">NSW, 2000</div></div></div><div data-v-9d7dbe90="" class="row-right"><span data-v-9d7dbe90="" class="pill"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide pill-icon lucide-circle-plus-icon lucide-circle-plus pill-icon" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></span></div></button><button data-v-9d7dbe90="" class="row"><div data-v-9d7dbe90="" class="row-left"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide row-icon lucide-map-pin-icon lucide-map-pin row-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div data-v-9d7dbe90="" class="row-text"><div data-v-9d7dbe90="" class="row-title">Parramatta, NSW, 2150</div><div data-v-9d7dbe90="" class="row-sub">NSW, 2150</div></div></div><div data-v-9d7dbe90="" class="row-right"><span data-v-9d7dbe90="" class="pill"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide pill-icon lucide-circle-plus-icon lucide-circle-plus pill-icon" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></span></div></button><button data-v-9d7dbe90="" class="row"><div data-v-9d7dbe90="" class="row-left"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide row-icon lucide-map-pin-icon lucide-map-pin row-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div data-v-9d7dbe90="" class="row-text"><div data-v-9d7dbe90="" class="row-title">Mascot, NSW, 2020</div><div data-v-9d7dbe90="" class="row-sub">NSW, 2020</div></div></div><div data-v-9d7dbe90="" class="row-right"><span data-v-9d7dbe90="" class="pill"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide pill-icon lucide-circle-plus-icon lucide-circle-plus pill-icon" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></span></div></button><button data-v-9d7dbe90="" class="row"><div data-v-9d7dbe90="" class="row-left"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide row-icon lucide-map-pin-icon lucide-map-pin row-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div data-v-9d7dbe90="" class="row-text"><div data-v-9d7dbe90="" class="row-title">Zetland, NSW, 2017</div><div data-v-9d7dbe90="" class="row-sub">NSW, 2017</div></div></div><div data-v-9d7dbe90="" class="row-right"><span data-v-9d7dbe90="" class="pill"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide pill-icon lucide-circle-plus-icon lucide-circle-plus pill-icon" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></span></div></button><button data-v-9d7dbe90="" class="row"><div data-v-9d7dbe90="" class="row-left"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide row-icon lucide-map-pin-icon lucide-map-pin row-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div data-v-9d7dbe90="" class="row-text"><div data-v-9d7dbe90="" class="row-title">Waterloo, NSW, 2017</div><div data-v-9d7dbe90="" class="row-sub">NSW, 2017</div></div></div><div data-v-9d7dbe90="" class="row-right"><span data-v-9d7dbe90="" class="pill"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide pill-icon lucide-circle-plus-icon lucide-circle-plus pill-icon" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></span></div></button><button data-v-9d7dbe90="" class="row"><div data-v-9d7dbe90="" class="row-left"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide row-icon lucide-map-pin-icon lucide-map-pin row-icon" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><div data-v-9d7dbe90="" class="row-text"><div data-v-9d7dbe90="" class="row-title">Hurstville, NSW, 2220</div><div data-v-9d7dbe90="" class="row-sub">NSW, 2220</div></div></div><div data-v-9d7dbe90="" class="row-right"><span data-v-9d7dbe90="" class="pill"><svg data-v-9d7dbe90="" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide pill-icon lucide-circle-plus-icon lucide-circle-plus pill-icon" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></span></div></button><!--v-if--></section></div></div>
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\nuoai> Get-CimInstance Win32_OperatingSystem | Select-Object LastBootUpTime, Caption, OSArchitecture | Format-List
+
+
+LastBootUpTime : 9/9/2025 6:26:30 AM
+Caption        : Microsoft Windows 11 Pro
+OSArchitecture : 64-bit
+
+
+
+PS C:\Users\nuoai> Get-Counter '\Processor(_Total)\% Processor Time','\PhysicalDisk(_Total)\% Disk Time','\Memory\Available MBytes' -SampleInterval 1 -MaxSamples 5
+
+Timestamp                  CounterSamples
+---------                  --------------
+9/9/2025 8:30:08 AM        \\q\processor(_total)\% processor time :
+                           0.580617828311658
+
+                           \\q\physicaldisk(_total)\% disk time :
+                           0.183140860307484
+
+                           \\q\memory\available mbytes :
+                           15532
+
+
+9/9/2025 8:30:09 AM        \\q\processor(_total)\% processor time :
+                           6.82709931180405
+
+                           \\q\physicaldisk(_total)\% disk time :
+                           0.0960295969733612
+
+                           \\q\memory\available mbytes :
+                           15543
+
+
+9/9/2025 8:30:10 AM        \\q\processor(_total)\% processor time :
+                           6.38927788254879
+
+                           \\q\physicaldisk(_total)\% disk time :
+                           0
+
+                           \\q\memory\available mbytes :
+                           15538
+
+
+9/9/2025 8:30:11 AM        \\q\processor(_total)\% processor time :
+                           3.19358874625071
+
+                           \\q\physicaldisk(_total)\% disk time :
+                           0
+
+                           \\q\memory\available mbytes :
+                           15546
+
+
+9/9/2025 8:30:12 AM        \\q\processor(_total)\% processor time :
+                           1.01645789642766
+
+                           \\q\physicaldisk(_total)\% disk time :
+                           0
+
+                           \\q\memory\available mbytes :
+                           15550
+
+
+
+
+PS C:\Users\nuoai> Get-Process | Sort-Object CPU -Descending | Select-Object -First 15 Name, Id, CPU, @{n='WS(MB)';e={[math]::Round($_.WS/1MB,1)}} | Format-Table -Auto
+
+Name             Id        CPU WS(MB)
+----             --        --- ------
+chrome        16248       1088  526.2
+chrome        12548   899.6875  129.1
+MsMpEng        5416  707.78125  439.3
+Code           2696  478.03125  520.8
+dwm            1736  374.28125    170
+TextInputHost  9844    277.625  198.6
+Code          11360 257.953125  652.4
+System            4 204.921875   10.7
+Code           3184 181.859375    375
+chrome        12772 158.234375  326.8
+chrome         9740 120.203125    262
+Code          14708      119.5  141.3
+Trae          14664  96.515625  443.9
+Code           5744  89.578125  189.8
+Trae           3436  82.203125  336.9
+
+
+PS C:\Users\nuoai> Get-Process | Sort-Object @{Expression={$_.IOReadBytes + $_.IOWriteBytes};Descending=$true} | Select-Object -First 10 Name, Id, @{n='IO(MB)';e={[math]::Round(($_.IOReadBytes + $_.IOWriteBytes)/1MB,1)}} | Format-Table -Auto
+
+Name                      Id IO(MB)
+----                      -- ------
+svchost                 1428      0
+svchost                 1600      0
+svchost                 1660      0
+StartMenuExperienceHost 9868      0
+svchost                  940      0
+svchost                 1248      0
+svchost                 1844      0
+svchost                 1960      0
+svchost                 1972      0
+svchost                 2060      0
+
+
+PS C:\Users\nuoai> Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location, User | Format-Table -Auto
+
+Name                                                     Command
+----                                                     -------
+GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
+OneDriveSetup                                            C:\Windows\System32\OneDriveSetup.exe /thfirstsetup
+GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
+OneDriveSetup                                            C:\Windows\System32\OneDriveSetup.exe /thfirstsetup
+GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
+Send to OneNote                                          Send to OneNote.lnk
+Ditto                                                    C:\Program Files\Ditto\Ditto.exe
+Claude                                                   "C:\Users\nuoai\AppData\Local\AnthropicClaude\claude.exe" -...
+Figma Agent                                              "C:\Users\nuoai\AppData\Local\FigmaAgent\figma_agent.exe"
+MicrosoftEdgeAutoLaunch_70410B6A3ADF57A5CE2BB002693ED6CF "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.e...
+GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
+SecurityHealth                                           %windir%\system32\SecurityHealthSystray.exe
+
+
+PS C:\Users\nuoai> reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+    SecurityHealth    REG_EXPAND_SZ    %windir%\system32\SecurityHealthSystray.exe
+
+PS C:\Users\nuoai> reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
+
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+    Ditto    REG_SZ    C:\Program Files\Ditto\Ditto.exe
+    Claude    REG_SZ    "C:\Users\nuoai\AppData\Local\AnthropicClaude\claude.exe" --startup
+    Figma Agent    REG_SZ    "C:\Users\nuoai\AppData\Local\FigmaAgent\figma_agent.exe"
+    MicrosoftEdgeAutoLaunch_70410B6A3ADF57A5CE2BB002693ED6CF    REG_SZ    "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --no-startup-window --win-session-start
+
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run\AutorunsDisabled
+PS C:\Users\nuoai> Get-ScheduledTask | Where-Object { $_.Triggers -ne $null -and ($_.Triggers | Where-Object { $_.TriggerType -eq 'Logon' }) } | Select-Object TaskName, TaskPath, State | Format-Table -Auto
+PS C:\Users\nuoai> Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Select-Object DeviceID, @{n='Free(GB)';e={[math]::Round($_.FreeSpace/1GB,1)}}, @{n='Size(GB)';e={[math]::Round($_.Size/1GB,1)}} | Format-Table -Auto
+
+DeviceID Free(GB) Size(GB)
+-------- -------- --------
+C:          632.3    930.9
+D:            593    931.3
+
+
+PS C:\Users\nuoai> Get-PhysicalDisk | Select-Object FriendlyName, HealthStatus, OperationalStatus, Size | Format-Table -Auto
+
+FriendlyName              HealthStatus OperationalStatus          Size
+------------              ------------ -----------------          ----
+CT1000BX500SSD1           Healthy      OK                1000204886016
+SanDisk Extreme SSD       Healthy      OK                1000204140544
+Samsung SSD 960 EVO 500GB Healthy      OK                 500107862016
+
+
+PS C:\Users\nuoai> Get-Service wuauserv, UsoSvc | Format-Table -Auto
+
+Status  Name     DisplayName
+------  ----     -----------
+Running UsoSvc   Update Orchestrator Service
+Running wuauserv Windows Update
+
+
+PS C:\Users\nuoai> Get-Process -Name TiWorker, MoUsoCoreWorker, wuauclt, MsMpEng -ErrorAction SilentlyContinue | Select-Object Name, Id, CPU, @{n='WS(MB)';e={[math]::Round($_.WS/1MB,1)}}, StartTime | Format-Table -Auto
+
+Name               Id        CPU WS(MB) StartTime
+----               --        --- ------ ---------
+MoUsoCoreWorker 17772   0.234375   30.7 9/9/2025 8:31:53 AM
+MsMpEng          5416 710.265625  439.3 9/9/2025 6:27:02 AM
+
+
+PS C:\Users\nuoai>
