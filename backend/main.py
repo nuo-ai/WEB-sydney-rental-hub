@@ -1255,7 +1255,9 @@ async def get_properties(
     maxPrice: Optional[int] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
-    isFurnished: Optional[bool] = None
+    isFurnished: Optional[bool] = None,
+    # 排序参数（白名单）：price_asc/available_date_asc/suburb_az/inspection_earliest
+    sort: Optional[str] = None,
 ):
     """
     Get a paginated list of properties with optional filters.
@@ -1404,6 +1406,21 @@ async def get_properties(
     # Update queries with WHERE clause
     base_query += where_clause
     count_query += where_clause
+
+    # 排序映射（为什么：让前端 Sort 真正生效；仅允许白名单，防注入；并附加 listing_id ASC 作为稳定次序键）
+    order_clause = " ORDER BY listing_id ASC"
+    if sort:
+        s = str(sort).strip().lower()
+        if s == "price_asc":
+            order_clause = " ORDER BY rent_pw ASC NULLS LAST, listing_id ASC"
+        elif s == "available_date_asc":
+            order_clause = " ORDER BY available_date ASC NULLS FIRST, listing_id ASC"
+        elif s == "suburb_az":
+            order_clause = " ORDER BY lower(suburb) ASC NULLS LAST, listing_id ASC"
+        elif s == "inspection_earliest":
+            # TODO：P1 精确解析 inspection_times 的“最早看房时间”进行排序
+            # 当前先与 available_date_asc 等价，满足 P0 真正生效的前端表现
+            order_clause = " ORDER BY available_date ASC NULLS FIRST, listing_id ASC"
     
     
     # Simple cursor implementation based on listing_id
@@ -1456,7 +1473,7 @@ async def get_properties(
         return success_response(data=items_as_dicts, pagination=pagination_info)
     else:
         # Page-based pagination
-        query = f"{base_query} ORDER BY listing_id ASC"
+        query = f"{base_query}{order_clause}"
         items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
         return success_response(data=items, pagination=pagination_info)
 

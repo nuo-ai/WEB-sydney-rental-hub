@@ -349,6 +349,11 @@ export const usePropertiesStore = defineStore('properties', {
         requestParams.page = paginationParams.page
         requestParams.page_size = paginationParams.page_size
 
+        // 排序兜底：若未显式传入且 Store 持有排序，则自动补齐，避免跨页丢失
+        if (requestParams.sort == null || requestParams.sort === '') {
+          if (this.sort) requestParams.sort = this.sort
+        }
+
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(requestParams)
         const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
