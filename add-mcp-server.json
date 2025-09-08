@@ -11,6 +11,14 @@
       "env": {
         "SUPABASE_ACCESS_TOKEN": "sbp_f2b3add2d67421de22c076a4a4e51e895efb2a8c"
       }
+    },
+    "spec-workflow": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pimzino/spec-workflow-mcp@latest",
+        "c:/Users/nuoai/Desktop/WEB-sydney-rental-hub"
+      ]
     }
   }
 }

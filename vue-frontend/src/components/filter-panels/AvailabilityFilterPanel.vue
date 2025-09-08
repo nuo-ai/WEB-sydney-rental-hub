@@ -205,10 +205,9 @@ const computePreviewCount = async () => {
   try {
     countLoading.value = true
     const draft = buildFilterParams()
-    // 中文注释：将草稿日期覆盖到当前已应用条件，保证“必要关联”
-    const base = propertiesStore.currentFilterParams || {}
-    const merged = { ...base, ...draft }
-    const n = await propertiesStore.getFilteredCount(merged)
+    // 中文注释：将“空出时间”面板草稿合入全局草稿，由 Store 统一计算预览计数（与其它面板口径一致）
+    propertiesStore.updatePreviewDraft('availability', draft)
+    const n = await propertiesStore.getPreviewCount()
     previewCount.value = Number.isFinite(n) ? n : 0
   } catch (err) {
     previewCount.value = null
@@ -268,6 +267,9 @@ const applyFilters = async () => {
 
     // 更新 URL
     await updateUrlQuery(filterParams)
+
+    // 中文注释：应用成功后清理“空出时间”分组的预览草稿，防止下次打开显示过期草稿计数
+    propertiesStore.clearPreviewDraft('availability')
 
     // 关闭面板
     emit('close')

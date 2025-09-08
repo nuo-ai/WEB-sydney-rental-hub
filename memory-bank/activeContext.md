@@ -1,20 +1,19 @@
-![1757283835886](image/activeContext/1757283835886.png)![1757284076673](image/activeContext/1757284076673.png)# 当前上下文与紧急焦点
+# 当前上下文与紧急焦点
 最后更新：2025-09-08
 
 今日快照（精简版，≤10行）
-- FILTER-PANELS-UNIFY-380：PC 全部面板统一宽 380；日期输入 PC 作用域瘦身（suffix-hit 20/ right 8/ min-ch 10ch/ padding-left 8/ group gap 6/ “至” 2px）；保留 1px 中性灰焦点；溯源：commit 9627f697
-- FILTER-MORE-PANEL-PC：新增“更多”分离式面板（furnished/bathrooms_min/parking_min）；FilterTabs 接入；store 按需启用 V2 映射；URL 同步非空；溯源：commit 7535437
-- FILTER-DROPDOWN-POSITION-FIX：PC 分离式筛选面板定位异常（左上角 0,0）已修复；策略= FilterTabs 显式坐标 explicitPosition + Dropdown early-return 修正；溯源：commit 63ac851
-- UI-EP-SCROLL-NEUTRAL-1：全局/面板滚动指示器中性化已完成；下一步待定：统一“主滚动职责”
-- MB-SLIM-B：Memory Bank 采用“保6文件 + 硬阈值”方案；INDEX.md 已废弃占位（保留兼容链接）；activeContext 仅保当日 ≤8–10 行；progress 近30天里程碑单条 ≤3 行
-- MB-SLIM-B-APPLY：废弃 INDEX.md（写入指引与溯源）+ 修复 projectbrief.md 标题；溯源：TASK MB-SLIM-B-APPLY
-- FILTER-BEDROOMS-PANEL-EXT：卧室面板并入“浴室/车位”，统一“最少 N”语义；PC 宽度 380，面板内不滚动；“应用（N）”实时计数；URL 同步仅非空；溯源：TASK FILTER-BEDROOMS-PANEL-EXT 2025-09-08
-- FILTER-PRICE-SIMPLE-380：价格面板极简（仅数字展示 + 双手柄滑轨 + 清除/应用（N））；PC 宽度 380，无内滚；URL 仅写非空；溯源：commit 5e4baf5
+- FIX-FILTERS-COUNT-P0：禁用“按需 V2 映射”，统一走 V1 契约；V1 分支移除 isFurnished，避免后端不识别导致计数暴涨；计数与列表一致性恢复。溯源：commit 48bad16（范围 9627f69..48bad16）
+- MORE-PANEL-SIMPLIFY：仅保“带家具”开关；接入计数器（300ms 防抖）；按钮“清除/应用（N）”；aria-live 播报；URL 仅在 true 时写 isFurnished=1（保持“仅非空参数”）。溯源：48bad16
+- DROPDOWN-A11Y-TRAP：FilterDropdown 加固（锁定 body 滚动、Esc 关闭、Tab/Shift+Tab 焦点陷阱、关闭后焦点还原至触发器、首控聚焦）。溯源：48bad16
+- AREA/MORE：面板关闭按钮 tabindex="-1"，避免首焦点误落在关闭按钮。溯源：48bad16
+- V2 映射：保留白名单透传与 suburb→suburbs 兜底，但默认不开启（enableFilterV2=false）；待后端契约（furnished/布尔取值）对齐后再启用。溯源：48bad16
+- FILTER-TABS 定位：explicitPosition + early-return 修正已稳定（无 0,0 回归）。溯源：63ac851
+- PC 面板统一宽 380、内部不滚动目标维持（价格/卧室面板已对齐）。溯源：9627f697 等
+- URL 同步：仅写入非空；分页参数守卫生效（防 page_size=1 串扰）。溯源：既有策略
 
-- MB-VERIFY-2025-09-08｜全量校验完成；提出 3 处文档对齐提案（无破坏性变更）
 服务状态
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
-- [P0] 无内滚与 380 宽度在多分辨率回归；键盘可达性复测（首控聚焦/Tab/ESC）；后续按需恢复 Studio
-- [Policy] 持续执行 MB-SLIM-B（不新增 MB 文件、强制溯源）
+- [P0] 与后端确认家具契约：V1 键名/取值（如 is_furnished=1）或 V2（furnished=1/true）；据此启用 enableFilterV2 或在 V1 分支添加映射
+- [回归] 多组合验证：区域+价格/卧室+家具；计数与列表 pagination.total 一致

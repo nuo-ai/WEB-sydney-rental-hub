@@ -57,7 +57,8 @@ const srLiveText = computed(() => (typeof previewCount.value === 'number' ? `可
 /* 构建参数（仅 isFurnished） */
 const buildFilterParams = () => {
   const p = {}
-  if (furnished.value === true) p.isFurnished = true
+  // 中文注释：当未勾选时用 undefined 显式清除草稿中的 isFurnished，避免遗留影响预览
+  p.isFurnished = furnished.value === true ? true : undefined
   return p
 }
 
@@ -66,9 +67,9 @@ const computePreviewCount = async () => {
   try {
     countLoading.value = true
     const draft = buildFilterParams()
-    const base = propertiesStore.currentFilterParams || {}
-    const merged = { ...base, ...draft }
-    const n = await propertiesStore.getFilteredCount(merged)
+    // 中文注释：将“更多”面板草稿合并进全局预览草稿，统一由 Store 计算预览计数
+    propertiesStore.updatePreviewDraft('more', draft)
+    const n = await propertiesStore.getPreviewCount()
     previewCount.value = Number.isFinite(n) ? n : 0
   } catch (e) {
     previewCount.value = null
@@ -88,6 +89,8 @@ onMounted(() => computePreviewCount())
 /* 清除：重置并触发计数 */
 const clearAll = () => {
   furnished.value = false
+  // 中文注释：清理“更多”分组的全局草稿，避免残留影响其它面板的预览口径
+  propertiesStore.clearPreviewDraft('more')
   if (_countTimer) clearTimeout(_countTimer)
   _countTimer = setTimeout(() => computePreviewCount(), 300)
 }
@@ -133,6 +136,8 @@ const apply = async () => {
     const filterParams = buildFilterParams()
     await propertiesStore.applyFilters(filterParams)
     await updateUrlQuery(filterParams)
+    // 中文注释：应用成功后清理“更多”分组的预览草稿，避免下次打开显示过期的草稿计数
+    propertiesStore.clearPreviewDraft('more')
     emit('close')
   } catch (err) {
     console.error('应用更多筛选失败:', err)

@@ -32,8 +32,17 @@ const mapFilterStateToApiParams = (
   // V1：保持现有键名与行为，确保零风险上线
   if (!opts.enableFilterV2) {
     const legacy = { ...rawFilters }
-    // 中文注释：P0 兼容——在 V1 契约下移除仅用于 V2 的键，避免后端不识别造成计数偏差
-    if ('isFurnished' in legacy) delete legacy.isFurnished
+    // 中文注释：P0 兼容——在 V1 契约下移除仅用于 V2 的键；如选择 v1 契约，则把 isFurnished 映射为后端可识别的 is_furnished=1
+    if ('isFurnished' in legacy) {
+      // 中文注释：V1 后端接收 isFurnished 布尔；需兼容 URL/字符串/数字形式（'1'/'true'/1/true/'yes'）
+      const v = legacy.isFurnished
+      const truthy = v === true || v === '1' || v === 1 || v === 'true' || v === 'yes'
+      if (truthy) {
+        legacy.isFurnished = true
+      } else {
+        delete legacy.isFurnished
+      }
+    }
 
     // 若组件侧未补齐 suburb，则基于已选区域填充（与历史行为一致）
     if (!legacy.suburb && Array.isArray(selectedLocations) && selectedLocations.length) {
@@ -229,6 +238,8 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 当前已应用的筛选参数（用于翻页/改每页大小时保持筛选条件）
     currentFilterParams: {},
+    // 全局“草稿”聚合（各面板未应用的改动，按 section 聚合；用于统一预览计数口径）
+    previewDraftSections: {},
     // 排序状态（UI占位；后端暂不识别时仅透传且不做前端本地排序）
     sort: '',
   }),
@@ -576,6 +587,13 @@ export const usePropertiesStore = defineStore('properties', {
         // 记录“当前已应用的筛选条件”，供翻页/改每页大小复用
         this.currentFilterParams = { ...mappedParams }
 
+        // 中文注释：调试输出本次请求参数（仅用于开发定位，生产可注释）
+        {
+          let __dbg = ''
+          try { __dbg = JSON.stringify(mappedParams) } catch (err) { void err; __dbg = '[unserializable]' }
+          // eslint-disable-next-line no-console
+          console.debug('[FILTER-DEBUG][applyFilters] mappedParams:', __dbg)
+        }
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
         const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
@@ -719,6 +737,13 @@ export const usePropertiesStore = defineStore('properties', {
           { enableFilterV2: useV2 },
         )
 
+        // 中文注释：调试输出计数请求参数（仅用于开发定位，生产可注释）
+        {
+          let __dbg = ''
+          try { __dbg = JSON.stringify(mappedParams) } catch (err) { void err; __dbg = '[unserializable]' }
+          // eslint-disable-next-line no-console
+          console.debug('[FILTER-DEBUG][getFilteredCount] mappedParams:', __dbg)
+        }
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
         const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
@@ -730,6 +755,50 @@ export const usePropertiesStore = defineStore('properties', {
       } catch (error) {
         console.error('获取筛选数量失败:', error)
         return 0
+      }
+    },
+
+    // 统一预览计数：合并“已应用条件 + 全局草稿 + 额外草稿”，并调用后端计数
+    async getPreviewCount(extraDraft = {}) {
+      try {
+        // 中文注释：统一口径——以 Store 为单一真源聚合草稿，避免各面板“各算各的”
+        const base = this.currentFilterParams || {}
+        const mergedPreview = Object.values(this.previewDraftSections || {}).reduce((acc, obj) => {
+          if (obj && typeof obj === 'object') return { ...acc, ...obj }
+          return acc
+        }, {})
+        const merged = { ...base, ...mergedPreview, ...extraDraft }
+        return await this.getFilteredCount(merged)
+      } catch (e) {
+        console.warn('getPreviewCount 失败', e)
+        return 0
+      }
+    },
+
+    // 更新/合并某个分组的“草稿”参数；值为 undefined/null/'' 代表删除该键
+    updatePreviewDraft(section, partialDraft = {}) {
+      // 中文注释：按 section 维度存储草稿，便于面板关闭时仅清理自己的增量
+      if (!section) return
+      const cleaned = { ...partialDraft }
+      Object.keys(cleaned).forEach((k) => {
+        if (cleaned[k] === undefined || cleaned[k] === null || cleaned[k] === '') {
+          delete cleaned[k]
+        }
+      })
+      const prev = this.previewDraftSections?.[section] || {}
+      this.previewDraftSections = {
+        ...this.previewDraftSections,
+        [section]: { ...prev, ...cleaned },
+      }
+    },
+
+    // 清理某个分组的草稿（面板关闭或“清除”时调用）
+    clearPreviewDraft(section) {
+      if (!section) return
+      if (this.previewDraftSections && this.previewDraftSections[section]) {
+        const next = { ...this.previewDraftSections }
+        delete next[section]
+        this.previewDraftSections = next
       }
     },
 

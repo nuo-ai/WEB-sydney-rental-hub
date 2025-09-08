@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-08｜FIX-FILTERS-COUNT-P0  
+  禁用按需 V2 映射，统一走 V1 契约；移除 V1 isFurnished；计数与列表一致性恢复｜溯源：commit 48bad16
+- 2025-09-08｜MORE-PANEL-SIMPLIFY  
+  “更多”面板仅保带家具开关；接入计数器（300ms 防抖）、aria-live；按钮“清除/应用（N）”；URL 仅写非空｜溯源：commit 48bad16
 - 2025-09-08｜FILTER-PANELS-UNIFY-380  
   PC 全部面板统一宽 380；日期输入内部瘦身（suffix-hit 20 / right 8 / min-ch 10ch / padding-left 8 / group gap 6 / “至” 2px）；焦点中性灰；溯源：commit 9627f697
 - 2025-09-08｜FILTER-MORE-PANEL-PC  

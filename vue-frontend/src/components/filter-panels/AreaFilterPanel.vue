@@ -67,8 +67,8 @@
         <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ $t('filter.cancel') }}
         </el-button>
-        <el-button type="primary" class="apply-btn" size="default" @click="applyFilters">
-          确定
+        <el-button type="primary" class="apply-btn" size="default" :loading="countLoading" @click="applyFilters">
+          {{ applyText }}
         </el-button>
       </div>
     </div>
@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, nextTick } from 'vue'
+import { ref, computed, inject, nextTick, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
@@ -99,6 +99,29 @@ const localIncludeNearby = ref(propertiesStore.includeNearby ?? true) // 包含�
 
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.selectedLocations || [])
+
+// 预览计数（应用（N））
+const previewCount = ref(null)
+const countLoading = ref(false)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用'
+)
+
+// 统一预览计数：将“区域”草稿合入全局草稿，由 Store 统一计算
+const computePreviewCount = async () => {
+  try {
+    countLoading.value = true
+    const draft = buildFilterParams()
+    propertiesStore.updatePreviewDraft('area', draft)
+    const n = await propertiesStore.getPreviewCount()
+    previewCount.value = Number.isFinite(n) ? n : 0
+  } catch (e) {
+    previewCount.value = null
+    console.warn('获取区域预估数量失败', e)
+  } finally {
+    countLoading.value = false
+  }
+}
 
 // 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
 const displaySelectedLocations = computed(() => {
@@ -164,6 +187,8 @@ const removeLocation = (id) => {
 // 清空所有区域
 const clearAllLocations = () => {
   propertiesStore.setSelectedLocations([])
+  // 中文注释：清理“区域”分组的全局草稿，避免残留影响其它面板的预览口径
+  propertiesStore.clearPreviewDraft('area')
   nextTick(() => debouncedRequestCount())
 }
 
@@ -184,24 +209,15 @@ const debouncedRequestCount = (() => {
   return () => {
     if (tid) clearTimeout(tid)
     tid = setTimeout(() => {
-      updateFilteredCount()
+      computePreviewCount()
       tid = null
     }, 250)
   }
 })()
 
-// 更新筛选计数，不应用筛选
-const updateFilteredCount = async () => {
-  // 准备筛选参数
-  const filterParams = buildFilterParams()
+// 首次打开时计算一次
+onMounted(() => computePreviewCount())
 
-  try {
-    // 通过 store 获取计数
-    await propertiesStore.getFilteredCount(filterParams)
-  } catch (error) {
-    console.error('获取区域筛选计数失败:', error)
-  }
-}
 
 // 构建筛选参数
 const buildFilterParams = () => {
@@ -276,6 +292,9 @@ const applyFilters = async () => {
 
     // 更新 URL
     await updateUrlQuery(filterParams)
+
+    // 应用成功后清理“区域”分组的预览草稿，防止下次打开显示过期草稿计数
+    propertiesStore.clearPreviewDraft('area')
 
     // 关闭面板
     emit('close')

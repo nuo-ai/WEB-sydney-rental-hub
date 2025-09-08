@@ -195,6 +195,8 @@ const clearAll = () => {
   localBedrooms.value = []
   localBathrooms.value = []
   localParking.value = []
+  // 中文注释：清理“卧室”分组的全局草稿，避免残留影响其它面板预览
+  propertiesStore.clearPreviewDraft('bedrooms')
   computePreviewCount()
 }
 
@@ -203,7 +205,9 @@ const computePreviewCount = async () => {
   try {
     countLoading.value = true
     const params = buildFilterParams()
-    const n = await propertiesStore.getFilteredCount(params)
+    // 中文注释：将“卧室”面板草稿合入全局草稿，由 Store 统一计算预览计数
+    propertiesStore.updatePreviewDraft('bedrooms', params)
+    const n = await propertiesStore.getPreviewCount()
     previewCount.value = Number.isFinite(n) ? n : 0
   } catch (e) {
     // 中文注释：快速失败，不做本地估算
@@ -215,6 +219,14 @@ const computePreviewCount = async () => {
 }
 
 watch(localBedrooms, () => {
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
+})
+watch(localBathrooms, () => {
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
+})
+watch(localParking, () => {
   if (_countTimer) clearTimeout(_countTimer)
   _countTimer = setTimeout(() => computePreviewCount(), 300)
 })
@@ -326,6 +338,9 @@ const applyFilters = async () => {
 
     // 更新 URL
     await updateUrlQuery(filterParams)
+
+    // 中文注释：应用成功后清理“卧室”分组的预览草稿，防止下次打开显示过期草稿计数
+    propertiesStore.clearPreviewDraft('bedrooms')
 
     // 关闭面板
     emit('close')
