@@ -239,13 +239,26 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
 ## 更多高级筛选模式（新增）
-- 原则：PC 端“更多”面板承载高级条件（furnished/bathrooms_min/parking_min）；仅在“应用”时提交到 Pinia；URL 仅写入非空参数。
+- 原则：PC 端"更多"面板承载高级条件（furnished/bathrooms_min/parking_min）；仅在"应用"时提交到 Pinia；URL 仅写入非空参数。
 - 定位与交互：沿用分离式下拉（FilterDropdown）显式坐标策略、单例打开、ESC/外点关闭；打开时首控件获焦点，Tab 顺序在面板内闭环。
 - 数据契约：组件传入 isFurnished/bathrooms/parking 等键；Store 侧 mapFilterStateToApiParams 在 V2 下映射为 furnished/bathrooms_min/parking_min，V1 下透传且可被后端忽略。
-- 特性开关：默认 enableFilterV2=false；当检测到“高级键”（isFurnished/bathrooms/parking/postcodes）时，按需启用 V2 映射，保障无痛回滚。
+- 特性开关：默认 enableFilterV2=false；当检测到"高级键"（isFurnished/bathrooms/parking/postcodes）时，按需启用 V2 映射，保障无痛回滚。
 - URL 同步：仅写入 isFurnished=1、bathrooms=3+、parking=2+ 等非空值；刷新/直链可复现（读取逻辑可按需补充）。
 - 回滚策略：移除 FilterTabs 中对 MoreFilterPanel 的注册即可回退为占位；或关闭 V2 映射开关恢复旧契约。
 - 溯源：commit 7535437｜FILTER-MORE-PANEL-PC
+
+## 筛选面板设计系统（新增）
+- 原则：基于区域筛选面板现代化设计的成功模式，建立统一的设计系统确保所有筛选面板遵循相同的视觉标准。
+- 设计令牌：创建 `src/styles/design-tokens.css` 统一管理颜色、间距、字体、圆角、阴影等设计令牌；使用中性灰色调避免过度品牌化；微妙圆角(4-6px)现代但不过分。
+- 基础组件：构建可复用组件库 `src/components/base/`：
+  - BaseChip.vue：标签组件，支持 default/selected/hover 变体，可移除功能
+  - BaseSearchInput.vue：搜索输入框，内置搜索图标和清除按钮，支持键盘交互
+  - BaseButton.vue：按钮组件，支持 primary/secondary/ghost/danger 变体和 small/medium/large 尺寸
+  - BaseListItem.vue：列表项组件，支持选中/禁用/可点击状态，包含前置/后置插槽
+- 应用范围：已应用到所有筛选面板(AreaFilterPanel, PriceFilterPanel, BedroomsFilterPanel, AvailabilityFilterPanel, MoreFilterPanel)，替换硬编码样式为设计令牌，使用基础组件统一交互。
+- 文档：创建完整的组件库文档 `src/components/base/README.md`，包含使用指南、最佳实践、扩展指南。
+- 为什么：确保全站筛选面板视觉一致性，提高代码复用性，降低维护成本，建立可扩展的设计系统基础。
+- 溯源：activeContext 2025-09-08｜DESIGN-SYSTEM-COMPLETE
 
 ## 分离式下拉定位模式（新增）
 - 原则：PC 分离式筛选使用“显式坐标优先”的定位策略，彻底规避 ref/布局时序导致的 0,0 问题。

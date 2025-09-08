@@ -23,10 +23,10 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <button class="link-clear" type="button" aria-label="清除更多筛选条件" @click="clearAll">清除</button>
-        <el-button type="primary" class="apply-btn" size="default" :loading="countLoading" :disabled="countLoading" @click="apply">
+        <BaseButton variant="ghost" size="small" @click="clearAll">清除</BaseButton>
+        <BaseButton variant="primary" :loading="countLoading" :disabled="countLoading" @click="apply">
           {{ applyText }}
-        </el-button>
+        </BaseButton>
         <span class="sr-only" aria-live="polite">{{ srLiveText }}</span>
       </div>
     </div>
@@ -37,6 +37,7 @@
 import { ref, computed, inject, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
+import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：更多（高级）筛选面板。仅在“应用”时提交到 store；与其它分离式面板一致。
 
@@ -148,8 +149,8 @@ const apply = async () => {
 <style scoped>
 .more-filter-panel {
   width: 100%;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--filter-panel-bg);
+  border-radius: var(--filter-panel-radius);
 }
 
 /* 头部 */
@@ -157,78 +158,58 @@ const apply = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-border-default);
+  padding: var(--filter-panel-padding);
+  border-bottom: 1px solid var(--filter-panel-header-border);
 }
 .panel-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--filter-panel-title-font-size);
+  font-weight: var(--filter-panel-title-font-weight);
+  color: var(--filter-panel-title-color);
   margin: 0;
 }
 .close-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--filter-close-btn-color);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: var(--filter-close-btn-padding);
+  border-radius: var(--filter-close-btn-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: var(--filter-transition-fast);
 }
 .close-btn:hover {
-  background: #f5f5f5;
-  color: var(--color-text-primary);
+  background: var(--filter-close-btn-hover-bg);
+  color: var(--filter-close-btn-hover-color);
 }
 .spec-icon {
-  width: 20px;
-  height: 20px;
+  width: var(--filter-close-btn-size);
+  height: var(--filter-close-btn-size);
 }
 
 /* 内容 */
 .panel-content {
-  padding: 16px;
+  padding: var(--filter-panel-padding);
 }
 .form-row {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--filter-space-md);
+  margin-bottom: var(--filter-space-xl);
 }
 .form-label {
-  font-size: 13px;
-  color: var(--color-text-secondary);
+  font-size: var(--filter-font-size-sm);
+  color: var(--filter-color-text-secondary);
+  font-weight: var(--filter-font-weight-medium);
 }
 
 /* 底部操作 */
 .panel-footer {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  gap: var(--filter-space-lg);
+  margin-top: var(--filter-space-md);
 }
-.cancel-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-secondary);
-}
-.cancel-btn:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
-}
-.apply-btn {
-  flex: 2;
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-}
-.apply-btn:hover {
-  background-color: var(--juwo-primary-light);
-  border-color: var(--juwo-primary-light);
-}
-
-/* 细节 */
-.w-full { width: 100%; }
 
 /* sr-only 辅助样式 */
 .sr-only {
@@ -241,19 +222,5 @@ const apply = async () => {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* 清除按钮样式（与其他面板一致） */
-.link-clear {
-  background: transparent;
-  border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  margin-right: auto;
-}
-.link-clear:hover {
-  color: var(--color-text-primary);
 }
 </style>

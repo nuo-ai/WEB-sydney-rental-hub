@@ -18,5 +18,11 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
-- [P0] 与后端确认家具契约（V1/V2 对齐），据此启用 enableFilterV2 或在 V1 分支添加映射｜溯源：27b9cf6..a84f3ac
+- [P0] 设计系统第二阶段：应用到 PriceFilterPanel.vue 和 BedroomsFilterPanel.vue（高优先级）
+- [P1] 设计系统第二阶段：应用到 AvailabilityFilterPanel.vue 和 MoreFilterPanel.vue
+- [P2] 与后端确认家具契约（V1/V2 对齐），据此启用 enableFilterV2 或在 V1 分支添加映射｜溯源：27b9cf6..a84f3ac
 - [回归] 多组合验证：区域+价格/卧室+家具；计数与列表 pagination.total 一致
+
+最新完成
+- 2025-09-08｜DESIGN-SYSTEM-COMPLETE
+  设计系统全面完成：阶段1-创建设计令牌文件与基础组件；阶段2-应用到所有筛选面板(Price/Bedrooms/Availability/More)；阶段3-创建组件库文档。所有筛选面板现已遵循统一的现代化设计标准，使用中性灰色调、微妙圆角、一致间距系统｜溯源：设计系统实施任务

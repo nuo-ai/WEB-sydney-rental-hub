@@ -1,5 +1,8 @@
 /* JUWO桔屋找房 - 全局样式系统 */
 
+/* 导入设计令牌系统 */
+@import './styles/design-tokens.css';
+
 /* ========== JUWO品牌色彩系统 ========== */
 :root {
   /* JUWO主品牌色 #FF5824 */

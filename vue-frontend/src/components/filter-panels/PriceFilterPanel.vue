@@ -30,10 +30,10 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <button type="button" class="link-clear" @click="clearAll">清除</button>
-        <el-button type="primary" class="apply-btn" size="default" :loading="countLoading" @click="applyFilters">
+        <BaseButton variant="ghost" size="small" @click="clearAll">清除</BaseButton>
+        <BaseButton variant="primary" :loading="countLoading" @click="applyFilters">
           {{ applyText }}
-        </el-button>
+        </BaseButton>
       </div>
     </div>
   </div>
@@ -43,6 +43,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：价格筛选专用面板，拆分自原 FilterPanel
 
@@ -217,8 +218,8 @@ const applyFilters = async () => {
 <style scoped>
 .price-filter-panel {
   width: 100%;
-  background: white;
-  border-radius: 8px;
+  background: var(--filter-panel-bg);
+  border-radius: var(--filter-panel-radius);
 }
 
 /* 面板头部 */
@@ -226,42 +227,43 @@ const applyFilters = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-border-default);
+  padding: var(--filter-panel-padding);
+  border-bottom: 1px solid var(--filter-panel-header-border);
 }
 
 .panel-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--filter-panel-title-font-size);
+  font-weight: var(--filter-panel-title-font-weight);
+  color: var(--filter-panel-title-color);
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--filter-close-btn-color);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: var(--filter-close-btn-padding);
+  border-radius: var(--filter-close-btn-radius);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: var(--filter-transition-fast);
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: var(--color-text-primary);
+  background: var(--filter-close-btn-hover-bg);
+  color: var(--filter-close-btn-hover-color);
 }
 
 .spec-icon {
-  width: 20px;
-  height: 20px;
+  width: var(--filter-close-btn-size);
+  height: var(--filter-close-btn-size);
 }
 
 /* 面板内容 */
 .panel-content {
-  padding: 16px;
+  padding: var(--filter-panel-padding);
 }
 
 /* 价格显示（保留用于 aria-live 文案，不再单独居中显示） */
@@ -276,36 +278,36 @@ const applyFilters = async () => {
 .price-cards {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: var(--filter-space-lg);
+  margin-bottom: var(--filter-space-md);
 }
 .price-card {
   flex: 1 1 0%;
-  border: 1px solid var(--color-border-default);
-  border-radius: 6px;
-  background: #fff;
-  padding: 8px 10px;
+  border: 1px solid var(--filter-color-border-default);
+  border-radius: var(--filter-radius-lg);
+  background: var(--filter-color-bg-primary);
+  padding: var(--filter-space-md) var(--filter-space-lg);
   box-sizing: border-box;
 }
 .card-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  margin-bottom: 4px;
+  font-size: var(--filter-font-size-xs);
+  color: var(--filter-color-text-secondary);
+  margin-bottom: var(--filter-space-xs);
 }
 .card-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--filter-font-size-lg);
+  font-weight: var(--filter-font-weight-semibold);
+  color: var(--filter-color-text-primary);
 }
 .card-value .unit {
-  margin-left: 4px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
+  margin-left: var(--filter-space-xs);
+  font-size: var(--filter-font-size-xs);
+  color: var(--filter-color-text-secondary);
 }
 
 /* 价格滑块 */
 .price-slider {
-  margin: 16px 0 8px 0;
+  margin: var(--filter-space-xl) 0 var(--filter-space-md) 0;
 }
 
 /* sr-only 用于无障碍播报 */
@@ -344,38 +346,35 @@ const applyFilters = async () => {
 
 /* 中间连字符 */
 .dash {
-  color: var(--color-text-secondary);
+  color: var(--filter-color-text-secondary);
 }
 
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
-.link-clear {
-  background: transparent;
-  border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  margin-right: auto;
-}
-.link-clear:hover {
-  color: var(--color-text-primary);
+  gap: var(--filter-space-lg);
+  margin-top: var(--filter-space-xl);
 }
 
-/* 取消按钮已移除，保留样式以兼容回滚 */
-
-.apply-btn {
-  flex: 2;
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
+/* 滑块样式使用设计令牌 */
+.price-slider :deep(.el-slider__runway) {
+  background-color: var(--filter-color-neutral-200);
+  height: 6px;
 }
 
-.apply-btn:hover {
-  background-color: var(--juwo-primary-light);
-  border-color: var(--juwo-primary-light);
+.price-slider :deep(.el-slider__bar) {
+  background-color: var(--filter-color-neutral-500);
+  height: 6px;
+}
+
+.price-slider :deep(.el-slider__button) {
+  border: 3px solid var(--filter-color-neutral-500);
+  background-color: var(--filter-color-bg-primary);
+  width: 20px;
+  height: 20px;
+}
+
+.price-slider :deep(.el-slider__button:hover) {
+  border-color: var(--filter-color-neutral-600);
 }
 </style>

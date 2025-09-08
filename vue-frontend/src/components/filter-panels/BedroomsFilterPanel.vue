@@ -62,19 +62,17 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <button type="button" class="link-clear" @click="clearAll">{{ anyLabel }}</button>
-        <el-button class="cancel-btn" size="default" @click="$emit('close')">
+        <BaseButton variant="ghost" size="small" @click="clearAll">{{ anyLabel }}</BaseButton>
+        <BaseButton variant="secondary" @click="$emit('close')">
           {{ cancelLabel }}
-        </el-button>
-        <el-button
-          type="primary"
-          class="apply-btn"
-          size="default"
+        </BaseButton>
+        <BaseButton
+          variant="primary"
           :loading="countLoading"
           @click="applyFilters"
         >
           {{ applyText }}
-        </el-button>
+        </BaseButton>
         <!-- a11y：数量变化通过 aria-live 播报 -->
         <span class="sr-only" aria-live="polite">
           {{ previewCount !== null ? ('可用结果 ' + previewCount + ' 条') : '' }}
@@ -88,6 +86,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：卧室筛选专用面板，拆分自原 FilterPanel
 
@@ -353,8 +352,8 @@ const applyFilters = async () => {
 <style scoped>
 .bedrooms-filter-panel {
   width: 100%;
-  background: white;
-  border-radius: 8px;
+  background: var(--filter-panel-bg);
+  border-radius: var(--filter-panel-radius);
 }
 
 /* 面板头部 */
@@ -362,129 +361,95 @@ const applyFilters = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-border-default);
+  padding: var(--filter-panel-padding);
+  border-bottom: 1px solid var(--filter-panel-header-border);
 }
 
 .panel-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--filter-panel-title-font-size);
+  font-weight: var(--filter-panel-title-font-weight);
+  color: var(--filter-panel-title-color);
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--filter-close-btn-color);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: var(--filter-close-btn-padding);
+  border-radius: var(--filter-close-btn-radius);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: var(--filter-transition-fast);
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: var(--color-text-primary);
+  background: var(--filter-close-btn-hover-bg);
+  color: var(--filter-close-btn-hover-color);
 }
 
 .spec-icon {
-  width: 20px;
-  height: 20px;
+  width: var(--filter-close-btn-size);
+  height: var(--filter-close-btn-size);
 }
 
 /* 面板内容 */
 .panel-content {
-  padding: 12px; /* 压缩留白，避免内部滚动 */
+  padding: var(--filter-space-lg); /* 使用设计令牌 */
 }
 
 /* 筛选按钮组 */
 .filter-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px; /* 压缩间距，控制面板总高 */
+  gap: var(--filter-space-md);
+  margin-bottom: var(--filter-space-xl);
 }
 
 .filter-btn {
-  padding: 10px 14px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 0;
-  background: white;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
+  padding: var(--filter-space-lg) var(--filter-space-xl);
+  border: 1px solid var(--filter-color-border-default);
+  border-radius: var(--filter-radius-md);
+  background: var(--filter-color-bg-primary);
+  font-size: var(--filter-font-size-md);
+  font-weight: var(--filter-font-weight-medium);
+  color: var(--filter-color-text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--filter-transition-normal);
   min-width: 60px;
 }
 
 .filter-btn:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
-  background: #f7f8fa;
+  border-color: var(--filter-color-hover-border);
+  color: var(--filter-color-text-primary);
+  background: var(--filter-color-hover-bg);
 }
 
 .filter-btn.active {
-  background: #ffefe9; /* 极弱浅橙，非品牌强底色 */
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  background: var(--filter-color-selected-bg);
+  border-color: var(--filter-color-selected-border);
+  color: var(--filter-color-text-primary);
+  font-weight: var(--filter-font-weight-semibold);
 }
 
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.cancel-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-secondary);
-}
-
-.cancel-btn:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
-}
-
-.apply-btn {
-  flex: 2;
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-}
-
-.apply-btn:hover {
-  background-color: var(--juwo-primary-light);
-  border-color: var(--juwo-primary-light);
+  gap: var(--filter-space-md);
+  margin-top: var(--filter-space-xl);
 }
 
 /* 小节标题 */
 .section {
-  margin-top: 4px;
+  margin-top: var(--filter-space-xs);
 }
 .section-label {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  margin-bottom: 8px;
-}
-
-/* 文本清空按钮（不限） */
-.link-clear {
-  background: transparent;
-  border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
-  margin-right: auto; /* 将清空靠左，其余按钮靠右 */
-}
-.link-clear:hover {
-  color: var(--color-text-primary);
+  font-size: var(--filter-font-size-sm);
+  color: var(--filter-color-text-secondary);
+  margin-bottom: var(--filter-space-md);
+  font-weight: var(--filter-font-weight-medium);
 }
 
 /* 屏幕阅读器可见性辅助 */

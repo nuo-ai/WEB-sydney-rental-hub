@@ -39,19 +39,17 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="default" @click="$emit('close')">
+        <BaseButton variant="secondary" @click="$emit('close')">
           {{ cancelLabel }}
-        </el-button>
-        <el-button
-          type="primary"
-          class="apply-btn"
-          size="default"
+        </BaseButton>
+        <BaseButton
+          variant="primary"
           :loading="countLoading"
+          :disabled="!isDateRangeValid"
           @click="applyFilters"
-          :disabled="!isDateRangeValid || countLoading"
         >
           {{ applyText }}
-        </el-button>
+        </BaseButton>
       </div>
     </div>
   </div>
@@ -61,6 +59,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：空出时间筛选专用面板，拆分自原 FilterPanel
 
@@ -282,59 +281,21 @@ const applyFilters = async () => {
 <style scoped>
 .availability-filter-panel {
   width: 100%;
-  background: white;
-  border-radius: 8px;
-}
-
-/* 面板头部 */
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--color-border-default);
-}
-
-.panel-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-btn:hover {
-  background: #f5f5f5;
-  color: var(--color-text-primary);
-}
-
-.spec-icon {
-  width: 20px;
-  height: 20px;
+  background: var(--filter-panel-bg);
+  border-radius: var(--filter-panel-radius);
 }
 
 /* 面板内容 */
 .panel-content {
-  padding: 16px;
+  padding: var(--filter-panel-padding);
 }
 
 /* 日期选择器 */
 .date-picker-group {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--filter-space-md);
+  margin-bottom: var(--filter-space-xl);
 }
 
 .date-picker-start,
@@ -343,8 +304,9 @@ const applyFilters = async () => {
 }
 
 .date-separator {
-  color: var(--color-text-secondary);
-  margin: 0 4px; /* 收紧“至”两侧间距 */
+  color: var(--filter-color-text-secondary);
+  margin: 0 var(--filter-space-xs);
+  font-weight: var(--filter-font-weight-medium);
 }
 
 /* 焦点态：中性灰细边框，移除黑色外框 */
@@ -375,44 +337,17 @@ const applyFilters = async () => {
 
 /* 日期错误提示 */
 .date-error {
-  color: #f56c6c;
-  font-size: 14px;
-  margin-top: 8px;
-  margin-bottom: 16px;
+  color: var(--filter-color-danger);
+  font-size: var(--filter-font-size-md);
+  margin-top: var(--filter-space-md);
+  margin-bottom: var(--filter-space-xl);
+  font-weight: var(--filter-font-weight-medium);
 }
 
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.cancel-btn {
-  flex: 1;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-secondary);
-}
-
-.cancel-btn:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
-}
-
-.apply-btn {
-  flex: 2;
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-}
-
-.apply-btn:hover {
-  background-color: var(--juwo-primary-light);
-  border-color: var(--juwo-primary-light);
-}
-
-.apply-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  gap: var(--filter-space-lg);
+  margin-top: var(--filter-space-3xl);
 }
 </style>
