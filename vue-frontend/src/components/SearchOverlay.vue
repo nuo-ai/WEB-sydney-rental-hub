@@ -37,21 +37,16 @@
 
       <!-- 已选 chips 标签区（横向滚动） -->
       <div v-if="selectedLocations.length" class="chips-row">
-        <div
+        <BaseChip
           v-for="loc in selectedLocations"
           :key="loc.id"
-          class="chip"
-          :class="{ active: loc.id === lastSelectedId }"
-          :title="loc.fullName || loc.name"
+          :variant="loc.id === lastSelectedId ? 'selected' : 'default'"
+          :remove-label="`移除 ${loc.fullName || loc.name}`"
+          @remove="removeLocation(loc.id)"
         >
-          <MapPin v-if="loc.type === 'suburb'" class="chip-icon" aria-hidden="true" />
-          <Hash v-else class="chip-icon" aria-hidden="true" />
-          <span class="chip-text">{{ loc.name }}</span>
-          <button class="chip-remove" aria-label="移除" @click="removeLocation(loc.id)">
-            <X class="chip-remove-icon" />
-          </button>
+          {{ loc.name }}
           <span v-if="loc.id === lastSelectedId" class="chip-caret" aria-hidden="true"></span>
-        </div>
+        </BaseChip>
       </div>
 
       <!-- 列表内容区（内部滚动） -->
@@ -69,26 +64,26 @@
           </div>
 
           <template v-else>
-            <button
+            <BaseListItem
               v-for="(sug, idx) in filteredSuggestions"
               :key="`${sug.id}-${idx}`"
-              class="row"
+              :selected="isSelected(sug)"
               @click="toggleSuggestion(sug)"
             >
-              <div class="row-left">
-                <MapPin v-if="sug.type === 'suburb'" class="row-icon" aria-hidden="true" />
-                <Hash v-else class="row-icon" aria-hidden="true" />
-                <div class="row-text">
-                  <div class="row-title">{{ sug.fullName || sug.name }}</div>
-                  <div class="row-sub">{{ (sug.count ?? 0) }} 套房源</div>
-                </div>
-              </div>
-              <div class="row-right">
+              <template #default>
+                {{ sug.fullName || sug.name }}
+              </template>
+
+              <template #description>
+                {{ (sug.count ?? 0) }} 套房源
+              </template>
+
+              <template #suffix>
                 <span class="pill" :class="{ selected: isSelected(sug) }">
                   <PlusCircle class="pill-icon" aria-hidden="true" />
                 </span>
-              </div>
-            </button>
+              </template>
+            </BaseListItem>
 
             <div v-if="!filteredSuggestions.length" class="empty">
               无匹配结果
@@ -100,26 +95,26 @@
                 <span>SUGGESTED FOR YOU</span>
               </div>
               <template v-if="nearby.length">
-                <button
+                <BaseListItem
                   v-for="(sug, idx) in nearby"
                   :key="`fallback-nearby-${sug.id || idx}`"
-                  class="row"
+                  :selected="isSelected(sug)"
                   @click="toggleSuggestion(sug)"
                 >
-                  <div class="row-left">
-                    <MapPin v-if="sug.type === 'suburb' || !sug.type" class="row-icon" aria-hidden="true" />
-                    <Hash v-else class="row-icon" aria-hidden="true" />
-                    <div class="row-text">
-                      <div class="row-title">{{ sug.fullName || sug.name }}</div>
-                      <div class="row-sub" v-if="sug.postcode">NSW, {{ sug.postcode }}</div>
-                    </div>
-                  </div>
-                  <div class="row-right">
+                  <template #default>
+                    {{ sug.fullName || sug.name }}
+                  </template>
+
+                  <template #description v-if="sug.postcode">
+                    NSW, {{ sug.postcode }}
+                  </template>
+
+                  <template #suffix>
                     <span class="pill" :class="{ selected: isSelected(sug) }">
                       <PlusCircle class="pill-icon" aria-hidden="true" />
                     </span>
-                  </div>
-                </button>
+                  </template>
+                </BaseListItem>
               </template>
               <div v-else class="empty">
                 暂无推荐，可更换关键字
@@ -141,26 +136,26 @@
           </div>
 
           <template v-else>
-            <button
+            <BaseListItem
               v-for="(sug, idx) in nearby"
               :key="`nearby-${sug.id || idx}`"
-              class="row"
+              :selected="isSelected(sug)"
               @click="toggleSuggestion(sug)"
             >
-              <div class="row-left">
-                <MapPin v-if="sug.type === 'suburb' || !sug.type" class="row-icon" aria-hidden="true" />
-                <Hash v-else class="row-icon" aria-hidden="true" />
-                <div class="row-text">
-                  <div class="row-title">{{ sug.fullName || sug.name }}</div>
-                  <div class="row-sub" v-if="sug.postcode">NSW, {{ sug.postcode }}</div>
-                </div>
-              </div>
-              <div class="row-right">
+              <template #default>
+                {{ sug.fullName || sug.name }}
+              </template>
+
+              <template #description v-if="sug.postcode">
+                NSW, {{ sug.postcode }}
+              </template>
+
+              <template #suffix>
                 <span class="pill" :class="{ selected: isSelected(sug) }">
                   <PlusCircle class="pill-icon" aria-hidden="true" />
                 </span>
-              </div>
-            </button>
+              </template>
+            </BaseListItem>
 
             <div v-if="!nearby.length" class="empty">
               暂无推荐，可输入关键字搜索
@@ -183,7 +178,9 @@
 import { ref, watch, onMounted, onUnmounted, computed, inject, nextTick } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
-import { Search, MapPin, Hash, PlusCircle, X, ChevronLeft, Lightbulb } from 'lucide-vue-next'
+import { Search, PlusCircle, X, ChevronLeft, Lightbulb } from 'lucide-vue-next'
+import BaseChip from './base/BaseChip.vue'
+import BaseListItem from './base/BaseListItem.vue'
 
 const emit = defineEmits(['close', 'open-filter-panel', 'openFilterPanel'])
 
@@ -465,35 +462,14 @@ watch(
 /* 已选 chips */
 .chips-row {
   display: flex;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--filter-chip-gap);
+  padding: var(--filter-space-md) var(--filter-space-lg);
   overflow-x: auto;
-  border-bottom: 1px solid var(--color-border-default, #e5e7eb);
-  background: #fff;
+  border-bottom: 1px solid var(--filter-color-border-default);
+  background: var(--filter-color-bg-primary);
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border: 1px solid var(--color-border-default, #e5e7eb);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--color-text-primary, #111827);
-  white-space: nowrap;
-}
-.chip.active {
-  background: #3c475b; /* 深灰底，强调当前选择 */
-  border-color: #3c475b;
-  color: #fff;
-}
-.chip.active .chip-icon,
-.chip.active .chip-remove {
-  color: #fff;
-}
-
-/* 活动 chip 的“输入光标”效果 */
+/* 活动 chip 的"输入光标"效果 */
 .chip-caret {
   width: 2px;
   height: 14px;
@@ -506,32 +482,6 @@ watch(
   50% { opacity: 0; }
 }
 
-.chip-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--juwo-primary, #ff5824);
-}
-
-.chip-text {
-  font-size: 14px;
-}
-
-.chip-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border: none;
-  background: transparent;
-  color: var(--color-text-secondary, #6b7280);
-  border-radius: 999px;
-}
-
-.chip-remove-icon {
-  width: 14px;
-  height: 14px;
-}
 
 /* 内容区 */
 .overlay-content {
@@ -562,55 +512,6 @@ watch(
   color: #999;
 }
 
-/* 行项 */
-.row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 14px 12px;
-  border-bottom: 1px solid #f1f1f1;
-  background: #fff;
-  cursor: pointer;
-}
-
-.row:active {
-  background: #fff6f1;
-}
-
-.row-left {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.row-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--juwo-primary, #ff5824);
-}
-
-.row-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.row-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary, #111827);
-}
-
-.row-sub {
-  font-size: 12px;
-  color: var(--color-text-secondary, #6b7280);
-  margin-top: 2px;
-}
-
-.row-right {
-  display: flex;
-  align-items: center;
-}
 
 .pill {
   display: inline-flex;
@@ -661,5 +562,86 @@ watch(
 /* 锁定 body 滚动（通过类名控制） */
 :global(body.srh-overlay-open) {
   overflow: hidden;
+}
+/* 设计令牌对齐覆盖（追加覆盖而非重写原样式，降低风险）
+   为什么这样做：
+   - 移动端搜索覆盖层需要与筛选面板共用一套设计语言（中性灰、统一间距/圆角/边框）
+   - 通过后置覆盖使用 design-tokens.css 中的 --filter-* 变量，避免大规模重写，保持向后兼容
+   - 若 design tokens 未来微调，可全局生效；此处仅做映射与对齐 */
+:root {}
+.search-overlay {
+  background: var(--filter-panel-bg, var(--filter-color-bg-primary));
+}
+
+/* 头部与输入区 */
+.overlay-header {
+  gap: var(--filter-space-md);
+  padding: var(--filter-space-lg) var(--filter-space-lg)
+    calc(var(--filter-space-lg) + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--filter-color-border-default);
+  background: var(--filter-color-bg-primary);
+}
+.icon-btn {
+  color: var(--filter-color-text-secondary);
+  border-radius: var(--filter-radius-lg);
+}
+.icon-btn:active {
+  background: var(--filter-color-hover-bg);
+}
+.header-input {
+  background: var(--filter-color-bg-primary);
+  border: 1px solid var(--filter-color-border-default);
+  border-radius: var(--filter-radius-xl);
+  padding: 0 var(--filter-space-md);
+}
+.header-actions {
+  margin-left: var(--filter-space-md);
+  gap: var(--filter-space-md);
+}
+.filter-text-btn {
+  color: var(--juwo-primary);
+}
+.filter-text-btn:active {
+  background: var(--filter-color-hover-bg);
+}
+.search-prefix {
+  color: var(--filter-color-text-secondary);
+}
+.input {
+  color: var(--filter-color-text-primary);
+}
+
+
+/* 内容区与分组标题 */
+.overlay-content {
+  padding-bottom: calc(var(--filter-space-lg) + env(safe-area-inset-bottom, 0px));
+}
+.section-title {
+  padding: var(--filter-group-title-padding-y) var(--filter-group-title-padding-x);
+  font-size: var(--filter-group-title-font-size);
+  font-weight: var(--filter-group-title-font-weight);
+  color: var(--filter-group-title-color);
+  background: var(--filter-group-title-bg);
+  border-bottom: 1px solid var(--filter-group-title-border);
+}
+.title-icon {
+  color: var(--filter-color-text-muted);
+}
+
+
+/* 操作徽标与空/加载态 */
+.pill {
+  border: 1px solid var(--filter-color-border-default);
+  color: var(--filter-color-text-secondary);
+}
+.loading,
+.empty {
+  padding: var(--filter-space-xl);
+  font-size: var(--filter-font-size-sm);
+  color: var(--filter-color-text-secondary);
+}
+.spinner {
+  border: 2px solid var(--filter-color-border-subtle);
+  border-top-color: var(--juwo-primary);
 }
 </style>

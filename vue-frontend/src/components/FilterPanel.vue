@@ -822,17 +822,52 @@ watch(
   { immediate: false }
 )
 
+// 滚动锁定管理
+const lockBodyScroll = () => {
+  if (typeof document === 'undefined') return
+  // 中文注释：锁定 body 滚动，防止页面滚动条与面板滚动条并列
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+  // 防止滚动穿透
+  document.body.style.position = 'fixed'
+  document.body.style.width = '100%'
+}
+
+const unlockBodyScroll = () => {
+  if (typeof document === 'undefined') return
+  // 中文注释：恢复 body 滚动
+  document.documentElement.style.overflow = ''
+  document.body.style.overflow = ''
+  document.body.style.position = ''
+  document.body.style.width = ''
+}
+
+// 键盘事件处理
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape') {
+    closePanel()
+  }
+}
+
 // 生命周期
 watch(visible, (newValue) => {
   if (newValue) {
-    // 打开面板时，更新筛选计数
+    // 打开面板时的操作
+    lockBodyScroll()
     updateFilteredCount()
+
+    // 添加键盘事件监听
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', handleKeyDown)
+    }
+
     try {
-      // 预先加载区域目录，避免首次打开仅见“静态搜索框”
+      // 预先加载区域目录，避免首次打开仅见"静态搜索框"
       propertiesStore.getAllAreas?.()
     } catch {
       /* 忽略非关键错误 */
     }
+
     // iOS 防自动放大：清理当前任何活动焦点，并把焦点转移到非输入容器
     nextTick(() => {
       try {
@@ -848,6 +883,23 @@ watch(visible, (newValue) => {
         // 忽略非关键错误
       }
     })
+  } else {
+    // 关闭面板时的清理操作
+    unlockBodyScroll()
+
+    // 移除键盘事件监听
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }
+})
+
+// 组件卸载时的清理
+import { onUnmounted } from 'vue'
+onUnmounted(() => {
+  unlockBodyScroll()
+  if (typeof document !== 'undefined') {
+    document.removeEventListener('keydown', handleKeyDown)
   }
 })
 
@@ -921,58 +973,79 @@ onMounted(() => {
   transform: translateX(0);
 }
 
-/* 面板头部 */
+/* 面板头部 - 使用设计令牌 */
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border-default);
-  background: white;
+  padding: var(--filter-space-2xl) var(--filter-space-3xl);
+  border-bottom: 1px solid var(--filter-panel-header-border);
+  background: var(--filter-panel-bg);
 }
 
 .panel-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--filter-panel-title-font-size);
+  font-weight: var(--filter-panel-title-font-weight);
+  color: var(--filter-panel-title-color);
   margin: 0;
+  line-height: var(--filter-line-height-tight);
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--filter-space-xl);
 }
 
 .reset-link {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--filter-action-link-color);
+  font-size: var(--filter-action-link-font-size);
+  font-weight: var(--filter-action-link-font-weight);
   cursor: pointer;
   text-decoration: underline;
-  padding: 4px;
+  padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
+  border-radius: var(--filter-action-link-radius);
+  transition: var(--filter-transition-fast);
+  /* 移动端触摸目标 */
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .reset-link:hover {
-  color: var(--color-text-primary);
+  background: var(--filter-action-link-hover-bg);
+  color: var(--filter-action-link-hover-color);
+  text-decoration: none;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
-  font-size: 20px;
+  color: var(--filter-close-btn-color);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  padding: var(--filter-close-btn-padding);
+  border-radius: var(--filter-close-btn-radius);
+  transition: var(--filter-transition-fast);
+  width: var(--filter-close-btn-size);
+  height: var(--filter-close-btn-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 移动端触摸目标优化 */
+  min-width: 40px;
+  min-height: 40px;
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: var(--color-text-primary);
+  background: var(--filter-close-btn-hover-bg);
+  color: var(--filter-close-btn-hover-color);
+}
+
+.close-btn:focus-visible {
+  outline: 2px solid var(--filter-color-focus-ring);
+  outline-offset: 1px;
 }
 
 /* 面板内容 */
@@ -1039,43 +1112,59 @@ onMounted(() => {
   border-color: var(--color-border-strong);
 }
 
-/* 筛选按钮组 */
+/* 筛选按钮组 - 使用设计令牌 */
 .filter-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--filter-space-lg);
 }
 
 /* 移动端按钮组 */
 @media (max-width: 767px) {
   .filter-buttons-group {
-    gap: 8px;
+    gap: var(--filter-space-md);
   }
 }
 
 .filter-btn {
-  padding: 12px 18px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 0;
-  background: white;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
+  padding: var(--filter-btn-padding-y) var(--filter-btn-padding-x);
+  border: 1px solid var(--filter-color-border-default);
+  border-radius: var(--filter-radius-lg);
+  background: var(--filter-color-bg-primary);
+  font-size: var(--filter-btn-font-size);
+  font-weight: var(--filter-btn-font-weight);
+  color: var(--filter-color-text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--filter-transition-normal);
   min-width: 60px;
+  /* 移动端触摸目标优化 */
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filter-btn:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
-  background: #f7f8fa;
+  border-color: var(--filter-color-hover-border);
+  color: var(--filter-color-text-primary);
+  background: var(--filter-color-hover-bg);
 }
 
 .filter-btn.active {
-  background: #ffefe9; /* 极弱浅橙，非品牌强底色 */
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  background: var(--filter-color-selected-bg);
+  border-color: var(--filter-color-selected-border);
+  color: var(--filter-color-text-primary);
+  font-weight: var(--filter-font-weight-semibold);
+}
+
+/* 移动端按钮优化 */
+@media (max-width: 767px) {
+  .filter-btn {
+    padding: 14px var(--filter-btn-padding-x);
+    font-size: var(--filter-font-size-md);
+    min-width: 64px;
+    min-height: 48px; /* 更大的触摸目标 */
+  }
 }
 
 /* 日期选择器 */
@@ -1147,126 +1236,239 @@ onMounted(() => {
   background-color: var(--color-border-strong);
 }
 
-/* 面板底部 */
+/* 面板底部 - 使用设计令牌 */
 .panel-footer {
   display: flex;
-  gap: 12px;
-  padding: 24px;
-  border-top: 1px solid var(--color-border-default);
-  background: white;
+  gap: var(--filter-btn-gap);
+  padding: var(--filter-space-3xl);
+  border-top: 1px solid var(--filter-panel-footer-border);
+  background: var(--filter-panel-bg);
 }
 
 .cancel-btn {
   flex: 1;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-secondary);
+  background: var(--filter-btn-secondary-bg);
+  border: 1px solid var(--filter-btn-secondary-border);
+  color: var(--filter-btn-secondary-color);
+  font-size: var(--filter-btn-font-size);
+  font-weight: var(--filter-btn-font-weight);
+  border-radius: var(--filter-btn-radius);
+  transition: var(--filter-transition-normal);
+  /* 移动端触摸目标优化 */
+  min-height: 48px;
 }
 
 .cancel-btn:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  border-color: var(--filter-btn-secondary-hover-border);
+  color: var(--filter-btn-secondary-hover-color);
+  background: var(--filter-color-hover-bg);
+}
+
+.cancel-btn:focus-visible {
+  outline: 2px solid var(--filter-color-focus-ring);
+  outline-offset: 1px;
 }
 
 .apply-btn {
   flex: 2;
-  background-color: var(--juwo-primary);
-  border-color: var(--juwo-primary);
+  background-color: var(--filter-btn-primary-bg);
+  border-color: var(--filter-btn-primary-bg);
+  color: var(--filter-btn-primary-color);
+  font-size: var(--filter-btn-font-size);
+  font-weight: var(--filter-btn-font-weight);
+  border-radius: var(--filter-btn-radius);
+  transition: var(--filter-transition-normal);
+  /* 移动端触摸目标优化 */
+  min-height: 48px;
 }
 
 .apply-btn:hover {
-  background-color: var(--juwo-primary-light);
-  border-color: var(--juwo-primary-light);
+  background-color: var(--filter-btn-primary-hover-bg);
+  border-color: var(--filter-btn-primary-hover-bg);
 }
 
-/* Location 区样式 */
+.apply-btn:focus-visible {
+  outline: 2px solid var(--filter-color-focus-ring);
+  outline-offset: 1px;
+}
+
+.apply-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.apply-btn:disabled:hover {
+  background-color: var(--filter-btn-primary-bg);
+  border-color: var(--filter-btn-primary-bg);
+}
+
+/* 移动端底部按钮优化 */
+@media (max-width: 767px) {
+  .panel-footer {
+    padding: var(--filter-space-2xl);
+    /* 为 iOS 底部 Home Bar 预留安全区，确保按钮不被遮挡 */
+    padding-bottom: calc(var(--filter-space-2xl) + env(safe-area-inset-bottom));
+    gap: var(--filter-space-lg);
+  }
+
+  .cancel-btn,
+  .apply-btn {
+    min-height: 52px; /* 移动端更大的触摸目标 */
+    font-size: var(--filter-font-size-lg);
+    font-weight: var(--filter-font-weight-semibold);
+  }
+}
+
+/* Location 区样式 - 使用设计令牌 */
 .location-section .location-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* 自适应 2–3 列 */
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--filter-space-md);
 }
+
 .location-chip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 0;
-  background: var(--chip-bg, #f7f8fa);
-  max-width: 140px; /* 中文注释：限制单个标签宽度，避免长词撑破布局 */
+  gap: var(--filter-chip-gap);
+  padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
+  border: 1px solid var(--filter-chip-border);
+  border-radius: var(--filter-chip-radius);
+  background: var(--filter-chip-bg);
+  color: var(--filter-chip-text);
+  font-size: var(--filter-chip-font-size);
+  font-weight: var(--filter-chip-font-weight);
+  max-width: 160px;
+  transition: var(--filter-transition-fast);
+  /* 移动端触摸优化 */
+  min-height: 32px;
 }
+
+.location-chip:hover {
+  border-color: var(--filter-chip-hover-border);
+  background: var(--filter-chip-hover-bg);
+}
+
 .location-chip .chip-text {
-  font-size: 14px;
-  color: var(--color-text-primary);
+  color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
 }
+
 .location-chip .chip-remove {
-  background: transparent;
+  background: var(--filter-chip-remove-bg);
   border: none;
-  color: var(--color-text-secondary);
-  width: 16px;
-  height: 16px;
-  border-radius: 0;
+  color: var(--filter-chip-remove-color);
+  width: var(--filter-chip-remove-size);
+  height: var(--filter-chip-remove-size);
+  border-radius: var(--filter-chip-remove-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   padding: 0;
+  cursor: pointer;
+  transition: var(--filter-transition-fast);
+  flex-shrink: 0;
+  /* 移动端触摸目标优化 */
+  min-width: 20px;
+  min-height: 20px;
 }
+
 .location-chip .chip-remove:hover {
-  background: transparent;
-  color: var(--color-text-primary);
+  background: var(--filter-chip-remove-hover-bg);
+  color: var(--filter-chip-remove-hover-color);
 }
+
 .location-actions {
-  margin-top: 6px;
-}
-.clear-all {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  font-size: 13px;
-  cursor: pointer;
-}
-.nearby-toggle {
-  margin-top: 10px;
-}
-
-/* Location 空态提示 */
-.location-empty .empty-box {
+  margin-top: var(--filter-space-sm);
   display: flex;
+  gap: var(--filter-space-lg);
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border: none;
-  background: var(--chip-bg, #f7f8fa);
-  border-radius: 0;
-  padding: 10px 12px;
-}
-.location-empty .empty-text {
-  font-size: 13px;
-  color: var(--color-text-secondary, #6b7280);
-}
-.location-empty .go-select {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  font-size: 13px;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
+.clear-all,
 .toggle-chips {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--filter-action-link-color);
   text-decoration: underline;
-  font-size: 13px;
+  font-size: var(--filter-action-link-font-size);
+  font-weight: var(--filter-action-link-font-weight);
   cursor: pointer;
-  padding: 0 4px;
+  padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
+  border-radius: var(--filter-action-link-radius);
+  transition: var(--filter-transition-fast);
+  /* 移动端触摸目标 */
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.clear-all:hover,
+.toggle-chips:hover {
+  background: var(--filter-action-link-hover-bg);
+  color: var(--filter-action-link-hover-color);
+  text-decoration: none;
+}
+
+.nearby-toggle {
+  margin-top: var(--filter-space-lg);
+}
+
+/* Location 空态提示 - 使用设计令牌 */
+.location-empty .empty-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--filter-space-md);
+  border: 1px solid var(--filter-empty-border);
+  background: var(--filter-empty-bg);
+  border-radius: var(--filter-empty-radius);
+  padding: var(--filter-empty-padding-y) var(--filter-empty-padding-x);
+  text-align: center;
+}
+
+.location-empty .empty-text {
+  font-size: var(--filter-empty-font-size);
+  font-weight: var(--filter-empty-font-weight);
+  color: var(--filter-empty-text-color);
+  line-height: var(--filter-line-height-normal);
+}
+
+/* 移动端Location区域优化 */
+@media (max-width: 767px) {
+  .location-section .location-list {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--filter-space-sm);
+  }
+
+  .location-chip {
+    padding: calc(var(--filter-chip-padding-y) + 2px) var(--filter-chip-padding-x);
+    min-height: 36px;
+    font-size: var(--filter-font-size-md);
+  }
+
+  .location-chip .chip-remove {
+    width: calc(var(--filter-chip-remove-size) + 4px);
+    height: calc(var(--filter-chip-remove-size) + 4px);
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  .location-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--filter-space-sm);
+  }
+
+  .clear-all,
+  .toggle-chips {
+    min-height: 36px;
+    padding: var(--filter-space-sm) var(--filter-space-md);
+  }
 }
 
 

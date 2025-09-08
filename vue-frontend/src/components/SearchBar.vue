@@ -591,7 +591,7 @@ watch(
   height: 20px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--filter-chip-gap);
   pointer-events: none; /* 不遮挡输入/点击 */
   overflow: hidden;
   white-space: nowrap;
@@ -605,20 +605,21 @@ watch(
   top: 0;
   bottom: 0;
   width: 24px;
-  background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
+  background: linear-gradient(to right, rgba(255,255,255,0), var(--filter-color-bg-primary));
 }
 
 /* 单个浅灰 chip */
 .inline-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border: none;
-  border-radius: 0;
-  background: var(--chip-bg, #f7f8fa);
-  color: var(--color-text-secondary, #374151);
-  font-size: 12px;
+  gap: var(--filter-chip-gap);
+  padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
+  border: 1px solid var(--filter-chip-border);
+  border-radius: var(--filter-chip-radius);
+  background: var(--filter-chip-bg);
+  color: var(--filter-chip-text);
+  font-size: var(--filter-chip-font-size);
+  font-weight: var(--filter-chip-font-weight);
   line-height: 1;
 }
 
@@ -632,7 +633,10 @@ watch(
 }
 
 .inline-chip-more {
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--filter-color-text-secondary);
+  background: var(--filter-chip-bg);
+  border: 1px solid var(--filter-chip-border);
+  border-radius: var(--filter-chip-radius);
 }
 
 .suggestion-item {
