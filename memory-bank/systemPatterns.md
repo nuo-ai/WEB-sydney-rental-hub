@@ -305,12 +305,17 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 
 ## 分离式筛选面板尺寸与无内滚（新增）
 - 原则：PC 端分离式筛选面板内部不出现滚动条；通过控量与压缩留白控制高度，仍遵循“仅一个主纵向滚动条”的系统原则。
-- 尺寸：仅“卧室”面板宽度为 380px；其它筛选面板为 520px；移动端最小宽度不少于触发器宽度（≥280px）。
+- 尺寸：PC 端所有筛选面板统一宽度为 380px；移动端最小宽度不少于触发器宽度（≥280px）。
 - 实施：
-  - FilterTabs.computePosition(el, panel)：PC 下 `panel==='bedrooms' ? 380 : 520`，并做左右 10px 视口边缘保护。
+  - FilterTabs.computePosition(el)：PC 下统一 width=380，并做左右 10px 视口边缘保护。
   - 面板内部通过压缩留白与间距控制总高（示例：panel-content padding 12px；按钮组 gap 8px；section margin-bottom 8/16；三组各一行），整体高度≈320–360px，确保不触发内部滚动。
+  - PC 日期输入内部间距与令牌基线（仅 .filter-dropdown-container 作用域）：
+    - --filter-suffix-hit: 20px；--filter-suffix-right: 8px；--date-field-min-ch: 10ch
+    - 输入包装 padding-left: 8px；:deep(.el-input__suffix-inner) gap: 0
+    - .date-picker-group 不换行，column-gap: 6px；“至”分隔 margin: 0 2px
+    - 保留 1px 中性灰焦点环；禁黑色 UA outline（面板内）
   - “应用（N）”计数采用 300ms 防抖，加载态禁点；错误快速失败，不做本地估算，保持可观测性。
-- 溯源：activeContext 2025-09-08｜FILTER-BEDROOMS-PANEL-EXT
+- 溯源：commit 9627f697｜FILTER-PANELS-UNIFY-380
 
 ## 导航交互统一（新增）
 

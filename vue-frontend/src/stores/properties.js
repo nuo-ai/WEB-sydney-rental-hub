@@ -32,6 +32,8 @@ const mapFilterStateToApiParams = (
   // V1：保持现有键名与行为，确保零风险上线
   if (!opts.enableFilterV2) {
     const legacy = { ...rawFilters }
+    // 中文注释：P0 兼容——在 V1 契约下移除仅用于 V2 的键，避免后端不识别造成计数偏差
+    if ('isFurnished' in legacy) delete legacy.isFurnished
 
     // 若组件侧未补齐 suburb，则基于已选区域填充（与历史行为一致）
     if (!legacy.suburb && Array.isArray(selectedLocations) && selectedLocations.length) {
@@ -61,6 +63,15 @@ const mapFilterStateToApiParams = (
   // V2：对齐白名单参数（suburbs/date_from/date_to/price_min/price_max/bedrooms/page/page_size/sort）
   const params = {}
 
+  // 中文注释：白名单透传已存在的 V2 键，避免预览计数丢参（如 currentFilterParams 中已有的 V2 字段）
+  const _wl = ['suburbs','postcodes','date_from','date_to','price_min','price_max','bedrooms','furnished','bathrooms_min','parking_min','sort','include_nearby']
+  _wl.forEach((k) => {
+    const v = rawFilters[k]
+    if (v !== undefined && v !== null && v !== '') {
+      params[k] = v
+    }
+  })
+
   // suburbs（仅 suburb 类型，去重 + 保序）
   const suburbs = Array.from(
     new Set(
@@ -70,7 +81,9 @@ const mapFilterStateToApiParams = (
         .filter(Boolean),
     ),
   )
-  if (suburbs.length) params.suburbs = suburbs.join(',')
+  if (!params.suburbs && suburbs.length) params.suburbs = suburbs.join(',')
+  // 中文注释：兜底——当开启 V2 映射但区域仍以 V1 键 suburb 存在时，转换为 V2 键 suburbs，避免计数丢失区域导致“全库总量”
+  if (!params.suburbs && rawFilters.suburb) params.suburbs = String(rawFilters.suburb)
   // postcodes（仅 postcode 类型，V2 才参与映射）
   const postcodes = Array.from(
     new Set(
@@ -80,7 +93,7 @@ const mapFilterStateToApiParams = (
         .filter(Boolean),
     ),
   )
-  if (postcodes.length) params.postcodes = postcodes.join(',')
+  if (!params.postcodes && postcodes.length) params.postcodes = postcodes.join(',')
 
   // 日期（闭区间），接受 Date 或字符串
   if (rawFilters.startDate) params.date_from = _fmtDate(rawFilters.startDate) || rawFilters.date_from
@@ -98,15 +111,15 @@ const mapFilterStateToApiParams = (
     max = Number(rawFilters.maxPrice ?? 5000)
   }
   if (min > max) [min, max] = [max, min] // 纠偏以降低用户困惑
-  if (min > 0) params.price_min = min
-  if (max < 5000) params.price_max = max
+  if (params.price_min == null && min > 0) params.price_min = min
+  if (params.price_max == null && max < 5000) params.price_max = max
 
   // 卧室：最小卧室数（支持 '4+' → 4），兼容字符串或 CSV
   if (rawFilters.bedrooms) {
     const b = Array.isArray(rawFilters.bedrooms)
       ? rawFilters.bedrooms[0]
       : String(rawFilters.bedrooms).split(',')[0]
-    if (b) params.bedrooms = b.endsWith('+') ? parseInt(b) : parseInt(b)
+    if (params.bedrooms == null && b) params.bedrooms = b.endsWith('+') ? parseInt(b) : parseInt(b)
   }
 
   // 分页/排序（含上限 50）
@@ -119,11 +132,11 @@ const mapFilterStateToApiParams = (
 
   // 扩展：家具/浴室/车位（V2 才启用）
   // 为什么：与“白名单 + 下限语义”保持一致，避免在多位/any 表达上产生歧义
-  if (rawFilters.isFurnished === true) {
+  if (params.furnished == null && rawFilters.isFurnished === true) {
     params.furnished = true
   }
   // 浴室下限：'any' 省略；'3+' -> 3；'2' -> 2
-  if (rawFilters.bathrooms) {
+  if (params.bathrooms_min == null && rawFilters.bathrooms) {
     const bRaw = Array.isArray(rawFilters.bathrooms)
       ? rawFilters.bathrooms[0]
       : String(rawFilters.bathrooms).split(',')[0]
@@ -133,7 +146,7 @@ const mapFilterStateToApiParams = (
     }
   }
   // 车位下限：'any' 省略；'2+' -> 2；'0' -> 0（有效）
-  if (rawFilters.parking) {
+  if (params.parking_min == null && rawFilters.parking) {
     const pRaw = Array.isArray(rawFilters.parking)
       ? rawFilters.parking[0]
       : String(rawFilters.parking).split(',')[0]
@@ -158,18 +171,6 @@ const mapFilterStateToApiParams = (
  * 为什么：More 面板产生的是 isFurnished/bathrooms/parking 等键；当出现这些键时应切换到 V2 白名单映射，
  * 避免以 V1 键名（如 isFurnished）请求导致后端不识别。
  */
-const _hasAdvancedV2Keys = (obj = {}) => {
-  try {
-    if (!obj || typeof obj !== 'object') return false
-    if (obj.isFurnished === true) return true
-    if (obj.bathrooms && obj.bathrooms !== 'any' && String(obj.bathrooms).length) return true
-    if (obj.parking && obj.parking !== 'any' && String(obj.parking).length) return true
-    if (obj.postcodes && String(obj.postcodes).length) return true
-    return false
-  } catch {
-    return false
-  }
-}
 
 // 特性开关守卫工具：检测是否已选择“区域”（suburb/postcode）
 // 目的：在 UI 禁用之外，增加 Store 侧的早返回保护，避免无意义的接口请求
@@ -552,7 +553,8 @@ export const usePropertiesStore = defineStore('properties', {
         }
         // 统一通过映射层构造请求参数
         // 目的：维持 V1 行为（默认），并可通过开关无缝切至 V2 契约（suburbs/price_min/...）
-        const useV2 = enableFilterV2 || _hasAdvancedV2Keys(filters)
+        // 中文注释：P0 稳定策略——仅当显式开启开关时才走 V2，禁用“按需切换”以防契约不一致
+        const useV2 = enableFilterV2
         const mappedParams = mapFilterStateToApiParams(
           filters,
           this.selectedLocations,
@@ -708,7 +710,8 @@ export const usePropertiesStore = defineStore('properties', {
           return 0
         }
         // 计数亦走统一映射，确保与列表参数一致
-        const useV2 = enableFilterV2 || _hasAdvancedV2Keys(params)
+        // 中文注释：P0 稳定策略——仅当显式开启开关时才走 V2，禁用“按需切换”以防契约不一致
+        const useV2 = enableFilterV2
         const mappedParams = mapFilterStateToApiParams(
           params,
           this.selectedLocations,

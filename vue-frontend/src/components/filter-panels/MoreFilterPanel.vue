@@ -2,8 +2,8 @@
   <div class="more-filter-panel">
     <!-- 面板头部 -->
     <div class="panel-header">
-      <h3 class="panel-title chinese-text">{{ moreLabel }}</h3>
-      <button class="close-btn" @click="$emit('close')" aria-label="关闭更多筛选面板">
+      <h3 class="panel-title chinese-text sr-only">{{ moreLabel }}</h3>
+      <button class="close-btn" tabindex="-1" @click="$emit('close')" aria-label="关闭更多筛选面板">
         <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -19,56 +19,22 @@
         </el-checkbox>
       </div>
 
-      <!-- 最少浴室数 -->
-      <div class="form-row">
-        <label class="form-label" :for="bathroomsId">{{ bathroomsLabel }}</label>
-        <el-select
-          :id="bathroomsId"
-          ref="firstFocusableRef"
-          v-model="bathrooms"
-          placeholder="不限"
-          class="w-full"
-        >
-          <el-option :label="anyLabel" value="any" />
-          <el-option label="1+" value="1+" />
-          <el-option label="2+" value="2+" />
-          <el-option label="3+" value="3+" />
-          <el-option label="4+" value="4+" />
-        </el-select>
-      </div>
 
-      <!-- 最少车位数 -->
-      <div class="form-row">
-        <label class="form-label" :for="parkingId">{{ parkingLabel }}</label>
-        <el-select
-          :id="parkingId"
-          v-model="parking"
-          placeholder="不限"
-          class="w-full"
-        >
-          <el-option :label="anyLabel" value="any" />
-          <el-option label="0" value="0" />
-          <el-option label="1+" value="1+" />
-          <el-option label="2+" value="2+" />
-          <el-option label="3+" value="3+" />
-        </el-select>
-      </div>
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="default" @click="$emit('close')">
-          {{ $t('filter.cancel') }}
+        <button class="link-clear" type="button" aria-label="清除更多筛选条件" @click="clearAll">清除</button>
+        <el-button type="primary" class="apply-btn" size="default" :loading="countLoading" :disabled="countLoading" @click="apply">
+          {{ applyText }}
         </el-button>
-        <el-button type="primary" class="apply-btn" size="default" @click="apply">
-          {{ $t('filter.apply') }}
-        </el-button>
+        <span class="sr-only" aria-live="polite">{{ srLiveText }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject, nextTick, onMounted } from 'vue'
+import { ref, computed, inject, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 
@@ -78,19 +44,53 @@ const emit = defineEmits(['close'])
 const router = useRouter()
 const t = inject('t') || ((k) => k)
 
-// 本地状态（默认值：不限/未勾选）
-const furnished = ref(false)           // 是否带家具（true 才透传）
-const bathrooms = ref('any')           // 'any' | '1+' | '2+' | '3+' | '4+'
-const parking = ref('any')             // 'any' | '0' | '1+' | '2+' | '3+'
+/* 本地状态（默认值：未勾选）仅保留“带家具” */
+const furnished = ref(false)
 
-// 可达性：首个可交互控件（打开时尝试聚焦）
-const firstFocusableRef = ref(null)
-onMounted(() => {
-  nextTick(() => {
-    // element-plus 的 el-select 支持 focus()
-    firstFocusableRef.value?.focus?.()
-  })
+/* 计数相关（应用（N）） */
+const previewCount = ref(null)
+const countLoading = ref(false)
+let _countTimer = null
+const applyText = computed(() => (typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用'))
+const srLiveText = computed(() => (typeof previewCount.value === 'number' ? `可用结果 ${previewCount.value} 条` : ''))
+
+/* 构建参数（仅 isFurnished） */
+const buildFilterParams = () => {
+  const p = {}
+  if (furnished.value === true) p.isFurnished = true
+  return p
+}
+
+/* 计数：将草稿覆盖到当前已应用条件（保障必要关联） */
+const computePreviewCount = async () => {
+  try {
+    countLoading.value = true
+    const draft = buildFilterParams()
+    const base = propertiesStore.currentFilterParams || {}
+    const merged = { ...base, ...draft }
+    const n = await propertiesStore.getFilteredCount(merged)
+    previewCount.value = Number.isFinite(n) ? n : 0
+  } catch (e) {
+    previewCount.value = null
+    console.warn('获取更多筛选预估数量失败', e)
+  } finally {
+    countLoading.value = false
+  }
+}
+
+/* 监听与首算（300ms 防抖） */
+watch(furnished, () => {
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
 })
+onMounted(() => computePreviewCount())
+
+/* 清除：重置并触发计数 */
+const clearAll = () => {
+  furnished.value = false
+  if (_countTimer) clearTimeout(_countTimer)
+  _countTimer = setTimeout(() => computePreviewCount(), 300)
+}
 
 // i18n 文案（带回退）
 const moreLabel = computed(() => {
@@ -101,26 +101,11 @@ const furnishedLabel = computed(() => {
   const v = t('filter.furnished')
   return v && v !== 'filter.furnished' ? v : '带家具'
 })
-const bathroomsLabel = computed(() => {
-  const v = t('filter.bathroomsMin')
-  return v && v !== 'filter.bathroomsMin' ? v : '最少浴室数'
-})
-const parkingLabel = computed(() => {
-  const v = t('filter.parkingMin')
-  return v && v !== 'filter.parkingMin' ? v : '最少车位数'
-})
-const anyLabel = computed(() => {
-  const v = t('filter.any')
-  return v && v !== 'filter.any' ? v : '不限'
-})
 
-// 唯一 id（简化处理）
-const bathroomsId = `bathrooms-${Math.random().toString(36).slice(2, 7)}`
-const parkingId = `parking-${Math.random().toString(36).slice(2, 7)}`
 
 const propertiesStore = usePropertiesStore()
 
-// 同步 URL（仅写入非空/有效参数）
+/* 同步 URL（仅写入非空/有效参数） */
 const updateUrlQuery = async (filterParams) => {
   try {
     const currentQuery = { ...router.currentRoute.value.query }
@@ -133,20 +118,6 @@ const updateUrlQuery = async (filterParams) => {
       delete newQuery.isFurnished
     }
 
-    // 浴室：'any' 不写入，其它写入原始表达（如 '3+')
-    if (filterParams.bathrooms && filterParams.bathrooms !== 'any') {
-      newQuery.bathrooms = filterParams.bathrooms
-    } else {
-      delete newQuery.bathrooms
-    }
-
-    // 车位：'any' 不写入；'0' 允许写入（有效）
-    if (filterParams.parking && filterParams.parking !== 'any') {
-      newQuery.parking = filterParams.parking
-    } else {
-      delete newQuery.parking
-    }
-
     // 幂等比对
     if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
       await router.replace({ query: newQuery })
@@ -156,22 +127,12 @@ const updateUrlQuery = async (filterParams) => {
   }
 }
 
-// 应用筛选（提交到 store）
+/* 应用筛选（提交到 store） */
 const apply = async () => {
   try {
-    // 构造最小参数集（遵循“仅非空写入”）
-    const filterParams = {}
-    if (furnished.value === true) filterParams.isFurnished = true
-    if (bathrooms.value && bathrooms.value !== 'any') filterParams.bathrooms = bathrooms.value
-    if (parking.value && parking.value !== 'any') filterParams.parking = parking.value
-
-    // 说明（为什么）：Store 的 mapFilterStateToApiParams 会在 V2 下将其映射为
-    // furnished/bathrooms_min/parking_min；V1 下则透传原键（后端可忽略）。
+    const filterParams = buildFilterParams()
     await propertiesStore.applyFilters(filterParams)
-
-    // URL 同步：仅写入非空（保持可复现）
     await updateUrlQuery(filterParams)
-
     emit('close')
   } catch (err) {
     console.error('应用更多筛选失败:', err)
@@ -263,4 +224,31 @@ const apply = async () => {
 
 /* 细节 */
 .w-full { width: 100%; }
+
+/* sr-only 辅助样式 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 清除按钮样式（与其他面板一致） */
+.link-clear {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-right: auto;
+}
+.link-clear:hover {
+  color: var(--color-text-primary);
+}
 </style>

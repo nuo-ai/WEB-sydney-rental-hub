@@ -2,6 +2,7 @@
 最后更新：2025-09-08
 
 今日快照（精简版，≤10行）
+- FILTER-PANELS-UNIFY-380：PC 全部面板统一宽 380；日期输入 PC 作用域瘦身（suffix-hit 20/ right 8/ min-ch 10ch/ padding-left 8/ group gap 6/ “至” 2px）；保留 1px 中性灰焦点；溯源：commit 9627f697
 - FILTER-MORE-PANEL-PC：新增“更多”分离式面板（furnished/bathrooms_min/parking_min）；FilterTabs 接入；store 按需启用 V2 映射；URL 同步非空；溯源：commit 7535437
 - FILTER-DROPDOWN-POSITION-FIX：PC 分离式筛选面板定位异常（左上角 0,0）已修复；策略= FilterTabs 显式坐标 explicitPosition + Dropdown early-return 修正；溯源：commit 63ac851
 - UI-EP-SCROLL-NEUTRAL-1：全局/面板滚动指示器中性化已完成；下一步待定：统一“主滚动职责”

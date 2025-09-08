@@ -3,7 +3,7 @@
     <!-- 面板头部 -->
     <div class="panel-header">
       <h3 class="panel-title chinese-text">{{ locationLabel }}</h3>
-      <button class="close-btn" @click="$emit('close')" aria-label="关闭区域筛选面板">
+      <button class="close-btn" tabindex="-1" @click="$emit('close')" aria-label="关闭区域筛选面板">
         <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>

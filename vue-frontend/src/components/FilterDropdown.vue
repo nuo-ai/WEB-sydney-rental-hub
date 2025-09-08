@@ -66,6 +66,20 @@ const isOpen = computed({
 const dropdownRef = ref(null)
 const positionStyle = ref({})
 
+// 中文注释：记录关闭后要恢复的焦点来源（优先使用触发器，其次使用关闭前的活动元素）
+const previousActiveElement = ref(null)
+const restoreFocus = () => {
+  // 优先将焦点还给触发器，其次是关闭前记录的活动元素
+  const triggerEl = props.trigger?.value
+  const target = (triggerEl && typeof triggerEl.focus === 'function') ? triggerEl
+    : (previousActiveElement.value && typeof previousActiveElement.value.focus === 'function') ? previousActiveElement.value
+    : null
+  if (target) {
+    // 使用 rAF 确保在 DOM 更新与过渡后再聚焦
+    requestAnimationFrame(() => target.focus())
+  }
+}
+
 // 中文注释：计算下拉面板的位置，确保正确对齐在触发元素下方
 const calculatePosition = () => {
   // 中文注释：若提供了显式坐标，则优先使用，避免任何时序问题
@@ -137,6 +151,8 @@ const updatePosition = () => {
 const closeDropdown = () => {
   isOpen.value = false
   emit('close')
+  // 中文注释：关闭后还原焦点到触发器（或先前聚焦元素），提升可达性
+  restoreFocus()
 }
 
 // 中文注释：处理ESC键关闭
@@ -217,6 +233,8 @@ const getFocusableElements = () => {
  // 中文注释：监听面板打开状态（锁滚 + 焦点首控件 + 定位确认）
 watch(() => isOpen.value, (newVal) => {
   if (newVal) {
+    // 中文注释：记录打开前的活动元素，关闭时用于还原焦点
+    previousActiveElement.value = document.activeElement
     // 中文注释：首次打开立即计算一次，并锁定 body 滚动
     lockBodyScroll()
     updatePosition()
@@ -268,8 +286,9 @@ onUnmounted(() => {
 })
 
 onUnmounted(() => {
-  // 中文注释：组件卸载时确保恢复页面滚动
+  // 中文注释：组件卸载时确保恢复页面滚动，并尝试将焦点还原到触发器
   unlockBodyScroll()
+  restoreFocus()
 })
 </script>
 
