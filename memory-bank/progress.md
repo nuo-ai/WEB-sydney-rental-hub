@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-08｜SORT-P0  
+  列表排序功能落地：后端 /api/properties 支持 sort 白名单（price_asc/available_date_asc/suburb_az/inspection_earliest；inspection_earliest 暂等价 available_date_asc），稳定次序 listing_id ASC；前端 fetchProperties 统一兜底跨页保留排序｜溯源：commit 7bd269b..54ba6c1
 - 2025-09-08｜REGION-FILTER-P0-FIX  
   区域筛选彻底修复（V1 契约）：仅选“邮编”时自动展开为多个 suburb 注入 suburb CSV；计数与列表口径一致；本地目录聚合 postcode.suburbs 兜底｜溯源：commit a331c69..27b9cf6
 - 2025-09-08｜FURNISHED-FILTER-FIX-V1  

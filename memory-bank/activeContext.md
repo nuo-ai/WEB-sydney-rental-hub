@@ -24,6 +24,8 @@
 - [回归] 多组合验证：区域+价格/卧室+家具；计数与列表 pagination.total 一致
 
 最新完成
+- 2025-09-08｜SORT-P0
+  列表排序功能落地：后端 /api/properties 支持 sort 白名单（price_asc/available_date_asc/suburb_az/inspection_earliest；inspection_earliest 暂等价 available_date_asc），稳定次序 listing_id ASC；前端 fetchProperties 统一兜底跨页保留排序。溯源：commit 7bd269b..54ba6c1
 - 2025-09-08｜MOBILE-SEARCH-DIRECT-FILTER
   移动端搜索框直连筛选面板功能完成：移除中间 SearchOverlay 步骤，点击搜索框直接打开筛选面板；优化可访问性（aria-label/role 区分移动/桌面角色）；添加移动端点击反馈效果；保留内嵌标签回显；移除未使用变量，ESLint 合规。用户体验更直接高效｜溯源：commit 7bd269b
 - 2025-09-08｜SEARCH-OVERLAY-COMPONENT-REFACTOR
