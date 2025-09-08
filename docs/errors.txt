@@ -1,33 +1,36 @@
-js?key=AIzaSyAwZa-eQ…braries=places:1289 InvalidValueError: setCenter: not a LatLng or LatLngLiteral with finite coordinates: in property lat: not a number
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1289
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1291
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1310
-applyCenterLock	@	GoogleMap.vue:138
-（匿名）	@	GoogleMap.vue:439
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1301
-b	@	map.js:37
-requestAnimationFrame		
-（匿名）	@	common.js:79
-ata	@	map.js:37
-（匿名）	@	map.js:101
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1556
-setTimeout		
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1342
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1556
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1343
-（匿名）	@	map.js:101
-iI	@	map.js:38
-mua	@	map.js:102
-zua	@	map.js:68
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1370
-Promise.then		
-（匿名）	@	js?key=AIzaSyAwZa-eQ…braries=places:1370
-initMap	@	GoogleMap.vue:425
-await in initMap		
-（匿名）	@	GoogleMap.vue:583
-Promise.then		
-fetchPropertyDetail	@	properties.js:513
-await in fetchPropertyDetail		
-（匿名）	@	PropertyDetail.vue:685
-Promise.then		
-（匿名）	@	main.js:32
+[{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "eslint8",
+	"severity": 4,
+	"message": "Unused eslint-disable directive (no problems were reported from 'no-console').",
+	"source": "eslint",
+	"startLineNumber": 828,
+	"startColumn": 11,
+	"endLineNumber": 828,
+	"endColumn": 11,
+	"origin": "extHost1"
+}]
+
+[{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "eslint8",
+	"severity": 4,
+	"message": "Unused eslint-disable directive (no problems were reported from 'no-console').",
+	"source": "eslint",
+	"startLineNumber": 642,
+	"startColumn": 11,
+	"endLineNumber": 642,
+	"endColumn": 11,
+	"origin": "extHost1"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "eslint8",
+	"severity": 4,
+	"message": "Unused eslint-disable directive (no problems were reported from 'no-console').",
+	"source": "eslint",
+	"startLineNumber": 828,
+	"startColumn": 11,
+	"endLineNumber": 828,
+	"endColumn": 11,
+	"origin": "extHost1"
+}]

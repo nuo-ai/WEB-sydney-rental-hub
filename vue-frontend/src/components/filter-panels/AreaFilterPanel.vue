@@ -35,7 +35,7 @@
           <button class="clear-all" type="button" @click="clearAllLocations">
             {{ clearAllLabel }}
           </button>
-          <button class="toggle-chips" type="button" @click="chipsCollapsed = !chipsCollapsed">
+          <button class="toggle-chips" :class="{ expanded: !chipsCollapsed }" type="button" @click="chipsCollapsed = !chipsCollapsed">
             {{ chipsCollapsed ? '展开' : '收起' }}
           </button>
         </div>
@@ -360,10 +360,10 @@ const applyFilters = async () => {
 
 /* 区域列表样式 */
 .location-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* 中文注释：自适应形成 2–3 列 */
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .location-chip {
@@ -371,73 +371,134 @@ const applyFilters = async () => {
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  border: 1px solid var(--color-border-default);
-  border-radius: 0;
-  background: var(--chip-bg, #f7f8fa);
-  max-width: 140px; /* 中文注释：限制单个标签宽度，避免长词撑破布局 */
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #f9fafb;
+  max-width: 200px;
+  transition: all 0.15s ease;
+}
+
+.location-chip:hover {
+  border-color: #9ca3af;
+  background: #f3f4f6;
 }
 
 .location-chip .chip-text {
-  font-size: 14px;
-  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
 }
 
 .location-chip .chip-remove {
-  background: transparent;
+  background: #e5e7eb;
   border: none;
-  color: var(--color-text-secondary);
+  color: #6b7280;
   width: 16px;
   height: 16px;
-  border-radius: 0;
+  border-radius: 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .location-chip .chip-remove:hover {
-  background: transparent;
-  color: var(--color-text-primary);
+  background: #dc2626;
+  color: white;
 }
 
 .location-actions {
-  margin-top: 6px;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
 }
 
 .clear-all {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
+  color: #64748b;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.clear-all:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.toggle-chips {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toggle-chips:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.toggle-chips::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid currentColor;
+  transition: transform 0.2s ease;
+}
+
+.toggle-chips.expanded::after {
+  transform: rotate(180deg);
 }
 
 /* 空态提示 */
 .location-empty {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .location-empty .empty-box {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px;
-  border: none;
-  background: var(--chip-bg, #f7f8fa);
-  border-radius: 0;
-  padding: 10px 12px;
+  border: 1px solid #f1f5f9;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 20px 16px;
+  text-align: center;
 }
 
 .location-empty .empty-text {
-  font-size: 13px;
-  color: var(--color-text-secondary, #6b7280);
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 /* 包含周边选项 */
@@ -479,23 +540,5 @@ const applyFilters = async () => {
 .apply-btn:hover {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
-}
-.toggle-chips {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  font-size: 13px;
-  cursor: pointer;
-  padding: 0 4px;
-}
-
-/* 中文注释：移除 chip 右侧的“均分”布局，改为内联，移出时保持命中区域小巧 */
-.location-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 6px;
-  margin-bottom: 12px;
 }
 </style>

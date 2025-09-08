@@ -18,5 +18,5 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
-- [P0] 与后端确认家具契约：V1 键名/取值（如 is_furnished=1）或 V2（furnished=1/true）；据此启用 enableFilterV2 或在 V1 分支添加映射
+- [P0] 与后端确认家具契约（V1/V2 对齐），据此启用 enableFilterV2 或在 V1 分支添加映射｜溯源：27b9cf6..a84f3ac
 - [回归] 多组合验证：区域+价格/卧室+家具；计数与列表 pagination.total 一致

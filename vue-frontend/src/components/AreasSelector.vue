@@ -1,21 +1,38 @@
 <template>
   <div class="areas-selector">
     <div class="areas-header">
-      <input
-        v-model="keyword"
-        type="text"
-        class="areas-search"
-        :placeholder="placeholderText"
-        @input="onSearch"
-        aria-label="搜索区域"
-      />
+      <div class="search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          v-model="keyword"
+          type="text"
+          class="areas-search"
+          :placeholder="placeholderText"
+          @input="onSearch"
+          aria-label="搜索区域"
+        />
+        <button
+          v-if="keyword"
+          class="clear-search-btn"
+          type="button"
+          @click="keyword = ''"
+          aria-label="清除搜索"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
       <button
-        class="clear-btn"
+        class="clear-all-btn"
         type="button"
         :disabled="(selected || []).length === 0"
         @click="clearAll"
       >
-        清空
+        清空全部
       </button>
     </div>
 
@@ -38,6 +55,7 @@
               v-for="a in group.items"
               :key="areaKey(a)"
               class="area-item"
+              :class="{ selected: isSelected(a) }"
             >
               <label class="area-row">
                 <input
@@ -256,62 +274,109 @@ watch(
 
 .areas-header {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .areas-search {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 12px;
+  width: 100%;
+  padding: 12px 16px 12px 40px;
   font-size: 14px;
   color: var(--color-text-primary);
   background: #ffffff;
   border: 1px solid var(--color-border-default);
-  border-radius: 0; /* 强约束：无圆角 */
+  border-radius: 6px;
   outline: none;
+  transition: all 0.2s ease;
 }
 
 .areas-search:focus {
-  border-color: var(--color-border-strong);
+  border-color: #6b7280;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
 }
 
-.clear-btn {
+.areas-search:hover:not(:focus) {
+  border-color: #9ca3af;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  background: #f3f4f6;
+  color: var(--color-text-primary);
+}
+
+.clear-all-btn {
   flex: none;
-  padding: 10px 12px;
+  padding: 12px 16px;
   font-size: 14px;
+  font-weight: 500;
   background: #fff;
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border-default);
-  border-radius: 0; /* 强约束：无圆角 */
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.clear-btn:hover:not(:disabled) {
-  background: #f7f8fa;
+.clear-all-btn:hover:not(:disabled) {
+  background: #f9fafb;
   color: var(--color-text-primary);
   border-color: var(--color-border-strong);
 }
 
-.clear-btn:disabled {
-  opacity: 0.6;
+.clear-all-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  background: #f9fafb;
 }
 
 .areas-body {
-  max-height: 260px;
+  max-height: 280px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   border: 1px solid var(--color-border-default);
-  border-radius: 0; /* 强约束：无圆角 */
+  border-radius: 6px;
+  background: #ffffff;
 }
 
 .loading-row,
 .empty-row {
-  padding: 10px 12px;
-  font-size: 13px;
+  padding: 20px 16px;
+  font-size: 14px;
   color: var(--color-text-secondary);
-  background: var(--chip-bg, #f7f8fa);
+  background: #f9fafb;
+  text-align: center;
+  border-radius: 6px;
 }
 
 .group {
@@ -321,12 +386,14 @@ watch(
 .group-title {
   position: sticky;
   top: 0;
-  background: #fff;
-  z-index: 1;
-  padding: 6px 10px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--color-border-default);
+  background: #f8fafc;
+  z-index: 2;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid #e2e8f0;
+  letter-spacing: 0.025em;
 }
 
 .group-list {
@@ -336,31 +403,68 @@ watch(
 }
 
 .area-item {
-  border-bottom: 1px solid var(--color-border-default);
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
 }
 
 .area-item:last-child {
   border-bottom: none;
 }
 
+.area-item:hover {
+  background: #f8fafc;
+}
+
 .area-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 12px;
+  padding: 14px 16px;
   cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 48px;
 }
 
 .check {
-  width: 16px;
-  height: 16px;
-  border-radius: 0; /* 强约束：无圆角 */
-  accent-color: var(--color-border-strong); /* 中性色系 */
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  accent-color: #6b7280;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.check:hover {
+  transform: scale(1.05);
 }
 
 .area-name {
   font-size: 14px;
   color: var(--color-text-primary);
   user-select: none;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* 选中状态的行样式 */
+.area-item:has(.check:checked) {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.area-item:has(.check:checked) .area-name {
+  color: #374151;
+  font-weight: 600;
+}
+
+/* 如果浏览器不支持 :has，使用 JavaScript 类名回退 */
+.area-item.selected {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.area-item.selected .area-name {
+  color: #374151;
+  font-weight: 600;
 }
 </style>

@@ -28,7 +28,7 @@
 - 2025-09-08｜FILTER-BEDROOMS-PANEL-EXT  
   卧室面板并入“浴室/车位”；PC 宽 380、面板内不滚动；“应用（N）”计数与 URL 同步
 - 2025-09-08｜FILTER-PRICE-SIMPLE-380  
-  价格面板极简（仅数字展示 + 双手柄滑轨 + 清除/应用（N））；PC 宽 380，无内滚；URL 仅写非空｜溯源：commit 5e4baf5
+![1757304441152](image/progress/1757304441152.png)  价格面板极简（仅数字展示 + 双手柄滑轨 + 清除/应用（N））；PC 宽 380，无内滚；URL 仅写非空｜溯源：commit 5e4baf5
 - 2025-09-07｜TITLE-AREA & FOCUS-GUARDRAIL  
   列表页标题区重构；src/style.css 增加可见性护栏（:focus-visible 基线）；提升一致性与可达性
 - 2025-09-06｜FILTER-PANEL-LOCATION + PAGINATION-GUARD  
@@ -39,6 +39,8 @@
   导航 hover 橙色、无灰底；EP 交互灰阶护栏（二轮）
 - 2025-09-05｜FILTER-EXPERIENCE-STACK  
   V1→V2 兼容层、URL 同步、错误策略与性能观测（>800ms 报警）
+- 2025-09-05｜RICH-TEXT-UNIFY  
+  统一 Markdown 渲染组件；PropertyDetail 富文本描述标准化；移除重复解析逻辑；提升内容展示一致性｜溯源：commit 范围待补充
 - 2025-09-05｜UI-PILL-COUNTER  
   图片计数器复刻（稳定 1/2 位/99+）；清理无用代码
 - 2025-09-05｜UI-FILTER-ENTRY-UNIFY  
