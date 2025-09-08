@@ -213,8 +213,9 @@ const computePosition = (el) => {
 }
 
 // 移动端判断
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 const isMobile = computed(() => {
-  return typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  return viewportWidth.value < 768
 })
 
 // 切换面板显示状态
@@ -228,6 +229,10 @@ const togglePanel = (panel, evt) => {
 
 // 全局事件处理
 const handleResize = () => {
+  // 同步视口宽度为响应式依赖，驱动 isMobile 重新计算
+  if (typeof window !== 'undefined') {
+    viewportWidth.value = window.innerWidth
+  }
   // 当切换到移动端视图时，自动关闭任何打开的面板
   if (isMobile.value && activePanel.value) {
     activePanel.value = null
@@ -242,6 +247,10 @@ const handleResize = () => {
 
 // 生命周期钩子
 onMounted(() => {
+  // 中文注释：组件挂载时即同步一次视口宽度，避免 SSR/初始值造成的断点误判
+  if (typeof window !== 'undefined') {
+    viewportWidth.value = window.innerWidth
+  }
   window.addEventListener('resize', handleResize)
 })
 

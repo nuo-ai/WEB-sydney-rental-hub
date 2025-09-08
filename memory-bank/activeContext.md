@@ -2,6 +2,8 @@
 最后更新：2025-09-08
 
 今日快照（精简版，≤10行）
+- FURNISHED-FILTER-FIX-V1：前端改为直接传 isFurnished=true（容错 true/'1'/1/'true'/'yes'），与后端 /api/properties 接口契约一致（SQL 基于 is_furnished yes/no/unknown）；添加 FILTER-DEBUG 输出以核对最终请求参数；ESLint 清理完毕。溯源：commit bade186（范围 48bad16..bade186）
+- PREVIEW-DRAFT-UNIFY-DONE：Area/Bedrooms/Price/Availability/More 五个面板全部接入全局 previewDraft + getPreviewCount，清除/应用时清理分组草稿，确保“应用（N）”与列表总数统一口径。溯源：bade186
 - FIX-FILTERS-COUNT-P0：禁用“按需 V2 映射”，统一走 V1 契约；V1 分支移除 isFurnished，避免后端不识别导致计数暴涨；计数与列表一致性恢复。溯源：commit 48bad16（范围 9627f69..48bad16）
 - MORE-PANEL-SIMPLIFY：仅保“带家具”开关；接入计数器（300ms 防抖）；按钮“清除/应用（N）”；aria-live 播报；URL 仅在 true 时写 isFurnished=1（保持“仅非空参数”）。溯源：48bad16
 - DROPDOWN-A11Y-TRAP：FilterDropdown 加固（锁定 body 滚动、Esc 关闭、Tab/Shift+Tab 焦点陷阱、关闭后焦点还原至触发器、首控聚焦）。溯源：48bad16

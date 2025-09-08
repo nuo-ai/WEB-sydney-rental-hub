@@ -191,7 +191,7 @@
           :disabled="!isDateRangeValid"
           :aria-label="`确定（${filteredCount} 条结果）`"
         >
-          确定
+          确定（{{ filteredCount }} 条结果）
         </el-button>
       </div>
     </div>

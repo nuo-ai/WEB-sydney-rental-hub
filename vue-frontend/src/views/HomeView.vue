@@ -685,7 +685,7 @@ onUnmounted(() => {
   }
 
   .filter-tabs-right {
-    display: none; /* 移动端隐藏四个 Chips */
+    display: inline-flex; /* 移动端显示 FilterTabs 组件（内部会自动切换为“筛选”按钮） */
   }
 
   .filter-trigger-btn {
