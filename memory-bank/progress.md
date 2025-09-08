@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-09｜SUPABASE-DATA-SYNC-P0  
+  修复 Supabase 同步滞后与邮编小数点：ETL 扩展更新判定（available_date/inspection_times/postcode/property_headline），统一 postcode 为4位字符串；前端表现：看房时间/空出日期与CSV一致，“NSW 2010.0”→“NSW 2010”。｜溯源：commit 53ff509..1b96baa
 - 2025-09-08｜SORT-P0  
   列表排序功能落地：后端 /api/properties 支持 sort 白名单（price_asc/available_date_asc/suburb_az/inspection_earliest；inspection_earliest 暂等价 available_date_asc），稳定次序 listing_id ASC；前端 fetchProperties 统一兜底跨页保留排序｜溯源：commit 7bd269b..54ba6c1
 - 2025-09-08｜REGION-FILTER-P0-FIX  

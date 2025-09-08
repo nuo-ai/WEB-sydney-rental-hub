@@ -238,6 +238,19 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 任何异常场景下可一键回退，确保向后兼容。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
+## 数据同步与清洗原则（新增）
+- 原则：数据库为“单一真源”；ETL 需同时保证“字段规范化 + 关键字段变更即更新”；缓存层与UI展示应考虑TTL滞后。
+- Postcode 规范化：
+  - 入库前统一提取4位数字字符串（如 "2010.0" → "2010"），空值置空字符串，禁止浮点字符串写入。
+  - 为什么：CSV 列混型常使 pandas 推断为 float，写回 DB 变成 “2010.0”，导致前端地址出现小数点。
+- ETL 更新判定（关键字段）：
+  - 触发更新除 rent_pw 外，还需包含 available_date、inspection_times、postcode、property_headline 任一变化。
+  - 写回时同步更新 status/status_changed_at，保持 is_active=TRUE，确保前端展示跟随最新爬取数据。
+- 缓存与可见性：
+  - 若启用 Redis（默认TTL≈15分钟），修复落库后前端可能短暂滞后；等待TTL或选择性清理缓存。
+  - 后端建议提供“选择性失效”接口，避免旧缓存长期污染响应。
+- 溯源：commit 53ff509..1b96baa｜SUPABASE-DATA-SYNC-P0
+
 ## 更多高级筛选模式（新增）
 - 原则：PC 端"更多"面板承载高级条件（furnished/bathrooms_min/parking_min）；仅在"应用"时提交到 Pinia；URL 仅写入非空参数。
 - 定位与交互：沿用分离式下拉（FilterDropdown）显式坐标策略、单例打开、ESC/外点关闭；打开时首控件获焦点，Tab 顺序在面板内闭环。

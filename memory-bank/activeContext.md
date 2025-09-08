@@ -1,7 +1,8 @@
 # 当前上下文与紧急焦点
-最后更新：2025-09-08
+最后更新：2025-09-09
 
 今日快照（精简版，≤10行）
+- SUPABASE-DATA-SYNC-P0：修复 Supabase 同步滞后与邮编小数点；ETL 扩展更新判定（available_date/inspection_times/postcode/property_headline），统一 postcode 4位字符串；前端表现：看房时间/空出日期与CSV一致，“NSW 2010.0”→“NSW 2010”。溯源：commit 53ff509..1b96baa
 - REGION-FILTER-P0-FIX：区域筛选彻底修复（V1 契约）。当仅选择“邮编”时，自动展开为其下属多个 suburb 并注入 suburb CSV；计数(getFilteredCount)与列表(applyFilters)口径一致；本地区域目录聚合 postcode.suburbs 作为兜底。溯源：commit a331c69..27b9cf6
 - FURNISHED-FILTER-FIX-V1：前端改为直接传 isFurnished=true（容错 true/'1'/1/'true'/'yes'），与后端 /api/properties 接口契约一致（SQL 基于 is_furnished yes/no/unknown）；添加 FILTER-DEBUG 输出以核对最终请求参数；ESLint 清理完毕。溯源：commit bade186（范围 48bad16..bade186）
 - PREVIEW-DRAFT-UNIFY-DONE：Area/Bedrooms/Price/Availability/More 五个面板全部接入全局 previewDraft + getPreviewCount，清除/应用时清理分组草稿，确保“应用（N）”与列表总数统一口径。溯源：bade186
@@ -11,8 +12,6 @@
 - AREA/MORE：面板关闭按钮 tabindex="-1"，避免首焦点误落在关闭按钮。溯源：48bad16
 - V2 映射：保留白名单透传与 suburb→suburbs 兜底，但默认不开启（enableFilterV2=false）；待后端契约（furnished/布尔取值）对齐后再启用。溯源：48bad16
 - FILTER-TABS 定位：explicitPosition + early-return 修正已稳定（无 0,0 回归）。溯源：63ac851
-- PC 面板统一宽 380、内部不滚动目标维持（价格/卧室面板已对齐）。溯源：9627f697 等
-- URL 同步：仅写入非空；分页参数守卫生效（防 page_size=1 串扰）。溯源：既有策略
 
 服务状态
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好

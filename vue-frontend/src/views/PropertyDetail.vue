@@ -233,7 +233,7 @@
               </div>
             </div>
             <div v-else class="no-inspection-times">
-              暂无公开的看房时间
+              当前无开放时间，请联系客服确认房源状态。
             </div>
           </section>
 
@@ -428,29 +428,39 @@ const inspectionTimes = computed(() => {
 
   const raw = property.value.inspection_times
 
+  // 中文注释：过滤无效值，确保不显示 null 或空白内容
   // 统一解析单个时间段字符串
   const parseEntry = (entry) => {
-    if (typeof entry !== 'string') return entry
+    if (typeof entry !== 'string' || !entry.trim()) return null
     const parts = entry.split(',')
+    const date = parts.slice(0, -1).join(',').trim()
+    const time = parts[parts.length - 1]?.trim() || ''
+
+    // 中文注释：过滤掉无效的日期时间条目
+    if (!date || !time) return null
+
     return {
-      date: parts.slice(0, -1).join(',').trim(),
-      time: parts[parts.length - 1]?.trim() || '',
+      date,
+      time,
     }
   }
 
+  let parsed = []
+
   if (typeof raw === 'string') {
-    return raw
+    parsed = raw
       .split(/;|\n|\|/)
       .map((s) => s.trim())
       .filter(Boolean)
       .map(parseEntry)
+      .filter(Boolean) // 中文注释：移除解析失败的条目
+  } else if (Array.isArray(raw)) {
+    parsed = raw
+      .map(parseEntry)
+      .filter(Boolean) // 中文注释：移除解析失败的条目
   }
 
-  if (Array.isArray(raw)) {
-    return raw.map(parseEntry)
-  }
-
-  return []
+  return parsed
 })
 
 /* 中文注释：根据断点动态决定地图高度，统一交由 GoogleMap 组件控制，避免外层容器与内部高度不一致导致灰条 */
