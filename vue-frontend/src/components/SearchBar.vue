@@ -8,6 +8,8 @@
         :placeholder="searchPlaceholder"
         size="large"
         class="search-input"
+        :aria-label="isMobile.value ? '点击打开筛选面板' : '搜索区域'"
+        :role="isMobile.value ? 'button' : 'searchbox'"
         @input="handleInput"
         @keydown="handleKeydown"
         @focus="handleFocus"
@@ -123,11 +125,8 @@ const locationSuggestions = ref([])
 const nearbySuggestions = ref([])
 const isLoadingSuggestions = ref(false)
 
-/* 移动端全屏 Overlay 开关（回滚：设为 false 即恢复旧行为） */
-const enableSearchOverlayMobile = true
+/* 移动端全屏 Overlay 状态 */
 const showOverlay = ref(false)
-/* 抑制下一次 Overlay 打开（用于筛选按钮点击场景） */
-const suppressNextOverlayOpen = ref(false)
 /* 引用输入框实例，便于手动 blur 避免 focus 触发 */
 const searchInputRef = ref(null)
 
@@ -258,16 +257,16 @@ const debouncedSearch = debounce((query) => {
 // 事件处理
 const handleFocus = () => {
   isInputFocused.value = true
-  // 若由筛选按钮触发，抑制本次 Overlay 打开
-  if (suppressNextOverlayOpen.value) {
-    suppressNextOverlayOpen.value = false
+
+  // 移动端直接打开筛选面板，不再使用 SearchOverlay
+  if (typeof window !== 'undefined' && window.innerWidth <= 767) {
+    // 阻止输入框获得焦点，避免键盘弹出
+    searchInputRef.value?.blur()
+    emit('openFilterPanel')
     return
   }
-  // 移动端采用全屏 Overlay
-  if (enableSearchOverlayMobile && typeof window !== 'undefined' && window.innerWidth <= 767) {
-    showOverlay.value = true
-    return
-  }
+
+  // 桌面端保持原有逻辑
   showSuggestions.value = true
   // 如果没有输入内容且有选中的区域，加载相邻区域推荐
   if (!searchQuery.value && selectedLocations.value.length > 0) {
@@ -801,6 +800,16 @@ watch(
     width: 100%;
   }
 
+  /* 移动端搜索框样式优化：添加点击反馈效果 */
+  .search-input :deep(.el-input__wrapper) {
+    cursor: pointer; /* 指示可点击 */
+    transition: background-color 0.2s ease;
+  }
+
+  .search-input :deep(.el-input__wrapper:active) {
+    background-color: var(--filter-color-hover-bg, #f5f5f5); /* 点击时背景色变化 */
+  }
+
   .location-suggestions {
     margin-left: -16px;
     margin-right: -16px;
@@ -822,6 +831,5 @@ watch(
   .suggestion-item {
     padding: 16px;
   }
-
 }
 </style>
