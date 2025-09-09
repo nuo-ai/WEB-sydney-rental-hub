@@ -293,6 +293,7 @@ export const usePropertiesStore = defineStore('properties', {
 
         // 处理邮编 (postcode)
         if (property.postcode) {
+          // 前端使用 Math.floor 处理小数点邮编
           const postcode = Math.floor(property.postcode).toString()
           const suburb = property.suburb ? property.suburb.trim() : ''
           const key = `postcode_${postcode}`
@@ -979,20 +980,13 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 切换对比状态
     toggleCompare(propertyId) {
-      const id = String(propertyId)
-      const index = this.compareIds.indexOf(id)
-
+      const index = this.compareList.findIndex(id => id === propertyId)
       if (index > -1) {
-        this.compareIds.splice(index, 1)
-      } else {
-        // 最多只对比4个
-        if (this.compareIds.length < 4) {
-          this.compareIds.push(id)
-        } else {
-          // 在实际应用中，这里应该给用户一个提示
-        }
+        this.compareList.splice(index, 1)
+      } else if (this.compareList.length < 3) {
+        this.compareList.push(propertyId)
       }
-      localStorage.setItem('juwo-compare', JSON.stringify(this.compareIds))
     },
   },
 })
+

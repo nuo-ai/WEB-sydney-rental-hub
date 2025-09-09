@@ -453,6 +453,7 @@ const formatDateToYYYYMMDD = (date) => {
 
 // 选项数据
 const bedroomOptions = [
+  { value: '0', label: 'Studio' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },

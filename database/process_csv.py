@@ -404,7 +404,7 @@ def main():
         logging.info(f"Reading CSV file from: {csv_file_path}")
         try:
             # 显式将 postcode 读取为字符串，避免自动转换为浮点数
-            df = pd.read_csv(csv_file_path, keep_default_na=True, na_values=['', '#N/A', '#N/A N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A', 'NULL', 'NaN', 'n/a', 'nan', 'null', 'NA'], dtype={'postcode': str})
+            df = pd.read_csv(csv_file_path, dtype={'postcode': str})
         except UnicodeDecodeError:
             logging.warning("UTF-8 decoding failed, trying with 'latin1'")
             # 同样在此处应用 dtype

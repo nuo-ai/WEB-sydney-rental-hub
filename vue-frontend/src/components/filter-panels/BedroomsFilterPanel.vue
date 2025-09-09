@@ -124,7 +124,8 @@ const propertiesStore = usePropertiesStore()
 
 // 选项数据
 const bedroomOptions = [
-  // 中文注释：最少卧室数（去除 Studio，后续按需再启用）
+  // 中文注释：Studio（开间）对应 bedrooms=0
+  { value: '0', label: 'Studio' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },

@@ -1,174 +1,552 @@
-Windows PowerShell
-Copyright (C) Microsoft Corporation. All rights reserved.
-
-Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
-
-PS C:\Users\nuoai> Get-CimInstance Win32_OperatingSystem | Select-Object LastBootUpTime, Caption, OSArchitecture | Format-List
-
-
-LastBootUpTime : 9/9/2025 6:26:30 AM
-Caption        : Microsoft Windows 11 Pro
-OSArchitecture : 64-bit
-
-
-
-PS C:\Users\nuoai> Get-Counter '\Processor(_Total)\% Processor Time','\PhysicalDisk(_Total)\% Disk Time','\Memory\Available MBytes' -SampleInterval 1 -MaxSamples 5
-
-Timestamp                  CounterSamples
----------                  --------------
-9/9/2025 8:30:08 AM        \\q\processor(_total)\% processor time :
-                           0.580617828311658
-
-                           \\q\physicaldisk(_total)\% disk time :
-                           0.183140860307484
-
-                           \\q\memory\available mbytes :
-                           15532
-
-
-9/9/2025 8:30:09 AM        \\q\processor(_total)\% processor time :
-                           6.82709931180405
-
-                           \\q\physicaldisk(_total)\% disk time :
-                           0.0960295969733612
-
-                           \\q\memory\available mbytes :
-                           15543
-
-
-9/9/2025 8:30:10 AM        \\q\processor(_total)\% processor time :
-                           6.38927788254879
-
-                           \\q\physicaldisk(_total)\% disk time :
-                           0
-
-                           \\q\memory\available mbytes :
-                           15538
-
-
-9/9/2025 8:30:11 AM        \\q\processor(_total)\% processor time :
-                           3.19358874625071
-
-                           \\q\physicaldisk(_total)\% disk time :
-                           0
-
-                           \\q\memory\available mbytes :
-                           15546
-
-
-9/9/2025 8:30:12 AM        \\q\processor(_total)\% processor time :
-                           1.01645789642766
-
-                           \\q\physicaldisk(_total)\% disk time :
-                           0
-
-                           \\q\memory\available mbytes :
-                           15550
-
-
-
-
-PS C:\Users\nuoai> Get-Process | Sort-Object CPU -Descending | Select-Object -First 15 Name, Id, CPU, @{n='WS(MB)';e={[math]::Round($_.WS/1MB,1)}} | Format-Table -Auto
-
-Name             Id        CPU WS(MB)
-----             --        --- ------
-chrome        16248       1088  526.2
-chrome        12548   899.6875  129.1
-MsMpEng        5416  707.78125  439.3
-Code           2696  478.03125  520.8
-dwm            1736  374.28125    170
-TextInputHost  9844    277.625  198.6
-Code          11360 257.953125  652.4
-System            4 204.921875   10.7
-Code           3184 181.859375    375
-chrome        12772 158.234375  326.8
-chrome         9740 120.203125    262
-Code          14708      119.5  141.3
-Trae          14664  96.515625  443.9
-Code           5744  89.578125  189.8
-Trae           3436  82.203125  336.9
-
-
-PS C:\Users\nuoai> Get-Process | Sort-Object @{Expression={$_.IOReadBytes + $_.IOWriteBytes};Descending=$true} | Select-Object -First 10 Name, Id, @{n='IO(MB)';e={[math]::Round(($_.IOReadBytes + $_.IOWriteBytes)/1MB,1)}} | Format-Table -Auto
-
-Name                      Id IO(MB)
-----                      -- ------
-svchost                 1428      0
-svchost                 1600      0
-svchost                 1660      0
-StartMenuExperienceHost 9868      0
-svchost                  940      0
-svchost                 1248      0
-svchost                 1844      0
-svchost                 1960      0
-svchost                 1972      0
-svchost                 2060      0
-
-
-PS C:\Users\nuoai> Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location, User | Format-Table -Auto
-
-Name                                                     Command
-----                                                     -------
-GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
-OneDriveSetup                                            C:\Windows\System32\OneDriveSetup.exe /thfirstsetup
-GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
-OneDriveSetup                                            C:\Windows\System32\OneDriveSetup.exe /thfirstsetup
-GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
-Send to OneNote                                          Send to OneNote.lnk
-Ditto                                                    C:\Program Files\Ditto\Ditto.exe
-Claude                                                   "C:\Users\nuoai\AppData\Local\AnthropicClaude\claude.exe" -...
-Figma Agent                                              "C:\Users\nuoai\AppData\Local\FigmaAgent\figma_agent.exe"
-MicrosoftEdgeAutoLaunch_70410B6A3ADF57A5CE2BB002693ED6CF "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.e...
-GoogleDriveFS                                            C:\Program Files\Google\Drive File Stream\113.0.1.0\GoogleD...
-SecurityHealth                                           %windir%\system32\SecurityHealthSystray.exe
-
-
-PS C:\Users\nuoai> reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
-
-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
-    SecurityHealth    REG_EXPAND_SZ    %windir%\system32\SecurityHealthSystray.exe
-
-PS C:\Users\nuoai> reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
-
-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
-    Ditto    REG_SZ    C:\Program Files\Ditto\Ditto.exe
-    Claude    REG_SZ    "C:\Users\nuoai\AppData\Local\AnthropicClaude\claude.exe" --startup
-    Figma Agent    REG_SZ    "C:\Users\nuoai\AppData\Local\FigmaAgent\figma_agent.exe"
-    MicrosoftEdgeAutoLaunch_70410B6A3ADF57A5CE2BB002693ED6CF    REG_SZ    "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --no-startup-window --win-session-start
-
-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run\AutorunsDisabled
-PS C:\Users\nuoai> Get-ScheduledTask | Where-Object { $_.Triggers -ne $null -and ($_.Triggers | Where-Object { $_.TriggerType -eq 'Logon' }) } | Select-Object TaskName, TaskPath, State | Format-Table -Auto
-PS C:\Users\nuoai> Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Select-Object DeviceID, @{n='Free(GB)';e={[math]::Round($_.FreeSpace/1GB,1)}}, @{n='Size(GB)';e={[math]::Round($_.Size/1GB,1)}} | Format-Table -Auto
-
-DeviceID Free(GB) Size(GB)
--------- -------- --------
-C:          632.3    930.9
-D:            593    931.3
-
-
-PS C:\Users\nuoai> Get-PhysicalDisk | Select-Object FriendlyName, HealthStatus, OperationalStatus, Size | Format-Table -Auto
-
-FriendlyName              HealthStatus OperationalStatus          Size
-------------              ------------ -----------------          ----
-CT1000BX500SSD1           Healthy      OK                1000204886016
-SanDisk Extreme SSD       Healthy      OK                1000204140544
-Samsung SSD 960 EVO 500GB Healthy      OK                 500107862016
-
-
-PS C:\Users\nuoai> Get-Service wuauserv, UsoSvc | Format-Table -Auto
-
-Status  Name     DisplayName
-------  ----     -----------
-Running UsoSvc   Update Orchestrator Service
-Running wuauserv Windows Update
-
-
-PS C:\Users\nuoai> Get-Process -Name TiWorker, MoUsoCoreWorker, wuauclt, MsMpEng -ErrorAction SilentlyContinue | Select-Object Name, Id, CPU, @{n='WS(MB)';e={[math]::Round($_.WS/1MB,1)}}, StartTime | Format-Table -Auto
-
-Name               Id        CPU WS(MB) StartTime
-----               --        --- ------ ---------
-MoUsoCoreWorker 17772   0.234375   30.7 9/9/2025 8:31:53 AM
-MsMpEng          5416 710.265625  439.3 9/9/2025 6:27:02 AM
-
-
-PS C:\Users\nuoai>
+[{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "eslint6",
+	"severity": 8,
+	"message": "Parsing error: Unexpected token |",
+	"source": "eslint",
+	"startLineNumber": 996,
+	"startColumn": 1,
+	"endLineNumber": 996,
+	"endColumn": 1,
+	"extensionID": "dbaeumer.vscode-eslint"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 1,
+	"endLineNumber": 996,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 4,
+	"endLineNumber": 996,
+	"endColumn": 6,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 6,
+	"endLineNumber": 996,
+	"endColumn": 8,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 8,
+	"endLineNumber": 996,
+	"endColumn": 9,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 11,
+	"endLineNumber": 996,
+	"endColumn": 13,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 13,
+	"endLineNumber": 996,
+	"endColumn": 15,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 15,
+	"endLineNumber": 996,
+	"endColumn": 17,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 17,
+	"endLineNumber": 996,
+	"endColumn": 18,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 20,
+	"endLineNumber": 996,
+	"endColumn": 22,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 22,
+	"endLineNumber": 996,
+	"endColumn": 24,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 24,
+	"endLineNumber": 996,
+	"endColumn": 26,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 996,
+	"startColumn": 26,
+	"endLineNumber": 996,
+	"endColumn": 27,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 997,
+	"startColumn": 1,
+	"endLineNumber": 997,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 998,
+	"startColumn": 1,
+	"endLineNumber": 998,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 998,
+	"startColumn": 22,
+	"endLineNumber": 998,
+	"endColumn": 24,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 998,
+	"startColumn": 28,
+	"endLineNumber": 998,
+	"endColumn": 29,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 999,
+	"startColumn": 1,
+	"endLineNumber": 999,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 999,
+	"startColumn": 18,
+	"endLineNumber": 999,
+	"endColumn": 19,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 999,
+	"startColumn": 20,
+	"endLineNumber": 999,
+	"endColumn": 22,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 999,
+	"startColumn": 24,
+	"endLineNumber": 999,
+	"endColumn": 26,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 999,
+	"startColumn": 27,
+	"endLineNumber": 999,
+	"endColumn": 28,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1001,
+	"startColumn": 1,
+	"endLineNumber": 1001,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1109",
+	"severity": 8,
+	"message": "应为表达式。",
+	"source": "ts",
+	"startLineNumber": 1001,
+	"startColumn": 3,
+	"endLineNumber": 1001,
+	"endColumn": 5,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1001,
+	"startColumn": 11,
+	"endLineNumber": 1001,
+	"endColumn": 12,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1434",
+	"severity": 8,
+	"message": "意外的关键字或标识符。",
+	"source": "ts",
+	"startLineNumber": 1001,
+	"startColumn": 12,
+	"endLineNumber": 1001,
+	"endColumn": 14,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1005",
+	"severity": 8,
+	"message": "应为“;”。",
+	"source": "ts",
+	"startLineNumber": 1001,
+	"startColumn": 21,
+	"endLineNumber": 1001,
+	"endColumn": 37,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1003,
+	"startColumn": 1,
+	"endLineNumber": 1003,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1003,
+	"startColumn": 2,
+	"endLineNumber": 1003,
+	"endColumn": 3,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1005",
+	"severity": 8,
+	"message": "应为“;”。",
+	"source": "ts",
+	"startLineNumber": 1003,
+	"startColumn": 4,
+	"endLineNumber": 1003,
+	"endColumn": 8,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1005,
+	"startColumn": 14,
+	"endLineNumber": 1005,
+	"endColumn": 15,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1006,
+	"startColumn": 12,
+	"endLineNumber": 1006,
+	"endColumn": 13,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1443",
+	"severity": 8,
+	"message": "模块声明名称只能使用 ' 或 \" 引用字符串。",
+	"source": "ts",
+	"startLineNumber": 1006,
+	"startColumn": 18,
+	"endLineNumber": 1006,
+	"endColumn": 30,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1007,
+	"startColumn": 13,
+	"endLineNumber": 1007,
+	"endColumn": 14,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1008,
+	"startColumn": 12,
+	"endLineNumber": 1008,
+	"endColumn": 13,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1010,
+	"startColumn": 1,
+	"endLineNumber": 1010,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1010,
+	"startColumn": 2,
+	"endLineNumber": 1010,
+	"endColumn": 3,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1005",
+	"severity": 8,
+	"message": "应为“;”。",
+	"source": "ts",
+	"startLineNumber": 1010,
+	"startColumn": 4,
+	"endLineNumber": 1010,
+	"endColumn": 8,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 1,
+	"endLineNumber": 1012,
+	"endColumn": 2,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 2,
+	"endLineNumber": 1012,
+	"endColumn": 3,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 3,
+	"endLineNumber": 1012,
+	"endColumn": 4,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1005",
+	"severity": 8,
+	"message": "应为“;”。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 5,
+	"endLineNumber": 1012,
+	"endColumn": 7,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1005",
+	"severity": 8,
+	"message": "应为“;”。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 8,
+	"endLineNumber": 1012,
+	"endColumn": 14,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 14,
+	"endLineNumber": 1012,
+	"endColumn": 15,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1012,
+	"startColumn": 17,
+	"endLineNumber": 1012,
+	"endColumn": 18,
+	"extensionID": "vscode.typescript-language-features"
+},{
+	"resource": "/c:/Users/nuoai/Desktop/WEB-sydney-rental-hub/vue-frontend/src/stores/properties.js",
+	"owner": "typescript",
+	"code": "1127",
+	"severity": 8,
+	"message": "无效的字符。",
+	"source": "ts",
+	"startLineNumber": 1013,
+	"startColumn": 18,
+	"endLineNumber": 1013,
+	"endColumn": 19,
+	"extensionID": "vscode.typescript-language-features"
+}]
