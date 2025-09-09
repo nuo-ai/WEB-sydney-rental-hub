@@ -257,3 +257,50 @@
 .filter-transition-fast { transition: all var(--filter-transition-fast); }
 .filter-transition-normal { transition: all var(--filter-transition-normal); }
 .filter-transition-slow { transition: all var(--filter-transition-slow); }
+
+/* ====== Global semantic color tokens (added, non-breaking) ======
+   中文注释：全局语义色令牌，仅“新增不改旧值”，为组件与页面提供统一入口；
+   允许继续沿用现有 var(--color-*) / var(--juwo-*)，本区用于补齐 visited/disabled 与反馈语义色等。
+*/
+:root {
+  /* 反色文本与弱底 */
+  --color-text-inverse: #ffffff;
+  --bg-muted: var(--neutral-50);
+
+  /* 链接态（补齐 visited/disabled） */
+  --link-visited: #0036b3;        /* 品牌蓝加深一档，保证可访问性 */
+  --link-disabled: var(--color-text-secondary);
+
+  /* 反馈语义（soft 背景 + 边框，避免强色块） */
+  --color-success: #16a34a;
+  --success-soft-bg: #ecfdf5;
+  --success-border: #bbf7d0;
+
+  --color-warning: #f59e0b;
+  --warning-soft-bg: #fffbeb;
+  --warning-border: #fde68a;
+
+  --color-danger: #dc2626;
+  --danger-soft-bg: #fef2f2;
+  --danger-border: #fecaca;
+
+  --color-info: #0ea5e9;
+  --info-soft-bg: #f0f9ff;
+  --info-border: #bae6fd;
+
+  /* 收藏（Favorite）三态 */
+  --favorite-icon-default: var(--color-text-secondary);
+  --favorite-icon-hover: var(--color-text-primary);
+  --favorite-icon-active: var(--juwo-primary);
+
+  /* 徽标/计数（Pill/Badge） */
+  --badge-bg: var(--chip-bg);
+  --badge-fg: var(--color-text-secondary);
+  --badge-border: var(--color-border-default);
+
+  /* 分隔线 */
+  --divider-color: var(--color-border-default);
+
+  /* 品牌别名（统一入口） */
+  --brand-primary: var(--juwo-primary);
+}
