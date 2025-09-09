@@ -2,6 +2,7 @@
 最后更新：2025-09-09
 
 今日快照（精简版，≤10行）
+- PC-MOBILE-FILTER-OPTIONS-UNIFY：统一 PC 端与移动端浴室和车位筛选选项。修改 BedroomsFilterPanel.vue 中 bathroomOptions 添加 'any' 选项，parkingOptions 将 '0' 替换为 'any' 并将 '2+' 改为 '3+'，与移动端 FilterPanel.vue 保持一致。前端表现：PC 端浴室和车位选项现与移动端完全统一，提升用户体验一致性。溯源：commit 04bd237
 - INSPECTION-TIME-NAN-FIX：修复房源列表卡片显示"开放时间：NaN"问题。新增 hasValidInspectionTime 计算属性严格验证数据有效性，增强 formatInspectionTime 函数添加输入验证，更新模板条件渲染。前端表现：无有效看房时间时完全隐藏开放时间模块，与详情页修复保持一致。溯源：commit 7ff2e6c
 - SUPABASE-DATA-SYNC-P0：修复 Supabase 同步滞后与邮编小数点；ETL 扩展更新判定（available_date/inspection_times/postcode/property_headline），统一 postcode 4位字符串；前端表现：看房时间/空出日期与CSV一致，“NSW 2010.0”→“NSW 2010”。溯源：commit 53ff509..1b96baa
 - REGION-FILTER-P0-FIX：区域筛选彻底修复（V1 契约）。当仅选择“邮编”时，自动展开为其下属多个 suburb 并注入 suburb CSV；计数(getFilteredCount)与列表(applyFilters)口径一致；本地区域目录聚合 postcode.suburbs 作为兜底。溯源：commit a331c69..27b9cf6
