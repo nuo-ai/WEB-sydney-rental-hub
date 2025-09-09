@@ -437,7 +437,7 @@ const handleMoreAction = (command) => {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: #22c55e;
+  background: var(--color-success); /* 中文注释：New 徽标背景走统一成功色令牌，前端表现不变但可集中管理 */
   color: white;
   font-size: 10px;
   font-weight: 600;

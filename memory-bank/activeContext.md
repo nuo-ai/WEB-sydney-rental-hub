@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- DESIGN-TOKEN-COLOR-3：新增全局语义色令牌集（link visited/disabled、success/warn/danger/info soft-bg/border、favorite 三态、badge、divider、inverse/弱底/brand 别名）；首批等价替换：建议项边框/悬浮、次要文案、筛选按钮激活态统一 tokens。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色。溯源：commit ff73605..69c3e0e
 - DESIGN-TOKEN-FAVORITE-P0：收藏按钮与 PropertyCard 颜色 Token 化，未收藏=中性灰，hover=中性加深，已收藏=品牌蓝；卡片地址/副文案/分隔线/规格/操作按钮/图片计数器等硬编码改 Token；叠加遮罩改 overlay 令牌。溯源：commit ff73605
 - THEME-BRAND-BLUE-PURE：品牌主色切换为纯正蓝 #0057ff（hover #0047e5 / active #0036b3），令牌映射 --juwo-primary/--link-color 等已对齐；前端表现：主按钮/导航 hover/文本链接统一蓝色系，页面结构与焦点仍为中性灰；向后兼容，可回滚。溯源：commit d7ac639..1f0b27e
 - PC-MOBILE-FILTER-OPTIONS-UNIFY：统一 PC 端与移动端浴室和车位筛选选项。修改 BedroomsFilterPanel.vue 中 bathroomOptions 添加 'any' 选项，parkingOptions 将 '0' 替换为 'any' 并将 '2+' 改为 '3+'，与移动端 FilterPanel.vue 保持一致。前端表现：PC 端浴室和车位选项现与移动端完全统一，提升用户体验一致性。溯源：commit 04bd237

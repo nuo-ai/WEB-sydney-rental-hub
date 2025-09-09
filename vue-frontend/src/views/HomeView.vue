@@ -94,7 +94,7 @@
 
           <!-- 错误状态 -->
           <div v-else-if="propertiesStore.error" class="error-message">
-            <el-icon :size="48" color="#f56c6c">
+            <el-icon :size="48" class="error-icon">
               <Warning />
             </el-icon>
             <p class="chinese-text">{{ propertiesStore.error }}</p>
@@ -103,7 +103,7 @@
 
           <!-- 空状态 -->
           <div v-else-if="propertiesStore.filteredProperties.length === 0" class="empty-state">
-            <el-icon :size="64" color="#d9d9d9">
+            <el-icon :size="64" class="empty-icon">
               <House />
             </el-icon>
             <h3 class="chinese-text">没有找到匹配的房源</h3>
@@ -824,4 +824,8 @@ onUnmounted(() => {
     line-height: 1;
   }
 }
+/* 统一图标语义色（错误/空状态），改用设计令牌，避免内联硬编码 */
+.error-message .el-icon.error-icon { color: var(--color-danger); }
+.empty-state .el-icon.empty-icon { color: var(--color-border-default); }
+
 </style>

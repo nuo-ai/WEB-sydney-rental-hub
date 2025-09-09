@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜DESIGN-TOKEN-COLOR-3  
+  新增全局语义色令牌（link visited/disabled；success/warn/danger/info soft-bg/border；favorite 三态；badge；divider；inverse/弱底；brand 别名）；并对公用样式做小范围等价替换（建议项边框/悬浮、卡片次要文案、筛选按钮激活态）。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色｜溯源：commit ff73605..69c3e0e
 - 2025-09-09｜INSPECTION-TIME-NAN-FIX  
   修复房源列表卡片显示"开放时间：NaN"问题：新增 hasValidInspectionTime 计算属性严格验证数据有效性，增强 formatInspectionTime 函数添加输入验证，更新模板条件渲染；前端表现：无有效看房时间时完全隐藏开放时间模块，与详情页修复保持一致｜溯源：commit 7ff2e6c
 - 2025-09-09｜SUPABASE-DATA-SYNC-P0

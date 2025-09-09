@@ -203,16 +203,16 @@ onUnmounted(() => {
 }
 
 .virtual-list-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent; /* 中文注释：统一滚动条轨道为透明，由容器底色决定视觉 */
   border-radius: 4px;
 }
 
 .virtual-list-container::-webkit-scrollbar-thumb {
-  background: #888;
+  background-color: var(--neutral-scrollbar-color); /* 中文注释：滚动条滑块统一中性灰令牌 */
   border-radius: 4px;
 }
 
 .virtual-list-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background-color: var(--neutral-scrollbar-hover-color); /* 中文注释：hover 略加深，保持一致的前端表现 */
 }
 </style>

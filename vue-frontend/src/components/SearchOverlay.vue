@@ -369,7 +369,7 @@ watch(
   position: fixed;
   inset: 0;
   z-index: 10050;
-  background: var(--color-bg-page, #fff);
+  background: var(--filter-panel-bg, var(--filter-color-bg-primary));
   display: flex;
   flex-direction: column;
   height: 100dvh; /* 可见视口高度，适配 iOS */
@@ -385,8 +385,8 @@ watch(
   align-items: center;
   gap: 8px;
   padding: 12px 12px calc(12px + env(safe-area-inset-top, 0px));
-  border-bottom: 1px solid var(--color-border-default, #e5e7eb);
-  background: #fff;
+  border-bottom: 1px solid var(--filter-color-border-default);
+  background: var(--filter-color-bg-primary);
   z-index: 1;
 }
 
@@ -403,7 +403,7 @@ watch(
 }
 
 .icon-btn:active {
-  background: #f3f4f6;
+  background: var(--filter-color-hover-bg);
 }
 
 .spec-icon {
@@ -417,8 +417,8 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
-  border: 1px solid var(--color-border-default, #e5e7eb);
+  background: var(--filter-color-bg-primary);
+  border: 1px solid var(--filter-color-border-default);
   border-radius: 8px;
   padding: 0 8px;
 }
@@ -440,7 +440,7 @@ watch(
   border-radius: 6px;
 }
 .filter-text-btn:active {
-  background: #fff6f1;
+  background: var(--filter-color-hover-bg);
 }
 
 .search-prefix {
@@ -499,9 +499,9 @@ watch(
   padding: 12px;
   font-size: 11px;
   font-weight: 600;
-  color: #666;
-  background: #f8f8f8;
-  border-bottom: 1px solid #f0f0f0;
+  color: var(--filter-color-text-secondary);
+  background: var(--filter-group-title-bg);
+  border-bottom: 1px solid var(--filter-group-title-border);
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
@@ -509,7 +509,7 @@ watch(
 .title-icon {
   width: 14px;
   height: 14px;
-  color: #999;
+  color: var(--filter-color-text-muted);
 }
 
 
@@ -519,10 +519,10 @@ watch(
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid var(--color-border-default, #e5e7eb);
+  border: 1px solid var(--filter-color-border-default);
   border-radius: 999px;
-  background: #fff;
-  color: var(--color-text-secondary, #6b7280);
+  background: var(--filter-color-bg-primary);
+  color: var(--filter-color-text-secondary);
 }
 
 .pill.selected {
@@ -549,7 +549,7 @@ watch(
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--filter-color-border-subtle);
   border-top-color: var(--juwo-primary, #ff5824);
   border-radius: 50%;
   animation: spin 1s linear infinite;

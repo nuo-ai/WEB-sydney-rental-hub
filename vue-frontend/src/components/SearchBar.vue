@@ -478,7 +478,7 @@ watch(
 }
 
 .remove-location-btn:hover {
-  background: #f3f4f6;
+  background: var(--bg-hover);
   color: var(--color-text-primary, #111827);
 }
 
@@ -640,7 +640,7 @@ watch(
 
 .suggestion-item {
   padding: 12px 16px;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid var(--color-border-default);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -651,7 +651,7 @@ watch(
 
 .suggestion-item:hover,
 .suggestion-item.active {
-  background-color: #f7f8fa;
+  background-color: var(--bg-hover);
   color: var(--color-text-primary);
 }
 
@@ -706,11 +706,11 @@ watch(
   padding: 8px 16px;
   font-size: 11px;
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: #f8f8f8;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--divider-color);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -718,7 +718,7 @@ watch(
 
 .suggestions-section-title i {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* +N 摘要 pill（桌面） */
@@ -778,7 +778,7 @@ watch(
 .loading-suggestions {
   padding: 20px;
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -787,7 +787,7 @@ watch(
   width: 16px;
   height: 16px;
   margin-right: 8px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border-default);
   border-top-color: var(--color-border-strong);
   border-radius: 50%;
   animation: sb-spin 1s linear infinite;

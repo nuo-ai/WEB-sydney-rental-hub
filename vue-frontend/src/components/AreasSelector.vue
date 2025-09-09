@@ -268,7 +268,7 @@ watch(
 <style scoped>
 .areas-selector {
   margin-top: 10px;
-  border-top: 1px solid var(--color-border-default);
+  border-top: 1px solid var(--filter-color-border-default);
   padding-top: 10px;
 }
 
@@ -288,7 +288,7 @@ watch(
 .search-icon {
   position: absolute;
   left: 12px;
-  color: var(--color-text-secondary);
+  color: var(--filter-color-text-secondary);
   pointer-events: none;
   z-index: 1;
 }
@@ -298,20 +298,20 @@ watch(
   padding: 12px 16px 12px 40px;
   font-size: 14px;
   color: var(--color-text-primary);
-  background: #ffffff;
-  border: 1px solid var(--color-border-default);
+  background: var(--filter-color-bg-primary);
+  border: 1px solid var(--filter-color-border-default);
   border-radius: 6px;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .areas-search:focus {
-  border-color: #6b7280;
-  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+  border-color: var(--filter-search-focus-border);
+  box-shadow: var(--filter-shadow-focus);
 }
 
 .areas-search:hover:not(:focus) {
-  border-color: #9ca3af;
+  border-color: var(--filter-search-hover-border);
 }
 
 .clear-search-btn {
@@ -330,8 +330,8 @@ watch(
 }
 
 .clear-search-btn:hover {
-  background: #f3f4f6;
-  color: var(--color-text-primary);
+  background: var(--filter-color-hover-bg);
+  color: var(--filter-color-text-primary);
 }
 
 .clear-all-btn {
@@ -339,9 +339,9 @@ watch(
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 500;
-  background: #fff;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border-default);
+  background: var(--filter-color-bg-primary);
+  color: var(--filter-color-text-secondary);
+  border: 1px solid var(--filter-color-border-default);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -349,24 +349,24 @@ watch(
 }
 
 .clear-all-btn:hover:not(:disabled) {
-  background: #f9fafb;
-  color: var(--color-text-primary);
-  border-color: var(--color-border-strong);
+  background: var(--filter-color-bg-secondary);
+  color: var(--filter-color-text-primary);
+  border-color: var(--filter-color-border-strong);
 }
 
 .clear-all-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f9fafb;
+  background: var(--filter-color-bg-secondary);
 }
 
 .areas-body {
   max-height: 280px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--color-border-default);
+  border: 1px solid var(--filter-color-border-default);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--filter-color-bg-primary);
 }
 
 .loading-row,
@@ -374,7 +374,7 @@ watch(
   padding: 20px 16px;
   font-size: 14px;
   color: var(--color-text-secondary);
-  background: #f9fafb;
+  background: var(--filter-color-bg-secondary);
   text-align: center;
   border-radius: 6px;
 }
@@ -386,13 +386,13 @@ watch(
 .group-title {
   position: sticky;
   top: 0;
-  background: #f8fafc;
+  background: var(--filter-group-title-bg);
   z-index: 2;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-primary);
-  border-bottom: 1px solid #e2e8f0;
+  color: var(--filter-color-text-primary);
+  border-bottom: 1px solid var(--filter-group-title-border);
   letter-spacing: 0.025em;
 }
 
@@ -403,7 +403,7 @@ watch(
 }
 
 .area-item {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--filter-color-border-subtle);
   transition: background-color 0.15s ease;
 }
 
@@ -412,7 +412,7 @@ watch(
 }
 
 .area-item:hover {
-  background: #f8fafc;
+  background: var(--filter-color-hover-bg);
 }
 
 .area-row {
@@ -429,7 +429,7 @@ watch(
   width: 18px;
   height: 18px;
   border-radius: 3px;
-  accent-color: #6b7280;
+  accent-color: var(--filter-checkbox-accent);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -448,8 +448,8 @@ watch(
 
 /* 选中状态的行样式 */
 .area-item:has(.check:checked) {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: var(--filter-color-selected-bg);
+  border-color: var(--filter-color-selected-border);
 }
 
 .area-item:has(.check:checked) .area-name {
@@ -459,8 +459,8 @@ watch(
 
 /* 如果浏览器不支持 :has，使用 JavaScript 类名回退 */
 .area-item.selected {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: var(--filter-color-selected-bg);
+  border-color: var(--filter-color-selected-border);
 }
 
 .area-item.selected .area-name {
