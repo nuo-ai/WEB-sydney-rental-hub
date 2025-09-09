@@ -131,6 +131,10 @@
   --chip-bg: #f7f8fa;
   --chip-bg-hover: #eef1f4;
   --chip-bg-selected: #e9eef2;
+
+  /* 叠加遮罩令牌（统一管理透明度） */
+  --overlay-light-90: rgba(255, 255, 255, 0.9);
+  --overlay-dark-75: rgba(0, 0, 0, 0.75);
 }
 
 /* ========== 全局重置样式 ========== */
@@ -294,8 +298,8 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
+  background: var(--overlay-light-90);
+  color: var(--color-text-primary);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -326,7 +330,7 @@ body {
   position: absolute;
   bottom: 12px;
   left: 12px;
-  background: rgba(0, 0, 0, 0.75);
+  background: var(--overlay-dark-75);
   color: white;
   font-size: 11px;
   font-weight: 500;
@@ -353,14 +357,14 @@ body {
 
 .property-price .price-unit {
   font-size: 14px;
-  color: #666666;
+  color: var(--color-text-secondary);
   font-weight: 400;
 }
 
 /* 地址信息 - 两行显示 */
 .property-address-primary {
   font-size: 15px;
-  color: #333333;
+  color: var(--color-text-primary);
   font-weight: 500;
   line-height: 1.3;
   margin-bottom: 4px;
@@ -368,7 +372,7 @@ body {
 
 .property-address-secondary {
   font-size: 13px;
-  color: #666666;
+  color: var(--color-text-secondary);
   font-weight: 500;
   line-height: 1.3;
   margin-bottom: 12px;
@@ -380,7 +384,7 @@ body {
   align-items: center;
   gap: 16px;
   margin-bottom: 12px;
-  color: #666666;
+  color: var(--color-text-secondary);
 }
 
 .feature-item {
@@ -396,14 +400,14 @@ body {
 }
 
 .feature-item span {
-  color: #000000;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 14px;
 }
 
 /* 底部信息区域 */
 .property-footer {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border-default);
   margin-top: 8px;
   padding-top: 8px;
 }
@@ -416,7 +420,7 @@ body {
 }
 
 .inspection-text {
-  color: #2563eb;
+  color: var(--link-color);
   font-size: 12px;
   font-weight: 500;
 }
@@ -442,7 +446,7 @@ body {
 }
 
 .filter-btn.active {
-  background: #ffefe9; /* 极弱浅橙，仅作轻提示 */
+  background: var(--chip-bg-selected);
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
@@ -1464,27 +1468,27 @@ header nav .el-menu-item:hover,
 }
 
 .spec-item span {
-  color: #000000;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 14px;
 }
 
 /* 底部信息区域 */
 .property-footer {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border-default);
   margin-top: 8px;
   padding-top: 8px;
 }
 
 .availability-text {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 400;
   margin-bottom: 4px;
 }
 
 .inspection-text {
-  color: #2563eb;
+  color: var(--link-color);
   font-size: 12px;
   font-weight: 500;
 }
@@ -1505,14 +1509,14 @@ header nav .el-menu-item:hover,
 }
 
 .filter-btn:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 .filter-btn.active {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-  color: white;
+  background: #ffefe9; /* 极弱浅橙，仅作轻提示 */
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 /* ========== 响应式设计系统 ========== */
@@ -1611,7 +1615,7 @@ header nav .el-menu-item:hover,
 }
 
 .suggestion-item:hover {
-  background-color: #f7f8fa;
+  background-color: var(--bg-hover);
   color: var(--color-text-primary);
 }
 
@@ -1624,23 +1628,23 @@ header nav .el-menu-item:hover,
 }
 
 .location-tag {
-  background: #fafbfc;
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-default);
-  border-radius: 2px;
+  background: var(--chip-bg);
+  color: var(--color-text-secondary);
+  border: none;
+  border-radius: 9999px;
   font-size: 13px;
   font-weight: 500;
-  padding: 4px 10px;
+  padding: 6px 12px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .location-tag:hover {
-  background: #f7f8fa;
-  border-color: var(--color-border-strong);
+  background: var(--chip-bg-hover);
   color: var(--color-text-primary);
+  border: none;
 }
 
 .remove-location-btn {
@@ -1655,7 +1659,7 @@ header nav .el-menu-item:hover,
 }
 
 .remove-location-btn:hover {
-  background: #f3f4f6;
+  background: var(--bg-hover);
   color: var(--color-text-primary);
 }
 

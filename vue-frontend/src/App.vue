@@ -71,19 +71,14 @@ const handleNavVisibility = (hidden) => {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--juwo-primary);
+  background: var(--neutral-scrollbar-color);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--juwo-primary-dark);
+  background: var(--neutral-scrollbar-hover-color);
 }
 
-/* 全局焦点样式 */
-*:focus {
-  outline: 2px solid var(--juwo-primary);
-  outline-offset: 2px;
-}
 
 /* 全局选择样式 */
 ::selection {
@@ -93,13 +88,13 @@ const handleNavVisibility = (hidden) => {
 
 /* 全局链接样式 */
 a {
-  color: var(--juwo-primary);
+  color: var(--link-color);
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 a:hover {
-  color: var(--juwo-primary-dark);
+  color: var(--link-hover-color);
 }
 
 /* 全局按钮样式增强 */
@@ -122,7 +117,7 @@ a:hover {
 }
 
 .el-input__wrapper:hover {
-  border-color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
 }
 
 /* 全局加载动画 */

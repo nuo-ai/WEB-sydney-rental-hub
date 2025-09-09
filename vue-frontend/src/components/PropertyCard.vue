@@ -370,7 +370,7 @@ const handleMoreAction = (command) => {
   position: absolute;
   bottom: 12px;
   left: 12px;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--overlay-dark-75);
   color: white;
   font-size: 11px;
   font-weight: 400;
@@ -405,12 +405,12 @@ const handleMoreAction = (command) => {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #9b9b9b;
+  color: var(--color-text-secondary);
   padding: 0;
 }
 
 .action-btn:hover {
-  color: #6b6b6b;
+  color: var(--color-text-primary);
 }
 
 .action-btn:focus,
@@ -426,8 +426,8 @@ const handleMoreAction = (command) => {
 
 /* 收藏按钮样式 */
 .favorite-btn .spec-icon.is-favorite {
-  color: #ff5824;
-  fill: #ff5824;
+  color: var(--juwo-primary);
+  fill: var(--juwo-primary);
 }
 
 /* 更多选项按钮 */
@@ -476,7 +476,7 @@ const handleMoreAction = (command) => {
 
 .price-unit {
   font-size: 14px;
-  color: #666666;
+  color: var(--color-text-secondary);
   font-weight: 400;
 }
 
@@ -487,7 +487,7 @@ const handleMoreAction = (command) => {
 
 .property-address-primary {
   font-size: 15px;
-  color: #333333;
+  color: var(--color-text-primary);
   font-weight: 500;
   line-height: 1.3;
   margin-bottom: 4px;
@@ -495,7 +495,7 @@ const handleMoreAction = (command) => {
 
 .property-address-secondary {
   font-size: 13px;
-  color: #666666;
+  color: var(--color-text-secondary);
   font-weight: 500;
   line-height: 1.3;
 }
@@ -506,7 +506,7 @@ const handleMoreAction = (command) => {
   align-items: center;
   gap: 16px;
   margin-bottom: 12px;
-  color: #666666;
+  color: var(--color-text-secondary);
 }
 
 .feature-item {
@@ -516,28 +516,28 @@ const handleMoreAction = (command) => {
 }
 
 .feature-item span {
-  color: #000000;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 14px;
 }
 
 /* 底部信息区域 */
 .property-footer {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--color-border-default);
   margin-top: 8px;
   padding-top: 8px;
   margin-bottom: 0;
 }
 
 .availability-text {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 400;
   margin-bottom: 4px;
 }
 
 .inspection-text {
-  color: #2563eb;
+  color: var(--link-color);
   font-size: 12px;
   font-weight: 500;
 }

@@ -2,6 +2,7 @@
 最后更新：2025-09-09
 
 今日快照（精简版，≤10行）
+- THEME-BRAND-BLUE-PURE：品牌主色切换为纯正蓝 #0057ff（hover #0047e5 / active #0036b3），令牌映射 --juwo-primary/--link-color 等已对齐；前端表现：主按钮/导航 hover/文本链接统一蓝色系，页面结构与焦点仍为中性灰；向后兼容，可回滚。溯源：commit d7ac639..1f0b27e
 - PC-MOBILE-FILTER-OPTIONS-UNIFY：统一 PC 端与移动端浴室和车位筛选选项。修改 BedroomsFilterPanel.vue 中 bathroomOptions 添加 'any' 选项，parkingOptions 将 '0' 替换为 'any' 并将 '2+' 改为 '3+'，与移动端 FilterPanel.vue 保持一致。前端表现：PC 端浴室和车位选项现与移动端完全统一，提升用户体验一致性。溯源：commit 04bd237
 - INSPECTION-TIME-NAN-FIX：修复房源列表卡片显示"开放时间：NaN"问题。新增 hasValidInspectionTime 计算属性严格验证数据有效性，增强 formatInspectionTime 函数添加输入验证，更新模板条件渲染。前端表现：无有效看房时间时完全隐藏开放时间模块，与详情页修复保持一致。溯源：commit 7ff2e6c
 - SUPABASE-DATA-SYNC-P0：修复 Supabase 同步滞后与邮编小数点；ETL 扩展更新判定（available_date/inspection_times/postcode/property_headline），统一 postcode 4位字符串；前端表现：看房时间/空出日期与CSV一致，“NSW 2010.0”→“NSW 2010”。溯源：commit 53ff509..1b96baa

@@ -1,0 +1,31 @@
+{
+  "customSyntax": "postcss-html",
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["stylelint-declaration-use-variable"],
+  "rules": {
+    "color-named": "never",
+    "color-no-hex": true,
+    "plugin/declaration-use-variable": [
+      ["/color/"],
+      {
+        "ignoreValues": ["transparent", "currentColor", "inherit"],
+        "ignoreProperties": ["outline", "box-shadow"]
+      }
+    ],
+    "declaration-property-value-disallowed-list": {
+      "/^(background|border|outline|color)/": ["/^rgba?\\(/", "/^hsla?\\(/"]
+    }
+  },
+  "overrides": [
+    {
+      "files": [
+        "vue-frontend/src/styles/design-tokens.css",
+        "vue-frontend/src/style.css"
+      ],
+      "rules": {
+        "color-no-hex": null,
+        "declaration-property-value-disallowed-list": null
+      }
+    }
+  ]
+}
