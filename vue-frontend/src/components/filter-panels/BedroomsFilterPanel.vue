@@ -134,14 +134,16 @@ const bedroomOptions = [
 
 // 浴室与车位的选项（最少 N 语义）
 const bathroomOptions = [
+  { value: 'any', label: 'Any' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3+', label: '3+' },
 ]
 const parkingOptions = [
-  { value: '0', label: '0' },
+  { value: 'any', label: 'Any' },
   { value: '1', label: '1' },
-  { value: '2+', label: '2+' },
+  { value: '2', label: '2' },
+  { value: '3+', label: '3+' },
 ]
 
 // 初始值（从已应用参数恢复），兼容 V1（字符串）与 V2（*_min）
