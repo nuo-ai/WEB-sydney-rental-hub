@@ -6,14 +6,14 @@
     "color-named": "never",
     "color-no-hex": true,
     "plugin/declaration-use-variable": [
-      ["/color/"],
+      ["/color/", "background", "background-color", "border", "border-color", "outline-color", "fill", "stroke"],
       {
         "ignoreValues": ["transparent", "currentColor", "inherit"],
         "ignoreProperties": ["outline", "box-shadow"]
       }
     ],
     "declaration-property-value-disallowed-list": {
-      "/^(background|border|outline|color)/": ["/^rgba?\\(/", "/^hsla?\\(/"]
+      "/^(background(-color)?|border(-color)?|outline(-color)?|color|fill|stroke)/": ["/^rgba?\\(/", "/^hsla?\\(/"]
     }
   },
   "overrides": [

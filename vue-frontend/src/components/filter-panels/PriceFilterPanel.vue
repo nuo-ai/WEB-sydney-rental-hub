@@ -323,26 +323,13 @@ const applyFilters = async () => {
   border: 0;
 }
 
-.price-slider :deep(.el-slider__runway) {
-  background-color: #e5e7eb;
-  height: 6px;
-}
+/* 已统一到下方 token 化样式，删除重复与硬编码块 */
 
-.price-slider :deep(.el-slider__bar) {
-  background-color: var(--color-border-strong);
-  height: 6px;
-}
+/* 已统一到下方 token 化样式，删除重复与硬编码块 */
 
-.price-slider :deep(.el-slider__button) {
-  border: 3px solid var(--color-border-strong);
-  background-color: white;
-  width: 20px;
-  height: 20px;
-}
+/* 已统一到下方 token 化样式，删除重复与硬编码块 */
 
-.price-slider :deep(.el-slider__button:hover) {
-  border-color: var(--color-border-strong);
-}
+/* 已统一到下方 token 化样式，删除重复与硬编码块 */
 
 /* 中间连字符 */
 .dash {

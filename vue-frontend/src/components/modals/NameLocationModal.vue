@@ -160,9 +160,9 @@ const handleConfirm = () => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   position: relative;
@@ -173,7 +173,7 @@ const handleConfirm = () => {
   height: 32px;
   border: none;
   background: none;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 18px;
   cursor: pointer;
   display: flex;
@@ -184,14 +184,14 @@ const handleConfirm = () => {
 }
 
 .back-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
 }
 
 .modal-title {
   flex: 1;
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
   text-align: center;
   padding: 0 60px;
@@ -227,14 +227,14 @@ const handleConfirm = () => {
   align-items: flex-start;
   gap: 12px;
   padding: 16px;
-  background: #f8f8f8;
+  background: var(--surface-2);
   border-radius: 8px;
   margin-bottom: 32px;
 }
 
 .selected-address i {
   flex-shrink: 0;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 16px;
   margin-top: 2px;
 }
@@ -243,7 +243,7 @@ const handleConfirm = () => {
   flex: 1;
   margin: 0;
   font-size: 15px;
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.5;
 }
 
@@ -259,8 +259,8 @@ const handleConfirm = () => {
   display: flex;
   align-items: center;
   padding: 16px;
-  background: white;
-  border: 1px solid #e3e3e3;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -268,8 +268,8 @@ const handleConfirm = () => {
 }
 
 .label-option:hover {
-  border-color: var(--brand-primary, #dc2626);
-  background: #fef2f2;
+  border-color: var(--color-border-strong);
+  background: var(--bg-hover);
 }
 
 .label-option input[type='radio'] {
@@ -282,7 +282,7 @@ const handleConfirm = () => {
 .radio-circle {
   width: 20px;
   height: 20px;
-  border: 2px solid #d0d0d0;
+  border: 2px solid var(--color-border-default);
   border-radius: 50%;
   margin-right: 12px;
   position: relative;
@@ -297,13 +297,13 @@ const handleConfirm = () => {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--brand-primary, #dc2626);
+  background: var(--juwo-primary);
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.2s;
 }
 
 .label-option input:checked ~ .radio-circle {
-  border-color: var(--brand-primary, #dc2626);
+  border-color: var(--juwo-primary);
 }
 
 .label-option input:checked ~ .radio-circle::after {
@@ -312,24 +312,24 @@ const handleConfirm = () => {
 
 .label-option input:checked ~ .label-text {
   font-weight: 600;
-  color: var(--brand-primary, #dc2626);
+  color: var(--juwo-primary);
 }
 
 .label-text {
   flex: 1;
   font-size: 16px;
-  color: #333;
+  color: var(--color-text-primary);
   transition: all 0.2s;
 }
 
 .label-icon {
-  color: #999;
+  color: var(--text-muted);
   font-size: 18px;
   transition: color 0.2s;
 }
 
 .label-option input:checked ~ .label-icon {
-  color: var(--brand-primary, #dc2626);
+  color: var(--juwo-primary);
 }
 
 /* 操作区域 */
@@ -344,13 +344,13 @@ const handleConfirm = () => {
   font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
-  background: var(--brand-primary, #dc2626) !important;
-  border-color: var(--brand-primary, #dc2626) !important;
+  background: var(--juwo-primary) !important;
+  border-color: var(--juwo-primary) !important;
 }
 
 .confirm-btn:hover:not(:disabled) {
-  background: var(--brand-primary-dark, #b91c1c) !important;
-  border-color: var(--brand-primary-dark, #b91c1c) !important;
+  background: var(--juwo-primary-dark) !important;
+  border-color: var(--juwo-primary-dark) !important;
 }
 
 .confirm-btn:disabled {

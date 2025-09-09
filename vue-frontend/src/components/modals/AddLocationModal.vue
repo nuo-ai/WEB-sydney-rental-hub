@@ -332,9 +332,9 @@ onMounted(async () => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -345,7 +345,7 @@ onMounted(async () => {
   height: 32px;
   border: none;
   background: none;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -356,13 +356,13 @@ onMounted(async () => {
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -375,8 +375,8 @@ onMounted(async () => {
 /* 搜索区域 */
 .search-section {
   padding: 20px;
-  background: white;
-  border-bottom: 1px solid #e3e3e3;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .search-input-wrapper {
@@ -388,7 +388,7 @@ onMounted(async () => {
 .search-icon {
   position: absolute;
   left: 16px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 16px;
 }
 
@@ -396,20 +396,20 @@ onMounted(async () => {
   width: 100%;
   height: 48px;
   padding: 0 40px 0 44px;
-  border: 1px solid #e3e3e3;
+  border: 1px solid var(--color-border-default);
   border-radius: 8px;
   font-size: 16px;
-  color: #333;
+  color: var(--color-text-primary);
   transition: border-color 0.2s;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #999;
+  border-color: var(--color-border-strong);
 }
 
 .search-input::placeholder {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .clear-btn {
@@ -419,7 +419,7 @@ onMounted(async () => {
   height: 28px;
   border: none;
   background: none;
-  color: #999;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -429,19 +429,19 @@ onMounted(async () => {
 }
 
 .clear-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
 }
 
 .search-hint {
   margin: 8px 0 0 0;
   font-size: 14px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* 搜索结果 */
 .search-results {
   flex: 1;
-  background: #fafafa;
+  background: var(--surface-2);
 }
 
 /* 预设地址 */
@@ -452,14 +452,14 @@ onMounted(async () => {
 .section-title {
   font-size: 14px;
   font-weight: 600;
-  color: #666;
+  color: var(--color-text-secondary);
   margin: 0 0 12px 0;
   text-transform: uppercase;
 }
 
 /* 结果列表 */
 .results-list {
-  background: white;
+  background: var(--color-bg-card);
 }
 
 .result-item {
@@ -467,24 +467,24 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  background: white;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--divider-color);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .result-item:hover {
-  background: #f8f8f8;
+  background: var(--bg-hover);
 }
 
 .result-item:active {
-  background: #f0f0f0;
+  background: var(--surface-3);
 }
 
 .result-item i {
   flex-shrink: 0;
   width: 20px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 16px;
   text-align: center;
 }
@@ -497,13 +497,13 @@ onMounted(async () => {
 .result-name {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 4px;
 }
 
 .result-address {
   font-size: 15px;
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.4;
 }
 
@@ -516,7 +516,7 @@ onMounted(async () => {
   justify-content: center;
   padding: 60px 20px;
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .searching-state i,
@@ -532,7 +532,7 @@ onMounted(async () => {
 
 .no-results-hint {
   font-size: 14px !important;
-  color: #bbb;
+  color: var(--color-text-secondary);
 }
 
 /* 动画 */

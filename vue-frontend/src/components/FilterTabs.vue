@@ -336,8 +336,7 @@ onUnmounted(() => {
 
 /* 激活状态样式 */
 .filter-tab.active {
-  background: #ffefe9; /* 极弱浅橙，非品牌强底色 */
-  border-color: var(--color-border-strong);
+  background: var(--chip-bg-selected); /* 中文注释：激活态统一为中性 chips 选中底色 */
   color: var(--color-text-primary);
 }
 
@@ -363,7 +362,7 @@ onUnmounted(() => {
   gap: 2px;
   border: 1px solid var(--color-border-default);
   border-radius: 9999px;
-  background: #fff;
+  background: var(--color-bg-card);
   color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 13px;
@@ -373,7 +372,7 @@ onUnmounted(() => {
 .filter-button:hover {
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
-  background: #f7f8fa;
+  background: var(--bg-hover);
 }
 
 .filter-icon {
