@@ -2194,8 +2194,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 右侧折叠提示箭头（改用 Lucide 组件，去除伪元素） */
-.travel-btn-content { /* 不再将箭头推到最右 */
-}
+/* 不再将箭头推到最右 */
 .travel-chevron {
   width: 24px;
   height: 24px;

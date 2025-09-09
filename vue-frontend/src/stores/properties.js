@@ -644,7 +644,7 @@ export const usePropertiesStore = defineStore('properties', {
         {
           let __dbg = ''
           try { __dbg = JSON.stringify(mappedParams) } catch (err) { void err; __dbg = '[unserializable]' }
-          // eslint-disable-next-line no-console
+           
           console.debug('[FILTER-DEBUG][applyFilters] mappedParams:', __dbg)
         }
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
@@ -830,7 +830,7 @@ export const usePropertiesStore = defineStore('properties', {
         {
           let __dbg = ''
           try { __dbg = JSON.stringify(mappedParams) } catch (err) { void err; __dbg = '[unserializable]' }
-          // eslint-disable-next-line no-console
+           
           console.debug('[FILTER-DEBUG][getFilteredCount] mappedParams:', __dbg)
         }
         const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
