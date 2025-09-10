@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜TYPOGRAPHY+I18N-V1  
+  建立文字 Design Tokens（styles/typography.css）与轻量 i18n 合并机制（i18n/locales/zh-CN.js + index.js）；试点重构 PropertyCard：价格/单位/新徽标/更多菜单/辅助文案接入 $t 与 .typo-*。前端表现：UI 中文化、文字节奏统一、动态地址仍英文｜溯源：commit 3e4ea72..c45d86a
 - 2025-09-10｜UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY  
   PropertyCard “New” 徽标改为品牌蓝（--brand-primary），文字用 --color-text-inverse；CommuteTimes “Add location” 按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化｜溯源：commit 3c7c150..3e4ea72
 - 2025-09-10｜UI-TOKENS-PC-FILTER-LOCATION  

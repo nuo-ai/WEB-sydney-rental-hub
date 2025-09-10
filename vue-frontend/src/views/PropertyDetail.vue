@@ -39,14 +39,14 @@
           <div class="image-actions">
             <button @click="shareProperty" class="image-action-btn">
               <el-icon :size="20"><Share /></el-icon>
-              <span>Share</span>
+              <span>{{ $t('propertyCard.share') }}</span>
             </button>
             <div class="action-divider"></div>
             <button @click="toggleFavorite" class="image-action-btn">
               <el-icon :size="20">
                 <i :class="isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
               </el-icon>
-              <span>Save</span>
+              <span>{{ $t('propertyCard.save') }}</span>
             </button>
           </div>
 
@@ -63,7 +63,7 @@
                 @error="photoIconFailed = true"
               />
               <el-icon v-else :size="16" class="pill-icon" aria-hidden="true"><Picture /></el-icon>
-              <span class="pill-label">Photos</span>
+              <span class="pill-label">{{ $t('propertyDetail.photos') }}</span>
               <span :class="['pill-badge', { 'two-digits': images.length >= 10 }]">{{
                 images.length > 99 ? '99+' : images.length
               }}</span>
@@ -90,23 +90,25 @@
           <section class="info-card">
             <!-- 价格 -->
             <div class="price-wrapper">
-              <span class="price-text">${{ property.rent_pw }} per week</span>
+              <span class="price-text typo-price">
+                ${{ property.rent_pw }} <span class="price-unit typo-label">{{ $t('propertyCard.perWeek') }}</span>
+              </span>
             </div>
 
             <!-- 地址 -->
             <div class="address-wrapper">
               <!-- PC端显示完整地址一行 -->
-              <h1 class="address-main address-pc">{{ property.address }}</h1>
+              <h1 class="address-main address-pc typo-address">{{ property.address }}</h1>
               <!-- 移动端显示地址和区号分行 -->
               <div class="address-mobile">
-                <h1 class="address-main">
+                <h1 class="address-main typo-address">
                   {{
                     property.address && property.address.includes(',')
                       ? property.address.split(',')[0]
                       : property.address
                   }}
                 </h1>
-                <p class="address-subtitle">
+                <p class="address-subtitle typo-body-sm">
                   {{ property.suburb }}, NSW {{ property.postcode || '' }}
                 </p>
               </div>
@@ -130,13 +132,13 @@
 
             <!-- 可用日期和押金 -->
             <div class="availability-info">
-              <span class="availability-label">Available from {{ getAvailableDate() }}</span>
+              <span class="availability-label typo-body">{{ $t('propertyCard.availableDateLabel') }}：{{ getAvailableDate() }}</span>
             </div>
           </section>
 
           <!-- 位置地图 -->
           <section class="location-section">
-            <h2 class="section-title">Location</h2>
+            <h2 class="section-title typo-heading-card">{{ $t('propertyDetail.location') }}</h2>
             <div class="map-wrapper">
               <!-- 使用 GoogleMap 渲染位置，默认锁定中心，保持向后兼容 -->
               <div v-if="property.latitude && property.longitude" class="map-container">
@@ -160,7 +162,7 @@
                   <i class="fas fa-location-dot"></i>
                 </div>
                 <div class="travel-btn-content">
-                  <span class="travel-btn-title">See your travel time</span>
+                  <span class="travel-btn-title typo-button">{{ $t('propertyDetail.seeTravel') }}</span>
                   <span class="travel-btn-subtitle"
                     >Find out travel times from this property to your destinations</span
                   >
@@ -175,7 +177,7 @@
             class="description-section"
             v-if="property.property_headline || property.description"
           >
-            <h2 class="section-title">Property Description</h2>
+            <h2 class="section-title typo-heading-card">{{ $t('propertyDetail.description') }}</h2>
 
             <div class="description-content">
               <div class="description-text" :class="{ expanded: isDescriptionExpanded }">
@@ -192,31 +194,31 @@
                 />
               </div>
               <button @click="toggleDescription" class="read-more-btn">
-                {{ isDescriptionExpanded ? 'Read less' : 'Read more' }}
+                {{ isDescriptionExpanded ? $t('common.readLess') : $t('common.readMore') }}
               </button>
             </div>
           </section>
 
           <!-- Property Features - 两列布局 -->
           <section class="features-section" v-if="allFeatures.length > 0">
-            <h2 class="section-title">Property Features</h2>
+            <h2 class="section-title typo-heading-card">{{ $t('propertyDetail.features') }}</h2>
             <div class="features-two-column">
-              <div v-for="feature in displayedFeatures" :key="feature" class="feature-list-item">
+              <div v-for="feature in displayedFeatures" :key="feature" class="feature-list-item typo-body">
                 {{ feature }}
               </div>
             </div>
             <button
               v-if="allFeatures.length > visibleFeaturesCount"
               @click="showAllFeatures = !showAllFeatures"
-              class="view-less-btn"
+              class="view-less-btn typo-button"
             >
-              {{ showAllFeatures ? 'View less' : 'View all features' }}
+              {{ showAllFeatures ? $t('propertyDetail.viewLessFeatures') : $t('propertyDetail.viewAllFeatures') }}
             </button>
           </section>
 
           <!-- Inspection Times - 按Figma设计卡片式布局 -->
           <section class="inspection-section">
-            <h2 class="section-title">Inspection times</h2>
+            <h2 class="section-title typo-heading-card">{{ $t('propertyDetail.inspectionTimes') }}</h2>
             <div v-if="inspectionTimes.length > 0" class="inspection-list">
               <div
                 v-for="(inspection, index) in inspectionTimes"
@@ -233,7 +235,7 @@
               </div>
             </div>
             <div v-else class="no-inspection-times">
-              当前无开放时间，请联系客服确认房源状态。
+              {{ $t('propertyDetail.noInspection') }}
             </div>
           </section>
 
@@ -243,8 +245,8 @@
 
       <!-- 底部固定操作栏 -->
       <footer class="action-footer">
-        <el-button class="action-btn enquire-btn" @click="handleEmail"> Enquire </el-button>
-        <el-button class="action-btn inspect-btn" @click="handleInspections"> Inspect </el-button>
+        <el-button class="action-btn enquire-btn typo-button" @click="handleEmail">{{ $t('propertyDetail.enquire') }}</el-button>
+        <el-button class="action-btn inspect-btn typo-button" @click="handleInspections">{{ $t('propertyDetail.inspect') }}</el-button>
       </footer>
     </template>
 
