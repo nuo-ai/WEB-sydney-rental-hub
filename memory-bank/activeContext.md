@@ -2,6 +2,10 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- FILTER-PANELS-HOVER-NEUTRAL：AreaFilterPanel 优先完成 chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex；与 FilterTabs 统一。前端表现：面板交互反馈一致，无彩色跳变。溯源：commit 0b6e146..806d3a3
+- SEARCH-ENTRY-CHIPS-TOKENIZED：SearchBar 内嵌/回显标签去除 var(--*, #hex) 兜底，统一 --chip-* 与 --color-text-*；移动端 active 改 --bg-hover。前端表现：搜索入口与筛选标签完全同源。溯源：commit 0b6e146..806d3a3
+- DETAIL-DIVIDER-TOKEN：PropertyDetail 统一 --divider-color → var(--color-border-default)，移除品牌色/分隔线兜底。前端表现：详情页线条全中性灰，CTA/链接保留品牌蓝。溯源：commit 0b6e146..806d3a3
+- OVERLAY+NAME-MODAL：SearchOverlay 去除品牌/文字兜底；NameLocationModal“跳过”改为 --juwo-primary（去旧红）。前端表现：移动覆盖层与 CTA 色域一致。溯源：commit 0b6e146..806d3a3
 - DESIGN-TOKENS-COMPLIANCE-SPRINT：PropertyDetail 二/三批全面令牌化（卡片/容器背景、分隔线、弱底 hover、占位与地图容器等），主/副文案统一 --color-text-primary/secondary，交互弱底用 --bg-hover，容器/边框用 --color-bg-card/--color-border-default。前端表现：详情页视觉与交互反馈一致、中性化，品牌色仅用于 CTA/链接。溯源：commit 9984dff..0b6e146
 - FILTERTABS-FALLBACK-REMOVAL：移除 Chip 类样式 var(--chip-*, #hex) 的十六进制兜底，统一使用 --chip-bg/--chip-bg-hover/--chip-bg-selected。前端表现：筛选标签在不同主题/深浅底下表现一致，不再出现遗留浅绿/米色。溯源：commit 9984dff..0b6e146
 - GUARDRAIL-STYLELINT+HOOK：新增 npm script "lint:style" 与 pre-commit 条件执行 stylelint（存在即运行），配合 .stylelintrc.json 禁止 hex/rgb/hsla/命名色并强制 var(--*)；design-tokens.css、style.css 保持豁免。前端表现：新/改代码禁止硬编码颜色，设计令牌落地有保障。溯源：commit 9984dff..0b6e146

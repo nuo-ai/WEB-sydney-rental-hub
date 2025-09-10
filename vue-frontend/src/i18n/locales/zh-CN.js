@@ -30,7 +30,12 @@ export default {
     inspectionTimes: '开放时间',
     noInspection: '当前无开放时间，请联系客服确认房源状态。',
     enquire: '联系咨询',
-    inspect: '预约看房'
+    inspect: '预约看房',
+    loadingMore: '正在加载更多信息...',
+    noPhotos: '暂无图片',
+    locationUnavailable: '位置信息暂不可用',
+    inspectSoon: '预约看房功能即将上线',
+    dateTBD: '待定'
   },
   commute: {
     pageTitle: '通勤时间',

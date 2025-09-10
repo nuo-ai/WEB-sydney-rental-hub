@@ -486,3 +486,26 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 单点问题按“最小 diff”快速回退；临时 fallback（如 `var(--token, #xxx)`）仅作短期兜底，应在下一轮清理。  
   - 深/浅主题或特殊底色对比问题，先以组件局部覆盖验证，再沉淀到 `:root` 令牌，避免全局抖动。
 - 溯源：progress 2025-09-10｜DESIGN-TOKENS-COMPLIANCE-SPRINT & GUARDRAIL-STYLELINT+HOOK（commit 9984dff..0b6e146）
+
+## 变量兜底禁用规则（新增）
+
+- 原则：运行代码（.vue/.css 等）中禁止使用 `var(--token, #hex)` 或 `var(--token, rgb/rgba/命名色)` 形式的兜底；仅限“令牌定义入口文件”（如 src/styles/design-tokens.css 与 src/style.css）可出现颜色常量。
+- 目的：杜绝主题/深浅底或品牌主题切换下出现“与設計令牌不一致”的硬编码色，确保全站风格一致、可回滚。
+- 适用范围：组件样式、页面样式、局部覆盖块、:deep 覆盖、内联 style。
+- 允许例外（受控）：极端紧急场景可临时引入兜底，但必须在下一轮清理；PR 描述需注明“临时兜底原因与清理计划”。
+- 代码示例
+  - 禁止：
+    ```css
+    .chip { background: var(--chip-bg, #f7f8fa); }
+    .btn:hover { background: var(--bg-hover, #f5f5f5); }
+    .pill.selected { background: var(--juwo-primary, #ff5824); }
+    ```
+  - 推荐：
+    ```css
+    .chip { background: var(--chip-bg); }
+    .btn:hover { background: var(--bg-hover); }
+    .pill.selected { background: var(--juwo-primary); }
+    ```
+- PR 审查要点：
+  - 若发现 `var(--*, #xxx)`/`var(--*, rgb/rgba/命名色)`，一律要求改为“纯令牌”；如对应 token 尚未存在，应先在根 tokens 定义入口补齐后再使用。
+- 溯源：progress 2025-09-10｜FILTER-PANELS-HOVER-NEUTRAL & ENTRY-CHIPS-TOKENIZED（commit 0b6e146..806d3a3）

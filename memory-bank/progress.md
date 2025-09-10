@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜FILTER-PANELS-HOVER-NEUTRAL & ENTRY-CHIPS-TOKENIZED  
+  筛选子面板 hover/focus 中性化（AreaFilterPanel/FilterTabs 同步基线）；SearchBar 内嵌/回显标签去除 var(--*, #hex) 兜底并统一 --chip-*；移动端 active 改 --bg-hover｜溯源：commit 0b6e146..806d3a3
+- 2025-09-10｜DETAIL-DIVIDER-TOKEN & OVERLAY/MODAL-ALIGN  
+  PropertyDetail 分隔线统一令牌 --divider-color→var(--color-border-default)，去除品牌色/分隔线兜底；SearchOverlay/NameLocationModal 去兜底并对齐 CTA 品牌蓝｜溯源：commit 0b6e146..806d3a3
 - 2025-09-10｜DESIGN-TOKENS-COMPLIANCE-SPRINT  
   详情页 PropertyDetail 二/三批令牌化：容器/分隔/弱底 hover/占位与地图容器等改用 --color-bg-card/--color-border-default/--bg-hover；主/副文案统一 --color-text-primary/secondary；品牌色仅用于 CTA/链接｜溯源：commit 9984dff..0b6e146
 - 2025-09-10｜GUARDRAIL-STYLELINT+HOOK & FILTERTABS-FALLBACK-REMOVAL  

@@ -5,7 +5,7 @@
       <!-- 加载提示（在有数据时显示为小提示） -->
       <div v-if="loading" class="loading-indicator">
         <el-icon class="is-loading" :size="16"><Loading /></el-icon>
-        <span>正在加载更多信息...</span>
+        <span>{{ $t('propertyDetail.loadingMore') }}</span>
       </div>
       <!-- 图片展示区域 - Domain风格 -->
       <header class="image-header">
@@ -27,7 +27,7 @@
           />
           <div v-else class="no-image">
             <el-icon :size="48"><Picture /></el-icon>
-            <span>暂无图片</span>
+            <span>{{ $t('propertyDetail.noPhotos') }}</span>
           </div>
 
           <!-- 返回按钮 - 左上角 -->
@@ -153,7 +153,7 @@
               </div>
               <div v-else class="map-placeholder">
                 <el-icon :size="32"><Location /></el-icon>
-                <span>位置信息暂不可用</span>
+                <span>{{ $t('propertyDetail.locationUnavailable') }}</span>
               </div>
 
               <!-- See travel times button -->
@@ -163,9 +163,7 @@
                 </div>
                 <div class="travel-btn-content">
                   <span class="travel-btn-title typo-button">{{ $t('propertyDetail.seeTravel') }}</span>
-                  <span class="travel-btn-subtitle"
-                    >Find out travel times from this property to your destinations</span
-                  >
+                  <span class="travel-btn-subtitle">{{ $t('propertyDetail.seeTravelSub') }}</span>
                 </div>
                 <ChevronDown class="travel-chevron" :size="24" />
               </button>
@@ -276,7 +274,7 @@
 
 <script setup>
 const photoIcon = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" stroke="%233c475b" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="%233c475b" stroke-width="2"/></svg>'
-import { onMounted, onUnmounted, computed, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref, inject } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
@@ -298,6 +296,7 @@ const route = useRoute()
 const router = useRouter()
 const propertiesStore = usePropertiesStore()
 const authStore = useAuthStore()
+const t = inject('t') || ((k) => k)
 
 const propertyId = route.params.id
 
@@ -563,7 +562,7 @@ const handleEmail = () => {
 
 const handleInspections = () => {
   if (inspectionTimes.value.length > 0) {
-    ElMessage.info('Inspection booking coming soon')
+    ElMessage.info(t('propertyDetail.inspectSoon'))
   } else {
     // 根据用户反馈更新
     ElMessage.info('可联系中介预约看房')
@@ -702,11 +701,11 @@ const handleAuthSuccess = () => {
 // 获取可用日期显示
 const getAvailableDate = () => {
   if (!property.value || !property.value.available_date) {
-    return 'Monday, 1st September 2025'
+    return t('propertyDetail.dateTBD')
   }
   const date = new Date(property.value.available_date)
   const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
-  return date.toLocaleDateString('en-US', options)
+  return date.toLocaleDateString('zh-CN', options)
 }
 
 // 预加载下一张图片
@@ -741,7 +740,7 @@ onBeforeRouteLeave(() => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: var(--color-bg-card); /* 统一页面与卡片背景为纯白 */
+  background-color: var(--color-bg-page); /* 页面背景采用中性页灰，与全站一致 */
   /* 新增：统一字体栈（含中文优先级） */
   --font-ui: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   font-family: var(--font-ui);
@@ -769,18 +768,18 @@ onBeforeRouteLeave(() => {
   gap: 8px;
   z-index: 20;
   font-size: 14px;
-  color: #6e7881;
+  color: var(--color-text-secondary);
 }
 
 .skeleton-image {
   height: 280px;
-  background: #e8e8e8;
+  background: var(--surface-4);
   margin-bottom: 0;
 }
 
 .skeleton-content {
   padding: 20px 16px;
-  background: white;
+  background: var(--color-bg-card);
 }
 
 /* 图片区域 - Figma 精确尺寸 */
@@ -788,7 +787,7 @@ onBeforeRouteLeave(() => {
   position: relative;
   width: 100%;
   margin: 0 auto;
-  background: #000;
+  background: var(--surface-4);
 }
 
 /* 返回按钮 - 左上角圆形 */
@@ -806,7 +805,7 @@ onBeforeRouteLeave(() => {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #2e3a4b;
+  color: var(--color-text-secondary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
@@ -839,19 +838,19 @@ onBeforeRouteLeave(() => {
   border: none;
   cursor: pointer;
   transition: background 0.2s ease;
-  color: #808296;
+  color: var(--color-text-secondary);
   font-family: var(--font-ui); /* 统一：替换系统字体为变量 */
   font-size: 14px;
   font-weight: 400;
 }
 
 .image-action-btn:hover {
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-hover);
 }
 
 .image-action-btn span {
   font-size: 14px;
-  color: #808296;
+  color: var(--color-text-secondary);
 }
 
 .action-divider {
@@ -917,7 +916,7 @@ onBeforeRouteLeave(() => {
   transform: none;
   filter: none;
   box-shadow: none;
-  background: #fefefe;
+  background: var(--color-bg-card);
 }
 
 /* 图标尺寸与对齐 */
@@ -944,8 +943,8 @@ onBeforeRouteLeave(() => {
   margin-left: 0;
   padding: 0;
   border-radius: 100%;
-  background: #e6e9ed;
-  color: #3c475b;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
   font-weight: 600;
   font-size: 12px;
   line-height: 1;
@@ -963,7 +962,7 @@ onBeforeRouteLeave(() => {
   position: relative;
   width: 100%;
   height: 280px; /* 移动端高度 */
-  background: #e8e8e8;
+  background: var(--surface-4);
   overflow: hidden;
 }
 
@@ -1116,13 +1115,13 @@ onBeforeRouteLeave(() => {
 
 /* 信息卡片 - 白色背景带阴影 */
 .info-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 24px 16px;
   margin: 0;
   min-height: 180px;
   box-shadow: none;
   border-radius: 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 /* PC端信息卡片 - 巨大变化 */
@@ -1131,7 +1130,7 @@ onBeforeRouteLeave(() => {
     width: 100%;
     margin: 0;
     padding: 32px 32px; /* 统一左右 32，与容器对齐 */
-    background: white;
+    background: var(--color-bg-card);
     box-shadow: none;
     border-radius: 0;
     position: relative;
@@ -1146,7 +1145,7 @@ onBeforeRouteLeave(() => {
 }
 
 .availability-label {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   font-size: 16px;
   font-weight: 400;
 }
@@ -1182,13 +1181,13 @@ onBeforeRouteLeave(() => {
   .price-wrapper {
     margin-bottom: 32px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e4e5e7;
+    border-bottom: 1px solid var(--color-border-default);
   }
 
   .price-text {
     font-size: 25px;
     font-weight: 700;
-    color: #000;
+    color: var(--color-text-primary);
   }
 }
 
@@ -1265,7 +1264,7 @@ onBeforeRouteLeave(() => {
 }
 
 .feature-item span {
-  color: #000000;
+  color: var(--color-text-primary);
   font-weight: 600;
   font-size: 16px;
 }
@@ -1273,7 +1272,7 @@ onBeforeRouteLeave(() => {
 .feature-type {
   margin-left: 12px;
   padding-left: 20px;
-  border-left: 1px solid #d0d3d9;
+  border-left: 1px solid var(--color-border-default);
   font-size: 18px;
   font-weight: 600;
   color: #6e7881;
@@ -1285,13 +1284,13 @@ onBeforeRouteLeave(() => {
   .price-wrapper {
     margin-bottom: 32px; /* 价格到地址 32 */
     padding-bottom: 24px; /* 保持内边距 */
-    border-bottom: 1px solid #e4e5e7; /* 保持分隔线 */
+    border-bottom: 1px solid var(--color-border-default); /* 保持分隔线 */
   }
 
   .price-text {
     font-size: 25px;
     font-weight: 700;
-    color: #000;
+    color: var(--color-text-primary);
   }
 }
 
@@ -1362,11 +1361,11 @@ onBeforeRouteLeave(() => {
 /* 位置部分 */
 .location-section {
   padding: 24px 16px;
-  background: white;
+  background: var(--color-bg-card);
   margin: 0;
   border-radius: 0;
   box-shadow: none;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 /* PC端位置部分 - 大改 */
@@ -1375,7 +1374,7 @@ onBeforeRouteLeave(() => {
     width: 100%;
     margin: 0;
     padding: 40px 48px;
-    background: white;
+    background: var(--color-bg-card);
     border-radius: 0;
     box-shadow: none;
   }
@@ -1441,7 +1440,7 @@ onBeforeRouteLeave(() => {
   justify-content: center;
   background: var(--surface-2);
   border-radius: var(--radius-md);
-  color: var(--color-secondary);
+  color: var(--color-text-secondary);
   gap: var(--spacing-sm);
 }
 
@@ -1463,11 +1462,11 @@ onBeforeRouteLeave(() => {
 /* Property Description 部分 */
 .description-section {
   padding: 24px 16px;
-  background: white;
+  background: var(--color-bg-card);
   margin: 0;
   border-radius: 0;
   box-shadow: none;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 /* PC端描述部分 - 大改 */
@@ -1524,7 +1523,7 @@ onBeforeRouteLeave(() => {
   left: 0;
   right: 0;
   height: 40px;
-  background: linear-gradient(to bottom, transparent, white);
+  background: linear-gradient(to bottom, transparent, var(--color-bg-card));
   pointer-events: none;
   opacity: 1;
   transition: opacity 0.3s;
@@ -1544,7 +1543,7 @@ onBeforeRouteLeave(() => {
   padding: 6px 14px;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: white;
+  background: var(--color-bg-card);
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
@@ -1560,11 +1559,11 @@ onBeforeRouteLeave(() => {
 /* Property Features 部分 - 两列布局 */
 .features-section {
   padding: 24px 16px 33px 16px; /* 调整底部padding以满足33px间距要求 */
-  background: white;
+  background: var(--color-bg-card);
   margin: 0;
   border-radius: 0;
   box-shadow: none;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 /* PC端特性部分 - 大改 */
@@ -1573,7 +1572,7 @@ onBeforeRouteLeave(() => {
     width: 100%;
     margin: 0;
     padding: 40px 48px 33px 48px; /* 同样调整底部padding */
-    background: white;
+    background: var(--color-bg-card);
     border-radius: 0;
     box-shadow: none;
   }
@@ -1629,7 +1628,7 @@ onBeforeRouteLeave(() => {
 /* Inspection Times 部分 - Figma设计 */
 .inspection-section {
   padding: 24px 16px;
-  background: white;
+  background: var(--color-bg-card);
   margin: 0 0 80px 0;
   border-radius: 0;
   box-shadow: none;
@@ -1637,11 +1636,11 @@ onBeforeRouteLeave(() => {
 
 .no-inspection-times {
   padding: 20px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--bg-base);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   text-align: center;
-  color: #6c757d;
+  color: var(--color-text-secondary);
   font-family: var(--font-ui);
   font-size: 15px;
 }
@@ -1652,7 +1651,7 @@ onBeforeRouteLeave(() => {
     width: 100%;
     margin: 0 0 80px 0;
     padding: 40px 48px;
-    background: white;
+    background: var(--color-bg-card);
     border-radius: 0;
     box-shadow: none;
   }
@@ -1668,7 +1667,7 @@ onBeforeRouteLeave(() => {
 
 .inspection-section .section-subtitle {
   font-size: 14px;
-  color: #6e7881;
+  color: var(--color-text-secondary);
   margin: 0 0 20px 0;
 }
 
@@ -1693,7 +1692,7 @@ onBeforeRouteLeave(() => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background: white;
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
   margin-bottom: 8px;
@@ -1736,7 +1735,7 @@ onBeforeRouteLeave(() => {
   height: 40px;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: white;
+  background: var(--color-bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1758,7 +1757,7 @@ onBeforeRouteLeave(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: white;
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
   font-size: 15px;
@@ -1777,8 +1776,8 @@ onBeforeRouteLeave(() => {
 }
 
 .add-to-planner-btn:hover {
-  background: #f5f6f7;
-  border-color: #017188;
+  background: var(--bg-hover);
+  border-color: var(--color-border-strong);
 }
 
 /* Commute Section */
@@ -1793,8 +1792,8 @@ onBeforeRouteLeave(() => {
   left: 0;
   right: 0;
   padding: 12px 16px;
-  background: white;
-  border-top: 1px solid #e4e5e7;
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border-default);
   display: flex;
   gap: 12px;
   z-index: 100;
@@ -1937,7 +1936,7 @@ onBeforeRouteLeave(() => {
 }
 /* 单张白卡一体化容器：由父容器统一承载白底与分隔线 */
 .content-card {
-  background: #ffffff;
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
   border-radius: 0; /* 移动端无圆角 */
   overflow: hidden; /* 防止子元素溢出破坏边界 */
@@ -1958,7 +1957,7 @@ onBeforeRouteLeave(() => {
 
 /* 统一分隔线：除首个以外的 section 顶部加1px分隔线 */
 .content-card > * + * {
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--divider-color);
 }
 
 /* 桌面端：轻微圆角与阴影，贴近 Figma 的“单卡”视觉 */
@@ -2022,7 +2021,7 @@ onBeforeRouteLeave(() => {
 .content-card .features-section,
 .content-card .inspection-section {
   box-shadow: none !important;
-  background: #fff;
+  background: var(--color-bg-card);
 }
 
 /* 2) 移除基于 border-top 的旧分隔线规则，改用伪元素绘制以控制左右对齐 */
@@ -2097,8 +2096,8 @@ onBeforeRouteLeave(() => {
   .property-detail-page hr,
   .property-detail-page .el-divider,
   .content-card > * + *::before {
-    background-color: #e5e5e5 !important;
-    border-color: #e5e5e5 !important;
+    background-color: var(--divider-color) !important;
+    border-color: var(--divider-color) !important;
   }
 
   /* 4) 返回按钮：白色圆底 + 灰色箭头（与移动端对齐，PC端） */
@@ -2151,11 +2150,11 @@ onBeforeRouteLeave(() => {
   .map-container {
     width: 100% !important;
     height: 240px !important;
-    border: 1px solid #e5e5e5 !important;
+    border: 1px solid var(--color-border-default) !important;
     border-radius: 0 !important;
     overflow: hidden !important;
     box-sizing: border-box !important; /* 边框计入宽度，确保与红线对齐 */
-    background: #e8e8e8; /* 兜底底色 */
+    background: var(--surface-2); /* 兜底底色 */
   }
 }
 /* ==== 精简“See your travel time”样式（PC 与移动端一致的简洁行项） ==== */
@@ -2200,7 +2199,7 @@ onBeforeRouteLeave(() => {
 .travel-chevron {
   width: 24px;
   height: 24px;
-  color: #3c475b;          /* 更深的中性色 */
+  color: var(--color-text-secondary);
   flex-shrink: 0;
   margin-left: 8px;        /* 与标题间距 */
   margin-right: 16px;      /* 与右侧边缘间距 */
@@ -2209,6 +2208,6 @@ onBeforeRouteLeave(() => {
 /* PC 悬浮轻微高亮 & 行高略增 */
 @media (min-width: 1200px) {
   .see-travel-times-btn { padding-block: 16px !important; }
-  .see-travel-times-btn:hover { background: #f7f8fa !important; }
+  .see-travel-times-btn:hover { background: var(--bg-hover) !important; }
 }
 </style>

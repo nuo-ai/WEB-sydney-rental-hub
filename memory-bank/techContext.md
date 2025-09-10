@@ -257,4 +257,11 @@ python scripts/run_backend.py  # localhost:8000
 - 回滚与例外
   - 发生误拦截时，优先在局部以更具体选择器限定；极端情况下可短期使用 var(--token, #xxx) 兜底，但需在下一轮清理。
   - 关闭钩子或移除脚本不影响生产构建；规则变更以 .stylelintrc.json 为准。
-- 溯源：commit 9984dff..0b6e146｜progress 2025-09-10
+- 增量（0b6e146..806d3a3）
+  - AreaFilterPanel：chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex
+  - SearchBar：内嵌/回显标签去除 var(--*, #hex) 兜底，统一 --chip-* 与 --color-text-*；移动端 active 改 --bg-hover
+  - SearchOverlay：移除品牌/文字颜色兜底，保留 CTA 走 --juwo-primary；其余交互中性化
+  - PropertyDetail：--divider-color → var(--color-border-default)，移除分隔线/品牌色兜底
+  - NameLocationModal：“跳过”按钮改 --juwo-primary（移除旧红色）
+- 规范补充：禁止在运行代码中保留 var(--token, #hex) 形式的兜底（仅 tokens 定义文件可例外）；PR 必须消除该模式，避免主题/深浅底不一致。
+- 溯源：commit 9984dff..806d3a3｜progress 2025-09-10
