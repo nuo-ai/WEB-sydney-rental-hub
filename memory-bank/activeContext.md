@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- PROPERTYDETAIL-TOKENS-UNIFY：详情页令牌化与图标统一（页灰背景 + 白卡容器、分隔线中性灰；移除 Font Awesome 与硬编码色/rgba 阴影；收藏高亮用品牌蓝；不改动数据流/对齐基线）。溯源：commit aaa5b8b..f201a24
 - COMMUTE/COMPARE-TOKENS-P1：通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；前端表现：中性灰体系一致、图标统一 lucide、无硬编码色；溯源：commit 19328a9..aaa5b8b
 - FILTER-PANELS-HOVER-NEUTRAL：AreaFilterPanel 优先完成 chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex；与 FilterTabs 统一。前端表现：面板交互反馈一致，无彩色跳变。溯源：commit 0b6e146..806d3a3
 - SEARCH-ENTRY-CHIPS-TOKENIZED：SearchBar 内嵌/回显标签去除 var(--*, #hex) 兜底，统一 --chip-* 与 --color-text-*；移动端 active 改 --bg-hover。前端表现：搜索入口与筛选标签完全同源。溯源：commit 0b6e146..806d3a3

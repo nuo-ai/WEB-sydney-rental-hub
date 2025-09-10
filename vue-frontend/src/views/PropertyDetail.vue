@@ -1165,7 +1165,7 @@ onBeforeRouteLeave(() => {
 .price-text {
   font-size: 20px;
   font-weight: 700;
-  color: var(--color-text-price);
+  color: var(--color-text-primary);
   line-height: 1.2;
 }
 
@@ -1440,7 +1440,7 @@ onBeforeRouteLeave(() => {
   background: var(--surface-2);
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
-  gap: var(--spacing-sm);
+  gap: var(--space-3);
 }
 
 .travel-times-link {
@@ -1810,7 +1810,7 @@ onBeforeRouteLeave(() => {
   flex: 1;
   height: 48px;
   border-radius: 24px;
-  font-size: var(--font-size-base);
+  font-size: var(--text-base);
   font-weight: 600;
   border: none;
   cursor: pointer;
@@ -1818,7 +1818,7 @@ onBeforeRouteLeave(() => {
 }
 
 .enquire-btn {
-  background: var(--color-accent);
+  background: var(--juwo-primary);
   color: var(--color-text-inverse);
 }
 
@@ -1846,7 +1846,7 @@ onBeforeRouteLeave(() => {
   }
 
   .content-container {
-    padding: 0 var(--spacing-lg);
+    padding: 0 var(--space-4);
   }
 
   .price {

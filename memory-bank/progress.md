@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜PROPERTYDETAIL-TOKENS-UNIFY  
+  详情页令牌化与图标统一（页灰背景 + 白卡容器、分隔线中性灰；移除 Font Awesome 与硬编码色/rgba 阴影；收藏高亮用品牌蓝；不改动数据流/对齐基线）｜溯源：commit aaa5b8b..f201a24
 - 2025-09-10｜COMMUTE/COMPARE-TOKENS-P1  
   通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；图标统一 lucide；中性灰令牌合规；不改动数据流；｜溯源：commit 19328a9..aaa5b8b
 - 2025-09-10｜FILTER-PANELS-HOVER-NEUTRAL & ENTRY-CHIPS-TOKENIZED  
