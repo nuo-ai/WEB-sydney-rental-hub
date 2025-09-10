@@ -5,7 +5,7 @@
       <button class="back-btn" @click="handleBack">
         <i class="fas fa-arrow-left"></i>
       </button>
-      <h1 class="page-title">Location</h1>
+      <h1 class="page-title typo-heading-card">{{ $t('commute.pageTitle') }}</h1>
     </header>
 
     <!-- 地图区域 -->
@@ -25,14 +25,14 @@
       />
       <div v-else class="map-placeholder">
         <el-icon :size="32"><Location /></el-icon>
-        <span>Loading map...</span>
+        <span class="typo-body-sm">{{ $t('commute.mapLoading') }}</span>
       </div>
     </section>
 
     <!-- Travel Time 区域 -->
     <section class="travel-time-section">
-      <h2 class="section-title">Travel Time</h2>
-      <p class="from-address">From {{ fullAddress }}</p>
+      <h2 class="section-title typo-heading-card">{{ $t('commute.sectionTitle') }}</h2>
+      <p class="from-address typo-body">{{ $t('commute.fromPrefix') }} {{ fullAddress }}</p>
 
       <!-- 交通方式选择 -->
       <TransportModes v-model="selectedMode" @change="handleModeChange" />
@@ -52,15 +52,15 @@
         <!-- 空状态 -->
         <div v-if="userLocations.length === 0" class="empty-state">
           <i class="fas fa-map-marked-alt"></i>
-          <p>No saved locations yet</p>
-          <p class="empty-hint">Add your frequent destinations to see travel times</p>
+          <p class="typo-body">{{ $t('commute.emptyTitle') }}</p>
+          <p class="empty-hint typo-body-sm">{{ $t('commute.emptyHint') }}</p>
         </div>
       </div>
 
       <!-- 添加地址按钮 -->
       <button class="add-location-btn" @click="showAddModal = true">
         <i class="fas fa-plus"></i>
-        <span>Add location</span>
+        <span class="typo-button">{{ $t('commute.addLocation') }}</span>
       </button>
     </section>
 
@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCommuteStore } from '@/stores/commute'
@@ -96,6 +96,8 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const commuteStore = useCommuteStore()
+
+const t = inject('t')
 
 // 从路由参数获取房源信息
 const propertyId = ref(route.query.propertyId)
@@ -270,11 +272,11 @@ const saveLocation = async (data) => {
     if (authStore.savedAddresses && authStore.savedAddresses.length > 0) {
       try {
         await ElMessageBox.confirm(
-          '已保存一所大学，是否替换？',
-          '替换当前大学？',
+          t ? t('commute.confirmReplaceMessage') : '已保存一所大学，是否替换？',
+          t ? t('commute.confirmReplaceTitle') : '替换当前大学？',
           {
-            confirmButtonText: '替换',
-            cancelButtonText: '取消',
+            confirmButtonText: t ? t('common.replace') : '替换',
+            cancelButtonText: t ? t('common.cancel') : '取消',
             type: 'warning'
           }
         )
@@ -309,10 +311,10 @@ const saveLocation = async (data) => {
     showNameModal.value = false
     selectedAddress.value = null
 
-    ElMessage.success('Location added successfully!')
+    ElMessage.success(t ? t('commute.locationAdded') : 'Location added successfully!')
   } catch (error) {
     console.error('Error saving location:', error)
-    ElMessage.error('Failed to save location')
+    ElMessage.error(t ? t('commute.locationAddFailed') : 'Failed to save location')
   }
 }
 
@@ -330,10 +332,10 @@ const handleNameModalBack = () => {
 const removeLocation = async (locationId) => {
   try {
     await authStore.removeUserAddress(locationId)
-    ElMessage.success('Location removed')
+    ElMessage.success(t ? t('commute.locationRemoved') : 'Location removed')
   } catch (error) {
     console.error('Failed to remove location', error)
-    ElMessage.error('Failed to remove location')
+    ElMessage.error(t ? t('commute.locationRemoveFailed') : 'Failed to remove location')
   }
 }
 
@@ -359,7 +361,7 @@ onMounted(() => {
 
   // 检查是否登录
   if (!isTest && !authStore.isAuthenticated) {
-    ElMessage.warning('Please login to access this feature')
+    ElMessage.warning(t ? t('commute.loginRequired') : 'Please login to access this feature')
     router.push('/')
     return
   }

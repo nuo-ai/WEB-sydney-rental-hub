@@ -5,7 +5,7 @@
       :key="mode.value"
       :class="['mode-btn', { active: modelValue === mode.value }]"
       @click="selectMode(mode.value)"
-      :title="mode.label"
+      :title="$t('commute.modes.' + mode.value.toLowerCase())"
     >
       <i :class="mode.icon"></i>
     </button>

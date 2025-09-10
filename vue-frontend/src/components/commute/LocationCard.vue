@@ -2,7 +2,7 @@
   <div class="location-card">
     <div class="location-info">
       <span class="location-label" :class="labelClass">{{ location.label }}</span>
-      <span class="location-address">{{ truncatedAddress }}</span>
+      <span class="location-address typo-body-sm">{{ truncatedAddress }}</span>
     </div>
 
     <div class="commute-info">
@@ -11,21 +11,21 @@
       </div>
       <div v-else-if="commuteData">
         <div class="time">{{ commuteData.duration }}</div>
-        <div class="distance">{{ commuteData.distance }}</div>
+        <div class="distance typo-body-sm">{{ commuteData.distance }}</div>
       </div>
       <div v-else class="no-data">
         <div class="time">--</div>
       </div>
     </div>
 
-    <button class="remove-btn" @click="handleRemove" title="Remove location">
+    <button class="remove-btn" @click="handleRemove" :title="$t('locationCard.remove')">
       <i class="fas fa-times"></i>
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import { useCommuteStore } from '@/stores/commute'
 import { transportAPI } from '@/services/api'
 
@@ -47,6 +47,7 @@ const props = defineProps({
 const emit = defineEmits(['remove'])
 
 const commuteStore = useCommuteStore()
+const t = inject('t')
 
 // 响应式状态
 const isLoading = ref(false)
@@ -98,7 +99,7 @@ const calculateCommute = async () => {
       }
 
       commuteData.value = {
-        duration: result.duration || 'N/A',
+        duration: result.duration || (t ? t('locationCard.na') : 'N/A'),
         distance: result.distance || '',
       }
 
@@ -109,7 +110,7 @@ const calculateCommute = async () => {
     console.error('Failed to calculate commute:', err)
     error.value = err.message
     commuteData.value = {
-      duration: 'N/A',
+      duration: t ? t('locationCard.na') : 'N/A',
       distance: '',
     }
   } finally {

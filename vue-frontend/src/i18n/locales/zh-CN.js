@@ -3,7 +3,8 @@ export default {
     cancel: '取消',
     confirm: '确定',
     readMore: '展开',
-    readLess: '收起'
+    readLess: '收起',
+    replace: '替换'
   },
   propertyCard: {
     perWeek: '每周',
@@ -30,6 +31,31 @@ export default {
     noInspection: '当前无开放时间，请联系客服确认房源状态。',
     enquire: '联系咨询',
     inspect: '预约看房'
+  },
+  commute: {
+    pageTitle: '通勤时间',
+    mapLoading: '地图加载中…',
+    sectionTitle: '通勤时间',
+    fromPrefix: '起点：',
+    emptyTitle: '暂无保存地址',
+    emptyHint: '添加常用目的地以查看通勤时间',
+    addLocation: '添加地址',
+    loginRequired: '请登录后使用该功能',
+    locationAdded: '地址已添加',
+    locationAddFailed: '保存地址失败',
+    locationRemoved: '地址已移除',
+    locationRemoveFailed: '移除地址失败',
+    confirmReplaceTitle: '替换当前大学？',
+    confirmReplaceMessage: '已保存一所大学，是否替换？',
+    modes: {
+      driving: '驾车',
+      transit: '公共交通',
+      walking: '步行'
+    }
+  },
+  locationCard: {
+    remove: '移除地址',
+    na: '不可用'
   },
   search: {
     placeholder: '请先输入区域或邮编，例如 “Ultimo” 或 “2000”'
