@@ -42,10 +42,8 @@
               <span>{{ $t('propertyCard.share') }}</span>
             </button>
             <div class="action-divider"></div>
-            <button @click="toggleFavorite" class="image-action-btn">
-              <el-icon :size="20">
-                <i :class="isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
-              </el-icon>
+            <button @click="toggleFavorite" :class="['image-action-btn', { 'fav-active': isFavorite }]">
+              <Star class="spec-icon" :size="20" aria-hidden="true" />
               <span>{{ $t('propertyCard.save') }}</span>
             </button>
           </div>
@@ -54,15 +52,7 @@
           <div class="image-bottom-controls">
             <!-- 这里改为 Photos pill（图标 + 文案 + 数字徽标） -->
             <div class="inspect-btn-overlay image-counter" aria-label="照片数量">
-              <img
-                v-if="!photoIconFailed"
-                :src="photoIcon"
-                alt=""
-                aria-hidden="true"
-                class="pill-icon"
-                @error="photoIconFailed = true"
-              />
-              <el-icon v-else :size="16" class="pill-icon" aria-hidden="true"><Picture /></el-icon>
+              <Images class="pill-icon spec-icon" aria-hidden="true" />
               <span class="pill-label">{{ $t('propertyDetail.photos') }}</span>
               <span :class="['pill-badge', { 'two-digits': images.length >= 10 }]">{{
                 images.length > 99 ? '99+' : images.length
@@ -162,7 +152,7 @@
               <!-- See travel times button -->
               <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
                 <div class="travel-icon-wrapper">
-                  <i class="fas fa-location-dot"></i>
+                  <MapPin class="spec-icon" />
                 </div>
                 <div class="travel-btn-content">
                   <span class="travel-btn-title typo-button">{{
@@ -292,14 +282,12 @@
 </template>
 
 <script setup>
-const photoIcon =
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" stroke="%233c475b" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="%233c475b" stroke-width="2"/></svg>'
 import { onMounted, onUnmounted, computed, ref, inject } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
 import { ArrowLeft, Share, Picture, Location, Calendar, Loading } from '@element-plus/icons-vue'
-import { BedDouble, Bath, CarFront, ChevronDown } from 'lucide-vue-next'
+import { BedDouble, Bath, CarFront, ChevronDown, MapPin, Images, Star } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
@@ -315,8 +303,6 @@ const propertyId = route.params.id
 
 // 响应式状态
 const currentImageIndex = ref(0)
-// 修复点 2：为图标加载增加失败标志，触发兜底图标
-const photoIconFailed = ref(false)
 const isDescriptionExpanded = ref(false)
 const showAllFeatures = ref(false)
 const showAuthModal = ref(false)
@@ -748,7 +734,7 @@ onBeforeRouteLeave(() => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: var(--color-bg-card); /* 页面背景改为卡片白（页白 + 卡片白） */
+  background-color: var(--color-bg-page); /* 页面背景用页灰，卡片区域用 --color-bg-card */
   /* 新增：统一字体栈（含中文优先级） */
   --font-ui: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   font-family: var(--font-ui);
@@ -859,6 +845,11 @@ onBeforeRouteLeave(() => {
 .image-action-btn span {
   font-size: 14px;
   color: var(--color-text-secondary);
+}
+
+/* 收藏高亮：使用品牌色，图标随 currentColor 继承 */
+.image-action-btn.fav-active {
+  color: var(--brand-primary);
 }
 
 .action-divider {
@@ -1017,7 +1008,7 @@ onBeforeRouteLeave(() => {
     margin: 0;
     overflow: hidden; /* 防止内部溢出造成滚动条 */
     border-radius: 0; /* 去掉圆角：按产品要求保持直角视觉 */
-    box-shadow: var(--shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.06));
+    box-shadow: var(--shadow-xs);
   }
 
   .property-image {
@@ -1940,7 +1931,6 @@ onBeforeRouteLeave(() => {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.2px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 /* 单张白卡一体化容器：由父容器统一承载白底与分隔线 */
 .content-card {

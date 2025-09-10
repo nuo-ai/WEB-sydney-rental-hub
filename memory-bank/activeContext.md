@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- COMMUTE/COMPARE-TOKENS-P1：通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；前端表现：中性灰体系一致、图标统一 lucide、无硬编码色；溯源：commit 19328a9..aaa5b8b
 - FILTER-PANELS-HOVER-NEUTRAL：AreaFilterPanel 优先完成 chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex；与 FilterTabs 统一。前端表现：面板交互反馈一致，无彩色跳变。溯源：commit 0b6e146..806d3a3
 - SEARCH-ENTRY-CHIPS-TOKENIZED：SearchBar 内嵌/回显标签去除 var(--*, #hex) 兜底，统一 --chip-* 与 --color-text-*；移动端 active 改 --bg-hover。前端表现：搜索入口与筛选标签完全同源。溯源：commit 0b6e146..806d3a3
 - DETAIL-DIVIDER-TOKEN：PropertyDetail 统一 --divider-color → var(--color-border-default)，移除品牌色/分隔线兜底。前端表现：详情页线条全中性灰，CTA/链接保留品牌蓝。溯源：commit 0b6e146..806d3a3
@@ -36,7 +37,6 @@
 
 下一步
 - [P0] 详情页 PropertyDetail* 全量颜色令牌化：去除 #f5f5f5/#e5e5e5/#007bff/#ff5722 等散点；引入 info/warning/danger-soft 令牌统一反馈弱底/边框。
-- [P1] 通勤/对比等组件残留令牌化：CommuteCalculator.vue / CompareToolbar.vue / commute/LocationCard.vue 等（hover/active/标签色族）。
 - [P2] 渐进移除 var(--token, #xxx) fallback；新组件模板要求 icon 用 currentColor + 外层 class 控制颜色。
 - [Guard] CI 验证 stylelint 新规则拦截效果；新增页面 PR 提示必须使用设计令牌。
 

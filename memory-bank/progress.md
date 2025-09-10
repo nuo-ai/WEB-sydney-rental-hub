@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜COMMUTE/COMPARE-TOKENS-P1  
+  通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；图标统一 lucide；中性灰令牌合规；不改动数据流；｜溯源：commit 19328a9..aaa5b8b
 - 2025-09-10｜FILTER-PANELS-HOVER-NEUTRAL & ENTRY-CHIPS-TOKENIZED  
   筛选子面板 hover/focus 中性化（AreaFilterPanel/FilterTabs 同步基线）；SearchBar 内嵌/回显标签去除 var(--*, #hex) 兜底并统一 --chip-*；移动端 active 改 --bg-hover｜溯源：commit 0b6e146..806d3a3
 - 2025-09-10｜DETAIL-DIVIDER-TOKEN & OVERLAY/MODAL-ALIGN  
