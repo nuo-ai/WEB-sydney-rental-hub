@@ -730,13 +730,15 @@ onBeforeRouteLeave(() => {
 
 <style scoped>
 /* Domain.com.au 像素级还原样式 - 基于Figma精确设计 */
-@import '@/assets/design-tokens.css';
+@import url('@/assets/design-tokens.css');
 
 .property-detail-page {
   min-height: 100vh;
   background-color: var(--color-bg-page); /* 页面背景用页灰，卡片区域用 --color-bg-card */
+
   /* 新增：统一字体栈（含中文优先级） */
-  --font-ui: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-ui: inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+
   font-family: var(--font-ui);
 }
 
@@ -950,6 +952,7 @@ onBeforeRouteLeave(() => {
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
+
 /* 两位及以上（含 99+）→ 自动胶囊 */
 .inspect-btn-overlay.image-counter .pill-badge.two-digits {
   width: auto;
@@ -973,14 +976,14 @@ onBeforeRouteLeave(() => {
 }
 
 /* 平板尺寸 */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .image-container {
     height: 400px;
   }
 }
 
 /* 桌面尺寸 - Figma 精确规格 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   /* Hero 全宽 + 自适应左右留白
      为什么：还原截图“更大气”的观感，同时用 clamp 保证在窄屏/超宽屏下都有合理留白与稳定表现 */
   .image-header {
@@ -991,6 +994,7 @@ onBeforeRouteLeave(() => {
       6vw,
       115px
     ); /* 自适应左右留白：窄屏收敛到 ~16-32px，≥1440 接近 115px */
+
     margin: 0 auto;
     background: transparent;
   }
@@ -1003,6 +1007,7 @@ onBeforeRouteLeave(() => {
       --hero-height,
       auto
     ); /* 加入分辨率守卫：加载后以 --hero-height 为准，避免放大导致模糊 */
+
     min-height: 560px;
     max-height: 820px;
     margin: 0;
@@ -1031,7 +1036,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 超大屏幕 - 1920px设计稿 */
-@media (min-width: 1920px) {
+@media (width >= 1920px) {
   /* 继续使用 Hero 全宽 + clamp 左右留白，避免出现“另一套主题”的观感 */
   .image-header {
     width: 100%;
@@ -1097,7 +1102,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端主内容区域 - 完全改变布局 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .content-container {
     max-width: none !important;
     width: 100% !important;
@@ -1124,11 +1129,11 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端信息卡片 - 巨大变化 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .info-card {
     width: 100%;
     margin: 0;
-    padding: 32px 32px; /* 统一左右 32，与容器对齐 */
+    padding: 32px; /* 统一左右 32，与容器对齐 */
     background: var(--color-bg-card);
     box-shadow: none;
     border-radius: 0;
@@ -1176,7 +1181,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端价格 - 超大字体 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .price-wrapper {
     margin-bottom: 32px;
     padding-bottom: 24px;
@@ -1220,7 +1225,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端地址 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .address-main {
     font-size: 16px;
   }
@@ -1279,7 +1284,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端特征 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .price-wrapper {
     margin-bottom: 32px; /* 价格到地址 32 */
     padding-bottom: 24px; /* 保持内边距 */
@@ -1368,7 +1373,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端位置部分 - 大改 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .location-section {
     width: 100%;
     margin: 0;
@@ -1383,16 +1388,16 @@ onBeforeRouteLeave(() => {
   font-size: 23px;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   font-family: var(--font-ui); /* 统一 */
 }
 
 /* PC端标题 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .section-title,
   .description-section .section-title {
     font-size: 25px;
-    margin: 0 0 24px 0;
+    margin: 0 0 24px;
   }
 }
 
@@ -1411,7 +1416,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端地图容器 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .map-container {
     height: auto; /* 高度由 GoogleMap 组件控制 */
     border-radius: 0;
@@ -1469,7 +1474,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端描述部分 - 大改 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .description-section {
     width: 100%;
     margin: 0;
@@ -1484,7 +1489,7 @@ onBeforeRouteLeave(() => {
   font-size: 23px;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 24px 0;
+  margin: 0 0 24px;
   font-family: var(--font-ui); /* 统一 */
 }
 
@@ -1503,7 +1508,7 @@ onBeforeRouteLeave(() => {
 }
 
 .description-text p {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .description-text p:last-child {
@@ -1557,7 +1562,7 @@ onBeforeRouteLeave(() => {
 
 /* Property Features 部分 - 两列布局 */
 .features-section {
-  padding: 24px 16px 33px 16px; /* 调整底部padding以满足33px间距要求 */
+  padding: 24px 16px 33px; /* 调整底部padding以满足33px间距要求 */
   background: var(--color-bg-card);
   margin: 0;
   border-radius: 0;
@@ -1566,11 +1571,11 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端特性部分 - 大改 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .features-section {
     width: 100%;
     margin: 0;
-    padding: 40px 48px 33px 48px; /* 同样调整底部padding */
+    padding: 40px 48px 33px; /* 同样调整底部padding */
     background: var(--color-bg-card);
     border-radius: 0;
     box-shadow: none;
@@ -1581,7 +1586,7 @@ onBeforeRouteLeave(() => {
   font-size: 24px;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
 }
 
 .features-section .features-two-column {
@@ -1592,7 +1597,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 桌面端(768px以上)切换为三列 */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .features-section .features-two-column {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1628,7 +1633,7 @@ onBeforeRouteLeave(() => {
 .inspection-section {
   padding: 24px 16px;
   background: var(--color-bg-card);
-  margin: 0 0 80px 0;
+  margin: 0 0 80px;
   border-radius: 0;
   box-shadow: none;
 }
@@ -1645,10 +1650,10 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端检查时间部分 - 大改 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .inspection-section {
     width: 100%;
-    margin: 0 0 80px 0;
+    margin: 0 0 80px;
     padding: 40px 48px;
     background: var(--color-bg-card);
     border-radius: 0;
@@ -1660,14 +1665,14 @@ onBeforeRouteLeave(() => {
   font-size: 23px;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 24px 0;
+  margin: 0 0 24px;
   font-family: var(--font-ui);
 }
 
 .inspection-section .section-subtitle {
   font-size: 14px;
   color: var(--color-text-secondary);
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
 }
 
 .inspection-list {
@@ -1678,7 +1683,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端检查列表 - 网格布局 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .inspection-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1698,7 +1703,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端检查项 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .inspection-item {
     height: 72px;
     padding: 16px 20px;
@@ -1768,7 +1773,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端添加到计划按钮 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .add-to-planner-btn {
     margin: 20px auto 0;
   }
@@ -1800,7 +1805,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC端隐藏底部操作栏 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .action-footer {
     display: none;
   }
@@ -1840,7 +1845,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* Responsive Design - Domain响应式 */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .image-container {
     height: 400px;
   }
@@ -1864,7 +1869,7 @@ onBeforeRouteLeave(() => {
 
 /* 将 1024 的高度限制为仅在 1024–1199 区间生效
    原因：避免覆盖 1200+ 的 16:9 比例设置（保持栅格与沉浸感一致） */
-@media (min-width: 1024px) and (max-width: 1199px) {
+@media (width >= 1024px) and (width <= 1199px) {
   .image-container {
     height: 500px;
   }
@@ -1932,6 +1937,7 @@ onBeforeRouteLeave(() => {
   font-weight: 600;
   letter-spacing: 0.2px;
 }
+
 /* 单张白卡一体化容器：由父容器统一承载白底与分隔线 */
 .content-card {
   background: var(--color-bg-card);
@@ -1959,7 +1965,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 桌面端：轻微圆角与阴影，贴近 Figma 的“单卡”视觉 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .content-card {
     border-radius: 8px;
     box-shadow: none;
@@ -1967,7 +1973,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 统一桌面端对齐与内容可读宽度（单张白卡内部） */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   /* 桌面端版心标准：左右内边距 50px，可读宽度 801px（按设计尺规） */
   .content-card {
     --section-padding-x: 50px;
@@ -2005,6 +2011,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* ==== 覆盖层（放在样式结尾，确保权重更高）==== */
+
 /* 1) 扁平化白卡外观：无边框、无圆角、无阴影 */
 .content-card {
   box-shadow: none !important; /* 去除白卡阴影 */
@@ -2028,7 +2035,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 3) 桌面端：分隔线左对齐正文内容（48px 内边距），右对齐地图右缘（与 --content-measure 一致） */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   /* 让每个区块能承载绝对定位的伪元素 */
   .content-card > * {
     position: relative;
@@ -2041,6 +2048,7 @@ onBeforeRouteLeave(() => {
     width: calc(
       100% - calc(var(--section-padding-x, 50px) * 2)
     ); /* 分隔线右端对齐到内容右缘（= 页面右侧 496） */
+
     top: 0;
     height: 1px;
     background-color: var(--divider-color);
@@ -2048,20 +2056,22 @@ onBeforeRouteLeave(() => {
 }
 
 /* 移动端与小屏：恢复基础分隔线（无需特殊对齐规则） */
-@media (max-width: 1199px) {
+@media (width <= 1199px) {
   .content-card > * + * {
     border-top: 1px solid var(--divider-color) !important;
   }
 }
+
 /* 超宽屏段落行长限制：提升可读性，不改变容器的 453px/496px 对齐规则 */
-@media (min-width: 1920px) {
+@media (width >= 1920px) {
   .property-detail-page .content-card .description-section p {
     max-width: var(--paragraph-measure, 68ch);
     margin-right: auto;
   }
 }
+
 /* 新增：桌面端固定正文左右边距（左 453 / 右 496），并移除 801px 上限以保证右缘对齐 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .content-card {
     margin-left: calc(453px - var(--section-padding-x, 50px)) !important;
     margin-right: calc(496px - var(--section-padding-x, 50px)) !important;
@@ -2077,8 +2087,9 @@ onBeforeRouteLeave(() => {
     width: auto !important;
   }
 }
+
 /* ==== PC 端局部覆盖：隐藏指示点、移除价格下分隔线、去橙色线条、返回键白底灰箭头 ==== */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   /* 1) 隐藏轮播指示点（仅PC，移动端保留） */
   .image-indicators {
     display: none !important;
@@ -2103,11 +2114,14 @@ onBeforeRouteLeave(() => {
   background: var(--color-bg-card) !important; /* 白色圆底（令牌化），适配浅/深背景 */
   color: var(--color-text-secondary) !important; /* 灰色箭头（随 currentColor） */
 }
+
   .back-btn:hover {
     background: var(--color-bg-card) !important; /* hover 同白底，阴影由默认处理 */
   }
 }
+
 /* ==== 全端统一：隐藏指示点 + 分隔线中性化（移动端与PC同时生效） ==== */
+
 /* 1) 移动端与PC：统一隐藏轮播指示点 */
 .image-indicators {
   display: none !important;
@@ -2129,12 +2143,14 @@ onBeforeRouteLeave(() => {
   border-bottom: none !important;
   padding-bottom: 0 !important;
 }
+
 /* ==== 移动端(≤767px)：地图尺寸与统一左右对齐（以 24px gutter 为基准） ==== */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   /* 统一白卡内部左右边界与地图一致 */
   .content-card {
     --mobile-gutter: 8px;
   }
+
   .content-card .info-card,
   .content-card .location-section,
   .content-card .description-section,
@@ -2155,7 +2171,9 @@ onBeforeRouteLeave(() => {
     background: var(--surface-2); /* 兜底底色 */
   }
 }
+
 /* ==== 精简“See your travel time”样式（PC 与移动端一致的简洁行项） ==== */
+
 /* 基础：单行、左右分布、上下分隔线、无卡片外观 */
 .see-travel-times-btn {
   display: flex !important;
@@ -2177,6 +2195,7 @@ onBeforeRouteLeave(() => {
 .travel-icon-wrapper {
   display: none !important;
 }
+
 .travel-btn-subtitle {
   display: none !important;
 }
@@ -2197,6 +2216,7 @@ onBeforeRouteLeave(() => {
 }
 
 /* 右侧折叠提示箭头（改用 Lucide 组件，去除伪元素） */
+
 /* 不再将箭头推到最右 */
 .travel-chevron {
   width: 24px;
@@ -2208,10 +2228,11 @@ onBeforeRouteLeave(() => {
 }
 
 /* PC 悬浮轻微高亮 & 行高略增 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .see-travel-times-btn {
     padding-block: 16px !important;
   }
+
   .see-travel-times-btn:hover {
     background: var(--bg-hover) !important;
   }

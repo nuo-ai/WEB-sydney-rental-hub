@@ -198,7 +198,7 @@ const handleClick = (event) => {
 /* 危险按钮 */
 .base-button--danger {
   background: var(--filter-color-danger);
-  color: #ffffff;
+  color: #fff;
   border-color: var(--filter-color-danger);
 }
 
@@ -268,13 +268,14 @@ const handleClick = (event) => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 /* 响应式调整 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .base-button {
     padding: calc(var(--filter-btn-padding-y) + 2px) var(--filter-btn-padding-x);
     font-size: var(--filter-font-size-md);

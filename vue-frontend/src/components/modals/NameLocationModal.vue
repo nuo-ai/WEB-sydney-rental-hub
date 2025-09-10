@@ -161,7 +161,6 @@ const handleConfirm = () => {
 
 /* 顶部导航 */
 .modal-header {
-  position: sticky;
   top: 0;
   z-index: 100;
   background: var(--color-bg-card);
@@ -364,7 +363,7 @@ const handleConfirm = () => {
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal-content {
     padding: 20px 16px;
   }

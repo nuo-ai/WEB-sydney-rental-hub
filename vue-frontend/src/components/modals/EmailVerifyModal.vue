@@ -371,7 +371,7 @@ onUnmounted(() => {
 }
 
 /* Mobile optimization */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .verify-content {
     padding: 24px 16px;
   }

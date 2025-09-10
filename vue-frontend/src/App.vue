@@ -48,14 +48,14 @@ const handleNavVisibility = (hidden) => {
 }
 
 /* 移动端适配 - 为底部导航留空间 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .main-view {
     padding-bottom: 80px;
   }
 }
 
 /* 桌面端适配 - 为固定导航栏留出空间 */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .main-view {
     padding-top: 64px; /* 为固定导航栏预留空间 */
   }
@@ -124,6 +124,7 @@ a:hover {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -134,13 +135,13 @@ a:hover {
 }
 
 /* 响应式字体大小 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   html {
     font-size: 14px;
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   html {
     font-size: 16px;
   }

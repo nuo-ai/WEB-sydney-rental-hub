@@ -445,7 +445,7 @@ onUnmounted(() => {
   overflow-x: hidden; /* 防止固定宽度元素造成水平滚动，不影响内部粘性定位 */
 }
 
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .home-container {
     padding-bottom: 0;
   }
@@ -454,6 +454,7 @@ onUnmounted(() => {
 /* 主内容区域 */
 .main-content {
   width: 100%;
+
   /* 移除 overflow-x: hidden 以修复粘性定位 */
 }
 
@@ -463,13 +464,13 @@ onUnmounted(() => {
   padding: 16px 32px; /* 减少移动端上下padding */
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .container {
-    padding: 32px 32px;
+    padding: 32px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .container {
     padding: 40px 32px;
   }
@@ -495,7 +496,7 @@ onUnmounted(() => {
   line-height: 1.4;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .page-title {
     font-size: 36px;
   }
@@ -510,7 +511,7 @@ onUnmounted(() => {
   /* 从一开始就横贯整个屏幕，像Domain一样 */
   width: 100%;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   margin-bottom: 16px; /* 减少移动端下边距 */
   z-index: 50;
   transition: all 0.2s ease-out;
@@ -523,19 +524,19 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   margin-bottom: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   transition: top 0.2s ease-in-out;
 }
 
 /* 当导航栏隐藏时，搜索栏贴顶 */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .search-filter-section.is-fixed.nav-hidden {
     top: 0;
   }
 }
 
 /* 移动端搜索栏始终贴顶 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .search-filter-section.is-fixed {
     top: 0;
   }
@@ -548,8 +549,9 @@ onUnmounted(() => {
 
 /* 移动端Logo区域 */
 .mobile-logo-section {
-  padding: 8px 0 12px 0; /* 减少上下间距，上8px下12px */
+  padding: 8px 0 12px; /* 减少上下间距，上8px下12px */
   position: relative;
+
   /* 移除高z-index，避免与fixed搜索栏产生叠加问题 */
 }
 
@@ -567,7 +569,7 @@ onUnmounted(() => {
 }
 
 /* 在桌面端隐藏移动端Logo */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .mobile-logo-section {
     display: none;
   }
@@ -577,7 +579,7 @@ onUnmounted(() => {
   /* 搜索内容居中对齐容器 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 32px 12px 32px; /* 减少上下padding */
+  padding: 16px 32px 12px; /* 减少上下padding */
 }
 
 /* 搜索行布局 */
@@ -615,11 +617,13 @@ onUnmounted(() => {
   font-size: 13px;
   line-height: 1; /* 垂直居中更稳 */
 }
+
 .filter-trigger-btn:hover {
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
   background: #f7f8fa;
 }
+
 .filter-trigger-btn:focus {
   outline: none; /* 去除浏览器默认 focus ring */
   box-shadow: none;
@@ -645,11 +649,13 @@ onUnmounted(() => {
 .title-block {
   padding-top: 8px;
 }
+
 .breadcrumbs {
   font-size: 12px;
   color: var(--color-text-secondary);
   margin-bottom: 10px;
 }
+
 .page-h1 {
   font-size: 24px;
   line-height: 28px;
@@ -664,12 +670,14 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
 }
+
 .alert-left {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   color: var(--color-text-secondary);
 }
+
 .alert-left .label {
   font-weight: 500;
 }
@@ -683,19 +691,20 @@ onUnmounted(() => {
   border: 0;
   padding: 8px 0;
 }
+
 .sort-btn .label {
   font-weight: 600;
 }
 
 /* 移动端下保持点击区可达性 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .actions-row {
     gap: 10px;
   }
 }
 
 /* 移动端布局调整 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .container {
     padding: 12px 16px;
   } /* 统一移动端左右 16px，与卡片内容区一致 */
@@ -704,7 +713,7 @@ onUnmounted(() => {
   }
 
   .search-content-container {
-    padding: 12px 16px 8px 16px; /* 与卡片内容区(16px)左右对齐 */
+    padding: 12px 16px 8px; /* 与卡片内容区(16px)左右对齐 */
   }
 
   .search-filter-row {
@@ -796,6 +805,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 24px;
   align-items: flex-start;
+
   /* max-width 将由外部容器 .container 控制 */
 }
 
@@ -831,7 +841,7 @@ onUnmounted(() => {
 }
 
 /* 响应式搜索筛选区域 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .search-filter-section {
     max-width: none;
     margin-bottom: 16px;
@@ -858,10 +868,12 @@ onUnmounted(() => {
     line-height: 1;
   }
 }
+
 /* 统一图标语义色（错误/空状态），改用设计令牌，避免内联硬编码 */
 .error-message .el-icon.error-icon {
   color: var(--color-danger);
 }
+
 .empty-state .el-icon.empty-icon {
   color: var(--color-border-default);
 }

@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜LIST-CARD-PRICE-UNIFY  
+  列表卡价格色改为主文案色；全局 --color-text-price 映射到 --color-text-primary，业务层禁用；无逻辑改动｜溯源：commit 07805ab..a5da918
 - 2025-09-10｜PROPERTYDETAIL-TOKENS-FINAL-P0  
   详情页令牌化收尾：价格改主文案色、CTA 统一品牌蓝、间距/字号令牌一致、地图占位间距令牌化；无逻辑改动｜溯源：commit f201a24..07805ab
 - 2025-09-10｜PROPERTYDETAIL-TOKENS-UNIFY  
@@ -74,7 +76,7 @@
 - 2025-09-05｜FILTER-EXPERIENCE-STACK  
   V1→V2 兼容层、URL 同步、错误策略与性能观测（>800ms 报警）
 - 2025-09-05｜RICH-TEXT-UNIFY  
-  统一 Markdown 渲染组件；PropertyDetail 富文本描述标准化；移除重复解析逻辑；提升内容展示一致性｜溯源：commit 范围待补充
+  统一 Markdown 渲染组件；PropertyDetail 富文本描述标准化；移除重复解析逻辑；提升内容展示一致性
 - 2025-09-05｜UI-PILL-COUNTER  
   图片计数器复刻（稳定 1/2 位/99+）；清理无用代码
 - 2025-09-05｜UI-FILTER-ENTRY-UNIFY  

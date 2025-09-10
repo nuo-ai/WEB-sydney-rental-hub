@@ -360,7 +360,7 @@ watch(
   flex-direction: column;
   height: 100dvh; /* 可见视口高度，适配 iOS */
   max-height: 100dvh;
-  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* 头部 */
@@ -395,7 +395,7 @@ watch(
 .spec-icon {
   width: 22px;
   height: 22px;
-  color: currentColor;
+  color: currentcolor;
 }
 
 .header-input {
@@ -425,6 +425,7 @@ watch(
   padding: 6px 8px;
   border-radius: 6px;
 }
+
 .filter-text-btn:active {
   background: var(--filter-color-hover-bg);
 }
@@ -432,7 +433,7 @@ watch(
 .search-prefix {
   width: 18px;
   height: 18px;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
 }
 
 .input {
@@ -459,11 +460,12 @@ watch(
 .chip-caret {
   width: 2px;
   height: 14px;
-  background: currentColor;
+  background: currentcolor;
   margin-left: 4px;
   align-self: center;
   animation: caret-blink 1s step-end infinite;
 }
+
 @keyframes caret-blink {
   50% {
     opacity: 0;
@@ -552,6 +554,7 @@ watch(
 :global(body.srh-overlay-open) {
   overflow: hidden;
 }
+
 /* 设计令牌对齐覆盖（追加覆盖而非重写原样式，降低风险）
    为什么这样做：
    - 移动端搜索覆盖层需要与筛选面板共用一套设计语言（中性灰、统一间距/圆角/边框）
@@ -559,6 +562,7 @@ watch(
    - 若 design tokens 未来微调，可全局生效；此处仅做映射与对齐 */
 :root {
 }
+
 .search-overlay {
   background: var(--filter-panel-bg, var(--filter-color-bg-primary));
 }
@@ -571,32 +575,40 @@ watch(
   border-bottom: 1px solid var(--filter-color-border-default);
   background: var(--filter-color-bg-primary);
 }
+
 .icon-btn {
   color: var(--filter-color-text-secondary);
   border-radius: var(--filter-radius-lg);
 }
+
 .icon-btn:active {
   background: var(--filter-color-hover-bg);
 }
+
 .header-input {
   background: var(--filter-color-bg-primary);
   border: 1px solid var(--filter-color-border-default);
   border-radius: var(--filter-radius-xl);
   padding: 0 var(--filter-space-md);
 }
+
 .header-actions {
   margin-left: var(--filter-space-md);
   gap: var(--filter-space-md);
 }
+
 .filter-text-btn {
   color: var(--juwo-primary);
 }
+
 .filter-text-btn:active {
   background: var(--filter-color-hover-bg);
 }
+
 .search-prefix {
   color: var(--filter-color-text-secondary);
 }
+
 .input {
   color: var(--filter-color-text-primary);
 }
@@ -605,6 +617,7 @@ watch(
 .overlay-content {
   padding-bottom: calc(var(--filter-space-lg) + env(safe-area-inset-bottom, 0px));
 }
+
 .section-title {
   padding: var(--filter-group-title-padding-y) var(--filter-group-title-padding-x);
   font-size: var(--filter-group-title-font-size);
@@ -613,6 +626,7 @@ watch(
   background: var(--filter-group-title-bg);
   border-bottom: 1px solid var(--filter-group-title-border);
 }
+
 .title-icon {
   color: var(--filter-color-text-muted);
 }
@@ -622,12 +636,14 @@ watch(
   border: 1px solid var(--filter-color-border-default);
   color: var(--filter-color-text-secondary);
 }
+
 .loading,
 .empty {
   padding: var(--filter-space-xl);
   font-size: var(--filter-font-size-sm);
   color: var(--filter-color-text-secondary);
 }
+
 .spinner {
   border: 2px solid var(--filter-color-border-subtle);
   border-top-color: var(--juwo-primary);

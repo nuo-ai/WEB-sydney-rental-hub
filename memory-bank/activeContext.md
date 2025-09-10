@@ -2,7 +2,9 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- GUARDRAIL-COLOR-CLEANUP：移除 SearchOverlay 颜色兜底 var(--color-text-secondary, #6b7280) → var(--color-text-secondary)，零视觉改动，令牌合规收尾。（前端表现：文字仍为中性次级灰，无任何 UI 变化）
 - PROPERTYDETAIL-TOKENS-FINAL-P0：详情页 P0 收尾（价格/CTA/间距/地图占位等统一令牌；移除 color-accent/font-size-base/spacing-*；无逻辑改动）。溯源：commit f201a24..07805ab
+- LIST-CARD-PRICE-TOKEN-UNIFY：列表卡价格色改主文案色；全局 --color-text-price 映射至 --color-text-primary，业务层禁用。溯源：commit 07805ab..a5da918
 - PROPERTYDETAIL-TOKENS-UNIFY：详情页令牌化与图标统一（页灰背景 + 白卡容器、分隔线中性灰；移除 Font Awesome 与硬编码色/rgba 阴影；收藏高亮用品牌蓝；不改动数据流/对齐基线）。溯源：commit aaa5b8b..f201a24
 - COMMUTE/COMPARE-TOKENS-P1：通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；前端表现：中性灰体系一致、图标统一 lucide、无硬编码色；溯源：commit 19328a9..aaa5b8b
 - FILTER-PANELS-HOVER-NEUTRAL：AreaFilterPanel 优先完成 chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex；与 FilterTabs 统一。前端表现：面板交互反馈一致，无彩色跳变。溯源：commit 0b6e146..806d3a3
@@ -38,10 +40,14 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
+- [P1] 令牌定义梳理：assets/design-tokens.css 标注 deprecated（--color-accent/--font-size-base/--spacing-lg）并提供语义映射，禁止业务层调用。
+- [P1] 图标系统统一：components/icons/* 使用点扫描；无用移除、在用迁移至 lucide-vue-next + currentColor。
 - [P2] 渐进移除 var(--token, #xxx) fallback；新组件模板要求 icon 用 currentColor + 外层 class 控制颜色。
 - [Guard] CI 验证 stylelint 新规则拦截效果；新增页面 PR 提示必须使用设计令牌。
 
 最新完成
+- 2025-09-10｜LIST-CARD-PRICE-UNIFY  
+  列表卡价格色改为主文案色；全局 --color-text-price 映射到 --color-text-primary，业务层禁用；无逻辑改动｜溯源：commit 07805ab..a5da918
 - 2025-09-10｜PROPERTYDETAIL-TOKENS-FINAL-P0  
   详情页令牌化收尾：price 文本改为主文案色、CTA 统一品牌蓝、间距/字号令牌一致、地图占位间距令牌化；无逻辑改动｜溯源：commit f201a24..07805ab
 - 2025-09-08｜SORT-P0

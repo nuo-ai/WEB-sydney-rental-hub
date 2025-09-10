@@ -435,10 +435,11 @@ onUnmounted(() => {
 }
 
 /* PC端右侧布局时的样式调整 */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .filter-tabs-container {
     max-width: none;
   }
+
   .filter-tabs {
     justify-content: flex-start; /* 紧邻搜索框 */
     flex-wrap: wrap;
@@ -446,7 +447,7 @@ onUnmounted(() => {
 }
 
 /* 移动端保持原有流式排列 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .filter-tabs-container {
     width: 100%;
     max-width: 100%;
@@ -454,6 +455,7 @@ onUnmounted(() => {
     padding: 0 16px;
     box-sizing: border-box;
   }
+
   .filter-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -504,7 +506,7 @@ onUnmounted(() => {
 .chevron-icon {
   width: 16px;
   height: 16px;
-  color: currentColor;
+  color: currentcolor;
 }
 
 /* 移动端筛选按钮 */

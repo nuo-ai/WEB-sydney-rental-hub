@@ -55,10 +55,12 @@ const goToCompare = () => {
   box-shadow: var(--shadow-xs);
   z-index: 1001;
 }
+
 .compare-items {
   display: flex;
   gap: 10px;
 }
+
 .compare-item {
   background: var(--surface-2);
   padding: 5px 10px;

@@ -437,14 +437,14 @@ onMounted(() => {
   align-items: center;
   padding: 12px 16px;
   z-index: 10;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+  background: linear-gradient(to bottom, rgb(0 0 0 / 50%), transparent);
 }
 
 .nav-icon-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   border: none;
   color: white;
   display: flex;
@@ -485,7 +485,7 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   border: none;
   color: white;
   display: flex;
@@ -513,7 +513,7 @@ onMounted(() => {
   position: absolute;
   bottom: 60px;
   right: 16px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(0 0 0 / 60%);
   color: white;
   padding: 4px 10px;
   border-radius: 4px;
@@ -534,7 +534,7 @@ onMounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgb(255 255 255 / 50%);
   cursor: pointer;
   transition: all 0.3s;
 }
@@ -574,7 +574,7 @@ onMounted(() => {
 }
 
 .blue-dot {
-  color: #0066ff;
+  color: #06f;
   font-size: 16px;
   line-height: 1;
 }
@@ -661,7 +661,7 @@ onMounted(() => {
   font-size: 18px;
   font-weight: 600;
   color: #000;
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .map-container {
@@ -783,13 +783,13 @@ onMounted(() => {
   font-size: 18px;
   font-weight: 600;
   color: #000;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
 }
 
 .property-id {
   font-size: 12px;
   color: #999;
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
 }
 
 .apply-info {
@@ -833,7 +833,7 @@ onMounted(() => {
   border: none;
   font-size: 14px;
   font-weight: 500;
-  color: #0066ff;
+  color: #06f;
   cursor: pointer;
 }
 
@@ -856,7 +856,7 @@ onMounted(() => {
   padding: 12px 16px;
   background: white;
   border-top: 1px solid #e8e8e8;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -2px 8px rgb(0 0 0 / 10%);
   z-index: 100;
 }
 
@@ -885,13 +885,13 @@ onMounted(() => {
 }
 
 /* 响应式设计 */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .image-container {
     height: 400px;
   }
 
   .main-content {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 20px rgb(0 0 0 / 10%);
   }
 }
 </style>

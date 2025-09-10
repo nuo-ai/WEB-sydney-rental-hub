@@ -181,12 +181,14 @@ const apply = async () => {
   padding: var(--filter-panel-padding);
   border-bottom: 1px solid var(--filter-panel-header-border);
 }
+
 .panel-title {
   font-size: var(--filter-panel-title-font-size);
   font-weight: var(--filter-panel-title-font-weight);
   color: var(--filter-panel-title-color);
   margin: 0;
 }
+
 .close-btn {
   background: none;
   border: none;
@@ -199,10 +201,12 @@ const apply = async () => {
   justify-content: center;
   transition: var(--filter-transition-fast);
 }
+
 .close-btn:hover {
   background: var(--filter-close-btn-hover-bg);
   color: var(--filter-close-btn-hover-color);
 }
+
 .spec-icon {
   width: var(--filter-close-btn-size);
   height: var(--filter-close-btn-size);
@@ -212,12 +216,14 @@ const apply = async () => {
 .panel-content {
   padding: var(--filter-panel-padding);
 }
+
 .form-row {
   display: flex;
   flex-direction: column;
   gap: var(--filter-space-md);
   margin-bottom: var(--filter-space-xl);
 }
+
 .form-label {
   font-size: var(--filter-font-size-sm);
   color: var(--filter-color-text-secondary);

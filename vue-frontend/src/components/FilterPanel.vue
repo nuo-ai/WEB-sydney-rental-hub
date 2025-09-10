@@ -42,21 +42,16 @@
 
           <template v-if="selectedLocations.length">
             <div class="location-list" :style="chipsCollapsed ? chipsCollapsedStyle : null">
-              <div
+              <BaseChip
                 v-for="loc in displaySelectedLocations"
                 :key="loc.id"
                 class="location-chip"
-                :title="loc.fullName || loc.name"
+                :removable="true"
+                :remove-label="`移除 ${loc.fullName || loc.name}`"
+                @remove="removeLocation(loc.id)"
               >
-                <span class="chip-text">{{ formatLocation(loc) }}</span>
-                <button
-                  class="chip-remove"
-                  :aria-label="'移除 ' + (loc.fullName || loc.name)"
-                  @click="removeLocation(loc.id)"
-                >
-                  ×
-                </button>
-              </div>
+                {{ formatLocation(loc) }}
+              </BaseChip>
             </div>
             <div class="location-actions">
               <button class="clear-all" type="button" @click="clearAllLocations">
@@ -220,6 +215,7 @@ import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
+import BaseChip from '@/components/base/BaseChip.vue'
 
 // 组件属性
 const props = defineProps({
@@ -945,10 +941,7 @@ onMounted(() => {
 /* Domain风格筛选面板包装器 */
 .filter-panel-wrapper {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 2000; /* 降低z-index，让日期选择器能显示在上面 */
   pointer-events: none; /* 默认不捕获事件，只在visible时才捕获 */
 }
@@ -960,19 +953,16 @@ onMounted(() => {
 /* 遮罩层 */
 .filter-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgb(0 0 0 / 40%);
   transition: opacity 0.3s ease;
   pointer-events: auto; /* 确保遮罩层可点击 */
 }
 
 /* 移动端遮罩层 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .filter-overlay {
-    background: rgba(0, 0, 0, 0.5); /* 移动端加深背景 */
+    background: rgb(0 0 0 / 50%); /* 移动端加深背景 */
   }
 }
 
@@ -984,7 +974,7 @@ onMounted(() => {
   width: 420px;
   height: 100vh;
   background: white;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  box-shadow: -4px 0 20px rgb(0 0 0 / 15%);
   transform: translateX(100%);
   transition: transform 0.3s ease;
   display: flex;
@@ -1031,6 +1021,7 @@ onMounted(() => {
   padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
   border-radius: var(--filter-action-link-radius);
   transition: var(--filter-transition-fast);
+
   /* 移动端触摸目标 */
   min-height: 32px;
   display: inline-flex;
@@ -1056,6 +1047,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   /* 移动端触摸目标优化 */
   min-width: 40px;
   min-height: 40px;
@@ -1092,7 +1084,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 600;
   color: var(--color-text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 /* 价格区块头部 */
@@ -1143,7 +1135,7 @@ onMounted(() => {
 }
 
 /* 移动端按钮组 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .filter-buttons-group {
     gap: var(--filter-space-md);
   }
@@ -1160,6 +1152,7 @@ onMounted(() => {
   cursor: pointer;
   transition: var(--filter-transition-normal);
   min-width: 60px;
+
   /* 移动端触摸目标优化 */
   min-height: 44px;
   display: inline-flex;
@@ -1181,7 +1174,7 @@ onMounted(() => {
 }
 
 /* 移动端按钮优化 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .filter-btn {
     padding: 14px var(--filter-btn-padding-x);
     font-size: var(--filter-font-size-md);
@@ -1277,6 +1270,7 @@ onMounted(() => {
   font-weight: var(--filter-btn-font-weight);
   border-radius: var(--filter-btn-radius);
   transition: var(--filter-transition-normal);
+
   /* 移动端触摸目标优化 */
   min-height: 48px;
 }
@@ -1301,6 +1295,7 @@ onMounted(() => {
   font-weight: var(--filter-btn-font-weight);
   border-radius: var(--filter-btn-radius);
   transition: var(--filter-transition-normal);
+
   /* 移动端触摸目标优化 */
   min-height: 48px;
 }
@@ -1326,9 +1321,10 @@ onMounted(() => {
 }
 
 /* 移动端底部按钮优化 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .panel-footer {
     padding: var(--filter-space-2xl);
+
     /* 为 iOS 底部 Home Bar 预留安全区，确保按钮不被遮挡 */
     padding-bottom: calc(var(--filter-space-2xl) + env(safe-area-inset-bottom));
     gap: var(--filter-space-lg);
@@ -1362,6 +1358,7 @@ onMounted(() => {
   font-weight: var(--filter-chip-font-weight);
   max-width: 160px;
   transition: var(--filter-transition-fast);
+
   /* 移动端触摸优化 */
   min-height: 32px;
 }
@@ -1372,6 +1369,14 @@ onMounted(() => {
 }
 
 .location-chip .chip-text {
+  color: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+/* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+.location-chip :deep(.base-chip__text) {
   color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1395,12 +1400,40 @@ onMounted(() => {
   cursor: pointer;
   transition: var(--filter-transition-fast);
   flex-shrink: 0;
+
+  /* 移动端触摸目标优化 */
+  min-width: 20px;
+  min-height: 20px;
+}
+/* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+.location-chip :deep(.base-chip__remove) {
+  background: var(--filter-chip-remove-bg);
+  border: none;
+  color: var(--filter-chip-remove-color);
+  width: var(--filter-chip-remove-size);
+  height: var(--filter-chip-remove-size);
+  border-radius: var(--filter-chip-remove-radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  transition: var(--filter-transition-fast);
+  flex-shrink: 0;
+
   /* 移动端触摸目标优化 */
   min-width: 20px;
   min-height: 20px;
 }
 
 .location-chip .chip-remove:hover {
+  background: var(--filter-chip-remove-hover-bg);
+  color: var(--filter-chip-remove-hover-color);
+}
+/* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+.location-chip :deep(.base-chip__remove:hover) {
   background: var(--filter-chip-remove-hover-bg);
   color: var(--filter-chip-remove-hover-color);
 }
@@ -1424,6 +1457,7 @@ onMounted(() => {
   padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
   border-radius: var(--filter-action-link-radius);
   transition: var(--filter-transition-fast);
+
   /* 移动端触摸目标 */
   min-height: 32px;
   display: inline-flex;
@@ -1462,7 +1496,7 @@ onMounted(() => {
 }
 
 /* 移动端Location区域优化 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .location-section .location-list {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: var(--filter-space-sm);
@@ -1475,6 +1509,13 @@ onMounted(() => {
   }
 
   .location-chip .chip-remove {
+    width: calc(var(--filter-chip-remove-size) + 4px);
+    height: calc(var(--filter-chip-remove-size) + 4px);
+    min-width: 24px;
+    min-height: 24px;
+  }
+  /* 兼容 BaseChip 子元素命名，保持现有样式生效（移动端尺寸） */
+  .location-chip :deep(.base-chip__remove) {
     width: calc(var(--filter-chip-remove-size) + 4px);
     height: calc(var(--filter-chip-remove-size) + 4px);
     min-width: 24px;
@@ -1495,9 +1536,10 @@ onMounted(() => {
 }
 
 /* 移动端全屏模式 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .domain-filter-panel {
     width: 100%;
+
     /* 使用 100dvh 适配 iOS 可见视口，避免地址栏导致的“超出屏幕” */
     height: 100dvh;
     max-height: 100dvh;
@@ -1506,8 +1548,9 @@ onMounted(() => {
     bottom: auto;
     transform: translateX(100%);
     transition: transform 0.3s ease;
+
     /* 防止 iOS 文本自动缩放触发放大 */
-    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   .domain-filter-panel.visible {
@@ -1526,6 +1569,7 @@ onMounted(() => {
       max-height: -webkit-fill-available;
     }
   }
+
   @supports not (height: -webkit-fill-available) {
     .domain-filter-panel {
       height: 100vh;
@@ -1566,9 +1610,11 @@ onMounted(() => {
 
   .panel-footer {
     padding: 20px;
+
     /* 为 iOS 底部 Home Bar 预留安全区，确保按钮不被遮挡 */
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
     background: white;
+
     /* 说明：footer 位于滚动容器(panel-content)之外，天然常驻，无需 sticky；此处仅做安全区留白 */
   }
 }

@@ -485,6 +485,7 @@ watch(
   border-radius: 2px;
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
+
   /* 预留右侧空间：右边距(12px) + 命中区域(32px)；可由 token 控制 */
   padding-right: 12px;
 }
@@ -551,7 +552,7 @@ watch(
 }
 
 .filter-icon-btn:focus {
-  outline: 2px solid rgba(0, 0, 0, 0.06);
+  outline: 2px solid rgb(0 0 0 / 6%);
   outline-offset: 2px;
   border-radius: 0;
 }
@@ -596,7 +597,7 @@ watch(
   top: 0;
   bottom: 0;
   width: 24px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--filter-color-bg-primary));
+  background: linear-gradient(to right, rgb(255 255 255 / 0%), var(--filter-color-bg-primary));
 }
 
 /* 单个浅灰 chip */
@@ -686,6 +687,7 @@ watch(
   font-weight: 600;
   font-size: 12px;
 }
+
 .suggestion-item.selected .suggestion-action {
   color: var(--color-text-primary);
 }
@@ -725,6 +727,7 @@ watch(
   font-size: 13px;
   cursor: pointer;
 }
+
 .more-chip:hover {
   background: var(--chip-bg-hover);
   color: var(--color-text-primary);
@@ -788,6 +791,7 @@ watch(
   border-radius: 50%;
   animation: sb-spin 1s linear infinite;
 }
+
 @keyframes sb-spin {
   to {
     transform: rotate(360deg);
@@ -795,7 +799,7 @@ watch(
 }
 
 /* 响应式适配 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .search-bar-container {
     width: 100%;
   }

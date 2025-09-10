@@ -272,7 +272,7 @@ const removeDestination = (destinationId) => {
   font-size: 20px;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .commute-form {
@@ -290,9 +290,11 @@ const removeDestination = (destinationId) => {
   flex-wrap: wrap;
   gap: 8px;
 }
+
 .commute-tabs {
   margin-bottom: 16px;
 }
+
 .commute-tabs .el-tabs__item {
   display: flex;
   align-items: center;
@@ -362,6 +364,7 @@ const removeDestination = (destinationId) => {
   font-weight: 700;
   font-size: 16px;
 }
+
 .duration-text.error {
   color: var(--color-danger);
 }
@@ -380,6 +383,7 @@ const removeDestination = (destinationId) => {
 .list-leave-active {
   transition: all 0.5s ease;
 }
+
 .list-enter-from,
 .list-leave-to {
   opacity: 0;

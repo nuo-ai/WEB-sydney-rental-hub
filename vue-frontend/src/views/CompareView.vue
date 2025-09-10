@@ -29,6 +29,7 @@ const compareItems = computed(() => {
   padding-left: 24px;
   padding-right: 24px;
 }
+
 .compare-grid {
   display: flex;
   gap: 20px;

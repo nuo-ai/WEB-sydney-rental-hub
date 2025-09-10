@@ -453,9 +453,9 @@ onMounted(() => {
 }
 
 .header-btn {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: rgb(255 255 255 / 90%) !important;
+  border: 1px solid rgb(0 0 0 / 5%) !important;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   width: 40px;
   height: 40px;
 }
@@ -482,7 +482,7 @@ onMounted(() => {
 .property-detail-content {
   background: white;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
   overflow: hidden;
 }
 
@@ -500,13 +500,13 @@ onMounted(() => {
   background-color: #f5f5f5;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .image-carousel {
     aspect-ratio: 16/10; /* 平板端 16:10 比例 */
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .image-carousel {
     aspect-ratio: 16/9; /* 桌面端 16:9 比例 */
   }
@@ -531,7 +531,7 @@ onMounted(() => {
   transform: translateY(-50%);
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
   border: none;
   border-radius: 50%;
   display: flex;
@@ -540,7 +540,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
 }
 
 .carousel-btn:hover {
@@ -566,7 +566,7 @@ onMounted(() => {
   position: absolute;
   bottom: 16px;
   right: 16px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgb(0 0 0 / 70%);
   color: white;
   padding: 4px 12px;
   border-radius: 16px;
@@ -620,7 +620,7 @@ onMounted(() => {
   font-size: 26px;
   font-weight: 700;
   color: #1a1a1a;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   line-height: 1.2;
 }
 
@@ -733,7 +733,7 @@ onMounted(() => {
   display: flex;
   gap: 16px;
   border-top: 1px solid #e3e3e3;
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 12px rgb(0 0 0 / 8%);
   z-index: 100;
 }
 
@@ -796,7 +796,7 @@ onMounted(() => {
   padding: 16px 0;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .action-buttons-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
@@ -843,10 +843,10 @@ onMounted(() => {
   font-size: 20px;
   font-weight: 700;
   color: #2d2d2d;
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .section-title {
     font-size: 22px;
   }
@@ -866,7 +866,7 @@ onMounted(() => {
   transition: max-height 0.3s ease;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .description-text {
     font-size: 16px;
     max-height: 128px;
@@ -884,14 +884,14 @@ onMounted(() => {
   font-weight: 600;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .read-more-btn {
     font-size: 16px;
   }
 }
 
 .commute-section {
-  padding: 0 24px 24px 24px;
+  padding: 0 24px 24px;
 }
 
 /* 5. 地图样式 */
@@ -919,13 +919,13 @@ onMounted(() => {
   overflow: hidden;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .map-container {
     height: 256px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .map-container {
     height: 288px;
   }
@@ -978,13 +978,13 @@ onMounted(() => {
   border-radius: 6px;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .image-skeleton {
     height: 300px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .image-skeleton {
     height: 400px;
   }
@@ -995,7 +995,7 @@ onMounted(() => {
 }
 
 /* 响应式优化 */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .core-info-section,
   .description-section,
   .map-section,
@@ -1029,7 +1029,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .property-header {
     flex-direction: column;
     gap: 16px;
@@ -1062,16 +1062,16 @@ onMounted(() => {
   width: 100% !important;
   height: 100% !important;
   opacity: 1 !important;
-  background-color: #000000 !important;
+  background-color: #000 !important;
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
 }
 
 :deep(.el-image-viewer__btn) {
   width: 44px !important;
   height: 44px !important;
   font-size: 24px !important;
-  background-color: rgba(0, 0, 0, 0.5) !important;
+  background-color: rgb(0 0 0 / 50%) !important;
   border-radius: 50% !important;
   opacity: 0.8 !important;
   transition: opacity 0.2s !important;
@@ -1087,7 +1087,7 @@ onMounted(() => {
 }
 
 :deep(.el-image-viewer__actions) {
-  background-color: rgba(0, 0, 0, 0.7) !important;
+  background-color: rgb(0 0 0 / 70%) !important;
   border-radius: 22px !important;
   padding: 8px 22px !important;
 }

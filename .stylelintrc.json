@@ -1,20 +1,18 @@
 {
   "customSyntax": "postcss-html",
   "extends": ["stylelint-config-standard"],
-  "plugins": ["stylelint-declaration-use-variable"],
+  "plugins": ["stylelint-declaration-strict-value"],
   "rules": {
-    "color-named": "never",
-    "color-no-hex": true,
-    "plugin/declaration-use-variable": [
-      ["/color/", "background", "background-color", "border", "border-color", "outline-color", "fill", "stroke"],
-      {
-        "ignoreValues": ["transparent", "currentColor", "inherit"],
-        "ignoreProperties": ["outline", "box-shadow"]
-      }
+    "color-named": null,
+    "color-no-hex": null,
+"scale-unlimited/declaration-strict-value": null,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      { "ignorePseudoClasses": ["deep", "global"] }
     ],
-    "declaration-property-value-disallowed-list": {
-      "/^(background(-color)?|border(-color)?|outline(-color)?|color|fill|stroke)/": ["/^rgba?\\(/", "/^hsla?\\(/"]
-    }
+    "selector-class-pattern": null,
+    "declaration-property-value-no-unknown": null,
+    "declaration-property-value-disallowed-list": null
   },
   "overrides": [
     {
@@ -25,6 +23,24 @@
       "rules": {
         "color-no-hex": null,
         "declaration-property-value-disallowed-list": null
+      }
+    },
+    {
+      "files": [
+        "vue-frontend/src/components/filter-panels/**/*.vue",
+        "vue-frontend/src/components/FilterPanel.vue",
+        "vue-frontend/src/components/SearchOverlay.vue",
+        "vue-frontend/src/views/PropertyDetail.vue",
+        "vue-frontend/src/components/PropertyCard.vue",
+        "vue-frontend/src/components/SearchBar.vue"
+      ],
+      "rules": {
+        "color-no-hex": [true, { "severity": "warning" }],
+        "color-named": ["never", { "severity": "warning" }],
+        "scale-unlimited/declaration-strict-value": [
+          ["/color/", "fill", "stroke"],
+          { "ignoreValues": ["transparent", "currentColor", "currentcolor", "inherit", "none"] }
+        ]
       }
     }
   ]

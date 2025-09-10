@@ -267,6 +267,7 @@ onMounted(() => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -277,7 +278,7 @@ onMounted(() => {
 }
 
 /* 移动端优化 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .location-card {
     padding: 10px;
   }

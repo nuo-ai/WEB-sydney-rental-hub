@@ -82,17 +82,20 @@ const handleLogin = async () => {
   justify-content: center;
   min-height: 100vh;
 }
+
 .login-box {
   width: 400px;
   padding: 40px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
   border-radius: 8px;
   background: white;
 }
+
 .title {
   text-align: center;
   margin-bottom: 30px;
 }
+
 .error-message {
   color: red;
   text-align: center;

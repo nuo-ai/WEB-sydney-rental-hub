@@ -276,6 +276,7 @@ const applyFilters = async () => {
   gap: var(--filter-space-lg);
   margin-bottom: var(--filter-space-md);
 }
+
 .price-card {
   flex: 1 1 0%;
   border: 1px solid var(--filter-color-border-default);
@@ -284,16 +285,19 @@ const applyFilters = async () => {
   padding: var(--filter-space-md) var(--filter-space-lg);
   box-sizing: border-box;
 }
+
 .card-label {
   font-size: var(--filter-font-size-xs);
   color: var(--filter-color-text-secondary);
   margin-bottom: var(--filter-space-xs);
 }
+
 .card-value {
   font-size: var(--filter-font-size-lg);
   font-weight: var(--filter-font-weight-semibold);
   color: var(--filter-color-text-primary);
 }
+
 .card-value .unit {
   margin-left: var(--filter-space-xs);
   font-size: var(--filter-font-size-xs);

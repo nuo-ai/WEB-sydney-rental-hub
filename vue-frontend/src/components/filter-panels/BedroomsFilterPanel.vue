@@ -458,6 +458,7 @@ const applyFilters = async () => {
 .section {
   margin-top: var(--filter-space-xs);
 }
+
 .section-label {
   font-size: var(--filter-font-size-sm);
   color: var(--filter-color-text-secondary);

@@ -702,7 +702,7 @@ onUnmounted(() => {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
   padding: 8px 12px;
   border-radius: 4px;
   display: flex;
@@ -710,6 +710,6 @@ onUnmounted(() => {
   gap: 6px;
   font-size: 14px;
   color: #666;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 </style>

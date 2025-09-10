@@ -395,7 +395,7 @@ onMounted(() => {
 <style scoped>
 .property-detail-page {
   min-height: 100vh;
-  background-color: #ffffff;
+  background-color: #fff;
   padding-bottom: 80px; /* Space for fixed footer */
 }
 
@@ -433,21 +433,21 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   z-index: 10;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgb(0 0 0 / 30%) 0%, transparent 100%);
 }
 
 .nav-btn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(255 255 255 / 95%);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .nav-btn:active {
@@ -497,7 +497,7 @@ onMounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgb(255 255 255 / 50%);
   cursor: pointer;
   transition: all 0.3s;
 }
@@ -505,7 +505,7 @@ onMounted(() => {
 .indicator.active {
   width: 20px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
 }
 
 /* Content Container */
@@ -571,7 +571,7 @@ onMounted(() => {
 .address {
   font-size: 16px;
   color: #333;
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
 }
 
 .suburb {
@@ -618,7 +618,7 @@ onMounted(() => {
   font-size: 18px;
   font-weight: 600;
   color: #000;
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .map-wrapper {
@@ -677,13 +677,13 @@ onMounted(() => {
   font-size: 18px;
   font-weight: 600;
   color: #000;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
 }
 
 .property-id {
   font-size: 13px;
   color: #999;
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
 }
 
 .description-text {
@@ -774,7 +774,7 @@ onMounted(() => {
   display: flex;
   gap: 16px;
   z-index: 100;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -2px 8px rgb(0 0 0 / 5%);
 }
 
 .action-btn {
@@ -807,7 +807,7 @@ onMounted(() => {
 }
 
 /* Responsive Design */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .image-container {
     height: 400px;
   }
@@ -825,7 +825,7 @@ onMounted(() => {
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .image-container {
     height: 500px;
   }
@@ -841,7 +841,7 @@ onMounted(() => {
 
 /* Dark overlay for lightbox */
 :deep(.el-image-viewer__mask) {
-  background-color: #000000 !important;
+  background-color: #000 !important;
   opacity: 0.95 !important;
 }
 </style>

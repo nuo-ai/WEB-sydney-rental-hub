@@ -115,7 +115,7 @@ const formattedCoordinates = computed(() => {
 }
 
 .map-info h4 {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-size: 16px;
   color: #333;
 }

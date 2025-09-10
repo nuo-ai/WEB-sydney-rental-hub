@@ -232,7 +232,7 @@ defineExpose({
   box-shadow: var(--filter-shadow-focus);
 }
 
-.base-search-input__field:hover:not(:focus):not(:disabled) {
+.base-search-input__field:hover:not(:focus, :disabled) {
   border-color: var(--filter-search-hover-border);
 }
 
@@ -283,7 +283,7 @@ defineExpose({
 }
 
 /* 响应式调整 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .base-search-input__field {
     font-size: 16px; /* iOS 防缩放 */
     padding: calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-x)
@@ -306,6 +306,7 @@ defineExpose({
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

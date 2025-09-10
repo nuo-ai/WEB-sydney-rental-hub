@@ -146,18 +146,17 @@ onUnmounted(() => {
 .virtual-list-container {
   width: 100%;
   height: 600px; /* 固定高度，确保虚拟滚动正常工作 */
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   position: relative;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .virtual-list-container {
     height: calc(100vh - 280px); /* 移动端调整高度 */
   }
 }
 
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .virtual-list-container {
     height: calc(100vh - 200px); /* 桌面端动态高度 */
   }
@@ -175,21 +174,21 @@ onUnmounted(() => {
 }
 
 /* 响应式网格布局 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .virtual-row {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (width >= 768px) and (width <= 1023px) {
   .virtual-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .virtual-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;

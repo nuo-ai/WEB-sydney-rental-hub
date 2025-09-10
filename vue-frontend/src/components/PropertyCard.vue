@@ -337,7 +337,7 @@ const handleMoreAction = (command) => {
   box-shadow: none !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 50%);
 }
 
 /* 左箭头位置 */
@@ -549,14 +549,11 @@ const handleMoreAction = (command) => {
 }
 
 /* 响应式适配 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .property-card {
     width: 100vw;
     max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    margin-top: 0;
-    margin-bottom: 20px;
+    margin: 0 calc(50% - 50vw) 20px;
     border-radius: 0; /* 满屏出血：去圆角 */
   }
 
@@ -569,10 +566,10 @@ const handleMoreAction = (command) => {
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .property-card {
     width: 580px;
-    margin: 0 0 20px 0;
+    margin: 0 0 20px;
   }
 }
 </style>

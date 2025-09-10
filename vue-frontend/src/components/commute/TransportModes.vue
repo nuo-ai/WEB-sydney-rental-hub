@@ -78,7 +78,7 @@ const selectMode = (value) => {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   transform: translate(-50%, -50%);
   transition:
     width 0.3s,

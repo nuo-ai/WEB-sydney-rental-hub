@@ -13,17 +13,17 @@
   --color-border: #e5e7eb; /* 边框色 */
 
   /* 可选：品牌强调色 */
-  --color-accent: #007c8c; /* Domain绿色(用于CTA按钮) */
+  --color-accent: #007c8c; /* DEPRECATED：禁止业务层使用；请改用 --brand-primary 或 --juwo-primary（统一品牌色入口）。仅为向后兼容保留，后续计划移除。 */
 
   /* ========== 字体 ========== */
   --font-primary: 'F37 Bolton', Helvetica, Arial, sans-serif;
-  --font-size-base: 16px;
+  --font-size-base: 16px; /* DEPRECATED：请改用 --text-base（见 src/style.css/typography.css），统一走文字令牌系统。 */
   --font-weight-bold: 700;
 
   /* ========== 间距（4个关键值） ========== */
   --spacing-sm: 8px;
   --spacing-md: 16px;
-  --spacing-lg: 24px;
+  --spacing-lg: 24px; /* DEPRECATED：请改用全局间距令牌 --space-lg，避免混用两套间距体系。 */
   --spacing-xl: 32px;
 
   /* ========== 圆角 ========== */

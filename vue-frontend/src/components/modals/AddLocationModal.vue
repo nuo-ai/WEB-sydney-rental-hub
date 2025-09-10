@@ -483,7 +483,7 @@ onMounted(async () => {
 }
 
 .search-hint {
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
   font-size: 14px;
   color: var(--text-muted);
 }
@@ -503,7 +503,7 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-secondary);
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   text-transform: uppercase;
 }
 
@@ -591,6 +591,7 @@ onMounted(async () => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

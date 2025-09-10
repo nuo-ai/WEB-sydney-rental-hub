@@ -244,7 +244,7 @@ const handleKeydown = (event) => {
 }
 
 /* 响应式调整 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .base-list-item {
     padding: calc(var(--filter-list-item-padding-y) + 2px) var(--filter-list-item-padding-x);
     min-height: calc(var(--filter-list-item-min-height) + 4px);
@@ -280,7 +280,7 @@ const handleKeydown = (event) => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 40%), transparent);
   animation: shimmer 1.5s infinite;
 }
 
@@ -288,6 +288,7 @@ const handleKeydown = (event) => {
   0% {
     left: -100%;
   }
+
   100% {
     left: 100%;
   }

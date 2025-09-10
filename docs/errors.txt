@@ -1,1 +1,32 @@
-<button data-v-f0d73e83="" class="add-location-btn"><i data-v-f0d73e83="" class="fas fa-plus"></i><span data-v-f0d73e83="">Add location</span></button>
+nuoai@q MINGW64 ~/Desktop/WEB-sydney-rental-hub (main)
+$ mkdir -p docs; cd vue-frontend; npx stylelint "src/**/*.{css,vue}" --formatter json --output ../docs/stylelint.report.json; cd ..; node -e "const fs=require('fs');const path=require('path');const file=path.join(process.cwd(),'docs/stylelint.report.json');let data=[];try{data=JSON.parse(fs.readFileSync(file,'utf8'));}catch(e){console.error('Failed to read report:',e.message);process.exit(1);}let files=0,errors=0,warnings=0;const ruleCount={};const fileErrs=[];for(const r of data){files++;let ecount=0;(r.warnings||[]).forEach(w=>{if(w.severity==='error') errors++; else warnings++; ruleCount[w.rule]=(ruleCount[w.rule]||0)+1; if(w.severity==='error') ecount++;}); if(ecount>0) fileErrs.push({src:r.source,count:ecount});}const topRules=Object.entries(ruleCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`- ${k}: ${v}`);fileErrs.sort((a,b)=>b.count-a.count);const topFiles=fileErrs.slice(0,5).map(f=>`- ${f.src} (errors: ${f.count})`);const lines=['Stylelint Summary','- Files: '+files,'- Errors: '+errors,'- Warnings: '+warnings,'','Top Rules:',...topRules,'','Top Error Files:',...topFiles];fs.writeFileSync('docs/errors.txt',lines.join('\\n'));console.log('Summary written to docs/errors.txt');"
+Invalid option "--output". Did you mean "--output-file"?
+bash: -: command not found
+bash: command substitution: line 1: syntax error near unexpected token `('
+bash: command substitution: line 1: `- ${f.src} (errors: ${f.count})'
+[eval]:1
+const fs=require('fs');const path=require('path');const file=path.join(process.cwd(),'docs/stylelint.report.json');let data=[];try{data=JSON.parse(fs.readFileSync(file,'utf8'));}catch(e){cons
+ole.error('Failed to read report:',e.message);process.exit(1);}let files=0,errors=0,warnings=0;const ruleCount={};const fileErrs=[];for(const r of data){files++;let ecount=0;(r.warnings||[]).
+forEach(w=>{if(w.severity==='error') errors++; else warnings++; ruleCount[w.rule]=(ruleCount[w.rule]||0)+1; if(w.severity==='error') ecount++;}); if(ecount>0) fileErrs.push({src:r.source,coun
+t:ecount});}const topRules=Object.entries(ruleCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>);fileErrs.sort((a,b)=>b.count-a.count);const topFiles=fileErrs.slice(0,5).map(f=>);const l
+ines=['Stylelint Summary','- Files: '+files,'- Errors: '+errors,'- Warnings: '+warnings,'','Top Rules:',...topRules,'','Top Error Files:',...topFiles];fs.writeFileSync('docs/errors.txt',lines
+.join('\n'));console.log('Summary written to docs/errors.txt');
+
+
+
+                                                                                                    ^
+
+SyntaxError: Unexpected token ')'
+    at makeContextifyScript (node:internal/vm:185:14)
+    at compileScript (node:internal/process/execution:386:10)
+    at node:internal/process/execution:450:25
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:447:60)
+    at evalFunction (node:internal/process/execution:87:30)
+    at evalScript (node:internal/process/execution:99:3)
+    at node:internal/main/eval_string:74:3
+
+Node.js v22.16.0
+
+nuoai@q MINGW64 ~/Desktop/WEB-sydney-rental-hub (main)
+$

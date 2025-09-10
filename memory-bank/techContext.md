@@ -17,6 +17,7 @@
 ## 2. 项目架构概览
 
 ### 项目结构
+
 ```
 vue-frontend/
 ├── src/views/          # 页面组件 (Home.vue, PropertyDetail.vue等)
@@ -28,15 +29,17 @@ vue-frontend/
 ```
 
 ### JUWO品牌设计系统
+
 - **主色**: #FF5824 (橙色)
 - **统一圆角**: 6px（组件设计令牌）
 - **标准房源卡片**: 580px宽度
 - **布局对齐**: 1200px最大宽度，32px间距
 
 ### API集成架构
-- **代理配置**: 默认将`/api`转发到 `http://localhost:8000`；在 WSL/容器环境可通过环境变量 `VITE_API_TARGET` 切换为 `http://172.31.16.1:8000`
+
+- **代理配置**: 默认将 `/api`转发到 `http://localhost:8000`；在 WSL/容器环境可通过环境变量 `VITE_API_TARGET` 切换为 `http://172.31.16.1:8000`
 - **拦截器**: 自动携带JWT认证头（按需启用；已具备框架基础）
-- **响应格式**: 统一`{status, data, pagination, error}`结构
+- **响应格式**: 统一 `{status, data, pagination, error}`结构
 - **失败策略**: 前端已移除 testMode 与本地估算降级；当后端异常时快速失败并抛错，便于监控定位
 
 ---
@@ -66,6 +69,7 @@ python scripts/run_backend.py  # localhost:8000
 ```
 
 **当前运行状态**:
+
 - ✅ Vue前端: 正常运行 (虚拟DOM + 响应式系统)
 - ✅ Python后端: 正常运行 (FastAPI + GraphQL)
 - ✅ 数据库连接: 正常 (3456条示例数据；会随导入更新)
@@ -79,6 +83,7 @@ python scripts/run_backend.py  # localhost:8000
 ## 已解决的技术债务 ✅
 
 **核心问题修复**:
+
 - 用户认证体系完整 (注册/登录/邮箱验证)
 - Google Places API完全替代方案 (本地存储/pre设数据)
 - Redis依赖降级 (内存缓存备选)
@@ -94,6 +99,7 @@ python scripts/run_backend.py  # localhost:8000
 - 统一 ≥1200px 与 1920px 断点的容器规范（`max-width: 1200px`, `padding: 0 32px`），与首页 Home 栅格一致，消除“另一套主题”观感。
 
 ### PropertyDetail 布局实现摘要
+
 - 选择器基线：.property-detail-page .content-card 及其分区（description-section、map-section 等）
 - 断点：
   - ≥1200px：启用 453px 左缘、496px 右缘的主版心计算；容器全宽布局
@@ -112,33 +118,34 @@ python scripts/run_backend.py  # localhost:8000
 ## 运行与集成增补（2025-09-06）
 
 - 部署（Netlify）配置
+
   - netlify.toml：
     - [build] base="vue-frontend"、command="npm run build"、publish="dist"
     - [[redirects]] from="/*" to="/index.html" status=200（SPA 重写）
   - Functions：未使用时保持为空，避免误判为函数项目
   - 环境变量：VITE_GOOGLE_MAPS_API_KEY（限制到 *.netlify.app 与自定义域），可选 VITE_API_BASE_URL、NODE_VERSION（遵循 package.json engines: 20.19.x 或 22.x）
   - 触发：push 到生产分支自动部署；若未触发，检查 Repository 绑定/Branch to deploy/Auto publish/Lock/Ignore/GitHub App 权限；必要时以 Build Hook 兜底
-
-
 - 搜索框内嵌筛选入口（SearchBar.vue / HomeView.vue）
+
   - 在 el-input 的 suffix 内嵌 sliders-horizontal SVG（16×16，stroke: currentColor），颜色使用 var(--color-text-secondary) 与搜索 icon 一致；
   - 绝对定位相对 .el-input__wrapper：right: var(--search-suffix-right, 12px); top: 50%; transform: translateY(-50%);
   - wrapper 右侧 padding-right 使用令牌化计算：calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px))，避免占位符/文本被覆盖；
   - 交互：button 语义 + aria-label="筛选"，点击 emit('openFilterPanel') 打开统一 FilterPanel；移除 clearable；
   - HomeView 监听 openFilterPanel 并隐藏 FilterTabs（v-if=false），维持“筛选入口单一”。
-
 - 移动端房源卡片 full-bleed（PropertyCard.vue）
+
   - @media (max-width: 767px) 下：width/max-width:100vw；左右 margin: calc(50% - 50vw) 实现贴边；border-radius:0；
   - 高度不变：图片容器与轮播容器保持 250px，object-fit: cover；桌面端不受影响。
-
 - 后端列表接口修复（backend/main.py）
-  - 移除 /api/properties 列表查询中的 cover_image 字段（数据库 schema 无此列），解决 500 错误，保证分页/筛选稳定。
 
+  - 移除 /api/properties 列表查询中的 cover_image 字段（数据库 schema 无此列），解决 500 错误，保证分页/筛选稳定。
 - 设计令牌（新增/约定）
+
   - --search-suffix-right: 12px（后缀右间距）
   - --search-suffix-hit: 32px（后缀命中区域宽高，可收紧为 24–28px）
 
 ### 数据库连接与池化（补充）
+
 - 建议：Supabase 使用 PgBouncer “事务池”端口 6543，避免 Session Pool 的 MaxClients 上限阻塞。推荐 .env 示例：
   - DATABASE_URL=postgres://USER:PASSWORD@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres?sslmode=require
   - DB_POOL_MIN_SIZE=1；DB_POOL_MAX_SIZE=4（可按环境覆盖）
@@ -148,36 +155,43 @@ python scripts/run_backend.py  # localhost:8000
 ## 运行与集成增补（2025-09-08）
 
 ### 分离式下拉定位实现（2025-09-08 修订）
+
 - 组件契约
+
   - FilterDropdown.vue 新增 props: explicitPosition?: { top: number|string, left: number|string, width?: number|string }。若提供则优先用于定位。
   - updatePosition() early-return 修正：仅当“无 explicitPosition 且无 trigger”时才早退，保证显式坐标生效。
   - watch(explicitPosition, {deep:true})：面板打开时变化即触发 updatePosition。
 - 触发与坐标
+
   - FilterTabs.vue 在 @click 时基于 event.currentTarget 计算显式坐标，存入 reactive positions，并以 :explicit-position 透传。
   - 进行视口边界保护（左右各 10px），width 取 max(rect.width, 280)。
   - 窗口 resize：若有面板打开则重算；≤768px 断点强制关闭。
 - 行为与体验
+
   - 面板稳定定位在触发按钮正下方；滚动/缩放后位置跟随；首开追加 1–2 帧 rAF 轻量确认重算以稳住首帧。
 - 回滚路径
+
   - 移除 explicit-position 绑定即回退到 trigger 测量模式；仍可运行但可能受 ref/布局时序影响出现 0,0。
 - 溯源：activeContext 2025-09-08｜FILTER-DROPDOWN-POSITION-FIX
-
 - 新增组件与改造
+
   - 新增：`src/components/FilterDropdown.vue`（通用下拉容器，teleport 到 body，支持点击外部/ESC 关闭，单例打开）
 - 新增：`src/components/filter-panels/AreaFilterPanel.vue`、`BedroomsFilterPanel.vue`、`PriceFilterPanel.vue`、`AvailabilityFilterPanel.vue`（四个分离式专用筛选面板）
 - 新增：`src/components/filter-panels/MoreFilterPanel.vue`（PC 高级筛选“更多”面板；仅“应用”时提交；URL 仅写入非空）
 - 改造：`src/components/FilterTabs.vue`（PC 分离式下拉，内部管理 activePanel、触发 refs、:modelValue/@update:modelValue 对偶）、`src/views/HomeView.vue`（仅移动端触发统一 FilterPanel；PC 忽略该触发）
 - 行为与契约
+
   - PC 分离式：FilterTabs 内部管理 activePanel（仅允许一个打开）；下拉定位基于触发元素 `getBoundingClientRect()`，`min-width ≥ 触发宽度`，`max-height: calc(100vh - 40px)`，`overscroll-behavior: contain` 防滚动穿透；点击外部/ESC 关闭；当切换至移动端断点（<768px）时强制关闭任何打开面板。
   - Mobile 统一面板：FilterTabs 通过 `emit('requestOpenFullPanel')` 通知父组件；HomeView 在 `windowWidth ≤ 768` 时打开统一 FilterPanel；PC 忽略该触发，避免双通道。
   - 状态与 URL：单一真源仍为 Pinia；面板内编辑仅在“应用”时调用 `applyFilters()` 提交；URL 同步仅持久化“非空参数”，进入页面从 URL 恢复；保持既有 V1→V2 渐进映射与回滚能力。
 - ESLint/可维护性
+
   - 修复 `v-model` 左值（LHS）不合法：统一改为 `:modelValue` + `@update:modelValue`。
   - 清理未使用变量（如 emit/import）；将文案抽至 `computed` 回退，避免 `$t` 未用告警。
 - 依赖与回滚
 - 无新增依赖；与 Mobile 统一面板并存，按断点切换；若需回退，恢复 FilterTabs 触发统一 FilterPanel 即可。
-
 - Store 与参数映射（补充）
+
   - 按需启用 V2：当 filters 含 isFurnished/bathrooms/parking/postcodes 等“高级键”时，自动切换 mapFilterStateToApiParams 到 V2 白名单输出（furnished/bathrooms_min/parking_min 等）；否则维持 V1 直传。
   - URL 同步：仅写入非空（例如 isFurnished=1、bathrooms=3+、parking=2+）；翻页与每页大小变化复用 currentFilterParams，保持幂等。
   - 回滚：关闭 enableFilterV2 或去除“更多”面板注册即可恢复旧契约/旧入口。
@@ -190,7 +204,7 @@ python scripts/run_backend.py  # localhost:8000
   - 覆写导航容器内 `.el-menu-item:hover` 灰底为透明，仅改文字颜色。
 - Element Plus 交互护栏（二轮）：Select/Dropdown/Cascader/DatePicker/Input 清除/聚焦等交互态统一中性灰，CTA 按钮保留品牌橙；仅样式层，最小 diff。
 - 风险与回滚：如误伤带 nav 的非导航容器，可局部覆写或精确选择器限定；整段追加块可整体删除回退。
-- 溯源：activeContext 2025-09-06｜UI-NAV-GLOBAL-RULES / EP-GUARDRAIL-2ND-PASS｜pending commit
+- 溯源：activeContext 2025-09-06｜UI-NAV-GLOBAL-RULES / EP-GUARDRAIL-2ND-PASS
 
 ## 运行与集成增补（2025-09-05）
 
@@ -225,6 +239,7 @@ python scripts/run_backend.py  # localhost:8000
     requestParams.page = paginationParams.page
     requestParams.page_size = paginationParams.page_size
     ```
+
     以“本次分页”为最高优先级，防止任何历史值（含 1）污染。
   - setCurrentPage / setPageSize：调用 fetchProperties 时显式传 `{ page, page_size }`。
 - 入口一致化（HomeView.vue）：
@@ -234,6 +249,7 @@ python scripts/run_backend.py  # localhost:8000
   - 搜索框内部浅灰标签（Inline Chips）：未聚焦/未输入/未打开移动 Overlay 时在输入框内部回显所选区域（前 2 项 + “+N” 汇总）；`pointer-events: none`，仅占位回显，不拦截交互。
 
 ## 样式与设计令牌护栏增强（2025-09-10）
+
 - 目的：阻止新增硬编码颜色，强制使用 CSS 自定义属性 Design Tokens；在未安装 stylelint 的环境下不阻断提交（条件执行）。
 - 新增脚本（vue-frontend/package.json）
   - "lint:style": "stylelint \"src/**/*.{css,vue}\" --fix"

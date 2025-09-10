@@ -86,7 +86,7 @@ const sanitizedHtml = computed(() => {
 }
 
 .markdown-content :deep(p) {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
 }
 
 .markdown-content :deep(p:last-child) {
@@ -122,25 +122,30 @@ const sanitizedHtml = computed(() => {
 .markdown-content :deep(h6) {
   font-weight: 600;
   color: #111;
-  margin: 16px 0 8px 0;
+  margin: 16px 0 8px;
   line-height: 1.3;
 }
 
 .markdown-content :deep(h1) {
   font-size: 24px;
 }
+
 .markdown-content :deep(h2) {
   font-size: 20px;
 }
+
 .markdown-content :deep(h3) {
   font-size: 18px;
 }
+
 .markdown-content :deep(h4) {
   font-size: 16px;
 }
+
 .markdown-content :deep(h5) {
   font-size: 14px;
 }
+
 .markdown-content :deep(h6) {
   font-size: 14px;
 }
@@ -165,7 +170,7 @@ const sanitizedHtml = computed(() => {
   background-color: #f5f5f5;
   padding: 2px 6px;
   border-radius: 3px;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: Consolas, Monaco, monospace;
   font-size: 13px;
 }
 

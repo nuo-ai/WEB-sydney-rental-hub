@@ -448,6 +448,7 @@ onMounted(() => {
   color: var(--text-muted);
   background: var(--bg-hover);
 }
+
 .map-placeholder .map-placeholder-icon {
   width: 32px;
   height: 32px;
@@ -470,13 +471,13 @@ onMounted(() => {
   font-size: 20px;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
 }
 
 .from-address {
   font-size: 14px;
   color: var(--color-text-secondary);
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
 }
 
 /* 地址列表 */
@@ -546,12 +547,13 @@ onMounted(() => {
 
 .add-location-btn i {
   font-size: 14px;
+
   /* 中文注释：图标颜色继承文字色，确保 hover/禁用一致 */
-  color: currentColor;
+  color: currentcolor;
 }
 
 /* 响应式设计 */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .travel-time-section {
     max-width: 640px;
     margin: 0 auto;

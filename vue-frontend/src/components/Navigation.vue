@@ -181,7 +181,7 @@ onUnmounted(() => {
   right: 0;
   background: white;
   border-top: 1px solid var(--color-border-default);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -2px 8px rgb(0 0 0 / 6%);
   z-index: 100;
   height: 70px;
 }
@@ -231,10 +231,11 @@ onUnmounted(() => {
   background: white;
   border-bottom: 1px solid var(--color-border-default);
   height: 64px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   z-index: 60;
   transform: translateY(0);
   transition: transform 0.25s ease-in-out;
+
   /* 硬件加速优化 - 避免transform冲突 */
   will-change: transform;
   backface-visibility: hidden;
@@ -352,13 +353,13 @@ onUnmounted(() => {
 }
 
 /* 响应式适配 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .top-nav {
     display: none;
   }
 }
 
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .bottom-nav {
     display: none;
   }
@@ -377,7 +378,7 @@ onUnmounted(() => {
   box-shadow: none !important;
 }
 
-@media (max-width: 1023px) {
+@media (width <= 1023px) {
   .top-nav-content {
     padding: 0 20px;
   }

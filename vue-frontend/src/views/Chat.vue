@@ -85,7 +85,7 @@ const goToHome = () => {
 .placeholder-content h3 {
   font-size: 20px;
   color: var(--color-text-primary);
-  margin: 16px 0 8px 0;
+  margin: 16px 0 8px;
 }
 
 .placeholder-content p {

@@ -325,7 +325,7 @@ onMounted(async () => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
   border: none;
   display: flex;
   align-items: center;
@@ -339,7 +339,7 @@ onMounted(async () => {
   left: 117px;
   top: 687px;
   width: 1683px;
-  background: rgba(254, 254, 254, 1);
+  background: rgb(254 254 254 / 100%);
 }
 
 .main-content {
@@ -378,7 +378,7 @@ onMounted(async () => {
   font-size: 22px;
   font-weight: 600;
   color: #2e3a4b;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-family: Inter, sans-serif;
 }
 
@@ -432,7 +432,7 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 700;
   color: #2e3a4b;
-  margin: 0 0 24px 0;
+  margin: 0 0 24px;
   font-family: Inter, sans-serif;
 }
 
@@ -453,7 +453,7 @@ onMounted(async () => {
   background: white;
   border: 1px solid #d0d3d9;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
   display: flex;
   align-items: center;
   gap: 14px;
@@ -463,7 +463,7 @@ onMounted(async () => {
 }
 
 .see-travel-times-btn:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 12%);
   background: #f8f9fa;
 }
 
@@ -518,7 +518,7 @@ onMounted(async () => {
   font-size: 23px;
   font-weight: 700;
   color: #60606d;
-  margin: 0 0 24px 0;
+  margin: 0 0 24px;
   font-family: Inter, sans-serif;
 }
 
@@ -602,7 +602,7 @@ onMounted(async () => {
   font-size: 23px;
   font-weight: 700;
   color: #4c5267;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-family: Inter, sans-serif;
 }
 
@@ -681,7 +681,7 @@ onMounted(async () => {
 }
 
 /* 响应式 - 移动端降级 */
-@media (max-width: 1920px) {
+@media (width <= 1920px) {
   .root-container {
     width: 100%;
     max-width: 1920px;
@@ -710,7 +710,7 @@ onMounted(async () => {
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .image-section {
     height: 300px;
   }

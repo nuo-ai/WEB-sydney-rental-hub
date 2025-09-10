@@ -384,7 +384,7 @@ const handleFacebookAuth = () => {
 }
 
 /* Mobile optimization */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .auth-content {
     padding: 24px 16px;
   }

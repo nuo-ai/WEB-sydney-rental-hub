@@ -137,7 +137,7 @@ const handleRemove = (event) => {
 }
 
 /* 响应式调整 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .base-chip {
     font-size: var(--filter-font-size-md); /* 移动端稍大字体 */
     padding: calc(var(--filter-chip-padding-y) + 1px) var(--filter-chip-padding-x);

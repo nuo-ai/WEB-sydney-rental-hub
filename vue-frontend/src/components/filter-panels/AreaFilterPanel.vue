@@ -33,21 +33,16 @@
           :class="{ collapsed: chipsCollapsed }"
           :style="chipsCollapsed ? chipsCollapsedStyle : null"
         >
-          <div
+          <BaseChip
             v-for="loc in displaySelectedLocations"
             :key="loc.id"
             class="location-chip"
-            :title="loc.fullName || loc.name"
+            :removable="true"
+            :remove-label="`移除 ${loc.fullName || loc.name}`"
+            @remove="removeLocation(loc.id)"
           >
-            <span class="chip-text">{{ formatLocation(loc) }}</span>
-            <button
-              class="chip-remove"
-              :aria-label="'移除 ' + (loc.fullName || loc.name)"
-              @click="removeLocation(loc.id)"
-            >
-              ×
-            </button>
-          </div>
+            {{ formatLocation(loc) }}
+          </BaseChip>
         </div>
         <div class="location-actions">
           <button class="clear-all" type="button" @click="clearAllLocations">
@@ -109,6 +104,7 @@ import { ref, computed, inject, nextTick, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
+import BaseChip from '@/components/base/BaseChip.vue'
 
 // 中文注释：区域筛选专用面板，拆分自原 FilterPanel
 
@@ -380,6 +376,7 @@ const applyFilters = async () => {
 /* 面板内容 */
 .panel-content {
   padding: 16px;
+
   /* 中文注释：主体可滚动，底部按钮 sticky 常驻 */
   max-height: calc(100vh - 160px);
   overflow: auto;
@@ -420,6 +417,16 @@ const applyFilters = async () => {
   white-space: nowrap;
   flex: 1;
 }
+/* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+.location-chip :deep(.base-chip__text) {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
 
 .location-chip .chip-remove {
   background: var(--bg-secondary);
@@ -438,8 +445,31 @@ const applyFilters = async () => {
   transition: all 0.15s ease;
   flex-shrink: 0;
 }
+/* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+.location-chip :deep(.base-chip__remove) {
+  background: var(--bg-secondary);
+  border: none;
+  color: var(--color-text-secondary);
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
 
 .location-chip .chip-remove:hover {
+  background: var(--bg-hover);
+  color: var(--color-text-primary);
+}
+/* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+.location-chip :deep(.base-chip__remove:hover) {
   background: var(--bg-hover);
   color: var(--color-text-primary);
 }
@@ -498,7 +528,7 @@ const applyFilters = async () => {
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 4px solid currentColor;
+  border-top: 4px solid currentcolor;
   transition: transform 0.2s ease;
 }
 

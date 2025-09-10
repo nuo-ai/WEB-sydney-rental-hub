@@ -772,16 +772,13 @@ const formatDate = (date) => {
 .switch-slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: var(--bg-hover);
   transition: var(--transition-colors);
   border-radius: var(--radius-full);
 }
 
-.switch-slider:before {
+.switch-slider::before {
   position: absolute;
   content: '';
   height: 18px;
@@ -797,7 +794,7 @@ const formatDate = (date) => {
   background-color: var(--brand-primary);
 }
 
-.switch input:checked + .switch-slider:before {
+.switch input:checked + .switch-slider::before {
   transform: translateX(24px);
 }
 
@@ -814,7 +811,7 @@ const formatDate = (date) => {
 }
 
 /* 响应式 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .user-card .card-body {
     flex-direction: column;
     text-align: center;
