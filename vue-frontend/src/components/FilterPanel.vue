@@ -1343,15 +1343,21 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: var(--filter-space-md);
+  /* 新增：白底容器外观 */
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .location-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--filter-chip-gap);
-  padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
-  border: 1px solid var(--filter-chip-border);
-  border-radius: var(--filter-chip-radius);
+  /* 贴近截图：更紧凑的内边距与更小圆角 */
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 4px;
   background: var(--filter-chip-bg);
   color: var(--filter-chip-text);
   font-size: var(--filter-chip-font-size);
@@ -1500,6 +1506,9 @@ onMounted(() => {
   .location-section .location-list {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: var(--filter-space-sm);
+    /* 移动端：更紧凑的内边距与圆角 */
+    padding: 8px;
+    border-radius: 6px;
   }
 
   .location-chip {

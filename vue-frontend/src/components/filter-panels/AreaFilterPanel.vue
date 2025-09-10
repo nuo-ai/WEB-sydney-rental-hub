@@ -389,6 +389,12 @@ const applyFilters = async () => {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
+
+  /* 新增：白底容器外观，贴近截图 */
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .location-chip {
