@@ -2,6 +2,8 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- UI-TOKENS-PC-FILTER-LOCATION：PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；弹窗头部/输入/列表 hover/active 改中性令牌；价格滑块清理硬编码，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色。溯源：commit 82c3f37..3c7c150
+- LINT-GUARDRAIL-COLOR：stylelint 扩展拦截 background/border/outline/fill/stroke 的硬编码色与 rgba/hsla，强制使用 var(--*)；保留 design-tokens.css 与 style.css 的定义豁免。目的：杜绝新增页面颜色硬编码回归。溯源：commit 82c3f37..3c7c150
 - DESIGN-TOKEN-COLOR-3：新增全局语义色令牌集（link visited/disabled、success/warn/danger/info soft-bg/border、favorite 三态、badge、divider、inverse/弱底/brand 别名）；首批等价替换：建议项边框/悬浮、次要文案、筛选按钮激活态统一 tokens。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色。溯源：commit ff73605..69c3e0e
 - DESIGN-TOKEN-FAVORITE-P0：收藏按钮与 PropertyCard 颜色 Token 化，未收藏=中性灰，hover=中性加深，已收藏=品牌蓝；卡片地址/副文案/分隔线/规格/操作按钮/图片计数器等硬编码改 Token；叠加遮罩改 overlay 令牌。溯源：commit ff73605
 - THEME-BRAND-BLUE-PURE：品牌主色切换为纯正蓝 #0057ff（hover #0047e5 / active #0036b3），令牌映射 --juwo-primary/--link-color 等已对齐；前端表现：主按钮/导航 hover/文本链接统一蓝色系，页面结构与焦点仍为中性灰；向后兼容，可回滚。溯源：commit d7ac639..1f0b27e
@@ -22,10 +24,10 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
-- [P0] 设计系统第二阶段：应用到 PriceFilterPanel.vue 和 BedroomsFilterPanel.vue（高优先级）
-- [P1] 设计系统第二阶段：应用到 AvailabilityFilterPanel.vue 和 MoreFilterPanel.vue
-- [P2] 与后端确认家具契约（V1/V2 对齐），据此启用 enableFilterV2 或在 V1 分支添加映射｜溯源：27b9cf6..a84f3ac
-- [回归] 多组合验证：区域+价格/卧室+家具；计数与列表 pagination.total 一致
+- [P0] 详情页 PropertyDetail* 全量颜色令牌化：去除 #f5f5f5/#e5e5e5/#007bff/#ff5722 等散点；引入 info/warning/danger-soft 令牌统一反馈弱底/边框。
+- [P1] 通勤/对比等组件残留令牌化：CommuteCalculator.vue / CompareToolbar.vue / commute/LocationCard.vue 等（hover/active/标签色族）。
+- [P2] 渐进移除 var(--token, #xxx) fallback；新组件模板要求 icon 用 currentColor + 外层 class 控制颜色。
+- [Guard] CI 验证 stylelint 新规则拦截效果；新增页面 PR 提示必须使用设计令牌。
 
 最新完成
 - 2025-09-08｜SORT-P0

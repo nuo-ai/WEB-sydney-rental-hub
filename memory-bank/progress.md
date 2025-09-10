@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜UI-TOKENS-PC-FILTER-LOCATION  
+  PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；价格滑块硬编码清理，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色｜溯源：commit 82c3f37..3c7c150
+- 2025-09-10｜LINT-GUARDRAIL-COLOR  
+  扩展 stylelint 拦截 background/border/outline/fill/stroke 的硬编码色与 rgba/hsla，强制使用 var(--*)；保留 design-tokens.css 与 style.css 的定义豁免，阻断新增硬编码进入｜溯源：commit 82c3f37..3c7c150
 - 2025-09-10｜DESIGN-TOKEN-COLOR-3  
   新增全局语义色令牌（link visited/disabled；success/warn/danger/info soft-bg/border；favorite 三态；badge；divider；inverse/弱底；brand 别名）；并对公用样式做小范围等价替换（建议项边框/悬浮、卡片次要文案、筛选按钮激活态）。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色｜溯源：commit ff73605..69c3e0e
 - 2025-09-09｜INSPECTION-TIME-NAN-FIX  

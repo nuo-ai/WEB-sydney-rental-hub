@@ -371,7 +371,7 @@ const handleMoreAction = (command) => {
   bottom: 12px;
   left: 12px;
   background: var(--overlay-dark-75);
-  color: white;
+  color: var(--color-text-inverse); /* 中文注释：反色文本令牌，便于主题切换与高对比 */
   font-size: 11px;
   font-weight: 400;
   padding: 3px 8px;
@@ -437,8 +437,8 @@ const handleMoreAction = (command) => {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: var(--color-success); /* 中文注释：New 徽标背景走统一成功色令牌，前端表现不变但可集中管理 */
-  color: white;
+  background: var(--brand-primary); /* 中文注释：改为品牌蓝，符合“新上线”品牌语义；可统一全站主题 */
+  color: var(--color-text-inverse); /* 中文注释：文本走反色令牌，确保可读性与高对比模式 */
   font-size: 10px;
   font-weight: 600;
   padding: 4px 10px;

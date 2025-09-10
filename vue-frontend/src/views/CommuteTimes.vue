@@ -503,10 +503,10 @@ onMounted(() => {
 .add-location-btn {
   width: 100%;
   height: 48px;
-  border: 1px solid #dc2626;
+  border: 1px solid var(--filter-btn-secondary-border); /* 中文注释：统一走次要按钮描边令牌，移除硬编码红色 */
   border-radius: 8px;
-  background: white;
-  color: #dc2626;
+  background: var(--filter-btn-secondary-bg); /* 中文注释：次要按钮默认白底，令牌可全局切换 */
+  color: var(--filter-btn-secondary-color); /* 中文注释：文字/图标颜色走次要按钮令牌 */
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -514,12 +514,20 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s;
+  transition: all var(--filter-transition-normal); /* 中文注释：统一过渡令牌 */
   margin-top: auto;
 }
 
 .add-location-btn:hover {
-  background: #fef2f2;
+  /* 中文注释：悬浮态使用统一弱底与加深描边/文字，避免危险色误导 */
+  background: var(--filter-color-hover-bg);
+  border-color: var(--filter-btn-secondary-hover-border);
+  color: var(--filter-btn-secondary-hover-color);
+}
+
+.add-location-btn:focus-visible {
+  /* 中文注释：键盘可达性——轻微灰色焦点环，使用设计令牌 */
+  box-shadow: var(--filter-shadow-focus);
 }
 
 .add-location-btn:active {
@@ -528,6 +536,8 @@ onMounted(() => {
 
 .add-location-btn i {
   font-size: 14px;
+  /* 中文注释：图标颜色继承文字色，确保 hover/禁用一致 */
+  color: currentColor;
 }
 
 /* 响应式设计 */
