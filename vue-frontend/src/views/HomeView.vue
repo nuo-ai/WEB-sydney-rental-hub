@@ -31,10 +31,7 @@
               @openFilterPanel="handleOpenFilterPanel"
             />
             <!-- 桌面端使用分离式筛选面板，完全在 FilterTabs 组件内部处理 -->
-            <FilterTabs
-              class="filter-tabs-right"
-              @requestOpenFullPanel="handleOpenFilterPanel"
-            />
+            <FilterTabs class="filter-tabs-right" @requestOpenFullPanel="handleOpenFilterPanel" />
           </div>
 
           <!-- 结果统计移至搜索容器下方的新容器中；此处移除以避免双处回显 -->
@@ -53,8 +50,10 @@
         <nav class="breadcrumbs">Home › NSW › {{ suburb || '—' }}</nav>
 
         <h1 class="page-h1">
-          {{ propertiesStore.totalCount }} Properties for rent in
-          {{ suburb || 'Sydney' }}, NSW<span v-if="postcode">, {{ postcode }}</span>
+          {{ propertiesStore.totalCount }} Properties for rent in {{ suburb || 'Sydney' }}, NSW<span
+            v-if="postcode"
+            >, {{ postcode }}</span
+          >
         </h1>
 
         <div class="actions-row">
@@ -180,7 +179,6 @@ import IconSort from '@/components/icons/IconSort.vue'
 const router = useRouter()
 const route = useRoute()
 
-
 /* 状态管理 */
 const propertiesStore = usePropertiesStore()
 
@@ -220,7 +218,7 @@ const suburb = computed(() => {
   if (Array.isArray(list) && list.length) {
     const first = list[0]
     // 优先使用 suburb 名称；若是 postcode 类型且带 suburb 字段则取其 suburb
-    return first?.type === 'suburb' ? first.name : (first.suburb || first.name) || ''
+    return first?.type === 'suburb' ? first.name : first.suburb || first.name || ''
   }
   return ''
 })
@@ -275,14 +273,12 @@ const handleLocationSelected = async () => {
   }
 }
 
-
 const handleOpenFilterPanel = () => {
   // 仅移动端打开统一 FilterPanel；PC 端采用分离式下拉面板（FilterTabs 内部处理）
   if (windowWidth.value > 768) return
   focusSection.value = null
   showFilterPanel.value = true
 }
-
 
 const handleFiltersChanged = () => {
   // 筛选逻辑已在FilterPanel组件中处理
@@ -609,15 +605,15 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   height: 34px;
-  padding: 0 12px;                 /* 更紧凑的药丸尺寸 */
-  gap: 2px;                        /* 图标与文字更紧凑 */
+  padding: 0 12px; /* 更紧凑的药丸尺寸 */
+  gap: 2px; /* 图标与文字更紧凑 */
   border: 1px solid var(--color-border-default);
-  border-radius: 9999px;           /* 强制药丸型 */
+  border-radius: 9999px; /* 强制药丸型 */
   background: #fff;
   color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 13px;
-  line-height: 1;                  /* 垂直居中更稳 */
+  line-height: 1; /* 垂直居中更稳 */
 }
 .filter-trigger-btn:hover {
   border-color: var(--color-border-strong);
@@ -625,7 +621,7 @@ onUnmounted(() => {
   background: #f7f8fa;
 }
 .filter-trigger-btn:focus {
-  outline: none;                   /* 去除浏览器默认 focus ring */
+  outline: none; /* 去除浏览器默认 focus ring */
   box-shadow: none;
 }
 
@@ -646,25 +642,63 @@ onUnmounted(() => {
 }
 
 /* 标题区（面包屑/H1/操作行）——对齐参考站 390 规格 */
-.title-block { padding-top: 8px; }
-.breadcrumbs { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
-.page-h1 { font-size: 24px; line-height: 28px; font-weight: 700; color: var(--color-text-primary); margin: 0 0 14px; }
+.title-block {
+  padding-top: 8px;
+}
+.breadcrumbs {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+.page-h1 {
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 14px;
+}
 
-.actions-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.alert-left { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text-secondary); }
-.alert-left .label { font-weight: 500; }
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.alert-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+}
+.alert-left .label {
+  font-weight: 500;
+}
 
-.sort-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text-secondary); background: transparent; border: 0; padding: 8px 0; }
-.sort-btn .label { font-weight: 600; }
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  padding: 8px 0;
+}
+.sort-btn .label {
+  font-weight: 600;
+}
 
 /* 移动端下保持点击区可达性 */
 @media (max-width: 768px) {
-  .actions-row { gap: 10px; }
+  .actions-row {
+    gap: 10px;
+  }
 }
 
 /* 移动端布局调整 */
 @media (max-width: 768px) {
-  .container { padding: 12px 16px; } /* 统一移动端左右 16px，与卡片内容区一致 */
+  .container {
+    padding: 12px 16px;
+  } /* 统一移动端左右 16px，与卡片内容区一致 */
   .search-filter-section {
     margin-bottom: 12px; /* 进一步减少移动端间距 */
   }
@@ -691,12 +725,12 @@ onUnmounted(() => {
   .filter-trigger-btn {
     display: inline-flex; /* 仅移动端显示按钮 */
     height: 34px;
-    padding: 0 12px;      /* 更紧凑但可点击 */
+    padding: 0 12px; /* 更紧凑但可点击 */
     border-radius: 9999px;
     gap: 2px;
     font-size: 13px;
     line-height: 1;
-    margin-right: 3px;    /* 对齐卡片“···”右缘（按钮右侧退 3px） */
+    margin-right: 3px; /* 对齐卡片“···”右缘（按钮右侧退 3px） */
   }
 }
 
@@ -817,7 +851,7 @@ onUnmounted(() => {
     display: inline-flex;
     width: auto;
     height: 34px;
-    padding: 0 12px;      /* 与上方断点一致 */
+    padding: 0 12px; /* 与上方断点一致 */
     border-radius: 9999px;
     gap: 2px;
     font-size: 13px;
@@ -825,7 +859,10 @@ onUnmounted(() => {
   }
 }
 /* 统一图标语义色（错误/空状态），改用设计令牌，避免内联硬编码 */
-.error-message .el-icon.error-icon { color: var(--color-danger); }
-.empty-state .el-icon.empty-icon { color: var(--color-border-default); }
-
+.error-message .el-icon.error-icon {
+  color: var(--color-danger);
+}
+.empty-state .el-icon.empty-icon {
+  color: var(--color-border-default);
+}
 </style>

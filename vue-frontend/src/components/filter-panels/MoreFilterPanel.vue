@@ -4,8 +4,22 @@
     <div class="panel-header">
       <h3 class="panel-title chinese-text sr-only">{{ moreLabel }}</h3>
       <button class="close-btn" tabindex="-1" @click="$emit('close')" aria-label="关闭更多筛选面板">
-        <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="spec-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M18 6 6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
     </div>
@@ -19,12 +33,15 @@
         </el-checkbox>
       </div>
 
-
-
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
         <BaseButton variant="ghost" size="small" @click="clearAll">清除</BaseButton>
-        <BaseButton variant="primary" :loading="countLoading" :disabled="countLoading" @click="apply">
+        <BaseButton
+          variant="primary"
+          :loading="countLoading"
+          :disabled="countLoading"
+          @click="apply"
+        >
           {{ applyText }}
         </BaseButton>
         <span class="sr-only" aria-live="polite">{{ srLiveText }}</span>
@@ -52,8 +69,12 @@ const furnished = ref(false)
 const previewCount = ref(null)
 const countLoading = ref(false)
 let _countTimer = null
-const applyText = computed(() => (typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用'))
-const srLiveText = computed(() => (typeof previewCount.value === 'number' ? `可用结果 ${previewCount.value} 条` : ''))
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
+)
+const srLiveText = computed(() =>
+  typeof previewCount.value === 'number' ? `可用结果 ${previewCount.value} 条` : '',
+)
 
 /* 构建参数（仅 isFurnished） */
 const buildFilterParams = () => {
@@ -105,7 +126,6 @@ const furnishedLabel = computed(() => {
   const v = t('filter.furnished')
   return v && v !== 'filter.furnished' ? v : '带家具'
 })
-
 
 const propertiesStore = usePropertiesStore()
 

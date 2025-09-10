@@ -23,7 +23,7 @@
 const { size } = defineProps({
   size: {
     type: [Number, String],
-    default: 18
-  }
+    default: 18,
+  },
 })
 </script>

@@ -170,8 +170,8 @@ export const useAuthStore = defineStore('auth', {
               category: 'university',
               latitude: -33.8888,
               longitude: 151.1873,
-              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o'
-            }
+              placeId: 'ChIJeUn9-jOuEmsRnedJZiyCU0o',
+            },
           ]
           addresses = presetAddresses
           localStorage.setItem('juwo-addresses', JSON.stringify(presetAddresses))

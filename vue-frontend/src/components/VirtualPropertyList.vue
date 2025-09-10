@@ -213,6 +213,8 @@ onUnmounted(() => {
 }
 
 .virtual-list-container::-webkit-scrollbar-thumb:hover {
-  background-color: var(--neutral-scrollbar-hover-color); /* 中文注释：hover 略加深，保持一致的前端表现 */
+  background-color: var(
+    --neutral-scrollbar-hover-color
+  ); /* 中文注释：hover 略加深，保持一致的前端表现 */
 }
 </style>

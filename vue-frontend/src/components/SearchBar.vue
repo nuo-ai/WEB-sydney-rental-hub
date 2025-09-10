@@ -22,11 +22,7 @@
       </el-input>
 
       <!-- 内嵌低调区域标签（占位显示），仅在未聚焦/未输入且有选区时展示 -->
-      <div
-        v-if="showInlineChips"
-        class="inline-chips-overlay"
-        aria-hidden="true"
-      >
+      <div v-if="showInlineChips" class="inline-chips-overlay" aria-hidden="true">
         <span
           v-for="loc in displayedLocations"
           :key="'inline-' + loc.id"
@@ -58,13 +54,13 @@
             :class="{ active: currentSuggestionIndex === index, selected: isSelected(suggestion) }"
             @click="toggleSuggestion(suggestion)"
           >
-              <div class="suggestion-content">
-                <div class="suggestion-text">
-                  <div class="suggestion-name">{{ suggestion.fullName }}</div>
-                  <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
-                </div>
-                <span class="suggestion-action">{{ isSelected(suggestion) ? '已选' : '添加' }}</span>
+            <div class="suggestion-content">
+              <div class="suggestion-text">
+                <div class="suggestion-name">{{ suggestion.fullName }}</div>
+                <div class="suggestion-count">{{ suggestion.count }} 套房源</div>
               </div>
+              <span class="suggestion-action">{{ isSelected(suggestion) ? '已选' : '添加' }}</span>
+            </div>
           </div>
         </div>
 
@@ -141,9 +137,7 @@ checkIsMobile()
 
 /* 桌面端 chips：最多展示 2 个，其余以 +N 摘要 */
 const displayedLocations = computed(() => selectedLocations.value.slice(0, 2))
-const hiddenCount = computed(() =>
-  Math.max(0, (selectedLocations.value?.length || 0) - 2),
-)
+const hiddenCount = computed(() => Math.max(0, (selectedLocations.value?.length || 0) - 2))
 
 /* 保留 +N 摘要仅在输入框内部回显，不提供顶部常驻 chips 与点击跳转 */
 
@@ -253,7 +247,6 @@ const debouncedSearch = debounce((query) => {
   searchLocationSuggestions(query)
 }, 300)
 
-
 // 事件处理
 const handleFocus = () => {
   isInputFocused.value = true
@@ -277,7 +270,6 @@ const handleFocus = () => {
 const handleBlur = () => {
   isInputFocused.value = false
 }
-
 
 /* 承接 SearchOverlay 内“筛选”按钮事件：关闭 Overlay 并打开筛选面板 */
 const onOverlayOpenFilter = () => {
@@ -384,7 +376,6 @@ const toggleSuggestion = async (suggestion) => {
   await selectLocation(suggestion)
 }
 
-
 const handleClickOutside = (event) => {
   const container = document.querySelector('.search-bar-container')
   if (!container?.contains(event.target)) {
@@ -433,8 +424,8 @@ watch(
 /* 区域标签样式 */
 .location-tags {
   display: flex;
-  flex-wrap: nowrap;              /* 单行，不换行 */
-  overflow-x: auto;               /* 横向滚动 */
+  flex-wrap: nowrap; /* 单行，不换行 */
+  overflow-x: auto; /* 横向滚动 */
   white-space: nowrap;
   gap: 8px;
   margin-bottom: 8px;
@@ -453,7 +444,9 @@ watch(
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .location-tag:hover {
@@ -486,7 +479,6 @@ watch(
 .search-input-container {
   position: relative;
 }
-
 
 .search-input :deep(.el-input__wrapper) {
   position: relative; /* 作为绝对定位锚点，保证按钮贴右且不遮挡文字 */
@@ -534,8 +526,8 @@ watch(
   right: var(--search-suffix-right, 12px);
   top: 50%;
   transform: translateY(-50%);
-  width: var(--search-suffix-hit, 32px);   /* 命中区域 */
-  height: var(--search-suffix-hit, 32px);  /* 命中区域 */
+  width: var(--search-suffix-hit, 32px); /* 命中区域 */
+  height: var(--search-suffix-hit, 32px); /* 命中区域 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -559,7 +551,7 @@ watch(
 }
 
 .filter-icon-btn:focus {
-  outline: 2px solid rgba(0,0,0,.06);
+  outline: 2px solid rgba(0, 0, 0, 0.06);
   outline-offset: 2px;
   border-radius: 0;
 }
@@ -604,7 +596,7 @@ watch(
   top: 0;
   bottom: 0;
   width: 24px;
-  background: linear-gradient(to right, rgba(255,255,255,0), var(--filter-color-bg-primary));
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--filter-color-bg-primary));
 }
 
 /* 单个浅灰 chip */
@@ -622,7 +614,9 @@ watch(
   line-height: 1;
 }
 
-.inline-chip-icon { display: none; }
+.inline-chip-icon {
+  display: none;
+}
 
 .inline-chip-text {
   overflow: hidden;
@@ -750,7 +744,9 @@ watch(
   border-radius: 0;
   background: var(--chip-bg);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -792,7 +788,11 @@ watch(
   border-radius: 50%;
   animation: sb-spin 1s linear infinite;
 }
-@keyframes sb-spin { to { transform: rotate(360deg); } }
+@keyframes sb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* 响应式适配 */
 @media (max-width: 767px) {

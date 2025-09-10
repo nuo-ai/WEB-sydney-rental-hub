@@ -73,7 +73,20 @@ const mapFilterStateToApiParams = (
   const params = {}
 
   // 中文注释：白名单透传已存在的 V2 键，避免预览计数丢参（如 currentFilterParams 中已有的 V2 字段）
-  const _wl = ['suburbs','postcodes','date_from','date_to','price_min','price_max','bedrooms','furnished','bathrooms_min','parking_min','sort','include_nearby']
+  const _wl = [
+    'suburbs',
+    'postcodes',
+    'date_from',
+    'date_to',
+    'price_min',
+    'price_max',
+    'bedrooms',
+    'furnished',
+    'bathrooms_min',
+    'parking_min',
+    'sort',
+    'include_nearby',
+  ]
   _wl.forEach((k) => {
     const v = rawFilters[k]
     if (v !== undefined && v !== null && v !== '') {
@@ -105,7 +118,8 @@ const mapFilterStateToApiParams = (
   if (!params.postcodes && postcodes.length) params.postcodes = postcodes.join(',')
 
   // 日期（闭区间），接受 Date 或字符串
-  if (rawFilters.startDate) params.date_from = _fmtDate(rawFilters.startDate) || rawFilters.date_from
+  if (rawFilters.startDate)
+    params.date_from = _fmtDate(rawFilters.startDate) || rawFilters.date_from
   if (rawFilters.endDate) params.date_to = _fmtDate(rawFilters.endDate) || rawFilters.date_to
   if (!params.date_from && rawFilters.date_from) params.date_from = rawFilters.date_from
   if (!params.date_to && rawFilters.date_to) params.date_to = rawFilters.date_to
@@ -232,9 +246,9 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 特性开关（集中管理回滚策略）
     // requireRegionBeforeFilter: 启用后，未选择区域（suburb/postcode）将禁用筛选并在 Store 侧早返回
-      featureFlags: {
-        requireRegionBeforeFilter: false,
-      },
+    featureFlags: {
+      requireRegionBeforeFilter: false,
+    },
 
     // 当前已应用的筛选参数（用于翻页/改每页大小时保持筛选条件）
     currentFilterParams: {},
@@ -334,7 +348,10 @@ export const usePropertiesStore = defineStore('properties', {
         let requestParams = paginationParams
         if (this.currentFilterParams && Object.keys(this.currentFilterParams).length) {
           // Store 守卫：当强制要求先选区域时，未选区域直接短路返回，避免无意义请求
-          if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+          if (
+            this.featureFlags?.requireRegionBeforeFilter &&
+            !hasRegionSelected(this.selectedLocations)
+          ) {
             this.filteredProperties = []
             this.totalCount = 0
             this.totalPages = 0
@@ -355,12 +372,17 @@ export const usePropertiesStore = defineStore('properties', {
           if (this.sort) requestParams.sort = this.sort
         }
 
-        const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const t0 =
+          typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(requestParams)
-        const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const t1 =
+          typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const dur = t1 - t0
         if (dur > 800) {
-          console.warn(`[FILTER-PERF] fetchProperties p95 threshold exceeded: ${Math.round(dur)} ms`, paginationParams)
+          console.warn(
+            `[FILTER-PERF] fetchProperties p95 threshold exceeded: ${Math.round(dur)} ms`,
+            paginationParams,
+          )
         }
 
         // 更新数据
@@ -425,7 +447,10 @@ export const usePropertiesStore = defineStore('properties', {
         }
 
         // 若本地无基础数据，尝试懒加载一批用于构建目录
-        if (!list.length && (!Array.isArray(this.allProperties) || this.allProperties.length === 0)) {
+        if (
+          !list.length &&
+          (!Array.isArray(this.allProperties) || this.allProperties.length === 0)
+        ) {
           try {
             await this.loadBaseDataAsync()
           } catch (err) {
@@ -436,9 +461,12 @@ export const usePropertiesStore = defineStore('properties', {
 
         // 回退：从已加载的数据推导（优先 allProperties，其次 filteredProperties）
         if (!list.length) {
-          const source = (Array.isArray(this.allProperties) && this.allProperties.length)
-            ? this.allProperties
-            : (Array.isArray(this.filteredProperties) ? this.filteredProperties : [])
+          const source =
+            Array.isArray(this.allProperties) && this.allProperties.length
+              ? this.allProperties
+              : Array.isArray(this.filteredProperties)
+                ? this.filteredProperties
+                : []
           if (source.length) {
             const map = new Map()
             for (const p of source) {
@@ -566,7 +594,10 @@ export const usePropertiesStore = defineStore('properties', {
 
       try {
         // Store 守卫：未选择区域时直接短路返回，避免无意义请求
-        if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+        if (
+          this.featureFlags?.requireRegionBeforeFilter &&
+          !hasRegionSelected(this.selectedLocations)
+        ) {
           // 清空当前结果，维持一致 UI 行为（按钮已禁用，此处为双保险）
           this.filteredProperties = []
           this.totalCount = 0
@@ -601,13 +632,19 @@ export const usePropertiesStore = defineStore('properties', {
               // 确保区域目录已加载（优先后端返回，包含 postcode → suburbs 映射）
               let areasList = Array.isArray(this.areasCache?.list) ? this.areasCache.list : []
               if (!areasList.length) {
-                try { areasList = await this.getAllAreas() } catch { /* 忽略非关键错误 */ }
+                try {
+                  areasList = await this.getAllAreas()
+                } catch {
+                  /* 忽略非关键错误 */
+                }
               }
 
               const postcodeToSuburbs = new Set()
               if (Array.isArray(areasList) && areasList.length) {
                 for (const code of selectedPostcodes) {
-                  const node = areasList.find((n) => n && n.type === 'postcode' && String(n.name) === String(code))
+                  const node = areasList.find(
+                    (n) => n && n.type === 'postcode' && String(n.name) === String(code),
+                  )
                   const subs = node && Array.isArray(node.suburbs) ? node.suburbs : []
                   for (const s of subs) {
                     if (s && typeof s === 'string') postcodeToSuburbs.add(s)
@@ -624,7 +661,9 @@ export const usePropertiesStore = defineStore('properties', {
                 mappedParams.suburb = merged.join(',')
               }
             }
-          } catch {/* 忽略非关键错误 */}
+          } catch {
+            /* 忽略非关键错误 */
+          }
         }
 
         // 移除 null/空串，避免无效参数污染缓存与后端白名单
@@ -644,16 +683,26 @@ export const usePropertiesStore = defineStore('properties', {
         // 中文注释：调试输出本次请求参数（仅用于开发定位，生产可注释）
         {
           let __dbg = ''
-          try { __dbg = JSON.stringify(mappedParams) } catch (err) { void err; __dbg = '[unserializable]' }
-           
+          try {
+            __dbg = JSON.stringify(mappedParams)
+          } catch (err) {
+            void err
+            __dbg = '[unserializable]'
+          }
+
           console.debug('[FILTER-DEBUG][applyFilters] mappedParams:', __dbg)
         }
-        const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const t0 =
+          typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
-        const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const t1 =
+          typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const dur = t1 - t0
         if (dur > 800) {
-          console.warn(`[FILTER-PERF] applyFilters p95 threshold exceeded: ${Math.round(dur)} ms`, mappedParams)
+          console.warn(
+            `[FILTER-PERF] applyFilters p95 threshold exceeded: ${Math.round(dur)} ms`,
+            mappedParams,
+          )
         }
 
         // 更新数据
@@ -778,7 +827,10 @@ export const usePropertiesStore = defineStore('properties', {
     async getFilteredCount(params = {}) {
       try {
         // Store 守卫：未选择区域时计数恒为 0（不触发网络请求）
-        if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+        if (
+          this.featureFlags?.requireRegionBeforeFilter &&
+          !hasRegionSelected(this.selectedLocations)
+        ) {
           return 0
         }
         // 计数亦走统一映射，确保与列表参数一致
@@ -802,13 +854,19 @@ export const usePropertiesStore = defineStore('properties', {
             if (selectedPostcodes.length > 0) {
               let areasList = Array.isArray(this.areasCache?.list) ? this.areasCache.list : []
               if (!areasList.length) {
-                try { areasList = await this.getAllAreas() } catch { /* 忽略非关键错误 */ }
+                try {
+                  areasList = await this.getAllAreas()
+                } catch {
+                  /* 忽略非关键错误 */
+                }
               }
 
               const postcodeToSuburbs = new Set()
               if (Array.isArray(areasList) && areasList.length) {
                 for (const code of selectedPostcodes) {
-                  const node = areasList.find((n) => n && n.type === 'postcode' && String(n.name) === String(code))
+                  const node = areasList.find(
+                    (n) => n && n.type === 'postcode' && String(n.name) === String(code),
+                  )
                   const subs = node && Array.isArray(node.suburbs) ? node.suburbs : []
                   for (const s of subs) {
                     if (s && typeof s === 'string') postcodeToSuburbs.add(s)
@@ -824,22 +882,34 @@ export const usePropertiesStore = defineStore('properties', {
                 mappedParams.suburb = merged.join(',')
               }
             }
-          } catch {/* 忽略非关键错误 */}
+          } catch {
+            /* 忽略非关键错误 */
+          }
         }
 
         // 中文注释：调试输出计数请求参数（仅用于开发定位，生产可注释）
         {
           let __dbg = ''
-          try { __dbg = JSON.stringify(mappedParams) } catch (err) { void err; __dbg = '[unserializable]' }
-           
+          try {
+            __dbg = JSON.stringify(mappedParams)
+          } catch (err) {
+            void err
+            __dbg = '[unserializable]'
+          }
+
           console.debug('[FILTER-DEBUG][getFilteredCount] mappedParams:', __dbg)
         }
-        const t0 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const t0 =
+          typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const response = await propertyAPI.getListWithPagination(mappedParams)
-        const t1 = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
+        const t1 =
+          typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const dur = t1 - t0
         if (dur > 800) {
-          console.warn(`[FILTER-PERF] getFilteredCount p95 threshold exceeded: ${Math.round(dur)} ms`, mappedParams)
+          console.warn(
+            `[FILTER-PERF] getFilteredCount p95 threshold exceeded: ${Math.round(dur)} ms`,
+            mappedParams,
+          )
         }
         return response.pagination?.total || 0
       } catch (error) {
@@ -980,7 +1050,7 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 切换对比状态
     toggleCompare(propertyId) {
-      const index = this.compareList.findIndex(id => id === propertyId)
+      const index = this.compareList.findIndex((id) => id === propertyId)
       if (index > -1) {
         this.compareList.splice(index, 1)
       } else if (this.compareList.length < 3) {
@@ -989,4 +1059,3 @@ export const usePropertiesStore = defineStore('properties', {
     },
   },
 })
-

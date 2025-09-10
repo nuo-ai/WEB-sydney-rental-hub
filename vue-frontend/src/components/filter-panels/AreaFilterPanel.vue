@@ -4,8 +4,22 @@
     <div class="panel-header">
       <h3 class="panel-title chinese-text">{{ locationLabel }}</h3>
       <button class="close-btn" tabindex="-1" @click="$emit('close')" aria-label="关闭区域筛选面板">
-        <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="spec-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M18 6 6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
     </div>
@@ -14,7 +28,11 @@
     <div class="panel-content">
       <!-- 已选区域列表 -->
       <template v-if="selectedLocations.length">
-        <div class="location-list" :class="{ collapsed: chipsCollapsed }" :style="chipsCollapsed ? chipsCollapsedStyle : null">
+        <div
+          class="location-list"
+          :class="{ collapsed: chipsCollapsed }"
+          :style="chipsCollapsed ? chipsCollapsedStyle : null"
+        >
           <div
             v-for="loc in displaySelectedLocations"
             :key="loc.id"
@@ -35,7 +53,12 @@
           <button class="clear-all" type="button" @click="clearAllLocations">
             {{ clearAllLabel }}
           </button>
-          <button class="toggle-chips" :class="{ expanded: !chipsCollapsed }" type="button" @click="chipsCollapsed = !chipsCollapsed">
+          <button
+            class="toggle-chips"
+            :class="{ expanded: !chipsCollapsed }"
+            type="button"
+            @click="chipsCollapsed = !chipsCollapsed"
+          >
             {{ chipsCollapsed ? '展开' : '收起' }}
           </button>
         </div>
@@ -67,7 +90,13 @@
         <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ $t('filter.cancel') }}
         </el-button>
-        <el-button type="primary" class="apply-btn" size="default" :loading="countLoading" @click="applyFilters">
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
+          :loading="countLoading"
+          @click="applyFilters"
+        >
           {{ applyText }}
         </el-button>
       </div>
@@ -104,7 +133,7 @@ const selectedLocations = computed(() => propertiesStore.selectedLocations || []
 const previewCount = ref(null)
 const countLoading = ref(false)
 const applyText = computed(() =>
-  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用'
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
 )
 
 // 统一预览计数：将“区域”草稿合入全局草稿，由 Store 统一计算
@@ -176,7 +205,7 @@ const formatLocation = (loc) => {
 // 移除单个区域
 const removeLocation = (id) => {
   const tempLocations = [...selectedLocations.value]
-  const index = tempLocations.findIndex(loc => loc.id === id)
+  const index = tempLocations.findIndex((loc) => loc.id === id)
   if (index !== -1) {
     tempLocations.splice(index, 1)
     propertiesStore.setSelectedLocations(tempLocations)
@@ -217,7 +246,6 @@ const debouncedRequestCount = (() => {
 
 // 首次打开时计算一次
 onMounted(() => computePreviewCount())
-
 
 // 构建筛选参数
 const buildFilterParams = () => {

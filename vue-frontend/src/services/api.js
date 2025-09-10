@@ -10,9 +10,10 @@ import axios from 'axios'
  *  （这样 Netlify 只需设置后端根域名或完整 /api 前缀均可）
  */
 const API_BASE_URL = (() => {
-  const raw = (import.meta.env && import.meta.env.VITE_API_BASE_URL)
-    ? String(import.meta.env.VITE_API_BASE_URL).trim()
-    : ''
+  const raw =
+    import.meta.env && import.meta.env.VITE_API_BASE_URL
+      ? String(import.meta.env.VITE_API_BASE_URL).trim()
+      : ''
   if (raw) {
     let base = raw.replace(/\/+$/, '') // 去掉末尾多余斜杠，防止出现双斜杠
     if (!/\/api$/.test(base)) {

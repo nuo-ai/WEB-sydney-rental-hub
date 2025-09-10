@@ -22,8 +22,8 @@
         stroke-linejoin="round"
         aria-hidden="true"
       >
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.35-4.35"/>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
       </svg>
 
       <!-- 输入框 -->
@@ -58,7 +58,7 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M18 6 6 18M6 6l12 12"/>
+          <path d="M18 6 6 18M6 6l12 12" />
         </svg>
       </button>
     </div>
@@ -74,44 +74,44 @@ const props = defineProps({
   // v-model 绑定值
   modelValue: {
     type: String,
-    default: ''
+    default: '',
   },
 
   // 占位符文本
   placeholder: {
     type: String,
-    default: '搜索...'
+    default: '搜索...',
   },
 
   // 是否显示清除按钮
   clearable: {
     type: Boolean,
-    default: true
+    default: true,
   },
 
   // 是否禁用
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   // 无障碍标签
   ariaLabel: {
     type: String,
-    default: ''
+    default: '',
   },
 
   // 清除按钮的无障碍标签
   clearLabel: {
     type: String,
-    default: '清除搜索'
+    default: '清除搜索',
   },
 
   // 是否自动聚焦
   autofocus: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'input', 'focus', 'blur', 'clear', 'keydown'])
@@ -122,7 +122,7 @@ const inputRef = ref(null)
 // 内部值管理
 const inputValue = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (value) => emit('update:modelValue', value),
 })
 
 // 事件处理
@@ -183,7 +183,7 @@ if (props.autofocus) {
 defineExpose({
   focus,
   blur,
-  inputRef
+  inputRef,
 })
 </script>
 
@@ -211,7 +211,8 @@ defineExpose({
 
 .base-search-input__field {
   width: 100%;
-  padding: var(--filter-search-padding-y) var(--filter-search-padding-x) var(--filter-search-padding-y) var(--filter-search-padding-left);
+  padding: var(--filter-search-padding-y) var(--filter-search-padding-x)
+    var(--filter-search-padding-y) var(--filter-search-padding-left);
   font-size: var(--filter-search-font-size);
   color: var(--filter-color-text-primary);
   background: var(--filter-color-bg-primary);
@@ -275,14 +276,18 @@ defineExpose({
 
 /* 有清除按钮时调整输入框右内边距 */
 .base-search-input__field:not(:disabled) {
-  padding-right: calc(var(--filter-clear-btn-right) * 2 + var(--filter-clear-btn-size) + var(--filter-clear-btn-padding) * 2);
+  padding-right: calc(
+    var(--filter-clear-btn-right) * 2 + var(--filter-clear-btn-size) +
+      var(--filter-clear-btn-padding) * 2
+  );
 }
 
 /* 响应式调整 */
 @media (max-width: 767px) {
   .base-search-input__field {
     font-size: 16px; /* iOS 防缩放 */
-    padding: calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-x) calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-left);
+    padding: calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-x)
+      calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-left);
   }
 
   .base-search-input__clear {

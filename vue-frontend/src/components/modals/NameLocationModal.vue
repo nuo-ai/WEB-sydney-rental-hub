@@ -12,7 +12,9 @@
           <i class="fas fa-arrow-left"></i>
         </button>
         <h2 class="modal-title typo-heading-card">{{ $t('nameLocation.title') }}</h2>
-        <button class="skip-btn typo-button" @click="handleSkip">{{ $t('nameLocation.skip') }}</button>
+        <button class="skip-btn typo-button" @click="handleSkip">
+          {{ $t('nameLocation.skip') }}
+        </button>
       </div>
     </template>
 

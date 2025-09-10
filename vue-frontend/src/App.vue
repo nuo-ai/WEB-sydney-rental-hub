@@ -79,7 +79,6 @@ const handleNavVisibility = (hidden) => {
   background: var(--neutral-scrollbar-hover-color);
 }
 
-
 /* 全局选择样式 */
 ::selection {
   background-color: var(--juwo-primary-50);

@@ -215,7 +215,10 @@ const computeRoute = async () => {
           routeData.value = { path }
         } else if (r.overviewPolyline?.encodedPath) {
           routeData.value = { encodedPolyline: r.overviewPolyline.encodedPath }
-        } else if (r.overview_polyline && typeof r.overview_polyline.getEncodedPath === 'function') {
+        } else if (
+          r.overview_polyline &&
+          typeof r.overview_polyline.getEncodedPath === 'function'
+        ) {
           routeData.value = { encodedPolyline: String(r.overview_polyline.getEncodedPath()) }
         } else {
           // 最弱降级：不渲染
@@ -277,8 +280,8 @@ const saveLocation = async (data) => {
           {
             confirmButtonText: t ? t('common.replace') : '替换',
             cancelButtonText: t ? t('common.cancel') : '取消',
-            type: 'warning'
-          }
+            type: 'warning',
+          },
         )
       } catch {
         // 用户取消替换
@@ -305,7 +308,7 @@ const saveLocation = async (data) => {
       latitude: lat,
       longitude: lng,
       // 说明：根据中文标签映射存储类别，学校→university，其它→other
-      category: data.label === '学校' ? 'university' : 'other'
+      category: data.label === '学校' ? 'university' : 'other',
     })
 
     showNameModal.value = false

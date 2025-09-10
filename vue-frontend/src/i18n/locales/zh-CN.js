@@ -4,7 +4,7 @@ export default {
     confirm: '确定',
     readMore: '展开',
     readLess: '收起',
-    replace: '替换'
+    replace: '替换',
   },
   propertyCard: {
     perWeek: '每周',
@@ -16,7 +16,7 @@ export default {
     imageAlt: '房源图片',
     priceTBA: '价格待定',
     availableDateLabel: '空出日期',
-    inspectionTimeLabel: '开放时间'
+    inspectionTimeLabel: '开放时间',
   },
   propertyDetail: {
     photos: '照片',
@@ -35,7 +35,7 @@ export default {
     noPhotos: '暂无图片',
     locationUnavailable: '位置信息暂不可用',
     inspectSoon: '预约看房功能即将上线',
-    dateTBD: '待定'
+    dateTBD: '待定',
   },
   commute: {
     pageTitle: '通勤时间',
@@ -55,12 +55,12 @@ export default {
     modes: {
       driving: '驾车',
       transit: '公共交通',
-      walking: '步行'
-    }
+      walking: '步行',
+    },
   },
   locationCard: {
     remove: '移除地址',
-    na: '不可用'
+    na: '不可用',
   },
   addLocation: {
     title: '添加地址',
@@ -72,15 +72,15 @@ export default {
     tryAnother: '尝试其他关键词',
     failedSearch: '搜索失败，请重试',
     pleaseSelectUniversity: '请从列表中选择大学',
-    failedDetails: '获取位置详情失败，请重试'
+    failedDetails: '获取位置详情失败，请重试',
   },
   nameLocation: {
     title: '命名地址',
     skip: '跳过',
-    confirm: '添加地址'
+    confirm: '添加地址',
   },
   search: {
-    placeholder: '请先输入区域或邮编，例如 “Ultimo” 或 “2000”'
+    placeholder: '请先输入区域或邮编，例如 “Ultimo” 或 “2000”',
   },
   filter: {
     title: '筛选',
@@ -98,6 +98,6 @@ export default {
     cancel: '取消',
     showResults: '显示结果',
     anyPrice: '不限价格',
-    selectRegionFirst: '请先选择区域后再筛选'
-  }
+    selectRegionFirst: '请先选择区域后再筛选',
+  },
 }

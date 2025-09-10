@@ -74,9 +74,7 @@
                 {{ sug.fullName || sug.name }}
               </template>
 
-              <template #description>
-                {{ (sug.count ?? 0) }} 套房源
-              </template>
+              <template #description> {{ sug.count ?? 0 }} 套房源 </template>
 
               <template #suffix>
                 <span class="pill" :class="{ selected: isSelected(sug) }">
@@ -85,9 +83,7 @@
               </template>
             </BaseListItem>
 
-            <div v-if="!filteredSuggestions.length" class="empty">
-              无匹配结果
-            </div>
+            <div v-if="!filteredSuggestions.length" class="empty">无匹配结果</div>
             <!-- 空态兜底：即使存在 query，也展示推荐区域，便于继续添加 -->
             <template v-if="!filteredSuggestions.length">
               <div class="section-title">
@@ -105,9 +101,7 @@
                     {{ sug.fullName || sug.name }}
                   </template>
 
-                  <template #description v-if="sug.postcode">
-                    NSW, {{ sug.postcode }}
-                  </template>
+                  <template #description v-if="sug.postcode"> NSW, {{ sug.postcode }} </template>
 
                   <template #suffix>
                     <span class="pill" :class="{ selected: isSelected(sug) }">
@@ -116,9 +110,7 @@
                   </template>
                 </BaseListItem>
               </template>
-              <div v-else class="empty">
-                暂无推荐，可更换关键字
-              </div>
+              <div v-else class="empty">暂无推荐，可更换关键字</div>
             </template>
           </template>
         </section>
@@ -146,9 +138,7 @@
                 {{ sug.fullName || sug.name }}
               </template>
 
-              <template #description v-if="sug.postcode">
-                NSW, {{ sug.postcode }}
-              </template>
+              <template #description v-if="sug.postcode"> NSW, {{ sug.postcode }} </template>
 
               <template #suffix>
                 <span class="pill" :class="{ selected: isSelected(sug) }">
@@ -157,9 +147,7 @@
               </template>
             </BaseListItem>
 
-            <div v-if="!nearby.length" class="empty">
-              暂无推荐，可输入关键字搜索
-            </div>
+            <div v-if="!nearby.length" class="empty">暂无推荐，可输入关键字搜索</div>
           </template>
         </section>
       </div>
@@ -250,9 +238,7 @@ const loadNearby = async () => {
   try {
     const r = await locationAPI.getNearbySuburbs(last.name)
     const list = r?.nearby || []
-    nearby.value = list.filter(
-      (s) => !selectedLocations.value.some((k) => k.id === s.id),
-    )
+    nearby.value = list.filter((s) => !selectedLocations.value.some((k) => k.id === s.id))
   } catch {
     nearby.value = []
   } finally {
@@ -479,9 +465,10 @@ watch(
   animation: caret-blink 1s step-end infinite;
 }
 @keyframes caret-blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
-
 
 /* 内容区 */
 .overlay-content {
@@ -512,7 +499,6 @@ watch(
   color: var(--filter-color-text-muted);
 }
 
-
 .pill {
   display: inline-flex;
   align-items: center;
@@ -537,7 +523,8 @@ watch(
 }
 
 /* 空/加载 */
-.loading, .empty {
+.loading,
+.empty {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -556,7 +543,9 @@ watch(
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* 锁定 body 滚动（通过类名控制） */
@@ -568,7 +557,8 @@ watch(
    - 移动端搜索覆盖层需要与筛选面板共用一套设计语言（中性灰、统一间距/圆角/边框）
    - 通过后置覆盖使用 design-tokens.css 中的 --filter-* 变量，避免大规模重写，保持向后兼容
    - 若 design tokens 未来微调，可全局生效；此处仅做映射与对齐 */
-:root {}
+:root {
+}
 .search-overlay {
   background: var(--filter-panel-bg, var(--filter-color-bg-primary));
 }
@@ -611,7 +601,6 @@ watch(
   color: var(--filter-color-text-primary);
 }
 
-
 /* 内容区与分组标题 */
 .overlay-content {
   padding-bottom: calc(var(--filter-space-lg) + env(safe-area-inset-bottom, 0px));
@@ -627,7 +616,6 @@ watch(
 .title-icon {
   color: var(--filter-color-text-muted);
 }
-
 
 /* 操作徽标与空/加载态 */
 .pill {

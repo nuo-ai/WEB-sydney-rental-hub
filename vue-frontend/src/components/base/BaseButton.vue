@@ -17,8 +17,8 @@
       {
         'base-button--loading': loading,
         'base-button--disabled': disabled,
-        'base-button--block': block
-      }
+        'base-button--block': block,
+      },
     ]"
     :type="type"
     :disabled="disabled || loading"
@@ -36,7 +36,7 @@
       stroke-linecap="round"
       stroke-linejoin="round"
     >
-      <path d="M21 12a9 9 0 11-6.219-8.56"/>
+      <path d="M21 12a9 9 0 11-6.219-8.56" />
     </svg>
 
     <!-- 前置图标 -->
@@ -64,40 +64,40 @@ defineProps({
   variant: {
     type: String,
     default: 'secondary',
-    validator: (value) => ['primary', 'secondary', 'ghost', 'danger'].includes(value)
+    validator: (value) => ['primary', 'secondary', 'ghost', 'danger'].includes(value),
   },
 
   // 按钮尺寸：small（小）、medium（中）、large（大）
   size: {
     type: String,
     default: 'medium',
-    validator: (value) => ['small', 'medium', 'large'].includes(value)
+    validator: (value) => ['small', 'medium', 'large'].includes(value),
   },
 
   // 按钮类型
   type: {
     type: String,
     default: 'button',
-    validator: (value) => ['button', 'submit', 'reset'].includes(value)
+    validator: (value) => ['button', 'submit', 'reset'].includes(value),
   },
 
   // 是否禁用
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   // 是否加载中
   loading: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   // 是否块级按钮（占满宽度）
   block: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['click'])

@@ -1,6 +1,5 @@
 <template>
   <div class="availability-filter-panel">
-
     <!-- 面板内容 -->
     <div class="panel-content">
       <!-- 日期选择 -->
@@ -87,7 +86,6 @@ const toLabel = computed(() => {
   const v = t('filter.to')
   return v && v !== 'filter.to' ? v : '至'
 })
-
 
 const cancelLabel = computed(() => {
   const v = t('filter.cancel')
@@ -319,7 +317,7 @@ const applyFilters = async () => {
 :deep(.el-date-editor .el-input__wrapper) {
   padding-right: calc(
     var(--filter-suffix-right, var(--search-suffix-right, 12px)) +
-    var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
+      var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
   ) !important;
 }
 

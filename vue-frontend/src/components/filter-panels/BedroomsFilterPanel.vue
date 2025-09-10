@@ -4,8 +4,22 @@
     <div class="panel-header">
       <h3 class="panel-title chinese-text">{{ bedroomsLabel }}</h3>
       <button class="close-btn" tabindex="-1" @click="$emit('close')" aria-label="关闭卧室筛选面板">
-        <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg
+          class="spec-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M18 6 6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
     </div>
@@ -66,16 +80,12 @@
         <BaseButton variant="secondary" @click="$emit('close')">
           {{ cancelLabel }}
         </BaseButton>
-        <BaseButton
-          variant="primary"
-          :loading="countLoading"
-          @click="applyFilters"
-        >
+        <BaseButton variant="primary" :loading="countLoading" @click="applyFilters">
           {{ applyText }}
         </BaseButton>
         <!-- a11y：数量变化通过 aria-live 播报 -->
         <span class="sr-only" aria-live="polite">
-          {{ previewCount !== null ? ('可用结果 ' + previewCount + ' 条') : '' }}
+          {{ previewCount !== null ? '可用结果 ' + previewCount + ' 条' : '' }}
         </span>
       </div>
     </div>

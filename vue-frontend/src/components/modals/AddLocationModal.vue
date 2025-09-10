@@ -127,7 +127,7 @@ const UNI_NAME_ZH_MAP = {
   'Western Sydney University': '西悉尼大学',
   'Australian Catholic University': '澳大利亚天主教大学',
   'The University of Notre Dame Australia': '澳大利亚圣母大学',
-  'University of Wollongong': '卧龙岗大学'
+  'University of Wollongong': '卧龙岗大学',
 }
 const ALIAS_ZH_MAP = {
   USYD: '悉尼大学',
@@ -137,7 +137,7 @@ const ALIAS_ZH_MAP = {
   WSU: '西悉尼大学',
   ACU: '澳大利亚天主教大学',
   UNDA: '澳大利亚圣母大学',
-  UOW: '卧龙岗大学'
+  UOW: '卧龙岗大学',
 }
 const toZhUniversityName = (name, aliasArr = []) => {
   if (UNI_NAME_ZH_MAP[name]) return UNI_NAME_ZH_MAP[name]
@@ -183,7 +183,9 @@ const searchPlaces = async (query) => {
     return results
   } catch (error) {
     console.error('Places search error:', error)
-    ElMessage.error(t ? t('addLocation.failedSearch') : 'Failed to search locations. Please try again.')
+    ElMessage.error(
+      t ? t('addLocation.failedSearch') : 'Failed to search locations. Please try again.',
+    )
     return []
   }
 }
@@ -286,7 +288,9 @@ const selectResult = async (result) => {
       // 在线详情，且仅允许 university
       placeDetails = await placesService.getPlaceDetails(result.place_id)
       if (!Array.isArray(placeDetails.types) || !placeDetails.types.includes('university')) {
-        ElMessage.warning(t ? t('addLocation.pleaseSelectUniversity') : 'Please select a university')
+        ElMessage.warning(
+          t ? t('addLocation.pleaseSelectUniversity') : 'Please select a university',
+        )
         isSearching.value = false
         return
       }
@@ -295,9 +299,10 @@ const selectResult = async (result) => {
     const formattedLocation = {
       place_id: placeDetails.place_id,
       formatted_address: placeDetails.formatted_address,
-      name: (placeDetails && placeDetails.campus)
-        ? `${toZhUniversityName(placeDetails.name)} (${placeDetails.campus})`
-        : toZhUniversityName(placeDetails.name),
+      name:
+        placeDetails && placeDetails.campus
+          ? `${toZhUniversityName(placeDetails.name)} (${placeDetails.campus})`
+          : toZhUniversityName(placeDetails.name),
       geometry: {
         location: {
           lat: () => placeDetails.latitude,
@@ -313,7 +318,9 @@ const selectResult = async (result) => {
     handleClose()
   } catch (error) {
     console.error('Failed to get place details:', error)
-    ElMessage.error(t ? t('addLocation.failedDetails') : 'Failed to get location details. Please try again.')
+    ElMessage.error(
+      t ? t('addLocation.failedDetails') : 'Failed to get location details. Please try again.',
+    )
   } finally {
     isSearching.value = false
   }

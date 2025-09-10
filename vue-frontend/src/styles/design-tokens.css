@@ -228,35 +228,77 @@
 /* ========== 实用工具类 ========== */
 
 /* 中性颜色工具类 */
-.filter-text-primary { color: var(--filter-color-text-primary); }
-.filter-text-secondary { color: var(--filter-color-text-secondary); }
-.filter-text-muted { color: var(--filter-color-text-muted); }
+.filter-text-primary {
+  color: var(--filter-color-text-primary);
+}
+.filter-text-secondary {
+  color: var(--filter-color-text-secondary);
+}
+.filter-text-muted {
+  color: var(--filter-color-text-muted);
+}
 
-.filter-bg-primary { background-color: var(--filter-color-bg-primary); }
-.filter-bg-secondary { background-color: var(--filter-color-bg-secondary); }
-.filter-bg-muted { background-color: var(--filter-color-bg-muted); }
+.filter-bg-primary {
+  background-color: var(--filter-color-bg-primary);
+}
+.filter-bg-secondary {
+  background-color: var(--filter-color-bg-secondary);
+}
+.filter-bg-muted {
+  background-color: var(--filter-color-bg-muted);
+}
 
-.filter-border-default { border-color: var(--filter-color-border-default); }
-.filter-border-strong { border-color: var(--filter-color-border-strong); }
-.filter-border-subtle { border-color: var(--filter-color-border-subtle); }
+.filter-border-default {
+  border-color: var(--filter-color-border-default);
+}
+.filter-border-strong {
+  border-color: var(--filter-color-border-strong);
+}
+.filter-border-subtle {
+  border-color: var(--filter-color-border-subtle);
+}
 
 /* 间距工具类 */
-.filter-space-xs { gap: var(--filter-space-xs); }
-.filter-space-sm { gap: var(--filter-space-sm); }
-.filter-space-md { gap: var(--filter-space-md); }
-.filter-space-lg { gap: var(--filter-space-lg); }
-.filter-space-xl { gap: var(--filter-space-xl); }
+.filter-space-xs {
+  gap: var(--filter-space-xs);
+}
+.filter-space-sm {
+  gap: var(--filter-space-sm);
+}
+.filter-space-md {
+  gap: var(--filter-space-md);
+}
+.filter-space-lg {
+  gap: var(--filter-space-lg);
+}
+.filter-space-xl {
+  gap: var(--filter-space-xl);
+}
 
 /* 圆角工具类 */
-.filter-radius-sm { border-radius: var(--filter-radius-sm); }
-.filter-radius-md { border-radius: var(--filter-radius-md); }
-.filter-radius-lg { border-radius: var(--filter-radius-lg); }
-.filter-radius-xl { border-radius: var(--filter-radius-xl); }
+.filter-radius-sm {
+  border-radius: var(--filter-radius-sm);
+}
+.filter-radius-md {
+  border-radius: var(--filter-radius-md);
+}
+.filter-radius-lg {
+  border-radius: var(--filter-radius-lg);
+}
+.filter-radius-xl {
+  border-radius: var(--filter-radius-xl);
+}
 
 /* 过渡工具类 */
-.filter-transition-fast { transition: all var(--filter-transition-fast); }
-.filter-transition-normal { transition: all var(--filter-transition-normal); }
-.filter-transition-slow { transition: all var(--filter-transition-slow); }
+.filter-transition-fast {
+  transition: all var(--filter-transition-fast);
+}
+.filter-transition-normal {
+  transition: all var(--filter-transition-normal);
+}
+.filter-transition-slow {
+  transition: all var(--filter-transition-slow);
+}
 
 /* ====== Global semantic color tokens (added, non-breaking) ======
    中文注释：全局语义色令牌，仅“新增不改旧值”，为组件与页面提供统一入口；
@@ -268,7 +310,7 @@
   --bg-muted: var(--neutral-50);
 
   /* 链接态（补齐 visited/disabled） */
-  --link-visited: #0036b3;        /* 品牌蓝加深一档，保证可访问性 */
+  --link-visited: #0036b3; /* 品牌蓝加深一档，保证可访问性 */
   --link-disabled: var(--color-text-secondary);
 
   /* 反馈语义（soft 背景 + 边框，避免强色块） */

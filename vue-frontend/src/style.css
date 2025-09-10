@@ -21,7 +21,7 @@
   --blue-900: #0d47a1;
 
   /* 专业中性灰阶（与筛选面板灰阶保持一致，统一全站风格） */
-  --neutral-50:  #f9fafb;
+  --neutral-50: #f9fafb;
   --neutral-100: #f3f4f6;
   --neutral-200: #e5e7eb;
   --neutral-300: #d1d5db;
@@ -126,7 +126,7 @@
 
   /* 输入框后缀定位令牌（统一管理） */
   --search-suffix-right: 12px; /* 图标距输入框右边界 */
-  --search-suffix-hit: 32px;   /* 命中区域尺寸，必要时可收紧为 24–28px */
+  --search-suffix-hit: 32px; /* 命中区域尺寸，必要时可收紧为 24–28px */
 
   /* Chip 中性化令牌（全站复用） */
   --chip-bg: #f7f8fa;
@@ -577,7 +577,9 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .location-tag:hover {
@@ -621,13 +623,13 @@ header nav a,
 .navigation a,
 .top-nav a,
 .bottom-nav a,
-[class*="nav"] a {
+[class*='nav'] a {
   text-decoration: none;
-  font-weight: inherit !important;      /* 不加粗 */
-  border-radius: 2px;                   /* 圆角一致 */
-  background: transparent !important;   /* 禁止灰底 */
-  transition: color .15s ease;
-  outline: none;                        /* 点击/键盘 focus 无外框 */
+  font-weight: inherit !important; /* 不加粗 */
+  border-radius: 2px; /* 圆角一致 */
+  background: transparent !important; /* 禁止灰底 */
+  transition: color 0.15s ease;
+  outline: none; /* 点击/键盘 focus 无外框 */
   box-shadow: none;
 }
 
@@ -639,10 +641,10 @@ header nav a:hover,
 .navigation a:hover,
 .top-nav a:hover,
 .bottom-nav a:hover,
-[class*="nav"] a:hover {
-  color: var(--nav-hover-color) !important;   /* 橙色 */
-  background: transparent !important;         /* 不要灰底 */
-  font-weight: inherit !important;            /* 不加粗 */
+[class*='nav'] a:hover {
+  color: var(--nav-hover-color) !important; /* 橙色 */
+  background: transparent !important; /* 不要灰底 */
+  font-weight: inherit !important; /* 不加粗 */
 }
 
 /* 焦点态（点击/键盘）明确移除外框/外发光，仅针对导航链接 */
@@ -660,8 +662,8 @@ header nav a:focus-visible,
 .top-nav a:focus-visible,
 .bottom-nav a:focus,
 .bottom-nav a:focus-visible,
-[class*="nav"] a:focus,
-[class*="nav"] a:focus-visible {
+[class*='nav'] a:focus,
+[class*='nav'] a:focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
@@ -674,7 +676,7 @@ header nav a i,
 .navigation a i,
 .top-nav a i,
 .bottom-nav a i,
-[class*="nav"] a i,
+[class*='nav'] a i,
 nav a svg,
 header nav a svg,
 .nav a svg,
@@ -682,7 +684,7 @@ header nav a svg,
 .navigation a svg,
 .top-nav a svg,
 .bottom-nav a svg,
-[class*="nav"] a svg {
+[class*='nav'] a svg {
   color: currentColor !important;
   fill: currentColor;
   stroke: currentColor;
@@ -696,9 +698,9 @@ header nav .el-menu-item:hover,
 .navigation .el-menu-item:hover,
 .top-nav .el-menu-item:hover,
 .bottom-nav .el-menu-item:hover,
-[class*="nav"] .el-menu-item:hover {
-  background: transparent !important;         /* 不要灰底 */
-  color: var(--nav-hover-color) !important;   /* 橙色 */
+[class*='nav'] .el-menu-item:hover {
+  background: transparent !important; /* 不要灰底 */
+  color: var(--nav-hover-color) !important; /* 橙色 */
 }
 
 /* 风险与回滚：
@@ -785,31 +787,71 @@ header nav .el-menu-item:hover,
 
 /* ========== Utilities · 8pt Spacing / Type Scale / Weight / Muted ========== */
 /* 纵向堆叠节奏（容器上使用），统一 8pt 系列 */
-.stack-xs > * + * { margin-top: 8px !important; }
-.stack-sm > * + * { margin-top: 12px !important; }
-.stack-md > * + * { margin-top: 16px !important; }
-.stack-lg > * + * { margin-top: 24px !important; }
-.stack-xl > * + * { margin-top: 32px !important; }
+.stack-xs > * + * {
+  margin-top: 8px !important;
+}
+.stack-sm > * + * {
+  margin-top: 12px !important;
+}
+.stack-md > * + * {
+  margin-top: 16px !important;
+}
+.stack-lg > * + * {
+  margin-top: 24px !important;
+}
+.stack-xl > * + * {
+  margin-top: 32px !important;
+}
 
 /* 字号工具，映射到全局 tokens */
-.text-xs  { font-size: var(--text-xs) !important; }
-.text-sm  { font-size: var(--text-sm) !important; }
-.text-base{ font-size: var(--text-base) !important; }
-.text-lg  { font-size: var(--text-lg) !important; }
+.text-xs {
+  font-size: var(--text-xs) !important;
+}
+.text-sm {
+  font-size: var(--text-sm) !important;
+}
+.text-base {
+  font-size: var(--text-base) !important;
+}
+.text-lg {
+  font-size: var(--text-lg) !important;
+}
 /* 标题快捷（与模板一致） */
-.h1 { font-size: 24px !important; line-height: 28px !important; font-weight: 700 !important; }
-.h2 { font-size: 20px !important; line-height: 24px !important; font-weight: 700 !important; }
+.h1 {
+  font-size: 24px !important;
+  line-height: 28px !important;
+  font-weight: 700 !important;
+}
+.h2 {
+  font-size: 20px !important;
+  line-height: 24px !important;
+  font-weight: 700 !important;
+}
 
 /* 字重工具 */
-.font-400 { font-weight: 400 !important; }
-.font-500 { font-weight: 500 !important; }
-.font-600 { font-weight: 600 !important; }
-.font-700 { font-weight: 700 !important; }
+.font-400 {
+  font-weight: 400 !important;
+}
+.font-500 {
+  font-weight: 500 !important;
+}
+.font-600 {
+  font-weight: 600 !important;
+}
+.font-700 {
+  font-weight: 700 !important;
+}
 
 /* 语义色工具 */
-.text-primary   { color: var(--color-text-primary) !important; }
-.text-secondary { color: var(--color-text-secondary) !important; }
-.text-brand     { color: var(--juwo-primary) !important; }
+.text-primary {
+  color: var(--color-text-primary) !important;
+}
+.text-secondary {
+  color: var(--color-text-secondary) !important;
+}
+.text-brand {
+  color: var(--juwo-primary) !important;
+}
 
 /* 统一卡片容器（轻边界 + 面背景），用于我的中心等信息区 */
 .section-card {
@@ -820,7 +862,9 @@ header nav .el-menu-item:hover,
   padding: 16px;
 }
 @media (min-width: 768px) {
-  .section-card { padding: 24px; }
+  .section-card {
+    padding: 24px;
+  }
 }
 
 /* ================= EP-GUARDRAIL-FOCUS-GLOBAL =================
@@ -842,7 +886,7 @@ header nav .el-menu-item:hover,
 }
 
 /* 1) 重置 UA outline（所有可聚焦元素） */
-:where(a, button, [role="button"], input, select, textarea, [tabindex]):focus {
+:where(a, button, [role='button'], input, select, textarea, [tabindex]):focus {
   outline: none;
 }
 
@@ -853,16 +897,36 @@ header nav .el-menu-item:hover,
 }
 
 /* 3) 其它可点击元素（按钮/链接）：默认不显示 ring（避免“橙色框/灰框”） */
-:where(a, button, [role="button"], .el-button, .el-link):focus-visible {
+:where(a, button, [role='button'], .el-button, .el-link):focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
 
 /* 4) 场景兜底：导航/标题动作区/卡片图标按钮内的可点击项统一隐藏 ring */
-:where(nav, .navigation, .top-nav, .bottom-nav, [class*="nav"], .title-block, .actions-row, .properties-grid, .property-card)
-:is(a, button, [role="button"], .el-button):focus,
-:where(nav, .navigation, .top-nav, .bottom-nav, [class*="nav"], .title-block, .actions-row, .properties-grid, .property-card)
-:is(a, button, [role="button"], .el-button):focus-visible {
+:where(
+    nav,
+    .navigation,
+    .top-nav,
+    .bottom-nav,
+    [class*='nav'],
+    .title-block,
+    .actions-row,
+    .properties-grid,
+    .property-card
+  )
+  :is(a, button, [role='button'], .el-button):focus,
+:where(
+    nav,
+    .navigation,
+    .top-nav,
+    .bottom-nav,
+    [class*='nav'],
+    .title-block,
+    .actions-row,
+    .properties-grid,
+    .property-card
+  )
+  :is(a, button, [role='button'], .el-button):focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
@@ -923,8 +987,12 @@ header nav .el-menu-item:hover,
   background: transparent !important;
 }
 
-.el-image-viewer__prev { left: 12px !important; }
-.el-image-viewer__next { right: 12px !important; }
+.el-image-viewer__prev {
+  left: 12px !important;
+}
+.el-image-viewer__next {
+  right: 12px !important;
+}
 
 /* 顶部计数器样式（由运行时注入 .custom-image-counter） */
 .custom-image-counter {
@@ -936,19 +1004,26 @@ header nav .el-menu-item:hover,
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.2px;
-  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* 可选：仅在移动端强制这些位置；若要全平台统一，可移除该媒体查询 */
 @media (max-width: 767px) {
-  .el-image-viewer__close { top: 12px !important; left: 12px !important; }
-  .el-image-viewer__prev { left: 12px !important; }
-  .el-image-viewer__next { right: 12px !important; }
+  .el-image-viewer__close {
+    top: 12px !important;
+    left: 12px !important;
+  }
+  .el-image-viewer__prev {
+    left: 12px !important;
+  }
+  .el-image-viewer__next {
+    right: 12px !important;
+  }
 }
 
 /* ===== Viewer 交互兜底 + 箭头灰底（提高层级与可点击性） ===== */
 .el-image-viewer__wrapper {
-  z-index: 99999 !important;              /* 提层，避免被其他 fixed/overlay 覆盖 */
+  z-index: 99999 !important; /* 提层，避免被其他 fixed/overlay 覆盖 */
 }
 
 /* 提升各按钮与工具栏层级，确保在遮罩之上可点击 */
@@ -970,11 +1045,11 @@ header nav .el-menu-item:hover,
 .el-image-viewer__next,
 .el-image-viewer__close,
 .el-image-viewer__actions {
-  pointer-events: auto !important;        /* 按钮可点击 */
+  pointer-events: auto !important; /* 按钮可点击 */
 }
 
 .custom-image-counter {
-  pointer-events: none !important;        /* 计数器不拦截点击 */
+  pointer-events: none !important; /* 计数器不拦截点击 */
 }
 
 /* 恢复左右箭头的半透明灰底（提高在浅色图上的可读性） */
@@ -1056,7 +1131,7 @@ header nav .el-menu-item:hover,
 /* Select 聚焦态兜底（键盘导航时） */
 .el-select .el-input.is-focus .el-input__wrapper {
   border-color: var(--color-border-strong) !important;
-  box-shadow: 0 0 0 2px rgba(0,0,0,.04) !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* 其他通用菜单项（如上下文菜单）hover 中性化 */
@@ -1079,13 +1154,15 @@ header nav .el-menu-item:hover,
 }
 
 /* Element Plus 输入/选择/日期等控件：圆角收紧 + 聚焦中性化 */
-.el-input__wrapper { border-radius: 2px !important; }
+.el-input__wrapper {
+  border-radius: 2px !important;
+}
 .el-input.is-focus .el-input__wrapper,
 .el-select .el-input.is-focus .el-input__wrapper,
 .el-textarea__inner:focus,
 .el-date-editor.is-active {
   border-color: var(--color-border-strong) !important; /* 中性加深 */
-  box-shadow: 0 0 0 2px rgba(0,0,0,.04) !important;   /* 轻微外发光 */
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04) !important; /* 轻微外发光 */
   outline: none !important;
 }
 
@@ -1107,7 +1184,9 @@ header nav .el-menu-item:hover,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 .location-tag:hover {
   background: var(--chip-bg-hover) !important;
@@ -1230,7 +1309,7 @@ header nav .el-menu-item:hover,
 
 /* 10) 通用可见焦点（兜底，克制的外发光） */
 :focus-visible {
-  outline: 2px solid rgba(0,0,0,.06) !important;
+  outline: 2px solid rgba(0, 0, 0, 0.06) !important;
   outline-offset: 2px !important;
 }
 
@@ -1243,16 +1322,20 @@ header nav .el-menu-item:hover,
    说明：仅面板作用域内覆盖，不影响全站其它表单控件的可达性。
 */
 .filter-dropdown-container :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus,
-.filter-dropdown-container :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus-visible,
+.filter-dropdown-container
+  :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus-visible,
 .domain-filter-panel :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus,
-.domain-filter-panel :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus-visible {
+.domain-filter-panel
+  :is(input, select, textarea, .el-input__inner, .el-input__wrapper):focus-visible {
   outline: none !important;
   box-shadow: none !important;
 }
 
 /* 面板内输入类控件的“统一中性灰 1px 细边”反馈（Element Plus 包装器） */
-.filter-dropdown-container :is(.el-input.is-focus .el-input__wrapper, .el-select .el-input.is-focus .el-input__wrapper),
-.domain-filter-panel :is(.el-input.is-focus .el-input__wrapper, .el-select .el-input.is-focus .el-input__wrapper) {
+.filter-dropdown-container
+  :is(.el-input.is-focus .el-input__wrapper, .el-select .el-input.is-focus .el-input__wrapper),
+.domain-filter-panel
+  :is(.el-input.is-focus .el-input__wrapper, .el-select .el-input.is-focus .el-input__wrapper) {
   outline: none !important;
   box-shadow: 0 0 0 1px var(--color-border-default) !important;
 }
@@ -1274,8 +1357,8 @@ header nav .el-menu-item:hover,
   --filter-field-font-mob: 16px; /* iOS 防缩放阈值 */
   --filter-field-padding-x: 12px;
   --filter-suffix-right: 12px; /* 若未定义则回退到 --search-suffix-right */
-  --filter-suffix-hit: 28px;   /* 若未定义则回退到 --search-suffix-hit */
-  --date-field-min-ch: 12ch;   /* YYYY-MM-DD 10ch 留余量，避免挤压 */
+  --filter-suffix-hit: 28px; /* 若未定义则回退到 --search-suffix-hit */
+  --date-field-min-ch: 12ch; /* YYYY-MM-DD 10ch 留余量，避免挤压 */
 }
 
 /* 仅在筛选面板作用域统一：PC 分离式 & 移动端全屏 */
@@ -1285,7 +1368,7 @@ header nav .el-menu-item:hover,
   padding-left: var(--filter-field-padding-x) !important;
   padding-right: calc(
     var(--filter-suffix-right, var(--search-suffix-right, 12px)) +
-    var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
+      var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
   ) !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
@@ -1306,8 +1389,8 @@ header nav .el-menu-item:hover,
 */
 .filter-dropdown-container {
   --filter-suffix-right: 8px; /* 收紧右侧内距：x到右边界更近 */
-  --filter-suffix-hit: 20px;  /* 收紧命中区，仍可点击 */
-  --date-field-min-ch: 10ch;  /* PC面板内日期最小字符宽 */
+  --filter-suffix-hit: 20px; /* 收紧命中区，仍可点击 */
+  --date-field-min-ch: 10ch; /* PC面板内日期最小字符宽 */
 }
 
 /* 仅 PC Filter 作用域：输入包装内边距与盒模型 */
@@ -1645,7 +1728,9 @@ header nav .el-menu-item:hover,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .location-tag:hover {

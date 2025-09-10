@@ -16,13 +16,15 @@
 设计令牌定义在 `src/styles/design-tokens.css` 中，包含：
 
 ### 颜色系统
+
 - **中性灰色调**：`--filter-color-neutral-50` 到 `--filter-color-neutral-900`
 - **语义化颜色**：`--filter-color-bg-primary`、`--filter-color-text-primary` 等
 - **交互状态颜色**：`--filter-color-hover-bg`、`--filter-color-focus-ring` 等
 
 ### 间距系统
+
 - `--filter-space-xs`: 4px
-- `--filter-space-sm`: 6px  
+- `--filter-space-sm`: 6px
 - `--filter-space-md`: 8px
 - `--filter-space-lg`: 12px
 - `--filter-space-xl`: 16px
@@ -30,11 +32,13 @@
 - `--filter-space-3xl`: 24px
 
 ### 字体系统
+
 - **字号**：`--filter-font-size-xs` (11px) 到 `--filter-font-size-xl` (18px)
 - **字重**：`--filter-font-weight-normal` (400) 到 `--filter-font-weight-bold` (700)
 - **行高**：`--filter-line-height-tight` (1.2) 到 `--filter-line-height-relaxed` (1.6)
 
 ### 圆角系统
+
 - `--filter-radius-sm`: 2px
 - `--filter-radius-md`: 4px
 - `--filter-radius-lg`: 6px
@@ -53,11 +57,13 @@
 ```
 
 **Props:**
+
 - `variant`: 'default' | 'selected' | 'hover' - 变体类型
 - `removable`: boolean - 是否可移除
 - `removeLabel`: string - 移除按钮的无障碍标签
 
 **Events:**
+
 - `remove` - 点击移除按钮时触发
 
 ### BaseSearchInput
@@ -71,6 +77,7 @@
 ```
 
 **Props:**
+
 - `modelValue`: string - v-model绑定值
 - `placeholder`: string - 占位符文本
 - `clearable`: boolean - 是否显示清除按钮
@@ -80,6 +87,7 @@
 - `autofocus`: boolean - 是否自动聚焦
 
 **Events:**
+
 - `update:modelValue` - 值变化时触发
 - `input` - 输入时触发
 - `focus` - 聚焦时触发
@@ -88,6 +96,7 @@
 - `keydown` - 键盘事件
 
 **Methods:**
+
 - `focus()` - 聚焦输入框
 - `blur()` - 失焦输入框
 
@@ -104,6 +113,7 @@
 ```
 
 **Props:**
+
 - `variant`: 'primary' | 'secondary' | 'ghost' | 'danger' - 按钮变体
 - `size`: 'small' | 'medium' | 'large' - 按钮尺寸
 - `type`: 'button' | 'submit' | 'reset' - 按钮类型
@@ -112,9 +122,11 @@
 - `block`: boolean - 是否块级按钮
 
 **Events:**
+
 - `click` - 点击时触发
 
 **Slots:**
+
 - `default` - 按钮文本
 - `icon` - 前置图标
 - `iconRight` - 后置图标
@@ -131,6 +143,7 @@
 ```
 
 **Props:**
+
 - `selected`: boolean - 是否选中
 - `disabled`: boolean - 是否禁用
 - `clickable`: boolean - 是否可点击
@@ -138,10 +151,12 @@
 - `role`: string - ARIA角色
 
 **Events:**
+
 - `click` - 点击时触发
 - `select` - 选择状态变化时触发
 
 **Slots:**
+
 - `default` - 主要内容
 - `prefix` - 前置内容
 - `suffix` - 后置内容
@@ -184,14 +199,13 @@ import BaseListItem from '@/components/base/BaseListItem.vue'
 可以使用预定义的工具类：
 
 ```html
-<div class="filter-text-primary filter-bg-secondary filter-radius-md">
-  使用工具类的内容
-</div>
+<div class="filter-text-primary filter-bg-secondary filter-radius-md">使用工具类的内容</div>
 ```
 
 ### 4. 响应式设计
 
 所有组件都包含响应式设计，在移动端会自动调整：
+
 - 字体大小增加（iOS防缩放）
 - 触摸目标增大
 - 间距适当调整
@@ -199,22 +213,26 @@ import BaseListItem from '@/components/base/BaseListItem.vue'
 ## 最佳实践
 
 ### 1. 颜色使用
+
 - **主要文本**：使用 `--filter-color-text-primary`
 - **次要文本**：使用 `--filter-color-text-secondary`
 - **边框**：使用 `--filter-color-border-default`
 - **背景**：使用 `--filter-color-bg-primary` 或 `--filter-color-bg-secondary`
 
 ### 2. 间距使用
+
 - **组件内部间距**：使用 `--filter-space-md` (8px)
 - **组件之间间距**：使用 `--filter-space-lg` (12px) 或 `--filter-space-xl` (16px)
 - **区块间距**：使用 `--filter-space-2xl` (20px) 或 `--filter-space-3xl` (24px)
 
 ### 3. 交互状态
+
 - **悬浮状态**：使用 `--filter-color-hover-bg` 和 `--filter-color-hover-border`
 - **选中状态**：使用 `--filter-color-selected-bg` 和 `--filter-color-selected-border`
 - **焦点状态**：使用 `--filter-color-focus-ring`
 
 ### 4. 过渡动画
+
 - **快速交互**：使用 `--filter-transition-fast` (0.15s)
 - **常规交互**：使用 `--filter-transition-normal` (0.2s)
 - **慢速交互**：使用 `--filter-transition-slow` (0.3s)
@@ -245,16 +263,19 @@ import BaseListItem from '@/components/base/BaseListItem.vue'
 ## 维护指南
 
 ### 版本控制
+
 - 设计令牌的变更需要谨慎评估影响范围
 - 基础组件的API变更需要更新所有使用方
 - 保持向后兼容性
 
 ### 测试
+
 - 在不同屏幕尺寸下测试组件
 - 验证无障碍功能
 - 确保与现有组件的兼容性
 
 ### 文档更新
+
 - 新增组件时更新此文档
 - 记录重要的设计决策
 - 提供使用示例和最佳实践

@@ -2,9 +2,20 @@
   <div class="areas-selector">
     <div class="areas-header">
       <div class="search-wrapper">
-        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
+        <svg
+          class="search-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
         </svg>
         <input
           v-model="keyword"
@@ -21,8 +32,18 @@
           @click="keyword = ''"
           aria-label="清除搜索"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 6 6 18M6 6l12 12"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
       </div>
@@ -44,11 +65,7 @@
         <div class="empty-row">未找到匹配的区域</div>
       </template>
       <template v-else>
-        <div
-          v-for="group in grouped"
-          :key="group.letter"
-          class="group"
-        >
+        <div v-for="group in grouped" :key="group.letter" class="group">
           <div class="group-title" :id="`group-${group.letter}`">{{ group.letter }}</div>
           <ul class="group-list">
             <li
@@ -125,18 +142,11 @@ const normalizeArea = (raw) => {
     (/^\d{4}$/.test(String(raw.name || '')) && !raw.suburb) ||
     (/^\d{4}$/.test(postcode) && !name)
 
-  const type = isPostcode ? 'postcode' : (raw.type || 'suburb')
+  const type = isPostcode ? 'postcode' : raw.type || 'suburb'
 
-  const id =
-    raw.id ||
-    (type === 'postcode'
-      ? `postcode_${postcode}`
-      : `suburb_${name}`)
+  const id = raw.id || (type === 'postcode' ? `postcode_${postcode}` : `suburb_${name}`)
 
-  const fullName =
-    type === 'postcode'
-      ? postcode
-      : (postcode ? `${name} NSW ${postcode}` : name)
+  const fullName = type === 'postcode' ? postcode : postcode ? `${name} NSW ${postcode}` : name
 
   return {
     id,
@@ -151,7 +161,7 @@ const normalizeArea = (raw) => {
 const displayName = (raw) => {
   const a = normalizeArea(raw)
   if (!a) return ''
-  return a.type === 'postcode' ? (a.postcode || a.name) : (a.fullName || a.name)
+  return a.type === 'postcode' ? a.postcode || a.name : a.fullName || a.name
 }
 
 // A→Z 分组 + 关键字过滤
@@ -261,7 +271,7 @@ watch(
       await ensureAreasLoaded()
     }
   },
-  { immediate: false }
+  { immediate: false },
 )
 </script>
 

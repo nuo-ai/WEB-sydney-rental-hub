@@ -13,8 +13,22 @@
           <button class="reset-link" @click="resetFilters">{{ $t('filter.reset') }}</button>
           <button class="close-btn" @click="closePanel" aria-label="关闭筛选面板">
             <!-- 使用内联SVG替代 Font Awesome，符合“SVG组件化图标”与统一风格要求；避免新增依赖 -->
-            <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg
+              class="spec-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M18 6 6 18M6 6l12 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </button>
         </div>
@@ -182,7 +196,9 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="large" @click="closePanel"> {{ $t('filter.cancel') }} </el-button>
+        <el-button class="cancel-btn" size="large" @click="closePanel">
+          {{ $t('filter.cancel') }}
+        </el-button>
         <el-button
           type="primary"
           class="apply-btn"
@@ -393,7 +409,11 @@ const applyQueryToState = (query, store) => {
       filters.value.endDate = new Date(String(query.date_to))
     }
     // 家具
-    if (query.isFurnished === '1' || query.furnished === '1' || String(query.furnished) === 'true') {
+    if (
+      query.isFurnished === '1' ||
+      query.furnished === '1' ||
+      String(query.furnished) === 'true'
+    ) {
       filters.value.isFurnished = true
     }
     // 区域（仅 suburb 名称 CSV）
@@ -514,8 +534,6 @@ const hasAppliedFilters = computed(() => {
     filters.value.isFurnished !== false
   )
 })
-
-
 
 const isDateRangeValid = computed(() => {
   // 中文注释：当“从/到”都选择时，校验开始日期不能晚于结束日期；否则视为有效
@@ -794,13 +812,17 @@ const scrollAndFocus = (sectionRef) => {
   if (!el) return
   try {
     el.scrollIntoView({ block: 'start', behavior: 'smooth' })
-  } catch {/* 忽略非关键错误 */}
+  } catch {
+    /* 忽略非关键错误 */
+  }
   if (!isDesktop()) return
   nextTick(() => {
     try {
       const focusEl = getFirstFocusable(el)
       focusEl?.focus?.({ preventScroll: true })
-    } catch {/* 忽略非关键错误 */}
+    } catch {
+      /* 忽略非关键错误 */
+    }
   })
 }
 
@@ -820,7 +842,7 @@ watch(
     const target = map[section]
     if (target) scrollAndFocus(target)
   },
-  { immediate: false }
+  { immediate: false },
 )
 
 // 滚动锁定管理
@@ -1471,7 +1493,6 @@ onMounted(() => {
     padding: var(--filter-space-sm) var(--filter-space-md);
   }
 }
-
 
 /* 移动端全屏模式 */
 @media (max-width: 767px) {

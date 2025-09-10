@@ -11,16 +11,44 @@
           @click.stop="togglePanel('area', $event)"
         >
           <span class="chinese-text">区域</span>
-          <svg v-if="activePanel !== 'area'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-if="activePanel !== 'area'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
-          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
         <FilterDropdown
           :modelValue="activePanel === 'area'"
-          @update:modelValue="val => !val && (activePanel = null)"
+          @update:modelValue="(val) => !val && (activePanel = null)"
           :trigger="areaTabRef"
           :explicit-position="positions.area"
           @close="activePanel = null"
@@ -38,16 +66,44 @@
           @click.stop="togglePanel('bedrooms', $event)"
         >
           <span class="chinese-text">卧室</span>
-          <svg v-if="activePanel !== 'bedrooms'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-if="activePanel !== 'bedrooms'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
-          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
         <FilterDropdown
           :modelValue="activePanel === 'bedrooms'"
-          @update:modelValue="val => !val && (activePanel = null)"
+          @update:modelValue="(val) => !val && (activePanel = null)"
           :trigger="bedroomsTabRef"
           :explicit-position="positions.bedrooms"
           @close="activePanel = null"
@@ -65,16 +121,44 @@
           @click.stop="togglePanel('price', $event)"
         >
           <span class="chinese-text">价格</span>
-          <svg v-if="activePanel !== 'price'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-if="activePanel !== 'price'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
-          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
         <FilterDropdown
           :modelValue="activePanel === 'price'"
-          @update:modelValue="val => !val && (activePanel = null)"
+          @update:modelValue="(val) => !val && (activePanel = null)"
           :trigger="priceTabRef"
           :explicit-position="positions.price"
           @close="activePanel = null"
@@ -92,16 +176,44 @@
           @click.stop="togglePanel('availability', $event)"
         >
           <span class="chinese-text">空出时间</span>
-          <svg v-if="activePanel !== 'availability'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-if="activePanel !== 'availability'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
-          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
         <FilterDropdown
           :modelValue="activePanel === 'availability'"
-          @update:modelValue="val => !val && (activePanel = null)"
+          @update:modelValue="(val) => !val && (activePanel = null)"
           :trigger="availabilityTabRef"
           :explicit-position="positions.availability"
           @close="activePanel = null"
@@ -119,16 +231,44 @@
           @click.stop="togglePanel('more', $event)"
         >
           <span class="chinese-text">更多</span>
-          <svg v-if="activePanel !== 'more'" class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-if="activePanel !== 'more'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
-          <svg v-else class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
         <FilterDropdown
           :modelValue="activePanel === 'more'"
-          @update:modelValue="val => !val && (activePanel = null)"
+          @update:modelValue="(val) => !val && (activePanel = null)"
           :trigger="moreTabRef"
           :explicit-position="positions.more"
           @close="activePanel = null"
@@ -142,8 +282,20 @@
   <!-- 移动端触发统一面板的按钮 -->
   <div v-else class="filter-tabs-mobile">
     <button class="filter-button" @click="$emit('requestOpenFullPanel')">
-      <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <svg
+        class="filter-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M3 4h18M3 12h18M3 20h18"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
       </svg>
       <span>筛选</span>
     </button>
@@ -187,12 +339,18 @@ const positions = reactive({
 
 const getRef = (panel) => {
   switch (panel) {
-    case 'area': return areaTabRef
-    case 'bedrooms': return bedroomsTabRef
-    case 'price': return priceTabRef
-    case 'availability': return availabilityTabRef
-    case 'more': return moreTabRef
-    default: return null
+    case 'area':
+      return areaTabRef
+    case 'bedrooms':
+      return bedroomsTabRef
+    case 'price':
+      return priceTabRef
+    case 'availability':
+      return availabilityTabRef
+    case 'more':
+      return moreTabRef
+    default:
+      return null
   }
 }
 
@@ -325,7 +483,9 @@ onUnmounted(() => {
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   white-space: nowrap;
 }
 

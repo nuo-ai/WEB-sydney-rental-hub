@@ -15,7 +15,7 @@
       'base-list-item--selected': selected,
       'base-list-item--disabled': disabled,
       'base-list-item--clickable': clickable,
-      'base-list-item--bordered': bordered
+      'base-list-item--bordered': bordered,
     }"
     :role="role"
     :aria-selected="selected"
@@ -58,32 +58,32 @@ const props = defineProps({
   // 是否选中
   selected: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   // 是否禁用
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   // 是否可点击
   clickable: {
     type: Boolean,
-    default: true
+    default: true,
   },
 
   // 是否显示边框
   bordered: {
     type: Boolean,
-    default: true
+    default: true,
   },
 
   // ARIA 角色
   role: {
     type: String,
-    default: 'listitem'
-  }
+    default: 'listitem',
+  },
 })
 
 const emit = defineEmits(['click', 'select'])
@@ -280,12 +280,7 @@ const handleKeydown = (event) => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   animation: shimmer 1.5s infinite;
 }
 

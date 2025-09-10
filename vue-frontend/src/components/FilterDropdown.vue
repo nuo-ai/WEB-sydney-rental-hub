@@ -71,9 +71,12 @@ const previousActiveElement = ref(null)
 const restoreFocus = () => {
   // 优先将焦点还给触发器，其次是关闭前记录的活动元素
   const triggerEl = props.trigger?.value
-  const target = (triggerEl && typeof triggerEl.focus === 'function') ? triggerEl
-    : (previousActiveElement.value && typeof previousActiveElement.value.focus === 'function') ? previousActiveElement.value
-    : null
+  const target =
+    triggerEl && typeof triggerEl.focus === 'function'
+      ? triggerEl
+      : previousActiveElement.value && typeof previousActiveElement.value.focus === 'function'
+        ? previousActiveElement.value
+        : null
   if (target) {
     // 使用 rAF 确保在 DOM 更新与过渡后再聚焦
     requestAnimationFrame(() => target.focus())
@@ -83,12 +86,26 @@ const restoreFocus = () => {
 // 中文注释：计算下拉面板的位置，确保正确对齐在触发元素下方
 const calculatePosition = () => {
   // 中文注释：若提供了显式坐标，则优先使用，避免任何时序问题
-  if (props.explicitPosition && (props.explicitPosition.top != null) && (props.explicitPosition.left != null)) {
-    const top = typeof props.explicitPosition.top === 'number' ? `${props.explicitPosition.top}px` : `${props.explicitPosition.top}`
-    const left = typeof props.explicitPosition.left === 'number' ? `${props.explicitPosition.left}px` : `${props.explicitPosition.left}`
-    const width = props.explicitPosition.width != null
-      ? (typeof props.explicitPosition.width === 'number' ? `${props.explicitPosition.width}px` : `${props.explicitPosition.width}`)
-      : (props.width || `${Math.max(props.trigger?.value?.getBoundingClientRect?.().width || 0, 280)}px`)
+  if (
+    props.explicitPosition &&
+    props.explicitPosition.top != null &&
+    props.explicitPosition.left != null
+  ) {
+    const top =
+      typeof props.explicitPosition.top === 'number'
+        ? `${props.explicitPosition.top}px`
+        : `${props.explicitPosition.top}`
+    const left =
+      typeof props.explicitPosition.left === 'number'
+        ? `${props.explicitPosition.left}px`
+        : `${props.explicitPosition.left}`
+    const width =
+      props.explicitPosition.width != null
+        ? typeof props.explicitPosition.width === 'number'
+          ? `${props.explicitPosition.width}px`
+          : `${props.explicitPosition.width}`
+        : props.width ||
+          `${Math.max(props.trigger?.value?.getBoundingClientRect?.().width || 0, 280)}px`
     return { top, left, width }
   }
   // 中文注释：触发元素尚未就绪时，保持上一次定位（或空），避免写入 0,0 导致出现在左上角
@@ -103,7 +120,7 @@ const calculatePosition = () => {
 
   // 中文注释：根据position属性计算水平位置
   if (props.position === 'bottom-center') {
-    left = rect.left + (rect.width / 2) - (parseInt(width) / 2)
+    left = rect.left + rect.width / 2 - parseInt(width) / 2
   } else if (props.position === 'bottom-end') {
     left = rect.right - parseInt(width) - (props.offset?.x || 0)
   }
@@ -141,7 +158,10 @@ const calculatePosition = () => {
 const updatePosition = () => {
   nextTick(() => {
     // 中文注释：若提供了显式坐标（explicitPosition），即使 trigger 未就绪也必须计算定位
-    const hasExplicit = props.explicitPosition && props.explicitPosition.top != null && props.explicitPosition.left != null
+    const hasExplicit =
+      props.explicitPosition &&
+      props.explicitPosition.top != null &&
+      props.explicitPosition.left != null
     if (!hasExplicit && !props.trigger?.value) return
     positionStyle.value = calculatePosition()
   })
@@ -212,7 +232,9 @@ const focusFirstInteractive = () => {
   const root = dropdownRef.value
   if (!root) return
   // 中文注释：排除 tabindex="-1"（如右上角关闭按钮），避免首焦点落在“关闭”
-  const first = root.querySelector('button:not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  const first = root.querySelector(
+    'button:not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  )
   if (first && typeof first.focus === 'function') {
     first.focus()
   } else {
@@ -225,53 +247,67 @@ const getFocusableElements = () => {
   const root = dropdownRef.value
   if (!root) return []
   // 中文注释：与 focusFirstInteractive 一致，排除 tabindex="-1" 的按钮（如右上角关闭按钮）
-  const selector = 'button:not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-  const nodes = Array.from(root.querySelectorAll(selector)).filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
+  const selector =
+    'button:not([tabindex="-1"]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  const nodes = Array.from(root.querySelectorAll(selector)).filter(
+    (el) => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true',
+  )
   return nodes
 }
 
- // 中文注释：监听面板打开状态（锁滚 + 焦点首控件 + 定位确认）
-watch(() => isOpen.value, (newVal) => {
-  if (newVal) {
-    // 中文注释：记录打开前的活动元素，关闭时用于还原焦点
-    previousActiveElement.value = document.activeElement
-    // 中文注释：首次打开立即计算一次，并锁定 body 滚动
-    lockBodyScroll()
-    updatePosition()
-    nextTick(() => {
-      // 中文注释：优先将焦点移至首个交互控件；如果不存在则聚焦容器
-      focusFirstInteractive()
-      // 中文注释：在布局/赋值可能慢一拍的场景下，追加 1–2 帧 rAF 进行轻量确认重算
-      const ensurePosition = (attempt = 0) => {
-        if (!positionStyle.value?.top || !positionStyle.value?.left) {
-          updatePosition()
+// 中文注释：监听面板打开状态（锁滚 + 焦点首控件 + 定位确认）
+watch(
+  () => isOpen.value,
+  (newVal) => {
+    if (newVal) {
+      // 中文注释：记录打开前的活动元素，关闭时用于还原焦点
+      previousActiveElement.value = document.activeElement
+      // 中文注释：首次打开立即计算一次，并锁定 body 滚动
+      lockBodyScroll()
+      updatePosition()
+      nextTick(() => {
+        // 中文注释：优先将焦点移至首个交互控件；如果不存在则聚焦容器
+        focusFirstInteractive()
+        // 中文注释：在布局/赋值可能慢一拍的场景下，追加 1–2 帧 rAF 进行轻量确认重算
+        const ensurePosition = (attempt = 0) => {
+          if (!positionStyle.value?.top || !positionStyle.value?.left) {
+            updatePosition()
+          }
+          if (attempt < 2) {
+            requestAnimationFrame(() => ensurePosition(attempt + 1))
+          }
         }
-        if (attempt < 2) {
-          requestAnimationFrame(() => ensurePosition(attempt + 1))
-        }
-      }
-      requestAnimationFrame(() => ensurePosition(0))
-    })
-  } else {
-    // 中文注释：关闭时恢复 body 滚动
-    unlockBodyScroll()
-  }
-})
+        requestAnimationFrame(() => ensurePosition(0))
+      })
+    } else {
+      // 中文注释：关闭时恢复 body 滚动
+      unlockBodyScroll()
+    }
+  },
+)
 
 // 中文注释：监听触发元素变化或窗口滚动，更新位置
-watch(() => props.trigger?.value, (el) => {
-  // 中文注释：触发元素一旦就绪即尝试定位，不再依赖 isOpen，先准备好位置
-  if (el) {
-    updatePosition()
-  }
-}, { immediate: true })
+watch(
+  () => props.trigger?.value,
+  (el) => {
+    // 中文注释：触发元素一旦就绪即尝试定位，不再依赖 isOpen，先准备好位置
+    if (el) {
+      updatePosition()
+    }
+  },
+  { immediate: true },
+)
 
 // 中文注释：当外部显式坐标变化时，若面板已打开则立即更新
-watch(() => props.explicitPosition, (pos) => {
-  if (isOpen.value && pos && pos.top != null && pos.left != null) {
-    updatePosition()
-  }
-}, { deep: true })
+watch(
+  () => props.explicitPosition,
+  (pos) => {
+    if (isOpen.value && pos && pos.top != null && pos.left != null) {
+      updatePosition()
+    }
+  },
+  { deep: true },
+)
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
@@ -325,7 +361,9 @@ onUnmounted(() => {
 /* 中文注释：过渡动画 */
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .dropdown-fade-enter-from,

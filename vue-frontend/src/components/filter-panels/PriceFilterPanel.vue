@@ -57,8 +57,6 @@ const t = inject('t') || ((k) => k)
 
 // 文案回退，避免显示未注册的 key
 
-
-
 const anyPriceLabel = computed(() => {
   const v = t('filter.anyPrice')
   return v && v !== 'filter.anyPrice' ? v : '不限价格'
@@ -121,9 +119,6 @@ watch(localPriceRange, () => {
 onMounted(() => {
   computePreviewCount()
 })
-
-
-
 
 // 价格范围文本显示
 const priceRangeText = computed(() => {

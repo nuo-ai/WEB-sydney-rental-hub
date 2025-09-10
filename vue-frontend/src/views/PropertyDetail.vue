@@ -91,7 +91,8 @@
             <!-- 价格 -->
             <div class="price-wrapper">
               <span class="price-text typo-price">
-                ${{ property.rent_pw }} <span class="price-unit typo-label">{{ $t('propertyCard.perWeek') }}</span>
+                ${{ property.rent_pw }}
+                <span class="price-unit typo-label">{{ $t('propertyCard.perWeek') }}</span>
               </span>
             </div>
 
@@ -132,7 +133,9 @@
 
             <!-- 可用日期和押金 -->
             <div class="availability-info">
-              <span class="availability-label typo-body">{{ $t('propertyCard.availableDateLabel') }}：{{ getAvailableDate() }}</span>
+              <span class="availability-label typo-body"
+                >{{ $t('propertyCard.availableDateLabel') }}：{{ getAvailableDate() }}</span
+              >
             </div>
           </section>
 
@@ -162,7 +165,9 @@
                   <i class="fas fa-location-dot"></i>
                 </div>
                 <div class="travel-btn-content">
-                  <span class="travel-btn-title typo-button">{{ $t('propertyDetail.seeTravel') }}</span>
+                  <span class="travel-btn-title typo-button">{{
+                    $t('propertyDetail.seeTravel')
+                  }}</span>
                   <span class="travel-btn-subtitle">{{ $t('propertyDetail.seeTravelSub') }}</span>
                 </div>
                 <ChevronDown class="travel-chevron" :size="24" />
@@ -201,7 +206,11 @@
           <section class="features-section" v-if="allFeatures.length > 0">
             <h2 class="section-title typo-heading-card">{{ $t('propertyDetail.features') }}</h2>
             <div class="features-two-column">
-              <div v-for="feature in displayedFeatures" :key="feature" class="feature-list-item typo-body">
+              <div
+                v-for="feature in displayedFeatures"
+                :key="feature"
+                class="feature-list-item typo-body"
+              >
                 {{ feature }}
               </div>
             </div>
@@ -210,13 +219,19 @@
               @click="showAllFeatures = !showAllFeatures"
               class="view-less-btn typo-button"
             >
-              {{ showAllFeatures ? $t('propertyDetail.viewLessFeatures') : $t('propertyDetail.viewAllFeatures') }}
+              {{
+                showAllFeatures
+                  ? $t('propertyDetail.viewLessFeatures')
+                  : $t('propertyDetail.viewAllFeatures')
+              }}
             </button>
           </section>
 
           <!-- Inspection Times - 按Figma设计卡片式布局 -->
           <section class="inspection-section">
-            <h2 class="section-title typo-heading-card">{{ $t('propertyDetail.inspectionTimes') }}</h2>
+            <h2 class="section-title typo-heading-card">
+              {{ $t('propertyDetail.inspectionTimes') }}
+            </h2>
             <div v-if="inspectionTimes.length > 0" class="inspection-list">
               <div
                 v-for="(inspection, index) in inspectionTimes"
@@ -243,8 +258,12 @@
 
       <!-- 底部固定操作栏 -->
       <footer class="action-footer">
-        <el-button class="action-btn enquire-btn typo-button" @click="handleEmail">{{ $t('propertyDetail.enquire') }}</el-button>
-        <el-button class="action-btn inspect-btn typo-button" @click="handleInspections">{{ $t('propertyDetail.inspect') }}</el-button>
+        <el-button class="action-btn enquire-btn typo-button" @click="handleEmail">{{
+          $t('propertyDetail.enquire')
+        }}</el-button>
+        <el-button class="action-btn inspect-btn typo-button" @click="handleInspections">{{
+          $t('propertyDetail.inspect')
+        }}</el-button>
       </footer>
     </template>
 
@@ -273,19 +292,13 @@
 </template>
 
 <script setup>
-const photoIcon = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" stroke="%233c475b" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="%233c475b" stroke-width="2"/></svg>'
+const photoIcon =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" stroke="%233c475b" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" stroke="%233c475b" stroke-width="2"/></svg>'
 import { onMounted, onUnmounted, computed, ref, inject } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
-import {
-  ArrowLeft,
-  Share,
-  Picture,
-  Location,
-  Calendar,
-  Loading,
-} from '@element-plus/icons-vue'
+import { ArrowLeft, Share, Picture, Location, Calendar, Loading } from '@element-plus/icons-vue'
 import { BedDouble, Bath, CarFront, ChevronDown } from 'lucide-vue-next'
 import { ElMessage } from 'element-plus'
 import GoogleMap from '@/components/GoogleMap.vue'
@@ -456,9 +469,7 @@ const inspectionTimes = computed(() => {
       .map(parseEntry)
       .filter(Boolean) // 中文注释：移除解析失败的条目
   } else if (Array.isArray(raw)) {
-    parsed = raw
-      .map(parseEntry)
-      .filter(Boolean) // 中文注释：移除解析失败的条目
+    parsed = raw.map(parseEntry).filter(Boolean) // 中文注释：移除解析失败的条目
   }
 
   return parsed
@@ -507,7 +518,6 @@ onUnmounted(() => {
 })
 /* 中文注释：默认折叠展示 2 行 → 2*2=4（移动端），3*2=6（≥768px） */
 const visibleFeaturesCount = computed(() => (isThreeCols.value ? 6 : 4))
-
 
 // 方法
 const goBack = () => {
@@ -586,7 +596,7 @@ const handleImageClick = () => {
     // 1) 保持黑色背景
     const mask = document.querySelector('.el-image-viewer__mask')
     if (mask) {
-      mask.style.backgroundColor = '#000000'
+      mask.style.backgroundColor = 'var(--overlay-bg)'
       mask.style.opacity = '0.95'
     }
 
@@ -669,7 +679,6 @@ const handleImageClick = () => {
   setTimeout(apply, INTERVAL)
 }
 
-
 const handleSeeTravelTimes = () => {
   // 测试模式：直接跳转，不需要登录
   const isTest = authStore.testMode
@@ -726,7 +735,6 @@ onMounted(async () => {
     preloadNextImage()
   }
   propertiesStore.logHistory(propertyId)
-
 })
 
 onBeforeRouteLeave(() => {
@@ -740,7 +748,7 @@ onBeforeRouteLeave(() => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: var(--color-bg-page); /* 页面背景采用中性页灰，与全站一致 */
+  background-color: var(--color-bg-card); /* 页面背景改为卡片白（页白 + 卡片白） */
   /* 新增：统一字体栈（含中文优先级） */
   --font-ui: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   font-family: var(--font-ui);
@@ -759,10 +767,10 @@ onBeforeRouteLeave(() => {
   position: fixed;
   top: 80px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-bg-card);
   padding: 8px 16px;
   border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -798,7 +806,7 @@ onBeforeRouteLeave(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-bg-card);
   border: none;
   display: flex;
   align-items: center;
@@ -806,14 +814,14 @@ onBeforeRouteLeave(() => {
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--color-text-secondary);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-xs);
   z-index: 10;
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 1);
+  background: var(--color-bg-card);
   transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Share和Save按钮组 - 右上角 */
@@ -880,13 +888,13 @@ onBeforeRouteLeave(() => {
   font-size: 14px;
   font-weight: 500;
   color: var(--color-text-secondary);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-xs);
 }
 
 .inspect-btn-overlay:hover {
   background: var(--bg-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 将覆盖按钮样式变为计数器时的非交互徽标状态 */
@@ -1077,7 +1085,7 @@ onBeforeRouteLeave(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-2);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1085,7 +1093,7 @@ onBeforeRouteLeave(() => {
 .indicator.active {
   width: 24px;
   border-radius: 3px;
-  background: white;
+  background: var(--color-bg-card);
 }
 
 /* 内容容器 - PC端1683px宽度居中 */
@@ -1151,7 +1159,7 @@ onBeforeRouteLeave(() => {
 }
 
 .divider {
-  color: #d0d3d9;
+  color: var(--color-border-default);
 }
 
 .bond-info {
@@ -1275,7 +1283,7 @@ onBeforeRouteLeave(() => {
   border-left: 1px solid var(--color-border-default);
   font-size: 18px;
   font-weight: 600;
-  color: #6e7881;
+  color: var(--color-text-secondary);
   font-family: var(--font-ui); /* 统一 */
 }
 
@@ -1475,7 +1483,7 @@ onBeforeRouteLeave(() => {
     width: 100%;
     margin: 0;
     padding: 40px 48px;
-    background: white;
+    background: var(--color-bg-card);
     border-radius: 0;
     box-shadow: none;
   }
@@ -1797,7 +1805,7 @@ onBeforeRouteLeave(() => {
   display: flex;
   gap: 12px;
   z-index: 100;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-xs);
 }
 
 /* PC端隐藏底部操作栏 */
@@ -1820,24 +1828,24 @@ onBeforeRouteLeave(() => {
 
 .enquire-btn {
   background: var(--color-accent);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .enquire-btn:hover {
-  background: #005a6b;
+  background: var(--juwo-primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 124, 140, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .inspect-btn {
-  background: #f97f4e; /* Domain橙色 */
-  color: white;
+  background: var(--juwo-primary); /* 统一 CTA 使用品牌主色 */
+  color: var(--color-text-inverse);
 }
 
 .inspect-btn:hover {
-  background: #e86a3a;
+  background: var(--juwo-primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(249, 127, 78, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Responsive Design - Domain响应式 */
@@ -1885,7 +1893,7 @@ onBeforeRouteLeave(() => {
 
 /* Dark overlay for lightbox */
 :deep(.el-image-viewer__mask) {
-  background-color: #000000 !important;
+  background-color: var(--overlay-bg) !important;
   opacity: 0.95 !important;
 }
 
@@ -1928,7 +1936,7 @@ onBeforeRouteLeave(() => {
   top: 12px;
   right: 12px;
   z-index: 100000; /* 高于 viewer 内部按钮 */
-  color: #fff;
+  color: var(--color-text-inverse);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -2102,11 +2110,11 @@ onBeforeRouteLeave(() => {
 
   /* 4) 返回按钮：白色圆底 + 灰色箭头（与移动端对齐，PC端） */
   .back-btn {
-    background: rgba(255, 255, 255, 0.95) !important; /* 白色圆底，保持轻透明以适配浅/深背景 */
-    color: #808296 !important;                        /* 灰色箭头（随 currentColor） */
-  }
+  background: var(--color-bg-card) !important; /* 白色圆底（令牌化），适配浅/深背景 */
+  color: var(--color-text-secondary) !important; /* 灰色箭头（随 currentColor） */
+}
   .back-btn:hover {
-    background: #ffffff !important;                   /* hover 保持白底，轻微高亮由上方默认阴影处理 */
+    background: var(--color-bg-card) !important; /* hover 同白底，阴影由默认处理 */
   }
 }
 /* ==== 全端统一：隐藏指示点 + 分隔线中性化（移动端与PC同时生效） ==== */
@@ -2162,29 +2170,33 @@ onBeforeRouteLeave(() => {
 .see-travel-times-btn {
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;  /* 靠左对齐 */
+  justify-content: flex-start !important; /* 靠左对齐 */
   width: 100% !important;
-  padding: 12px 16px 12px 0 !important;    /* 右侧留 16px 缓冲 */
+  padding: 12px 16px 12px 0 !important; /* 右侧留 16px 缓冲 */
   margin-top: 0 !important;
   background: transparent !important;
-  border: none !important;                 /* 去除上下横线 */
+  border: none !important; /* 去除上下横线 */
   border-radius: 0 !important;
   box-shadow: none !important;
   text-align: left !important;
   cursor: pointer;
-  gap: 8px !important;                     /* 文案与箭头最小间距 */
+  gap: 8px !important; /* 文案与箭头最小间距 */
 }
 
 /* 标题仅一行，副标题与图标隐藏 */
-.travel-icon-wrapper { display: none !important; }
-.travel-btn-subtitle { display: none !important; }
+.travel-icon-wrapper {
+  display: none !important;
+}
+.travel-btn-subtitle {
+  display: none !important;
+}
 
 .travel-btn-content {
   display: inline-flex !important;
   align-items: center !important;
-  flex: 0 0 auto !important;               /* 不占满整行，避免视觉居中 */
+  flex: 0 0 auto !important; /* 不占满整行，避免视觉居中 */
   width: auto !important;
-  flex-direction: row !important;          /* 与标题在一行 */
+  flex-direction: row !important; /* 与标题在一行 */
 }
 
 .travel-btn-title {
@@ -2201,13 +2213,17 @@ onBeforeRouteLeave(() => {
   height: 24px;
   color: var(--color-text-secondary);
   flex-shrink: 0;
-  margin-left: 8px;        /* 与标题间距 */
-  margin-right: 16px;      /* 与右侧边缘间距 */
+  margin-left: 8px; /* 与标题间距 */
+  margin-right: 16px; /* 与右侧边缘间距 */
 }
 
 /* PC 悬浮轻微高亮 & 行高略增 */
 @media (min-width: 1200px) {
-  .see-travel-times-btn { padding-block: 16px !important; }
-  .see-travel-times-btn:hover { background: var(--bg-hover) !important; }
+  .see-travel-times-btn {
+    padding-block: 16px !important;
+  }
+  .see-travel-times-btn:hover {
+    background: var(--bg-hover) !important;
+  }
 }
 </style>

@@ -10,7 +10,10 @@
 
         <!-- 我的收藏 -->
         <section class="section-card stack-md">
-          <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <div
+            class="section-header"
+            style="display: flex; align-items: center; justify-content: space-between"
+          >
             <h2 class="h2">Favorites</h2>
             <span class="text-secondary text-sm">({{ favoriteCount }})</span>
           </div>
@@ -27,7 +30,10 @@
 
         <!-- 浏览历史 -->
         <section class="section-card stack-md">
-          <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <div
+            class="section-header"
+            style="display: flex; align-items: center; justify-content: space-between"
+          >
             <h2 class="h2">History</h2>
             <span class="text-secondary text-sm">({{ historyCount }})</span>
           </div>

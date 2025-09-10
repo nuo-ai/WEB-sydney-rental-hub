@@ -38,7 +38,9 @@
       <!-- 移除图片上的按钮 -->
 
       <!-- 新房源标签 -->
-      <div v-if="isNewProperty" class="property-status-tag typo-label">{{ $t('propertyCard.newBadge') }}</div>
+      <div v-if="isNewProperty" class="property-status-tag typo-label">
+        {{ $t('propertyCard.newBadge') }}
+      </div>
     </div>
 
     <!-- 房源内容区域 -->
@@ -109,12 +111,14 @@
       <div class="property-footer">
         <!-- 空出日期 - 中文显示 -->
         <div class="availability-text chinese-text typo-body-sm">
-          {{ $t('propertyCard.availableDateLabel') }}: {{ formatAvailabilityDate(property.available_date) }}
+          {{ $t('propertyCard.availableDateLabel') }}:
+          {{ formatAvailabilityDate(property.available_date) }}
         </div>
 
         <!-- 开放时间 - 中文显示 -->
         <div v-if="hasValidInspectionTime" class="inspection-text chinese-text typo-body-sm">
-          {{ $t('propertyCard.inspectionTimeLabel') }}: {{ formatInspectionTime(property.inspection_times) }}
+          {{ $t('propertyCard.inspectionTimeLabel') }}:
+          {{ formatInspectionTime(property.inspection_times) }}
         </div>
       </div>
     </div>
@@ -185,9 +189,9 @@ const hasValidInspectionTime = computed(() => {
   }
 
   // 检查是否包含有效的日期/时间信息
-  const hasValidContent = /\d/.test(times) &&
-    (times.includes('day') || times.includes('Day') ||
-     times.includes('周') || times.includes(':'))
+  const hasValidContent =
+    /\d/.test(times) &&
+    (times.includes('day') || times.includes('Day') || times.includes('周') || times.includes(':'))
 
   return hasValidContent
 })

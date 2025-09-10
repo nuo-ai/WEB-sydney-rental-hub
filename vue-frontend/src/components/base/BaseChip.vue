@@ -8,13 +8,7 @@
 -->
 
 <template>
-  <div
-    class="base-chip"
-    :class="[
-      `base-chip--${variant}`,
-      { 'base-chip--removable': removable }
-    ]"
-  >
+  <div class="base-chip" :class="[`base-chip--${variant}`, { 'base-chip--removable': removable }]">
     <span class="base-chip__text">
       <slot />
     </span>
@@ -38,20 +32,20 @@ defineProps({
   variant: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'selected', 'hover'].includes(value)
+    validator: (value) => ['default', 'selected', 'hover'].includes(value),
   },
 
   // 是否可移除
   removable: {
     type: Boolean,
-    default: true
+    default: true,
   },
 
   // 移除按钮的无障碍标签
   removeLabel: {
     type: String,
-    default: '移除'
-  }
+    default: '移除',
+  },
 })
 
 const emit = defineEmits(['remove'])

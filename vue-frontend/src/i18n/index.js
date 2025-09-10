@@ -23,12 +23,12 @@ const BUILTIN_MESSAGES = {
       cancel: '取消',
       showResults: '显示结果',
       anyPrice: '不限价格',
-      selectRegionFirst: '请先选择区域后再筛选'
+      selectRegionFirst: '请先选择区域后再筛选',
     },
     search: {
-      ph: '请先输入区域或邮编，例如 ‘Ultimo’ 或 ‘2000’'
-    }
-  }
+      ph: '请先输入区域或邮编，例如 ‘Ultimo’ 或 ‘2000’',
+    },
+  },
 }
 
 // 简单的深度取值
@@ -61,7 +61,7 @@ function deepMerge(target, source) {
 
 // 默认消息：内置 zh-CN 与本地 zh-CN 合并（本地优先）
 const DEFAULT_MESSAGES = {
-  'zh-CN': deepMerge(BUILTIN_MESSAGES['zh-CN'] || {}, zhCN || {})
+  'zh-CN': deepMerge(BUILTIN_MESSAGES['zh-CN'] || {}, zhCN || {}),
 }
 
 // 默认导出：作为 Vue 插件使用
@@ -90,7 +90,7 @@ export default {
     app.config.globalProperties.$t = t
     // 也提供注入（可在组合式 API 中 inject('t') 使用）
     app.provide('t', t)
-  }
+  },
 }
 
 // 同步导出合并后的默认文案（用于外部覆盖/调试）

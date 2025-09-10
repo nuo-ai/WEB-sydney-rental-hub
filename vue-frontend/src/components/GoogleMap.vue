@@ -176,13 +176,15 @@ function decodePolyline(str) {
     lng = 0
   const coordinates = []
   while (index < str.length) {
-    let b, shift = 0, result = 0
+    let b,
+      shift = 0,
+      result = 0
     do {
       b = str.charCodeAt(index++) - 63
       result |= (b & 0x1f) << shift
       shift += 5
     } while (b >= 0x20)
-    const dlat = (result & 1) ? ~(result >> 1) : (result >> 1)
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1
     lat += dlat
 
     shift = 0
@@ -192,7 +194,7 @@ function decodePolyline(str) {
       result |= (b & 0x1f) << shift
       shift += 5
     } while (b >= 0x20)
-    const dlng = (result & 1) ? ~(result >> 1) : (result >> 1)
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1
     lng += dlng
 
     coordinates.push({ lat: lat / 1e5, lng: lng / 1e5 })
@@ -211,7 +213,9 @@ const fitRouteBounds = (path) => {
     typeof props.routeEndpoints.origin.lat === 'number' &&
     typeof props.routeEndpoints.origin.lng === 'number'
   ) {
-    bounds.extend(new google.maps.LatLng(props.routeEndpoints.origin.lat, props.routeEndpoints.origin.lng))
+    bounds.extend(
+      new google.maps.LatLng(props.routeEndpoints.origin.lat, props.routeEndpoints.origin.lng),
+    )
   }
   if (
     props.routeEndpoints &&
@@ -220,7 +224,10 @@ const fitRouteBounds = (path) => {
     typeof props.routeEndpoints.destination.lng === 'number'
   ) {
     bounds.extend(
-      new google.maps.LatLng(props.routeEndpoints.destination.lat, props.routeEndpoints.destination.lng),
+      new google.maps.LatLng(
+        props.routeEndpoints.destination.lat,
+        props.routeEndpoints.destination.lng,
+      ),
     )
   }
   try {
@@ -561,7 +568,7 @@ watch(
   async () => {
     await nextTick()
     triggerMapResize()
-  }
+  },
 )
 
 /* 中文注释：统一触发地图 resize 并根据策略恢复视图，避免容器高度变化后出现灰条 */
@@ -628,7 +635,7 @@ onUnmounted(() => {
   // 移除事件监听，避免内存泄漏
   try {
     if (listeners && listeners.length && google && google.maps && google.maps.event) {
-      listeners.forEach(l => google.maps.event.removeListener(l))
+      listeners.forEach((l) => google.maps.event.removeListener(l))
     }
   } catch {
     // 忽略清理异常
