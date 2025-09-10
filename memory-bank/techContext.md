@@ -1,7 +1,7 @@
 ![1757262958422](image/techContext/1757262958422.png)# 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-08
+**最后更新**: 2025-09-10
 
 ---
 
@@ -232,3 +232,29 @@ python scripts/run_backend.py  # localhost:8000
 - UI 回显：
   - FilterPanel 顶部常驻 Location 区：chips 回显/单项移除/清空；清空后显示空态提示，避免“区域信息消失”；`include_nearby` 勾选常驻，URL 写入/恢复（透传参数，后端未识别时无副作用）；i18n 回退修复（`filter.location/clearAll/searchNearby` 等 key 缺失时使用中文）。
   - 搜索框内部浅灰标签（Inline Chips）：未聚焦/未输入/未打开移动 Overlay 时在输入框内部回显所选区域（前 2 项 + “+N” 汇总）；`pointer-events: none`，仅占位回显，不拦截交互。
+
+## 样式与设计令牌护栏增强（2025-09-10）
+- 目的：阻止新增硬编码颜色，强制使用 CSS 自定义属性 Design Tokens；在未安装 stylelint 的环境下不阻断提交（条件执行）。
+- 新增脚本（vue-frontend/package.json）
+  - "lint:style": "stylelint \"src/**/*.{css,vue}\" --fix"
+- 提交钩子（scripts/git-hooks/pre-commit 摘要）
+  ```bash
+  if [ -x "vue-frontend/node_modules/.bin/stylelint" ]; then
+    (cd vue-frontend && npm run -s lint:style)
+  fi
+  ```
+  - 中文注释：仅当本地已安装 stylelint 时执行，以兼容干净环境；不影响其他语言栈的 pre-commit 流水线。
+- Stylelint 规则（.stylelintrc.json 摘要）
+  - 禁止十六进制/命名色/rgba/hsla；
+  - 启用 plugin/declaration-use-variable 强制 color/background/border/outline/fill/stroke 使用 var(--*)；
+  - 豁免：src/styles/design-tokens.css 与 src/style.css（令牌定义入口）。
+- 合规范围扩展（本轮）
+  - FilterTabs：chip 背景/hover/选中统一 --chip-bg / --chip-bg-hover / --chip-bg-selected（移除 hex fallback）。
+  - PropertyCard：轮播箭头颜色使用 var(--color-text-inverse)，保证深底可读与主题可控。
+  - PropertyDetail：容器/分隔/弱底/占位/地图容器等统一为 --color-bg-card / --color-border-default / --bg-hover / --surface-*；主/副文案统一 --color-text-primary/secondary。
+- 主题映射
+  - --juwo-primary / --link-color 对齐纯正蓝（#0057ff / hover #0047e5 / active #0036b3）；品牌色仅用于 CTA/链接，其他交互使用中性灰令牌。
+- 回滚与例外
+  - 发生误拦截时，优先在局部以更具体选择器限定；极端情况下可短期使用 var(--token, #xxx) 兜底，但需在下一轮清理。
+  - 关闭钩子或移除脚本不影响生产构建；规则变更以 .stylelintrc.json 为准。
+- 溯源：commit 9984dff..0b6e146｜progress 2025-09-10

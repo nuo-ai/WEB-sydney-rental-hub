@@ -398,7 +398,7 @@ watch(
   height: 36px;
   background: transparent;
   border: none;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
   border-radius: 6px;
 }
 
@@ -433,7 +433,7 @@ watch(
 .filter-text-btn {
   background: transparent;
   border: none;
-  color: var(--juwo-primary, #ff5824);
+  color: var(--juwo-primary);
   font-weight: 600;
   font-size: 14px;
   padding: 6px 8px;
@@ -456,7 +456,7 @@ watch(
   outline: none;
   font-size: 16px; /* iOS 防 auto-zoom */
   background: transparent;
-  color: var(--color-text-primary, #111827);
+  color: var(--color-text-primary);
 }
 
 /* 已选 chips */
@@ -526,8 +526,8 @@ watch(
 }
 
 .pill.selected {
-  background: var(--juwo-primary, #ff5824);
-  border-color: var(--juwo-primary, #ff5824);
+  background: var(--juwo-primary);
+  border-color: var(--juwo-primary);
   color: #fff;
 }
 
@@ -542,7 +542,7 @@ watch(
   align-items: center;
   gap: 8px;
   padding: 16px;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -550,7 +550,7 @@ watch(
   width: 16px;
   height: 16px;
   border: 2px solid var(--filter-color-border-subtle);
-  border-top-color: var(--juwo-primary, #ff5824);
+  border-top-color: var(--juwo-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

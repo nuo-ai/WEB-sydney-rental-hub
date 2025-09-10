@@ -1614,7 +1614,7 @@ onBeforeRouteLeave(() => {
   padding: 0;
   font-size: 14px;
   font-weight: 600; /* 加粗以匹配设计 */
-  color: var(--juwo-primary, #ff5824); /* 使用品牌主色 */
+  color: var(--juwo-primary); /* 使用品牌主色 */
   background: none;
   border: none;
   cursor: pointer;
@@ -2046,14 +2046,14 @@ onBeforeRouteLeave(() => {
     ); /* 分隔线右端对齐到内容右缘（= 页面右侧 496） */
     top: 0;
     height: 1px;
-    background-color: var(--divider-color, #e5e7eb);
+    background-color: var(--divider-color);
   }
 }
 
 /* 移动端与小屏：恢复基础分隔线（无需特殊对齐规则） */
 @media (max-width: 1199px) {
   .content-card > * + * {
-    border-top: 1px solid var(--divider-color, #e5e7eb) !important;
+    border-top: 1px solid var(--divider-color) !important;
   }
 }
 /* 超宽屏段落行长限制：提升可读性，不改变容器的 453px/496px 对齐规则 */
@@ -2118,7 +2118,7 @@ onBeforeRouteLeave(() => {
 
 /* 2) 为详情页作用域提供统一分隔线变量，并在所有断点生效 */
 .property-detail-page {
-  --divider-color: #e5e5e5; /* 中性灰 */
+  --divider-color: var(--color-border-default); /* 中性灰 */
 }
 
 /* 3) 常见分隔元素统一为中性灰（避免品牌橙渗透到“线条/边框”） */

@@ -459,3 +459,30 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 在 fetchProperties/applyFilters/getFilteredCount 处打印超过阈值的警告日志 [FILTER-PERF]；
   - 若持续超阈，考虑后端提供轻量 count 端点或索引优化。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
+
+## 设计令牌合规长期规则（新增）
+
+- 非 CTA 交互中性化  
+  - 原则：hover/focus 默认使用中性灰弱底/边框（如 `var(--bg-hover)`, `var(--color-border-default)`），品牌色仅用于 CTA 按钮/文本链接/强调操作。  
+  - 关系：导航 hover 已在“导航交互统一”中规范，其他普通组件遵循相同约束；页面整体的焦点可见性仍保留中性可见焦点。
+- 容器/分隔/弱底令牌化  
+  - 容器背景：`var(--color-bg-card)`；页面背景：`var(--color-bg-page)`  
+  - 分隔线/边框：`var(--color-border-default)`；强分隔：`var(--color-border-strong)`  
+  - 弱底/占位：`var(--bg-hover)`, `var(--surface-2/4)`（按需选择）  
+  - 文案色：`var(--color-text-primary/secondary)`, `var(--text-muted)`  
+  - 示例（局部作用域，少量 !important 仅作兜底）：  
+    ```css
+    /* 中文注释：使用设计令牌统一容器/分隔/弱底 */
+    .card { background: var(--color-bg-card); border: 1px solid var(--color-border-default); }
+    .divider { background: var(--color-border-default); height: 1px; }
+    .muted { color: var(--color-text-secondary); }
+    .hoverable:hover { background: var(--bg-hover); }
+    ```
+- 提交前 Stylelint 条件执行  
+  - Git 钩子：`scripts/git-hooks/pre-commit` 中若检测到 `vue-frontend/node_modules/.bin/stylelint` 存在，则执行 `cd vue-frontend && npm run -s lint:style`，否则跳过以避免阻断本地未安装环境。  
+  - 规则：`.stylelintrc.json` 禁止 hex/rgb/hsl(a)/命名色，启用 `plugin/declaration-use-variable` 强制 `var(--*)`；`design-tokens.css` 与 `style.css` 作为定义入口豁免。  
+  - 回滚：移除或跳过该钩子即可，不影响生产构建流程。
+- 回滚与例外处理  
+  - 单点问题按“最小 diff”快速回退；临时 fallback（如 `var(--token, #xxx)`）仅作短期兜底，应在下一轮清理。  
+  - 深/浅主题或特殊底色对比问题，先以组件局部覆盖验证，再沉淀到 `:root` 令牌，避免全局抖动。
+- 溯源：progress 2025-09-10｜DESIGN-TOKENS-COMPLIANCE-SPRINT & GUARDRAIL-STYLELINT+HOOK（commit 9984dff..0b6e146）

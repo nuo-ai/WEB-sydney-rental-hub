@@ -443,8 +443,8 @@ watch(
 }
 
 .location-tag {
-  background: var(--chip-bg, #f7f8fa);
-  color: var(--color-text-secondary, #374151);
+  background: var(--chip-bg);
+  color: var(--color-text-secondary);
   border: none;
   border-radius: 9999px;
   font-size: 13px;
@@ -457,14 +457,14 @@ watch(
 }
 
 .location-tag:hover {
-  background: var(--chip-bg-hover, #eef1f4);
-  color: var(--color-text-primary, #111827);
+  background: var(--chip-bg-hover);
+  color: var(--color-text-primary);
 }
 
 .remove-location-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-size: 12px;
   padding: 2px;
@@ -479,7 +479,7 @@ watch(
 
 .remove-location-btn:hover {
   background: var(--bg-hover);
-  color: var(--color-text-primary, #111827);
+  color: var(--color-text-primary);
 }
 
 /* 搜索输入框 */
@@ -698,7 +698,7 @@ watch(
 
 /* 选中行弱高亮（可按需调整） */
 .suggestion-item.selected {
-  background-color: var(--chip-bg-selected, #e9eef2);
+  background-color: var(--chip-bg-selected);
 }
 
 /* 新增：区域标题样式 */
@@ -724,16 +724,16 @@ watch(
 /* +N 摘要 pill（桌面） */
 .more-chip {
   border: none;
-  background: var(--chip-bg, #f7f8fa);
-  color: var(--color-text-secondary, #6b7280);
+  background: var(--chip-bg);
+  color: var(--color-text-secondary);
   border-radius: 0;
   padding: 6px 10px;
   font-size: 13px;
   cursor: pointer;
 }
 .more-chip:hover {
-  background: var(--chip-bg-hover, #eef1f4);
-  color: var(--color-text-primary, #111827);
+  background: var(--chip-bg-hover);
+  color: var(--color-text-primary);
 }
 
 /* 新增：相邻区域网格布局 */
@@ -748,7 +748,7 @@ watch(
   padding: 8px 12px;
   border: none;
   border-radius: 0;
-  background: var(--chip-bg, #f7f8fa);
+  background: var(--chip-bg);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
   display: inline-flex;
@@ -758,7 +758,7 @@ watch(
 }
 
 .nearby-suggestion-item:hover {
-  background: var(--chip-bg-hover, #eef1f4);
+  background: var(--chip-bg-hover);
   color: var(--color-text-primary);
 }
 
@@ -807,7 +807,7 @@ watch(
   }
 
   .search-input :deep(.el-input__wrapper:active) {
-    background-color: var(--filter-color-hover-bg, #f5f5f5); /* 点击时背景色变化 */
+    background-color: var(--bg-hover); /* 点击时背景色变化 */
   }
 
   .location-suggestions {

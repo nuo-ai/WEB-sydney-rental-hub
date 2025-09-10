@@ -307,7 +307,7 @@ const applyFilters = async () => {
 <style scoped>
 .area-filter-panel {
   width: 100%;
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 8px;
 }
 
@@ -340,7 +340,7 @@ const applyFilters = async () => {
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
   color: var(--color-text-primary);
 }
 
@@ -371,22 +371,22 @@ const applyFilters = async () => {
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: #f9fafb;
+  background: var(--chip-bg);
   max-width: 200px;
   transition: all 0.15s ease;
 }
 
 .location-chip:hover {
-  border-color: #9ca3af;
-  background: #f3f4f6;
+  border-color: var(--color-border-strong);
+  background: var(--chip-bg-hover);
 }
 
 .location-chip .chip-text {
   font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -394,9 +394,9 @@ const applyFilters = async () => {
 }
 
 .location-chip .chip-remove {
-  background: #e5e7eb;
+  background: var(--bg-secondary);
   border: none;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   width: 16px;
   height: 16px;
   border-radius: 2px;
@@ -412,8 +412,8 @@ const applyFilters = async () => {
 }
 
 .location-chip .chip-remove:hover {
-  background: #dc2626;
-  color: white;
+  background: var(--bg-hover);
+  color: var(--color-text-primary);
 }
 
 .location-actions {
@@ -422,13 +422,13 @@ const applyFilters = async () => {
   gap: 12px;
   margin-bottom: 16px;
   padding-top: 8px;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--color-border-default);
 }
 
 .clear-all {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -439,14 +439,14 @@ const applyFilters = async () => {
 }
 
 .clear-all:hover {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-hover);
+  color: var(--color-text-primary);
 }
 
 .toggle-chips {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -460,8 +460,8 @@ const applyFilters = async () => {
 }
 
 .toggle-chips:hover {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-hover);
+  color: var(--color-text-primary);
 }
 
 .toggle-chips::after {
@@ -488,8 +488,8 @@ const applyFilters = async () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid #f1f5f9;
-  background: #f8fafc;
+  border: 1px solid var(--color-border-default);
+  background: var(--bg-secondary);
   border-radius: 8px;
   padding: 20px 16px;
   text-align: center;
@@ -497,7 +497,7 @@ const applyFilters = async () => {
 
 .location-empty .empty-text {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
@@ -514,14 +514,14 @@ const applyFilters = async () => {
   margin-top: 24px;
   position: sticky;
   bottom: 0;
-  background: white;
+  background: var(--color-bg-card);
   padding-top: 12px;
   border-top: 1px solid var(--color-border-default);
 }
 
 .cancel-btn {
   flex: 1;
-  background: white;
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
   color: var(--color-text-secondary);
 }

@@ -2,6 +2,9 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- DESIGN-TOKENS-COMPLIANCE-SPRINT：PropertyDetail 二/三批全面令牌化（卡片/容器背景、分隔线、弱底 hover、占位与地图容器等），主/副文案统一 --color-text-primary/secondary，交互弱底用 --bg-hover，容器/边框用 --color-bg-card/--color-border-default。前端表现：详情页视觉与交互反馈一致、中性化，品牌色仅用于 CTA/链接。溯源：commit 9984dff..0b6e146
+- FILTERTABS-FALLBACK-REMOVAL：移除 Chip 类样式 var(--chip-*, #hex) 的十六进制兜底，统一使用 --chip-bg/--chip-bg-hover/--chip-bg-selected。前端表现：筛选标签在不同主题/深浅底下表现一致，不再出现遗留浅绿/米色。溯源：commit 9984dff..0b6e146
+- GUARDRAIL-STYLELINT+HOOK：新增 npm script "lint:style" 与 pre-commit 条件执行 stylelint（存在即运行），配合 .stylelintrc.json 禁止 hex/rgb/hsla/命名色并强制 var(--*)；design-tokens.css、style.css 保持豁免。前端表现：新/改代码禁止硬编码颜色，设计令牌落地有保障。溯源：commit 9984dff..0b6e146
 - ADD-LOCATION-UNI-ZH：AddLocationModal/NameLocationModal 接入 i18n；大学名称中文映射（USYD/UNSW/UTS 等，校区括注保留英文），地址 formatted_address 保持英文；热门与选择回传 name=中文、address=英文；修复告警分支。前端表现：添加地址流程中文化，大学中文名 + 英文地址。溯源：commit ee6e006..9984dff
 - COMMUTE-I18N-TYPO：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；统一空状态/按钮/提示文案；ElMessage/ElMessageBox 使用 t()。前端表现：通勤页中文化一致、文字节奏与详情页对齐。溯源：commit 43f943e..ee6e006
 - TYPOGRAPHY+I18N-V1：新增 typography.css（基础/语义文字令牌与 .typo-* 工具类）；扩展轻量 i18n（locales/zh-CN.js + 合并策略）；PropertyCard 首批接入 $t 与 .typo-*（价格/单位/标签/菜单/辅助）。前端表现：UI 中文化，文字节奏统一，动态地址仍英文。溯源：commit 3e4ea72..c45d86a

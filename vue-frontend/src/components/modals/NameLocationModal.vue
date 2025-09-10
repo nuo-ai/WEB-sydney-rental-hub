@@ -202,7 +202,7 @@ const handleConfirm = () => {
   right: 20px;
   background: none;
   border: none;
-  color: var(--brand-primary, #dc2626);
+  color: var(--juwo-primary);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;

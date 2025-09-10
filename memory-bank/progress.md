@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜DESIGN-TOKENS-COMPLIANCE-SPRINT  
+  详情页 PropertyDetail 二/三批令牌化：容器/分隔/弱底 hover/占位与地图容器等改用 --color-bg-card/--color-border-default/--bg-hover；主/副文案统一 --color-text-primary/secondary；品牌色仅用于 CTA/链接｜溯源：commit 9984dff..0b6e146
+- 2025-09-10｜GUARDRAIL-STYLELINT+HOOK & FILTERTABS-FALLBACK-REMOVAL  
+  新增 npm script "lint:style" + pre-commit 条件执行 stylelint；.stylelintrc.json 禁止 hex/rgb/hsla/命名色并强制 var(--*)；FilterTabs 去除 chip 背景/hover/选中 hex fallback，统一 --chip-*｜溯源：commit 9984dff..0b6e146
 - 2025-09-10｜ADD-LOCATION-UNI-ZH  
   “添加地址”流程中文化：Add/Name Location 模态 i18n；大学中文名映射（含别名 USYD/UNSW/UTS 等、校区括注英文）；地址始终英文。热门与选择回传 name=中文，formatted_address=英文；修复一处语法告警｜溯源：commit ee6e006..9984dff
 - 2025-09-10｜COMMUTE-I18N-TYPO  
