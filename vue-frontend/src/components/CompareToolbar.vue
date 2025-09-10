@@ -3,7 +3,9 @@
     <div class="compare-items">
       <div v-for="item in compareItems" :key="item.listing_id" class="compare-item">
         <span>{{ item.address }}</span>
-        <el-button size="small" circle :icon="Close" @click="removeFromCompare(item.listing_id)" />
+        <el-button size="small" circle @click="removeFromCompare(item.listing_id)">
+          <template #icon><X class="spec-icon" /></template>
+        </el-button>
       </div>
     </div>
     <el-button type="primary" @click="goToCompare" :disabled="compareItems.length < 2">
@@ -16,7 +18,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { Close } from '@element-plus/icons-vue'
+import { X } from 'lucide-vue-next'
 
 const propertiesStore = usePropertiesStore()
 const router = useRouter()

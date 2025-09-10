@@ -9,7 +9,7 @@
     <template #header>
       <div class="modal-header">
         <button class="back-btn" @click="handleBack">
-          <i class="fas fa-arrow-left"></i>
+          <ArrowLeft class="spec-icon" />
         </button>
         <h2 class="modal-title typo-heading-card">{{ $t('nameLocation.title') }}</h2>
         <button class="skip-btn typo-button" @click="handleSkip">
@@ -21,7 +21,7 @@
     <div class="modal-content">
       <!-- 选中的地址 -->
       <div class="selected-address">
-        <i class="fas fa-map-marker-alt"></i>
+        <MapPin class="selected-icon spec-icon" />
         <p class="typo-body">{{ displayAddress }}</p>
       </div>
 
@@ -31,7 +31,8 @@
           <input type="radio" v-model="selectedLabel" :value="option.value" name="location-label" />
           <span class="radio-circle"></span>
           <span class="label-text">{{ option.label }}</span>
-          <i :class="option.icon" class="label-icon"></i>
+          <GraduationCap v-if="option.value === '学校'" class="label-icon spec-icon" />
+          <MapPin v-else class="label-icon spec-icon" />
         </label>
       </div>
 
@@ -53,6 +54,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { ArrowLeft, MapPin, GraduationCap } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: {
@@ -234,10 +236,11 @@ const handleConfirm = () => {
   margin-bottom: 32px;
 }
 
-.selected-address i {
+.selected-address .selected-icon {
   flex-shrink: 0;
   color: var(--color-text-secondary);
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
   margin-top: 2px;
 }
 

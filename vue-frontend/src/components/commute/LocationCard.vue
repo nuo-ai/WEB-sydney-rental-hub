@@ -7,7 +7,7 @@
 
     <div class="commute-info">
       <div v-if="isLoading" class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
+        <Loader2 class="spec-icon spinner" />
       </div>
       <div v-else-if="commuteData">
         <div class="time">{{ commuteData.duration }}</div>
@@ -19,7 +19,7 @@
     </div>
 
     <button class="remove-btn" @click="handleRemove" :title="$t('locationCard.remove')">
-      <i class="fas fa-times"></i>
+      <X class="spec-icon" />
     </button>
   </div>
 </template>
@@ -28,6 +28,7 @@
 import { ref, computed, watch, onMounted, inject } from 'vue'
 import { useCommuteStore } from '@/stores/commute'
 import { transportAPI } from '@/services/api'
+import { Loader2, X } from 'lucide-vue-next'
 
 const props = defineProps({
   location: {
@@ -150,14 +151,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding: 12px;
-  background: #f8f8f8;
+  background: var(--surface-2);
   border-radius: 8px;
   margin-bottom: 12px;
   transition: all 0.2s;
 }
 
 .location-card:hover {
-  background: #f0f0f0;
+  background: var(--bg-hover);
 }
 
 /* 地址信息 */
@@ -179,28 +180,32 @@ onMounted(() => {
 }
 
 .label-work {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .label-school {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .label-home {
-  background: #fce7f3;
-  color: #be185d;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .label-other {
-  background: #e5e7eb;
-  color: #6b7280;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .location-address {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -215,24 +220,24 @@ onMounted(() => {
 }
 
 .loading {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .time {
   font-size: 16px;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.2;
 }
 
 .distance {
   font-size: 12px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-top: 2px;
 }
 
 .no-data .time {
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* 删除按钮 */
@@ -242,7 +247,7 @@ onMounted(() => {
   height: 24px;
   border: none;
   background: none;
-  color: #999;
+  color: var(--text-muted);
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -253,8 +258,8 @@ onMounted(() => {
 }
 
 .remove-btn:hover {
-  background: #fff;
-  color: #dc2626;
+  background: var(--color-bg-card);
+  color: var(--color-danger);
 }
 
 /* 加载动画 */
@@ -267,7 +272,7 @@ onMounted(() => {
   }
 }
 
-.fa-spin {
+.spinner {
   animation: spin 1s linear infinite;
 }
 

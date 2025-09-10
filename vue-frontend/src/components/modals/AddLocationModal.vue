@@ -9,7 +9,7 @@
     <template #header>
       <div class="modal-header">
         <button class="close-btn" @click="handleClose">
-          <i class="fas fa-times"></i>
+          <X class="spec-icon" />
         </button>
         <h2 class="modal-title typo-heading-card">{{ $t('addLocation.title') }}</h2>
       </div>
@@ -19,7 +19,7 @@
       <!-- 搜索区域 -->
       <div class="search-section">
         <div class="search-input-wrapper">
-          <i class="fas fa-search search-icon"></i>
+          <Search class="spec-icon search-icon" />
           <input
             ref="searchInput"
             v-model="searchQuery"
@@ -29,7 +29,7 @@
             @input="handleInput"
           />
           <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
-            <i class="fas fa-times"></i>
+            <X class="spec-icon" />
           </button>
         </div>
         <p class="search-hint typo-body-sm">{{ $t('addLocation.searchHint') }}</p>
@@ -46,9 +46,9 @@
             class="result-item"
             @click="selectLocation(location)"
           >
-            <i class="fas fa-graduation-cap" v-if="location.type === 'university'"></i>
-            <i class="fas fa-train" v-else-if="location.type === 'station'"></i>
-            <i class="fas fa-map-marker-alt" v-else></i>
+            <GraduationCap class="result-icon spec-icon" v-if="location.type === 'university'" />
+            <Train class="result-icon spec-icon" v-else-if="location.type === 'station'" />
+            <MapPin class="result-icon spec-icon" v-else />
             <div class="result-info">
               <div class="result-name typo-body">{{ formatUniDisplayName(location) }}</div>
               <div class="result-address">{{ location.address }}</div>
@@ -64,7 +64,7 @@
             class="result-item"
             @click="selectResult(result)"
           >
-            <i class="fas fa-map-marker-alt"></i>
+            <MapPin class="result-icon spec-icon" />
             <div class="result-info">
               <div class="result-address">{{ result.description }}</div>
             </div>
@@ -73,13 +73,13 @@
 
         <!-- 搜索中 -->
         <div v-else-if="isSearching" class="searching-state">
-          <i class="fas fa-spinner fa-spin"></i>
+          <Loader2 class="spec-icon spinner" />
           <span class="typo-body-sm">{{ $t('addLocation.searching') }}</span>
         </div>
 
         <!-- 无结果 -->
         <div v-else-if="searchQuery && !isSearching" class="no-results">
-          <i class="fas fa-search"></i>
+          <Search class="spec-icon" />
           <p class="typo-body">{{ $t('addLocation.noResults') }}</p>
           <p class="no-results-hint typo-body-sm">{{ $t('addLocation.tryAnother') }}</p>
         </div>
@@ -93,6 +93,7 @@ import { ref, watch, onMounted, nextTick, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import placesService from '@/services/places'
 import universities from '@/data/universities.sydney.json'
+import { X, Search, GraduationCap, Train, MapPin, Loader2 } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: {
@@ -437,7 +438,8 @@ onMounted(async () => {
   position: absolute;
   left: 16px;
   color: var(--text-muted);
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .search-input {
@@ -516,7 +518,7 @@ onMounted(async () => {
   gap: 16px;
   padding: 16px 20px;
   background: var(--color-bg-card);
-  border-bottom: 1px solid var(--divider-color);
+  border-bottom: 1px solid var(--color-border-default);
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -529,11 +531,11 @@ onMounted(async () => {
   background: var(--surface-3);
 }
 
-.result-item i {
+.result-item .result-icon {
   flex-shrink: 0;
   width: 20px;
+  height: 20px;
   color: var(--text-muted);
-  font-size: 16px;
   text-align: center;
 }
 
@@ -567,9 +569,10 @@ onMounted(async () => {
   color: var(--text-muted);
 }
 
-.searching-state i,
-.no-results i {
-  font-size: 32px;
+.searching-state .spec-icon,
+.no-results .spec-icon {
+  width: 32px;
+  height: 32px;
   margin-bottom: 16px;
 }
 
@@ -593,7 +596,7 @@ onMounted(async () => {
   }
 }
 
-.fa-spin {
+.spinner {
   animation: spin 1s linear infinite;
 }
 </style>
