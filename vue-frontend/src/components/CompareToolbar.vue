@@ -42,14 +42,15 @@ const goToCompare = () => {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
-  color: white;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   padding: 10px 20px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-xs);
   z-index: 1001;
 }
 .compare-items {
@@ -57,7 +58,7 @@ const goToCompare = () => {
   gap: 10px;
 }
 .compare-item {
-  background: #555;
+  background: var(--surface-2);
   padding: 5px 10px;
   border-radius: 4px;
   display: flex;

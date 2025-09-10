@@ -12,7 +12,7 @@
           size="large"
         >
           <template #prepend>
-            <i class="fas fa-map-marker-alt"></i>
+            <MapPin class="spec-icon" />
           </template>
         </el-input>
         <el-input
@@ -46,16 +46,16 @@
 
     <el-tabs v-model="activeCommuteMode" @tab-change="handleTabChange" class="commute-tabs">
       <el-tab-pane name="DRIVING">
-        <template #label><i class="fas fa-car el-icon--left"></i> 驾车</template>
+        <template #label><Car class="spec-icon" /> 驾车</template>
       </el-tab-pane>
       <el-tab-pane name="TRANSIT">
-        <template #label><i class="fas fa-bus el-icon--left"></i> 公交</template>
+        <template #label><Bus class="spec-icon" /> 公交</template>
       </el-tab-pane>
       <el-tab-pane name="WALKING">
-        <template #label><i class="fas fa-walking el-icon--left"></i> 步行</template>
+        <template #label><Footprints class="spec-icon" /> 步行</template>
       </el-tab-pane>
       <el-tab-pane name="BICYCLING">
-        <template #label><i class="fas fa-bicycle el-icon--left"></i> 自行车</template>
+        <template #label><Bike class="spec-icon" /> 自行车</template>
       </el-tab-pane>
     </el-tabs>
 
@@ -72,7 +72,7 @@
             </div>
             <div class="commute-time">
               <div v-if="dest.isLoading" class="loading-state">
-                <el-icon class="is-loading"><Loading /></el-icon>
+                <el-icon class="is-loading"><Loader2 /></el-icon>
                 <span>计算中...</span>
               </div>
               <div v-else-if="dest.results[activeCommuteMode]?.error" class="error-state">
@@ -92,7 +92,7 @@
               type="danger"
               text
               circle
-              :icon="Delete"
+              :icon="Trash2"
               @click="removeDestination(dest.id)"
               class="remove-btn"
             />
@@ -107,7 +107,7 @@
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { transportAPI } from '@/services/api'
 import { ElMessage } from 'element-plus'
-import { Delete, Loading } from '@element-plus/icons-vue'
+import { MapPin, Car, Bus, Footprints, Bike, Loader2, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps({
   property: {
@@ -264,14 +264,14 @@ const removeDestination = (destinationId) => {
 
 <style scoped>
 .commute-calculator-container {
-  border-top: 1px solid #e3e3e3;
+  border-top: 1px solid var(--color-border-default);
   padding-top: 24px;
 }
 
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #2d2d2d;
+  color: var(--color-text-primary);
   margin: 0 0 16px 0;
 }
 
@@ -307,7 +307,7 @@ const removeDestination = (destinationId) => {
 
 .no-results {
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
   padding: 24px 0;
   font-size: 14px;
 }
@@ -317,7 +317,7 @@ const removeDestination = (destinationId) => {
   align-items: center;
   gap: 16px;
   padding: 12px;
-  background-color: #f8f9fa;
+  background-color: var(--surface-2);
   border-radius: 6px;
   transition: all 0.3s ease;
 }
@@ -329,7 +329,7 @@ const removeDestination = (destinationId) => {
 
 .destination-name {
   font-weight: 600;
-  color: #2d2d2d;
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -337,7 +337,7 @@ const removeDestination = (destinationId) => {
 
 .destination-address {
   font-size: 12px;
-  color: #595959;
+  color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -354,7 +354,7 @@ const removeDestination = (destinationId) => {
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -363,12 +363,12 @@ const removeDestination = (destinationId) => {
   font-size: 16px;
 }
 .duration-text.error {
-  color: #f56c6c;
+  color: var(--color-danger);
 }
 
 .distance-text {
   font-size: 12px;
-  color: #595959;
+  color: var(--color-text-secondary);
 }
 
 .remove-btn {

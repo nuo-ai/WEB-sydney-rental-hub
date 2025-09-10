@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <header class="page-header">
       <button class="back-btn" @click="handleBack">
-        <i class="fas fa-arrow-left"></i>
+        <ArrowLeft class="spec-icon" />
       </button>
       <h1 class="page-title typo-heading-card">{{ $t('commute.pageTitle') }}</h1>
     </header>
@@ -24,7 +24,7 @@
         :route-label-text="routeLabelText"
       />
       <div v-else class="map-placeholder">
-        <el-icon :size="32"><Location /></el-icon>
+        <MapPin class="spec-icon map-placeholder-icon" />
         <span class="typo-body-sm">{{ $t('commute.mapLoading') }}</span>
       </div>
     </section>
@@ -51,7 +51,7 @@
 
         <!-- 空状态 -->
         <div v-if="userLocations.length === 0" class="empty-state">
-          <i class="fas fa-map-marked-alt"></i>
+          <MapPin class="spec-icon empty-icon" />
           <p class="typo-body">{{ $t('commute.emptyTitle') }}</p>
           <p class="empty-hint typo-body-sm">{{ $t('commute.emptyHint') }}</p>
         </div>
@@ -59,7 +59,7 @@
 
       <!-- 添加地址按钮 -->
       <button class="add-location-btn" @click="showAddModal = true">
-        <i class="fas fa-plus"></i>
+        <Plus class="spec-icon" />
         <span class="typo-button">{{ $t('commute.addLocation') }}</span>
       </button>
     </section>
@@ -83,7 +83,7 @@ import { ref, computed, onMounted, watch, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useCommuteStore } from '@/stores/commute'
-import { Location } from '@element-plus/icons-vue'
+import { ArrowLeft, MapPin, Plus } from 'lucide-vue-next'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import GoogleMap from '@/components/GoogleMap.vue'
@@ -386,7 +386,7 @@ onMounted(() => {
 <style scoped>
 .commute-times-page {
   min-height: 100vh;
-  background: white;
+  background: var(--color-bg-page);
   display: flex;
   flex-direction: column;
 }
@@ -396,8 +396,8 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: white;
-  border-bottom: 1px solid #e3e3e3;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-default);
   padding: 12px 16px;
   padding-top: calc(12px + env(safe-area-inset-top));
   display: flex;
@@ -410,7 +410,7 @@ onMounted(() => {
   height: 32px;
   border: none;
   background: none;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 18px;
   cursor: pointer;
   display: flex;
@@ -421,13 +421,13 @@ onMounted(() => {
 }
 
 .back-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
 }
 
 .page-title {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -435,7 +435,7 @@ onMounted(() => {
 .map-section {
   height: 40vh;
   position: relative;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .map-placeholder {
@@ -445,14 +445,18 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #999;
-  background: #f5f5f5;
+  color: var(--text-muted);
+  background: var(--bg-hover);
+}
+.map-placeholder .map-placeholder-icon {
+  width: 32px;
+  height: 32px;
 }
 
 .route-summary {
   margin-top: 8px;
   font-size: 14px;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 /* Travel Time 区域 */
@@ -465,13 +469,13 @@ onMounted(() => {
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0 0 8px 0;
 }
 
 .from-address {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin: 0 0 20px 0;
 }
 
@@ -485,13 +489,14 @@ onMounted(() => {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #999;
+  color: var(--text-muted);
 }
 
-.empty-state i {
-  font-size: 48px;
+.empty-state .empty-icon {
+  width: 48px;
+  height: 48px;
   margin-bottom: 16px;
-  color: #ddd;
+  color: var(--color-border-default);
 }
 
 .empty-state p {
@@ -501,7 +506,7 @@ onMounted(() => {
 
 .empty-hint {
   font-size: 14px !important;
-  color: #bbb;
+  color: var(--text-muted);
 }
 
 /* 添加地址按钮 */
