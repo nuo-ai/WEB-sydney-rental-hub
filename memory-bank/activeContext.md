@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY：PropertyCard“New”徽标改为品牌蓝 var(--brand-primary)，文字用 var(--color-text-inverse)；CommuteTimes“Add location”按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化。溯源：commit 3c7c150..3e4ea72
 - UI-TOKENS-PC-FILTER-LOCATION：PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；弹窗头部/输入/列表 hover/active 改中性令牌；价格滑块清理硬编码，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色。溯源：commit 82c3f37..3c7c150
 - LINT-GUARDRAIL-COLOR：stylelint 扩展拦截 background/border/outline/fill/stroke 的硬编码色与 rgba/hsla，强制使用 var(--*)；保留 design-tokens.css 与 style.css 的定义豁免。目的：杜绝新增页面颜色硬编码回归。溯源：commit 82c3f37..3c7c150
 - DESIGN-TOKEN-COLOR-3：新增全局语义色令牌集（link visited/disabled、success/warn/danger/info soft-bg/border、favorite 三态、badge、divider、inverse/弱底/brand 别名）；首批等价替换：建议项边框/悬浮、次要文案、筛选按钮激活态统一 tokens。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色。溯源：commit ff73605..69c3e0e

@@ -1,10 +1,11 @@
 /**
  * 轻量 i18n 插件（无外部依赖）
- * 目的：在不引入新依赖的前提下，为项目提供 $t 文案访问能力
- * 原因：遵循“小步、向后兼容、不新增依赖”的约束；默认语言 zh-CN
+ * 目标：提供 $t 文案访问能力；默认 zh-CN；支持本地 locales/ 与内置文案合并（新增不破坏）
  */
 
-const MESSAGES = {
+import zhCN from './locales/zh-CN'
+
+const BUILTIN_MESSAGES = {
   'zh-CN': {
     filter: {
       title: '筛选',
@@ -38,12 +39,44 @@ function get(obj, path) {
     .reduce((o, k) => (o != null ? o[k] : undefined), obj)
 }
 
+function isObject(val) {
+  return val && typeof val === 'object' && !Array.isArray(val)
+}
+
+// 递归浅安全合并（右侧覆盖左侧），数组直接覆盖
+function deepMerge(target, source) {
+  const out = isObject(target) ? { ...target } : {}
+  if (!isObject(source)) return out
+  for (const key of Object.keys(source)) {
+    const sv = source[key]
+    const tv = out[key]
+    if (isObject(sv) && isObject(tv)) {
+      out[key] = deepMerge(tv, sv)
+    } else {
+      out[key] = sv
+    }
+  }
+  return out
+}
+
+// 默认消息：内置 zh-CN 与本地 zh-CN 合并（本地优先）
+const DEFAULT_MESSAGES = {
+  'zh-CN': deepMerge(BUILTIN_MESSAGES['zh-CN'] || {}, zhCN || {})
+}
+
 // 默认导出：作为 Vue 插件使用
 export default {
   install(app, options = {}) {
     const locale = options.locale || 'zh-CN'
     const fallbackLocale = options.fallbackLocale || 'zh-CN'
-    const messages = options.messages || MESSAGES
+    const userMessages = options.messages || {}
+
+    // 克隆默认并与用户消息合并（用户 > 默认）
+    const base = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    const messages = {}
+    for (const loc of new Set([...Object.keys(base), ...Object.keys(userMessages)])) {
+      messages[loc] = deepMerge(base[loc] || {}, userMessages[loc] || {})
+    }
 
     // t: 读取当前 locale 的文案，失败回退到 fallback，再回退 key
     const t = (key) => {
@@ -60,5 +93,5 @@ export default {
   }
 }
 
-// 同步导出默认文案，便于后续扩展/覆盖
-export { MESSAGES }
+// 同步导出合并后的默认文案（用于外部覆盖/调试）
+export { DEFAULT_MESSAGES as MESSAGES }

@@ -2,6 +2,7 @@
 
 /* 导入设计令牌系统 */
 @import './styles/design-tokens.css';
+@import './styles/typography.css';
 
 /* 新增：品牌蓝色与专业中性灰阶（基础层 tokens）
    中文注释：提供统一的蓝色品牌色族与中性灰阶，作为基础令牌被全站复用。

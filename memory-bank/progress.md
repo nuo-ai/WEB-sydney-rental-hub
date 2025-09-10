@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY  
+  PropertyCard “New” 徽标改为品牌蓝（--brand-primary），文字用 --color-text-inverse；CommuteTimes “Add location” 按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化｜溯源：commit 3c7c150..3e4ea72
 - 2025-09-10｜UI-TOKENS-PC-FILTER-LOCATION  
   PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；价格滑块硬编码清理，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色｜溯源：commit 82c3f37..3c7c150
 - 2025-09-10｜LINT-GUARDRAIL-COLOR  

@@ -13,7 +13,7 @@
         <el-carousel-item v-for="(image, index) in validImages" :key="index">
           <img
             :src="image"
-            :alt="`房源图片 ${index + 1}`"
+            :alt="$t('propertyCard.imageAlt')"
             @error="handleImageError"
             class="carousel-image"
             @click="handleCardClick"
@@ -25,7 +25,7 @@
       <img
         v-else
         :src="placeholderImage"
-        alt="房源图片"
+        :alt="$t('propertyCard.imageAlt')"
         class="single-image"
         @click="handleCardClick"
       />
@@ -38,16 +38,16 @@
       <!-- 移除图片上的按钮 -->
 
       <!-- 新房源标签 -->
-      <div v-if="isNewProperty" class="property-status-tag">New</div>
+      <div v-if="isNewProperty" class="property-status-tag typo-label">{{ $t('propertyCard.newBadge') }}</div>
     </div>
 
     <!-- 房源内容区域 -->
     <div class="property-content" @click="handleCardClick">
       <!-- 价格和操作按钮行 -->
       <div class="property-header">
-        <div class="property-price english-text">
+        <div class="property-price english-text typo-price">
           {{ formatPrice(property.rent_pw) }}
-          <span class="price-unit">per week</span>
+          <span class="price-unit typo-label">{{ $t('propertyCard.perWeek') }}</span>
         </div>
         <div class="property-actions">
           <!-- 收藏按钮 -->
@@ -55,7 +55,7 @@
             class="action-btn favorite-btn"
             :class="{ 'is-favorite': isFavorite }"
             @click.stop="toggleFavorite"
-            title="Save"
+            :title="$t('propertyCard.save')"
           >
             <Star :class="{ 'is-favorite': isFavorite }" class="spec-icon" />
           </button>
@@ -68,13 +68,13 @@
               <el-dropdown-menu>
                 <el-dropdown-item command="share">
                   <Share2 class="spec-icon" />
-                  <span>Share</span>
+                  <span class="typo-body-sm">{{ $t('propertyCard.share') }}</span>
                 </el-dropdown-item>
                 <el-dropdown-item command="hide">
                   <EyeOff class="spec-icon" />
-                  <span>Hide</span>
-                  <div style="font-size: 12px; color: #999; margin-left: 24px">
-                    Remove from results
+                  <span class="typo-body-sm">{{ $t('propertyCard.hide') }}</span>
+                  <div class="typo-body-sm" style="font-size: 12px; color: #999; margin-left: 24px">
+                    {{ $t('propertyCard.hideHint') }}
                   </div>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -108,13 +108,13 @@
       <!-- 底部信息区域 -->
       <div class="property-footer">
         <!-- 空出日期 - 中文显示 -->
-        <div class="availability-text chinese-text">
-          空出日期: {{ formatAvailabilityDate(property.available_date) }}
+        <div class="availability-text chinese-text typo-body-sm">
+          {{ $t('propertyCard.availableDateLabel') }}: {{ formatAvailabilityDate(property.available_date) }}
         </div>
 
         <!-- 开放时间 - 中文显示 -->
-        <div v-if="hasValidInspectionTime" class="inspection-text chinese-text">
-          开放时间: {{ formatInspectionTime(property.inspection_times) }}
+        <div v-if="hasValidInspectionTime" class="inspection-text chinese-text typo-body-sm">
+          {{ $t('propertyCard.inspectionTimeLabel') }}: {{ formatInspectionTime(property.inspection_times) }}
         </div>
       </div>
     </div>
@@ -122,10 +122,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import { BedDouble, Bath, CarFront, Star, MoreHorizontal, Share2, EyeOff } from 'lucide-vue-next' // 导入 Lucide 图标
 import { usePropertiesStore } from '@/stores/properties'
+
+const t = inject('t')
 
 const props = defineProps({
   property: {
@@ -153,7 +155,7 @@ const validImages = computed(() => {
 })
 
 const placeholderImage = computed(() => {
-  const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="#9ca3af" text-anchor="middle">Property Image</text></svg>`
+  const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="#9ca3af" text-anchor="middle">${t('propertyCard.imageAlt')}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(placeholderSvg)}`
 })
 
@@ -192,7 +194,7 @@ const hasValidInspectionTime = computed(() => {
 
 // 方法
 const formatPrice = (price) => {
-  if (!price) return 'Price TBA'
+  if (!price) return t('propertyCard.priceTBA')
   return `$${price}`
 }
 
