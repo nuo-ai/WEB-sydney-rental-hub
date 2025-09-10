@@ -61,7 +61,7 @@
   /* 从现有设计系统继承的颜色 */
   --color-text-primary: #2d2d2d;
   --color-text-secondary: #595959;
-  --color-text-price: #000000;
+  --color-text-price: var(--color-text-primary); /* deprecated alias: do not use in business code */
   --color-border-default: #e3e3e3;
   --color-bg-page: #f4f7f9;
   --color-bg-card: #ffffff;
@@ -357,7 +357,8 @@ body {
 .property-price {
   font-size: 22px;
   font-weight: 700;
-  color: var(--color-text-price);
+  color: var(--color-text-primary);
+  color: var(--color-text-primary);
   line-height: 1.2;
   margin-bottom: 8px;
 }

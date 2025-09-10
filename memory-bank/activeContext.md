@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- PROPERTYDETAIL-TOKENS-FINAL-P0：详情页 P0 收尾（价格/CTA/间距/地图占位等统一令牌；移除 color-accent/font-size-base/spacing-*；无逻辑改动）。溯源：commit f201a24..07805ab
 - PROPERTYDETAIL-TOKENS-UNIFY：详情页令牌化与图标统一（页灰背景 + 白卡容器、分隔线中性灰；移除 Font Awesome 与硬编码色/rgba 阴影；收藏高亮用品牌蓝；不改动数据流/对齐基线）。溯源：commit aaa5b8b..f201a24
 - COMMUTE/COMPARE-TOKENS-P1：通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；前端表现：中性灰体系一致、图标统一 lucide、无硬编码色；溯源：commit 19328a9..aaa5b8b
 - FILTER-PANELS-HOVER-NEUTRAL：AreaFilterPanel 优先完成 chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex；与 FilterTabs 统一。前端表现：面板交互反馈一致，无彩色跳变。溯源：commit 0b6e146..806d3a3
@@ -37,11 +38,12 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
-- [P0] 详情页 PropertyDetail* 全量颜色令牌化：去除 #f5f5f5/#e5e5e5/#007bff/#ff5722 等散点；引入 info/warning/danger-soft 令牌统一反馈弱底/边框。
 - [P2] 渐进移除 var(--token, #xxx) fallback；新组件模板要求 icon 用 currentColor + 外层 class 控制颜色。
 - [Guard] CI 验证 stylelint 新规则拦截效果；新增页面 PR 提示必须使用设计令牌。
 
 最新完成
+- 2025-09-10｜PROPERTYDETAIL-TOKENS-FINAL-P0  
+  详情页令牌化收尾：price 文本改为主文案色、CTA 统一品牌蓝、间距/字号令牌一致、地图占位间距令牌化；无逻辑改动｜溯源：commit f201a24..07805ab
 - 2025-09-08｜SORT-P0
   列表排序功能落地：后端 /api/properties 支持 sort 白名单（price_asc/available_date_asc/suburb_az/inspection_earliest；inspection_earliest 暂等价 available_date_asc），稳定次序 listing_id ASC；前端 fetchProperties 统一兜底跨页保留排序。溯源：commit 7bd269b..54ba6c1
 - 2025-09-08｜MOBILE-SEARCH-DIRECT-FILTER

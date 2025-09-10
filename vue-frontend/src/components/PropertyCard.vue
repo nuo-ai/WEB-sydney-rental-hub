@@ -475,7 +475,7 @@ const handleMoreAction = (command) => {
 .property-price {
   font-size: 22px;
   font-weight: 700;
-  color: var(--color-text-price);
+  color: var(--color-text-primary);
   line-height: 1.2;
   margin-bottom: 8px;
 }
