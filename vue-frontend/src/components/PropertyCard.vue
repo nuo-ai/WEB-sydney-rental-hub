@@ -73,7 +73,7 @@
                 <el-dropdown-item command="hide">
                   <EyeOff class="spec-icon" />
                   <span class="typo-body-sm">{{ $t('propertyCard.hide') }}</span>
-                  <div class="typo-body-sm" style="font-size: 12px; color: #999; margin-left: 24px">
+                  <div class="typo-body-sm text-xs text-secondary" style="margin-left: 24px">
                     {{ $t('propertyCard.hideHint') }}
                   </div>
                 </el-dropdown-item>
@@ -323,7 +323,7 @@ const handleMoreAction = (command) => {
 /* 轮播箭头 - 无背景，直接显示箭头 */
 .property-carousel :deep(.el-carousel__arrow) {
   background: transparent !important;
-  color: white !important;
+  color: var(--color-text-inverse) !important; /* 中文注释：使用反色文本令牌，替代命名色 white */
   width: 40px !important;
   height: 60px !important;
   font-size: 24px !important;
@@ -354,7 +354,7 @@ const handleMoreAction = (command) => {
 /* 鼠标悬停在箭头上时 */
 .property-carousel :deep(.el-carousel__arrow):hover {
   background: transparent !important;
-  color: white !important;
+  color: var(--color-text-inverse) !important; /* 中文注释：hover 保持反色文本令牌 */
   opacity: 1;
   transform: translateY(-50%) scale(1.1) !important;
 }
@@ -363,7 +363,7 @@ const handleMoreAction = (command) => {
 .property-carousel :deep(.el-carousel__arrow):focus,
 .property-carousel :deep(.el-carousel__arrow):active {
   background: transparent !important;
-  color: white !important;
+  color: var(--color-text-inverse) !important; /* 中文注释：focus/active 统一反色文本令牌 */
   outline: none !important;
 }
 

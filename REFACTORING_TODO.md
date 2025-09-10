@@ -70,16 +70,34 @@
 |---|---|---|---|---|---|---|---|---|---|---|
 | P0-001 | src/App.vue | N/A | 全局滚动条/焦点用品牌色 | scrollbar.thumb / focus.ring | `--neutral-scrollbar-*` / `--focus-ring-*` | 全局 | P0 | 低 | done | 前端表现：滚动条/输入焦点改为中性灰，CTA/链接仍为品牌蓝（已完成，见 commit 本地变更） |
 | P0-002 | src/App.vue | N/A | a / a:hover 用品牌色字面语义不统一 | link | `--link-color` / `--link-hover-color` | 全局 | P0 | 低 | done | 前端表现：链接颜色统一品牌蓝，hover 深一档（已完成） |
-| P0-003 | src/style.css | property-price .price-unit | `#666666` | text.secondary | `--color-text-secondary` | 组件 | P0 | 低 | todo | 前端表现：副价文案改中性灰二级，和全站一致 |
-| P0-004 | src/style.css | property-address-primary | `#333333` | text.primary | `--color-text-primary` | 组件 | P0 | 低 | todo | 前端表现：地址主行统一一级文本色 |
-| P0-005 | src/style.css | property-features | `#666666` | text.secondary | `--color-text-secondary` | 组件 | P0 | 低 | todo | 前端表现：规格行统一二级文本色 |
-| P0-006 | src/style.css | property-footer | `border-top: 1px solid #e5e7eb` | border.default | `--color-border-default` | 组件 | P0 | 低 | todo | 前端表现：分隔线中性灰，和卡片/面板一致 |
-| P0-007 | src/style.css | .inspection-text | `#2563eb` | link（强调/链接色） | `--link-color` | 组件 | P0 | 低 | todo | 前端表现：看房时间蓝色与链接一致，hover 可走 `--link-hover-color` |
-| P0-008 | src/style.css | .suggestion-item:hover | `#f7f8fa` | bg.hover | `--bg-hover` | 组件 | P0 | 低 | todo | 前端表现：下拉建议 hover 统一浅灰 |
+| P0-003 | src/style.css | property-price .price-unit | `#666666` | text.secondary | `--color-text-secondary` | 组件 | P0 | 低 | done | 前端表现：副价文案改中性灰二级，和全站一致 |
+| P0-004 | src/style.css | property-address-primary | `#333333` | text.primary | `--color-text-primary` | 组件 | P0 | 低 | done | 前端表现：地址主行统一一级文本色 |
+| P0-005 | src/style.css | property-features | `#666666` | text.secondary | `--color-text-secondary` | 组件 | P0 | 低 | done | 前端表现：规格行统一二级文本色 |
+| P0-006 | src/style.css | property-footer | `border-top: 1px solid #e5e7eb` | border.default | `--color-border-default` | 组件 | P0 | 低 | done | 前端表现：分隔线中性灰，和卡片/面板一致 |
+| P0-007 | src/style.css | .inspection-text | `#2563eb` | link（强调/链接色） | `--link-color` | 组件 | P0 | 低 | done | 前端表现：看房时间蓝色与链接一致，hover 可走 `--link-hover-color` |
+| P0-008 | src/style.css | .suggestion-item:hover | `#f7f8fa` | bg.hover | `--bg-hover` | 组件 | P0 | 低 | done | 前端表现：下拉建议 hover 统一浅灰 |
+| P0-014 | src/style.css | .availability-text | `#4b5563` → var(--color-text-secondary) | text.secondary | `--color-text-secondary` | 组件 | P0 | 低 | done | 前端表现：可租状态副文案统一为次级文字令牌；与列表/详情一致 |
 | P1-009 | src/style.css | .location-tag（旧实现块） | `#fafbfc/#f3f4f6` 等 | chip.* | `--chip-*` / filter chip tokens | 组件 | P1 | 中 | todo | 前端表现：标签底/hover 使用 Chip 令牌；与筛选面板一致 |
 | P1-010 | src/components/PropertyCard.vue | N/A | scoped 样式若含硬编码 | border/text/bg | 统一改 `--color-*` | 组件 | P1 | 中 | todo | 前端表现：卡片与列表页/详情页视觉一致 |
 | P1-011 | src/views/PropertyDetail.vue | N/A | 富文本/分隔线残留 | text/border | `--color-text-*` / `--color-border-*` | 视图 | P1 | 中 | todo | 前端表现：正文/分隔线一致；链接走 `--link-*` |
 | P1-012 | src/components/filter-*/** | N/A | hover/focus 残留品牌色 | hover/focus | 用中性令牌或 `--filter-*` | 组件 | P1 | 低 | todo | 前端表现：非 CTA 交互全部中性化 |
+| P1-015 | src/components/PropertyCard.vue | template | 内联样式颜色 `#999` | text.muted | `--text-muted` 或 `var(--color-text-secondary)` | 组件 | P1 | 低 | done | 前端表现：隐藏提示副文案统一中性灰，小字级别 |
+| P1-016 | src/components/PropertyCard.vue | :deep(.el-carousel__arrow) | 命名色 `white` | text.inverse | `--color-text-inverse` | 组件 | P1 | 低 | done | 前端表现：轮播箭头前景走反色令牌，主题切换可控 |
+| P1-017 | src/components/FilterTabs.vue | .filter-tab/hover | var() fallback 含 hex | chip.bg/hover | `--chip-bg` / `--chip-bg-hover` | 组件 | P1 | 低 | done | 前端表现：筛选入口底/hover 统一中性 chip 令牌 |
+| P1-018 | src/views/PropertyDetail.vue | .property-detail-page | `background-color: #ffffff` | bg.card | `--color-bg-card` | 视图 | P1 | 低 | done | 前端表现：详情页主体白底走语义令牌，主题/全局统一 |
+| P1-019 | src/views/PropertyDetail.vue | .price-text .price-unit | `color: #666666` | text.secondary | `--color-text-secondary` | 视图 | P1 | 低 | done | 前端表现：价格单位副文案统一中性灰二级 |
+| P1-020 | src/views/PropertyDetail.vue | .address-main | `color: #333333` | text.primary | `--color-text-primary` | 视图 | P1 | 低 | done | 前端表现：地址主行统一一级文本色 |
+| P1-021 | src/views/PropertyDetail.vue | .address-subtitle | `color: #666666` | text.secondary | `--color-text-secondary` | 视图 | P1 | 低 | done | 前端表现：地址副标题统一中性灰二级 |
+| P1-022 | src/views/PropertyDetail.vue | .property-features | `color: #666666` | text.secondary | `--color-text-secondary` | 视图 | P1 | 低 | done | 前端表现：特征行统一二级文字色，图标行更克制 |
+| P1-023 | src/views/PropertyDetail.vue | .no-image | `color: #999` | text.muted | `--text-muted` | 视图 | P1 | 低 | done | 前端表现：无图占位文案使用弱文本令牌 |
+| P1-024 | src/views/PropertyDetail.vue | .map-container | `background: #e8e8e8` | surface.bg | `--surface-4` | 视图 | P1 | 低 | done | 前端表现：地图容器兜底底色使用表面层级令牌 |
+| P1-025 | src/views/PropertyDetail.vue | .map-placeholder | `background: #f5f5f5` | surface.bg | `--surface-2` | 视图 | P1 | 低 | done | 前端表现：无地图占位底色统一浅灰表面令牌 |
+| P1-026 | src/views/PropertyDetail.vue | .add-to-calendar-btn:hover | `background: #f5f6f7; border-color: #017188` | hover/bg + border.strong | `--bg-hover` / `--color-border-strong` | 视图 | P1 | 低 | done | 前端表现：按钮 hover 中性化（浅灰底+加深边界），移除品牌色渗透 |
+| P1-027 | src/views/PropertyDetail.vue | .image-actions | `background: #fefefe; border: 1px solid #cfd1d7` | surface/bg + border | `--color-bg-card` / `--color-border-default` | 视图 | P1 | 低 | done | 前端表现：图片右上按钮容器采用卡片底与中性边界 |
+| P1-028 | src/views/PropertyDetail.vue | .action-divider | `background: #cfd1d7` | divider/border | `--color-border-default` | 视图 | P1 | 低 | done | 前端表现：分隔线统一中性灰 |
+| P1-029 | src/views/PropertyDetail.vue | .inspect-btn-overlay:hover | `background: #f8f8f8` | bg.hover | `--bg-hover` | 视图 | P1 | 低 | done | 前端表现：照片计数/覆盖按钮悬浮为浅灰弱底 |
+| P1-030 | src/views/PropertyDetail.vue | .inspect-btn-overlay.image-counter | `background: #fefefe; color: #3c475b; border: 1px solid #cfd1d7` | surface/bg + text + border | `--color-bg-card` / `--color-text-primary` / `--color-border-default` | 视图 | P1 | 低 | done | 前端表现：照片计数徽标样式与卡片/文本/边界统一 |
+| P1-031 | src/views/PropertyDetail.vue | .read-more-btn:hover | `background: #f5f6f7` | bg.hover | `--bg-hover` | 视图 | P1 | 低 | done | 前端表现：阅读更多按钮悬浮为浅灰弱底 |
 | P2-013 | 全局 | N/A | Font Awesome 遗留（图标系统） | icon | 迁移至 lucide-vue-next | 全局 | P2 | 中 | todo | 前端表现：图标风格统一（非本轮重点） |
 
 > 备注：style.css 中包含通用样式（非纯 Token 文件），因此可纳入替换范围；但一次仅提交小块（2–5 处），控制风险。

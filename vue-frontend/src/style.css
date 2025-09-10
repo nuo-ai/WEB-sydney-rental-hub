@@ -420,7 +420,7 @@ body {
 }
 
 .availability-text {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 400;
   margin-bottom: 4px;

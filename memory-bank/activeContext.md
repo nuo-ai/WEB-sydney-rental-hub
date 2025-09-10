@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- ADD-LOCATION-UNI-ZH：AddLocationModal/NameLocationModal 接入 i18n；大学名称中文映射（USYD/UNSW/UTS 等，校区括注保留英文），地址 formatted_address 保持英文；热门与选择回传 name=中文、address=英文；修复告警分支。前端表现：添加地址流程中文化，大学中文名 + 英文地址。溯源：commit ee6e006..9984dff
 - COMMUTE-I18N-TYPO：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；统一空状态/按钮/提示文案；ElMessage/ElMessageBox 使用 t()。前端表现：通勤页中文化一致、文字节奏与详情页对齐。溯源：commit 43f943e..ee6e006
 - TYPOGRAPHY+I18N-V1：新增 typography.css（基础/语义文字令牌与 .typo-* 工具类）；扩展轻量 i18n（locales/zh-CN.js + 合并策略）；PropertyCard 首批接入 $t 与 .typo-*（价格/单位/标签/菜单/辅助）。前端表现：UI 中文化，文字节奏统一，动态地址仍英文。溯源：commit 3e4ea72..c45d86a
 - UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY：PropertyCard“New”徽标改为品牌蓝 var(--brand-primary)，文字用 var(--color-text-inverse)；CommuteTimes“Add location”按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化。溯源：commit 3c7c150..3e4ea72

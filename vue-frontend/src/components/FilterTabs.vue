@@ -318,7 +318,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background: var(--chip-bg, #f7f8fa);
+  background: var(--chip-bg);
   border: none;
   border-radius: 0;
   font-size: 14px;
@@ -330,7 +330,7 @@ onUnmounted(() => {
 }
 
 .filter-tab:hover {
-  background: var(--chip-bg-hover, #eef1f4);
+  background: var(--chip-bg-hover);
   color: var(--color-text-primary);
 }
 

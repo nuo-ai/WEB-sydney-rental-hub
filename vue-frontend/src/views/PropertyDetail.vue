@@ -741,7 +741,7 @@ onBeforeRouteLeave(() => {
 
 .property-detail-page {
   min-height: 100vh;
-  background-color: #ffffff; /* 统一页面与卡片背景为纯白 */
+  background-color: var(--color-bg-card); /* 统一页面与卡片背景为纯白 */
   /* 新增：统一字体栈（含中文优先级） */
   --font-ui: Inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   font-family: var(--font-ui);
@@ -823,8 +823,8 @@ onBeforeRouteLeave(() => {
   top: 16px;
   right: 16px;
   display: flex;
-  background: #fefefe;
-  border: 1px solid #cfd1d7;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   overflow: hidden;
   z-index: 10;
@@ -857,7 +857,7 @@ onBeforeRouteLeave(() => {
 .action-divider {
   width: 1px;
   height: 42px;
-  background: #cfd1d7;
+  background: var(--color-border-default);
 }
 
 /* 底部控制按钮 - 左下角 */
@@ -885,7 +885,7 @@ onBeforeRouteLeave(() => {
 }
 
 .inspect-btn-overlay:hover {
-  background: #f8f8f8;
+  background: var(--bg-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
@@ -899,9 +899,9 @@ onBeforeRouteLeave(() => {
   min-width: 118px;
   height: 40px;
   padding: 0 14px;
-  background: #fefefe;
-  color: #3c475b;
-  border: 1px solid #cfd1d7;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
   cursor: default;
   font-family: var(--font-ui);
@@ -1060,7 +1060,7 @@ onBeforeRouteLeave(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #999;
+  color: var(--text-muted);
   gap: 8px;
   font-size: 14px;
 }
@@ -1173,7 +1173,7 @@ onBeforeRouteLeave(() => {
 
 .price-text .price-unit {
   font-size: 14px;
-  color: #666666;
+  color: var(--color-text-secondary);
   font-weight: 400;
 }
 
@@ -1199,7 +1199,7 @@ onBeforeRouteLeave(() => {
 
 .address-main {
   font-size: 16px;
-  color: #333333;
+  color: var(--color-text-primary);
   font-weight: 500;
   line-height: 1.3;
   margin-bottom: 4px;
@@ -1207,7 +1207,7 @@ onBeforeRouteLeave(() => {
 
 .address-subtitle {
   font-size: 13px;
-  color: #666666;
+  color: var(--color-text-secondary);
   font-weight: 500;
   line-height: 1.3;
 }
@@ -1247,7 +1247,7 @@ onBeforeRouteLeave(() => {
   align-items: center;
   gap: 16px;
   margin-bottom: 24px; /* 图标行到“可入住/押金” 24 */
-  color: #666666;
+  color: var(--color-text-secondary);
 }
 
 .feature-item {
@@ -1408,7 +1408,7 @@ onBeforeRouteLeave(() => {
   height: auto;
   border-radius: 0;
   overflow: hidden;
-  background: #e8e8e8;
+  background: var(--surface-4);
   margin-bottom: 16px;
 }
 
@@ -1439,7 +1439,7 @@ onBeforeRouteLeave(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  background: var(--surface-2);
   border-radius: var(--radius-md);
   color: var(--color-secondary);
   gap: var(--spacing-sm);
@@ -1553,7 +1553,7 @@ onBeforeRouteLeave(() => {
 }
 
 .read-more-btn:hover {
-  background: #f5f6f7;
+  background: var(--bg-hover);
   border-color: var(--color-text-secondary);
 }
 
@@ -1745,8 +1745,8 @@ onBeforeRouteLeave(() => {
 }
 
 .add-to-calendar-btn:hover {
-  background: #f5f6f7;
-  border-color: #017188;
+  background: var(--bg-hover);
+  border-color: var(--color-border-strong);
 }
 
 .add-to-planner-btn {

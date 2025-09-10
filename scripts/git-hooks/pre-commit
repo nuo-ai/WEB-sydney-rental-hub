@@ -10,6 +10,14 @@ cd "$PROJECT_ROOT"
 if [ -d "vue-frontend" ]; then
   echo "• Frontend: ESLint"
   (cd vue-frontend && npm run -s lint)
+
+  # Conditionally run Stylelint if available to enforce Design Token guardrails
+  if [ -x "vue-frontend/node_modules/.bin/stylelint" ]; then
+    echo "• Frontend: Stylelint"
+    (cd vue-frontend && npm run -s lint:style)
+  else
+    echo "• Frontend: Stylelint skipped (binary not found)"
+  fi
 fi
 
 # 2) TypeScript typecheck for MCP server (no emit)

@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜ADD-LOCATION-UNI-ZH  
+  “添加地址”流程中文化：Add/Name Location 模态 i18n；大学中文名映射（含别名 USYD/UNSW/UTS 等、校区括注英文）；地址始终英文。热门与选择回传 name=中文，formatted_address=英文；修复一处语法告警｜溯源：commit ee6e006..9984dff
 - 2025-09-10｜COMMUTE-I18N-TYPO  
   通勤页面与组件中文化与文字令牌接入：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；提示/空状态/按钮/模式标题中文化；脚本消息统一 t()。前端表现：通勤页文案中文且与详情/列表节奏一致｜溯源：commit 43f943e..ee6e006
 - 2025-09-10｜TYPOGRAPHY+I18N-V1  
