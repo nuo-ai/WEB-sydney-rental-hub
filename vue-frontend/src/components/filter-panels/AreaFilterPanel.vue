@@ -28,11 +28,7 @@
     <div class="panel-content">
       <!-- 已选区域列表 -->
       <template v-if="selectedLocations.length">
-        <div
-          class="location-list"
-          :class="{ collapsed: chipsCollapsed }"
-          :style="chipsCollapsed ? chipsCollapsedStyle : null"
-        >
+        <div class="location-list">
           <BaseChip
             v-for="loc in displaySelectedLocations"
             :key="loc.id"
@@ -47,14 +43,6 @@
         <div class="location-actions">
           <button class="clear-all" type="button" @click="clearAllLocations">
             {{ clearAllLabel }}
-          </button>
-          <button
-            class="toggle-chips"
-            :class="{ expanded: !chipsCollapsed }"
-            type="button"
-            @click="chipsCollapsed = !chipsCollapsed"
-          >
-            {{ chipsCollapsed ? '展开' : '收起' }}
           </button>
         </div>
       </template>
@@ -163,13 +151,6 @@ const displaySelectedLocations = computed(() => {
   return Array.from(map.values())
 })
 
-// 中文注释：PC 收起2行、Mobile 收起1行；用近似像素高度控制，避免复杂测量
-const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 767 : false
-const chipsCollapsed = ref(true)
-const chipsCollapsedStyle = computed(() => ({
-  maxHeight: isMobile ? '36px' : '64px',
-  overflow: 'hidden',
-}))
 
 // 文案回退，避免显示未注册的 key
 const searchNearbyLabel = computed(() => {

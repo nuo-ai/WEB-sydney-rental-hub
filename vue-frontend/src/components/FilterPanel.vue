@@ -41,7 +41,7 @@
           <h4 class="section-title chinese-text">{{ locationLabel }}</h4>
 
           <template v-if="selectedLocations.length">
-            <div class="location-list" :style="chipsCollapsed ? chipsCollapsedStyle : null">
+            <div class="location-list">
               <BaseChip
                 v-for="loc in displaySelectedLocations"
                 :key="loc.id"
@@ -56,9 +56,6 @@
             <div class="location-actions">
               <button class="clear-all" type="button" @click="clearAllLocations">
                 {{ clearAllLabel }}
-              </button>
-              <button class="toggle-chips" type="button" @click="chipsCollapsed = !chipsCollapsed">
-                {{ chipsCollapsed ? '展开' : '收起' }}
               </button>
             </div>
           </template>
@@ -282,13 +279,6 @@ const displaySelectedLocations = computed(() => {
   return Array.from(map.values())
 })
 
-// 中文注释：PC 收起2行、Mobile 收起1行；用近似像素高度控制，避免复杂测量
-const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 767 : false
-const chipsCollapsed = ref(true)
-const chipsCollapsedStyle = computed(() => ({
-  maxHeight: isMobile ? '36px' : '64px',
-  overflow: 'hidden',
-}))
 const includeNearby = ref(true)
 /* 文案回退，避免显示未注册的 key */
 const searchNearbyLabel = computed(() => {
@@ -1340,8 +1330,9 @@ onMounted(() => {
 
 /* Location 区样式 - 使用设计令牌 */
 .location-section .location-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--filter-space-md);
   /* 新增：白底容器外观 */
   background: var(--color-bg-card);
@@ -1504,7 +1495,8 @@ onMounted(() => {
 /* 移动端Location区域优化 */
 @media (width <= 767px) {
   .location-section .location-list {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--filter-space-sm);
     /* 移动端：更紧凑的内边距与圆角 */
     padding: 8px;
