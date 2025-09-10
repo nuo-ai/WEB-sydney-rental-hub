@@ -11,7 +11,7 @@
         <button class="close-btn" @click="handleClose">
           <i class="fas fa-times"></i>
         </button>
-        <h2 class="modal-title">Add location</h2>
+        <h2 class="modal-title typo-heading-card">{{ $t('addLocation.title') }}</h2>
       </div>
     </template>
 
@@ -25,21 +25,21 @@
             v-model="searchQuery"
             type="text"
             class="search-input"
-            placeholder="Address"
+            :placeholder="$t('addLocation.placeholder')"
             @input="handleInput"
           />
           <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
             <i class="fas fa-times"></i>
           </button>
         </div>
-        <p class="search-hint">Search for your location's address</p>
+        <p class="search-hint typo-body-sm">{{ $t('addLocation.searchHint') }}</p>
       </div>
 
       <!-- 搜索结果 -->
       <div class="search-results">
         <!-- 预设地址 -->
         <div v-if="!searchQuery && presetLocations.length > 0" class="preset-section">
-          <h3 class="section-title">Popular locations</h3>
+          <h3 class="section-title typo-body-sm">{{ $t('addLocation.popular') }}</h3>
           <div
             v-for="location in presetLocations"
             :key="location.place_id || location.placeId"
@@ -50,7 +50,7 @@
             <i class="fas fa-train" v-else-if="location.type === 'station'"></i>
             <i class="fas fa-map-marker-alt" v-else></i>
             <div class="result-info">
-              <div class="result-name">{{ location.name }}</div>
+              <div class="result-name typo-body">{{ formatUniDisplayName(location) }}</div>
               <div class="result-address">{{ location.address }}</div>
             </div>
           </div>
@@ -74,14 +74,14 @@
         <!-- 搜索中 -->
         <div v-else-if="isSearching" class="searching-state">
           <i class="fas fa-spinner fa-spin"></i>
-          <span>Searching...</span>
+          <span class="typo-body-sm">{{ $t('addLocation.searching') }}</span>
         </div>
 
         <!-- 无结果 -->
         <div v-else-if="searchQuery && !isSearching" class="no-results">
           <i class="fas fa-search"></i>
-          <p>No results found</p>
-          <p class="no-results-hint">Try a different search term</p>
+          <p class="typo-body">{{ $t('addLocation.noResults') }}</p>
+          <p class="no-results-hint typo-body-sm">{{ $t('addLocation.tryAnother') }}</p>
         </div>
       </div>
     </div>
@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, nextTick, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import placesService from '@/services/places'
 import universities from '@/data/universities.sydney.json'
@@ -102,6 +102,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'select'])
+const t = inject('t')
 
 // 响应式状态
 const visible = ref(props.modelValue)
@@ -116,6 +117,40 @@ const presetLocations = ref([])
 
 // Session token for Google Places API billing optimization
 let sessionToken = null
+
+// 中文注释：大学中文名映射（名称/别名）—用于展示，地址保持英文
+const UNI_NAME_ZH_MAP = {
+  'University of Sydney': '悉尼大学',
+  'University of New South Wales': '新南威尔士大学',
+  'University of Technology Sydney': '悉尼科技大学',
+  'Macquarie University': '麦考瑞大学',
+  'Western Sydney University': '西悉尼大学',
+  'Australian Catholic University': '澳大利亚天主教大学',
+  'The University of Notre Dame Australia': '澳大利亚圣母大学',
+  'University of Wollongong': '卧龙岗大学'
+}
+const ALIAS_ZH_MAP = {
+  USYD: '悉尼大学',
+  UNSW: '新南威尔士大学',
+  UTS: '悉尼科技大学',
+  MQ: '麦考瑞大学',
+  WSU: '西悉尼大学',
+  ACU: '澳大利亚天主教大学',
+  UNDA: '澳大利亚圣母大学',
+  UOW: '卧龙岗大学'
+}
+const toZhUniversityName = (name, aliasArr = []) => {
+  if (UNI_NAME_ZH_MAP[name]) return UNI_NAME_ZH_MAP[name]
+  for (const a of aliasArr || []) {
+    const key = String(a || '').toUpperCase()
+    if (ALIAS_ZH_MAP[key]) return ALIAS_ZH_MAP[key]
+  }
+  return name || ''
+}
+const formatUniDisplayName = (loc) => {
+  const zh = toZhUniversityName(loc?.name, loc?.alias)
+  return loc?.campus ? `${zh} (${loc.campus})` : zh
+}
 
 // 监听props变化
 watch(
@@ -148,7 +183,7 @@ const searchPlaces = async (query) => {
     return results
   } catch (error) {
     console.error('Places search error:', error)
-    ElMessage.error('Failed to search locations. Please try again.')
+    ElMessage.error(t ? t('addLocation.failedSearch') : 'Failed to search locations. Please try again.')
     return []
   }
 }
@@ -212,7 +247,7 @@ const selectLocation = (location) => {
   const formattedLocation = {
     place_id: location.place_id,
     formatted_address: location.formatted_address,
-    name: location.name,
+    name: formatUniDisplayName(location),
     geometry: {
       location: {
         lat: () => location.latitude,
@@ -239,7 +274,9 @@ const selectResult = async (result) => {
       }
       placeDetails = {
         place_id: u.placeId || `local-${u.id}`,
-        name: u.campus ? `${u.name} (${u.campus})` : u.name,
+        name: u.name,
+        campus: u.campus,
+        alias: u.alias,
         formatted_address: u.address,
         latitude: u.lat,
         longitude: u.lng,
@@ -249,7 +286,7 @@ const selectResult = async (result) => {
       // 在线详情，且仅允许 university
       placeDetails = await placesService.getPlaceDetails(result.place_id)
       if (!Array.isArray(placeDetails.types) || !placeDetails.types.includes('university')) {
-        ElMessage.warning('Please select a university')
+        ElMessage.warning(t ? t('addLocation.pleaseSelectUniversity') : 'Please select a university')
         isSearching.value = false
         return
       }
@@ -258,7 +295,9 @@ const selectResult = async (result) => {
     const formattedLocation = {
       place_id: placeDetails.place_id,
       formatted_address: placeDetails.formatted_address,
-      name: placeDetails.name || result.main_text || result.description.split(',')[0],
+      name: (placeDetails && placeDetails.campus)
+        ? `${toZhUniversityName(placeDetails.name)} (${placeDetails.campus})`
+        : toZhUniversityName(placeDetails.name),
       geometry: {
         location: {
           lat: () => placeDetails.latitude,
@@ -274,7 +313,7 @@ const selectResult = async (result) => {
     handleClose()
   } catch (error) {
     console.error('Failed to get place details:', error)
-    ElMessage.error('Failed to get location details. Please try again.')
+    ElMessage.error(t ? t('addLocation.failedDetails') : 'Failed to get location details. Please try again.')
   } finally {
     isSearching.value = false
   }
@@ -297,7 +336,9 @@ onMounted(async () => {
   presetLocations.value = universities.map((u) => ({
     place_id: u.placeId || `local-${u.id}`,
     placeId: u.placeId || `local-${u.id}`,
-    name: u.campus ? `${u.name} (${u.campus})` : u.name,
+    name: u.name,
+    campus: u.campus,
+    alias: u.alias,
     formatted_address: u.address,
     address: u.address,
     latitude: u.lat,

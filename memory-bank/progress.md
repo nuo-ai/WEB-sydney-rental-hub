@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-10｜COMMUTE-I18N-TYPO  
+  通勤页面与组件中文化与文字令牌接入：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；提示/空状态/按钮/模式标题中文化；脚本消息统一 t()。前端表现：通勤页文案中文且与详情/列表节奏一致｜溯源：commit 43f943e..ee6e006
 - 2025-09-10｜TYPOGRAPHY+I18N-V1  
   建立文字 Design Tokens（styles/typography.css）与轻量 i18n 合并机制（i18n/locales/zh-CN.js + index.js）；试点重构 PropertyCard：价格/单位/新徽标/更多菜单/辅助文案接入 $t 与 .typo-*。前端表现：UI 中文化、文字节奏统一、动态地址仍英文｜溯源：commit 3e4ea72..c45d86a
 - 2025-09-10｜UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY  

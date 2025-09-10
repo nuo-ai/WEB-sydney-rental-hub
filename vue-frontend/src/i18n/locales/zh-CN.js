@@ -57,6 +57,23 @@ export default {
     remove: '移除地址',
     na: '不可用'
   },
+  addLocation: {
+    title: '添加地址',
+    placeholder: '地址',
+    searchHint: '搜索你的位置地址',
+    popular: '热门地点',
+    searching: '搜索中...',
+    noResults: '未找到结果',
+    tryAnother: '尝试其他关键词',
+    failedSearch: '搜索失败，请重试',
+    pleaseSelectUniversity: '请从列表中选择大学',
+    failedDetails: '获取位置详情失败，请重试'
+  },
+  nameLocation: {
+    title: '命名地址',
+    skip: '跳过',
+    confirm: '添加地址'
+  },
   search: {
     placeholder: '请先输入区域或邮编，例如 “Ultimo” 或 “2000”'
   },

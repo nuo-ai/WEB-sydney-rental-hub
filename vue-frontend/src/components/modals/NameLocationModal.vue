@@ -11,8 +11,8 @@
         <button class="back-btn" @click="handleBack">
           <i class="fas fa-arrow-left"></i>
         </button>
-        <h2 class="modal-title">Name location</h2>
-        <button class="skip-btn" @click="handleSkip">Skip</button>
+        <h2 class="modal-title typo-heading-card">{{ $t('nameLocation.title') }}</h2>
+        <button class="skip-btn typo-button" @click="handleSkip">{{ $t('nameLocation.skip') }}</button>
       </div>
     </template>
 
@@ -20,7 +20,7 @@
       <!-- 选中的地址 -->
       <div class="selected-address">
         <i class="fas fa-map-marker-alt"></i>
-        <p>{{ displayAddress }}</p>
+        <p class="typo-body">{{ displayAddress }}</p>
       </div>
 
       <!-- 标签选择 -->
@@ -40,9 +40,9 @@
           size="large"
           @click="handleConfirm"
           :disabled="!selectedLabel"
-          class="confirm-btn"
+          class="confirm-btn typo-button"
         >
-          Add location
+          {{ $t('nameLocation.confirm') }}
         </el-button>
       </div>
     </div>

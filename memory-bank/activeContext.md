@@ -2,6 +2,7 @@
 最后更新：2025-09-10
 
 今日快照（精简版，≤10行）
+- COMMUTE-I18N-TYPO：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；统一空状态/按钮/提示文案；ElMessage/ElMessageBox 使用 t()。前端表现：通勤页中文化一致、文字节奏与详情页对齐。溯源：commit 43f943e..ee6e006
 - TYPOGRAPHY+I18N-V1：新增 typography.css（基础/语义文字令牌与 .typo-* 工具类）；扩展轻量 i18n（locales/zh-CN.js + 合并策略）；PropertyCard 首批接入 $t 与 .typo-*（价格/单位/标签/菜单/辅助）。前端表现：UI 中文化，文字节奏统一，动态地址仍英文。溯源：commit 3e4ea72..c45d86a
 - UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY：PropertyCard“New”徽标改为品牌蓝 var(--brand-primary)，文字用 var(--color-text-inverse)；CommuteTimes“Add location”按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化。溯源：commit 3c7c150..3e4ea72
 - UI-TOKENS-PC-FILTER-LOCATION：PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；弹窗头部/输入/列表 hover/active 改中性令牌；价格滑块清理硬编码，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色。溯源：commit 82c3f37..3c7c150
