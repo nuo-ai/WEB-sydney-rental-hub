@@ -75,20 +75,22 @@
             <el-switch v-model="alertOn" size="small" inactive-text="Off" />
           </div>
 
-          <el-dropdown @command="onSortCommand" placement="bottom-end" :teleported="false">
-            <button class="sort-btn" type="button">
-              <ArrowUpDown :size="20" />
-              <span class="label">Sort</span>
-            </button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="price_asc">按最小价格</el-dropdown-item>
-                <el-dropdown-item command="available_date_asc">按空出时间</el-dropdown-item>
-                <el-dropdown-item command="inspection_earliest">按最早看房时间</el-dropdown-item>
-                <el-dropdown-item command="suburb_az">按区域（首字母）</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <div class="actions-right">
+            <el-dropdown @command="onSortCommand" placement="bottom-end" :teleported="false">
+              <button class="sort-btn" type="button">
+                <ArrowUpDown :size="20" />
+                <span class="label">Sort</span>
+              </button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="price_asc">按最小价格</el-dropdown-item>
+                  <el-dropdown-item command="available_date_asc">按空出时间</el-dropdown-item>
+                  <el-dropdown-item command="inspection_earliest">按最早看房时间</el-dropdown-item>
+                  <el-dropdown-item command="suburb_az">按区域（首字母）</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </div>
 
@@ -319,6 +321,7 @@ const goToPropertyDetail = (property) => {
   propertiesStore.currentProperty = property
   router.push({ name: 'PropertyDetail', params: { id: property.listing_id } })
 }
+
 
 const handleContactProperty = (property) => {
   // TODO: 实现联系我们功能
@@ -766,6 +769,14 @@ onUnmounted(() => {
 .sort-btn .label {
   font-weight: 600;
 }
+
+/* 右侧操作容器：并排显示“地图视图”与排序下拉 */
+.actions-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 
 /* 移动端下保持点击区可达性 */
 @media (width <= 768px) {

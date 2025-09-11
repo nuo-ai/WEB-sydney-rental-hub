@@ -5,6 +5,21 @@
   - 只用全局 tokens（颜色/间距/圆角/阴影/字号），禁止散落 #hex/px
   - 统一页面骨架区块：Header / Toolbar / Content / Footer
   - 移动端固定底部导航时，根容器使用 padding-bottom: var(--bottom-nav-height) 防遮挡
+
+  前端表现要点：
+  - 左右留白：移动端 16px（--page-x-padding-mob），桌面 32px（--page-x-padding-desktop）
+  - 区块间距：用 --page-section-gap / --page-section-gap-lg 控制，不手写数值
+  - 图标：lucide-vue-next + currentColor，颜色由外层继承；禁止在图标内部硬编码色
+  - 按钮/输入：统一使用 BaseButton / BaseSearchInput；禁止内联颜色/阴影/圆角
+  - 分隔线/弱边框：统一使用 --color-border-default
+  - 空状态/骨架屏：中性灰体系，尺寸/圆角/间距统一，避免页面跳变
+  - 响应式：<=768 为移动端，>768 为桌面；网格建议移动 1 列、桌面 2–3 列
+  - 地图入口示例：列表/首页操作区提供“地图视图”药丸按钮（非顶栏），路由保持当前筛选状态
+
+  禁止事项：
+  - 禁止 hex/rgb/hsla/命名色（design-tokens.css/style.css 定义处除外）
+  - 禁止页面内自定义品牌色/阴影/圆角，优先新增语义令牌再引用
+
   风险与回滚：
   - 本文件仅作为样板，不参与路由；复制后按需启用/删去注释即可，随时可回滚
 -->
@@ -50,7 +65,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 // 中文注释：示例仅引入现有、稳定组件，避免新增依赖
 import SearchBar from '@/components/SearchBar.vue'
 import PropertyCard from '@/components/PropertyCard.vue'

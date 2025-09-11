@@ -27,14 +27,9 @@ const router = createRouter({
       component: () => import('../views/Favorites.vue'),
     },
     {
-      path: '/map',
-      name: 'map',
-      component: () => import('../views/Map.vue'),
-    },
-    {
       path: '/chat',
       name: 'chat',
-      component: () => import('../views/Chat.vue'),
+      component: () => import('../views/ChatView.vue'),
     },
     {
       path: '/profile',

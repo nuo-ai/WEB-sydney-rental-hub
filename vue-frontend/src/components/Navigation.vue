@@ -59,7 +59,7 @@
 defineOptions({ name: 'MainNavigation' })
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Search, Heart, MessageSquare, Map, User } from 'lucide-vue-next'
+import { Search, Heart, MessageSquare, User } from 'lucide-vue-next'
 
 // 定义导航栏显示状态的props
 const props = defineProps({
@@ -101,13 +101,6 @@ const navItems = [
     label: 'AI助手',
   },
   {
-    name: 'map',
-    path: '/map',
-    icon: 'fa-regular fa-map',
-    iconComp: Map,
-    label: '地图',
-  },
-  {
     name: 'profile',
     path: '/profile',
     icon: 'fa-regular fa-user',
@@ -130,13 +123,6 @@ const mainNavItems = [
     icon: 'fa-regular fa-heart',
     iconComp: Heart,
     label: '收藏',
-  },
-  {
-    name: 'map',
-    path: '/map',
-    icon: 'fa-regular fa-map',
-    iconComp: Map,
-    label: '地图',
   },
 ]
 
