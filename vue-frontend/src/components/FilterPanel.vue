@@ -1424,9 +1424,11 @@ onMounted(() => {
 }
 /* 兼容 BaseChip 子元素命名，保持现有样式生效 */
 .location-chip :deep(.base-chip__remove) {
-  background: var(--filter-chip-remove-bg);
-  border: none;
-  color: var(--filter-chip-remove-color);
+  background: var(--filter-chip-remove-bg) !important;
+  background-color: var(--filter-chip-remove-bg) !important;
+  background-image: none !important;
+  border: none !important;
+  color: var(--filter-chip-remove-color) !important;
   width: var(--filter-chip-remove-size);
   height: var(--filter-chip-remove-size);
   border-radius: var(--filter-chip-remove-radius);
@@ -1438,6 +1440,10 @@ onMounted(() => {
   padding: 0;
   cursor: pointer;
   transition: var(--filter-transition-fast);
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
 
   /* 移动端触摸目标优化 */
@@ -1453,6 +1459,20 @@ onMounted(() => {
 .location-chip :deep(.base-chip__remove:hover) {
   background: var(--filter-chip-remove-hover-bg);
   color: var(--filter-chip-remove-hover-color);
+}
+
+/* 彻底移除“位置标签 ×”的浅蓝底：选中/hover/focus 均保持中性 remove 背景 */
+.location-chip :deep(.base-chip--selected .base-chip__remove),
+.location-chip :deep(.base-chip__remove:focus),
+.location-chip :deep(.base-chip__remove:focus-visible) {
+  background: var(--filter-chip-remove-bg) !important;
+  color: var(--filter-chip-remove-color) !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .location-actions {

@@ -2,6 +2,7 @@
 最后更新：2025-09-11
 
 今日快照（精简版，≤10行）
+- LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP：列表页 H1 字号/行高改 22/26 与价格主数字一致；卧室/浴室/车位数字选项改连体 segmented（左右端 2px 圆角，中段无圆角，相邻边框 -1px 折叠消缝）；视觉配色与状态逻辑不变（沿用令牌）；交互仍为单选 ≥N。溯源：commit 4146bd1
 - SPEC-ROW-UNIFY-LIST+DETAIL：引入全局规格变量 --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap 并变量化全局规则；列表与详情接入规范类 spec-row/spec-item/spec-text，局部容器就近覆写 18/14/18/6/12，移除局部硬编码尺寸，修正详情页垂直间距为 12px。前端表现：图标尺寸与横向间距在列表与详情完全一致。溯源：commit 5b7254c..25ff698
 - ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE：全站导航/首页/个人中心图标统一 lucide-vue-next + currentColor；移除 Font Awesome 引用；导航数据结构加入 iconComp；Logo 改 Home 图标；Profile 标签与按钮统一图标尺寸类。前端表现：图标风格统一，颜色随文字色继承，中性化，主题切换更稳。溯源：commit fe8f012..2a9dd4d
 - TOKENS-DEPRECATE-NOTES：在 assets/design-tokens.css 为 --color-accent/--font-size-base/--spacing-lg 增加 @deprecated 注释与替代建议（仅注释，零视觉改动）。前端表现：无变化。溯源：commit fe8f012..2a9dd4d

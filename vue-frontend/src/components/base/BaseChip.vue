@@ -84,6 +84,7 @@ const handleRemove = (event) => {
 }
 
 .base-chip__remove {
+  /* 使用中性 remove 背景，避免父级选中/hover 背景透出 */
   background: var(--filter-chip-remove-bg);
   border: none;
   color: var(--filter-chip-remove-color);
@@ -112,6 +113,26 @@ const handleRemove = (event) => {
   color: var(--filter-chip-remove-hover-color);
 }
 
+/* 选中/hover 场景下，仍保持 x 的中性背景，避免父级底色透出 */
+.base-chip:hover .base-chip__remove,
+.base-chip--selected .base-chip__remove,
+.base-chip.base-chip--hover .base-chip__remove {
+  background: var(--filter-chip-remove-bg) !important;
+}
+
+/* 规范化原生外观与点击高亮（消除桌面端浅蓝背景） */
+.base-chip__remove {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.base-chip__remove:active {
+  /* 点击时使用 hover-bg，非选中/焦点时保持透明 */
+  background: var(--filter-chip-remove-hover-bg);
+  color: var(--filter-chip-remove-hover-color);
+}
+
 /* 变体样式 */
 .base-chip--selected {
   background: var(--filter-color-selected-bg);
@@ -130,10 +151,20 @@ const handleRemove = (event) => {
   padding-right: calc(var(--filter-chip-padding-x) - 2px); /* 为移除按钮调整内边距 */
 }
 
-/* 无障碍支持 */
+/* 无障碍支持（中性化：移除浏览器默认浅蓝高亮） */
+.base-chip__remove:focus,
 .base-chip__remove:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
-  outline-offset: 1px;
+  outline: none !important;
+  box-shadow: none !important;
+  /* 焦点保持中性 remove 背景，避免父级选中底色透出 */
+  background: var(--filter-chip-remove-bg) !important;
+  color: var(--filter-chip-remove-color) !important;
+}
+
+/* Firefox 内边距/边框清理，避免焦点内边线 */
+.base-chip__remove::-moz-focus-inner {
+  border: 0;
+  padding: 0;
 }
 
 /* 响应式调整 */

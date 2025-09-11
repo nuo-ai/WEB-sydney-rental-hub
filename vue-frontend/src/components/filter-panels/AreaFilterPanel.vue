@@ -436,13 +436,16 @@ const applyFilters = async () => {
   flex-shrink: 0;
 }
 /* 兼容 BaseChip 子元素命名，保持现有样式生效 */
+/* 默认态加固：使用设计令牌并阻断父级/UA 覆盖（消除浅蓝底） */
 .location-chip :deep(.base-chip__remove) {
-  background: var(--bg-secondary);
-  border: none;
-  color: var(--color-text-secondary);
-  width: 16px;
-  height: 16px;
-  border-radius: 2px;
+  background: var(--filter-chip-remove-bg) !important;
+  background-color: var(--filter-chip-remove-bg) !important;
+  background-image: none !important;
+  border: none !important;
+  color: var(--filter-chip-remove-color) !important;
+  width: var(--filter-chip-remove-size);
+  height: var(--filter-chip-remove-size);
+  border-radius: var(--filter-chip-remove-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -450,7 +453,11 @@ const applyFilters = async () => {
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: var(--filter-transition-fast);
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
 }
 
@@ -459,9 +466,25 @@ const applyFilters = async () => {
   color: var(--color-text-primary);
 }
 /* 兼容 BaseChip 子元素命名，保持现有样式生效 */
-.location-chip :deep(.base-chip__remove:hover) {
-  background: var(--bg-hover);
-  color: var(--color-text-primary);
+/* Hover/Active 采用移除态危险色 */
+.location-chip :deep(.base-chip__remove:hover),
+.location-chip :deep(.base-chip__remove:active) {
+  background: var(--filter-chip-remove-hover-bg) !important;
+  color: var(--filter-chip-remove-hover-color) !important;
+}
+
+/* 选中/焦点保持中性 remove 背景，彻底移除浅蓝底 */
+.location-chip :deep(.base-chip--selected .base-chip__remove),
+.location-chip :deep(.base-chip__remove:focus),
+.location-chip :deep(.base-chip__remove:focus-visible) {
+  background: var(--filter-chip-remove-bg) !important;
+  color: var(--filter-chip-remove-color) !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .location-actions {

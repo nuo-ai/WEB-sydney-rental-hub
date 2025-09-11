@@ -26,6 +26,37 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 
 ## CSS与布局模式
 
+### 分段控件（Segmented）模式（新增）
+- 目的：将一组“数字/枚举按钮”在视觉上连为整体，仅改变几何关系（相邻无缝、端部圆角 2px），不改变颜色/描边/填充/hover/active 等设计令牌与状态逻辑（保持前端表现一致）。
+- CSS 模式（容器 + 子项）：
+  ```css
+  /* 容器：不换行、无内间距缝隙、可溢出滚动 */
+  .filter-buttons-group.segmented {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    overflow: hidden;      /* PC 保持整条；移动端可配合 overflow-x:auto */
+  }
+  /* 子项：中段无圆角；相邻边框折叠避免 2px 中缝 */
+  .filter-buttons-group.segmented .filter-btn { border-radius: 0; }
+  .filter-buttons-group.segmented .filter-btn + .filter-btn { margin-left: -1px; }
+  /* 首尾端：仅左右两端 2px 圆角 */
+  .filter-buttons-group.segmented .filter-btn:first-child {
+    border-top-left-radius: 2px; border-bottom-left-radius: 2px;
+  }
+  .filter-buttons-group.segmented .filter-btn:last-child {
+    border-top-right-radius: 2px; border-bottom-right-radius: 2px;
+  }
+  @media (width <= 767px) {
+    .filter-buttons-group.segmented { overflow-x: auto; } /* 窄屏避免换行破坏连体 */
+  }
+  ```
+- 约束与可达性：
+  - 不在该模式内覆写颜色/描边/填充/hover/active，全部沿用既有设计令牌（如 --filter-color-*）。
+  - 交互逻辑不变（如单选 ≥N 语义）；键盘与 aria 语义保持原实现。
+- 适用：卧室/浴室/车位等数字选项行，或任意需要“连体分段”视觉的枚举组。
+- 溯源：commit 4146bd1（LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP）
+
 ### 1. 样式作用域
 **模式** ✅: 将布局影响的CSS规则 (`overflow`, `position`, `display`) 限定在组件作用域内
 **反模式** ❌: 对顶级元素 (`body`, `html`) 应用全局 `overflow-x: hidden`

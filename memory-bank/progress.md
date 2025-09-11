@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-11｜LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP  
+  列表页 H1 字号/行高改 22/26 与价格主数字一致；卧室/浴室/车位数字选项连体 segmented（左右端 2px 圆角；相邻边框 -1px 折叠消缝）；视觉配色与状态逻辑不变，交互仍为单选 ≥N。｜溯源：commit 4146bd1
 - 2025-09-11｜SPEC-ROW-UNIFY-LIST+DETAIL  
   全局引入规格变量 --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap 并变量化全局规则；列表与详情接入 spec-row/spec-item/spec-text，局部容器覆写为 18/14/18/6/12；移除局部硬编码尺寸；详情垂直间距统一为 12px。前端表现：列表与详情的“图标+数字”行在尺寸与横向间距完全一致。｜溯源：commit 5b7254c..25ff698
 - 2025-09-11｜ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE  
