@@ -5,7 +5,7 @@
       <el-input
         ref="searchInputRef"
         v-model="searchQuery"
-        :placeholder="searchPlaceholder"
+        :placeholder="effectivePlaceholder"
         size="large"
         class="search-input"
         :aria-label="isMobile.value ? '点击打开筛选面板' : '搜索区域'"
@@ -18,11 +18,28 @@
         <template #prefix>
           <Search class="spec-icon search-icon" />
         </template>
-        <template #suffix></template>
+        <template #suffix>
+          <!-- 中文注释：在输入框右侧提供“筛选”入口（桌面端）。点击后打开统一筛选面板 -->
+          <button
+            type="button"
+            class="filter-icon-btn"
+            v-if="!isMobile.value"
+            :aria-label="t('filter.open') || '打开筛选面板'"
+            @click.stop="emit('openFilterPanel')"
+          >
+            <SlidersHorizontal aria-hidden="true" />
+          </button>
+        </template>
       </el-input>
 
       <!-- 内嵌低调区域标签（占位显示），仅在未聚焦/未输入且有选区时展示 -->
-      <div v-if="showInlineChips" class="inline-chips-overlay" aria-hidden="true">
+      <div
+        v-if="showInlineChips"
+        class="inline-chips-overlay"
+        @click="focusInput"
+        role="group"
+        aria-label="已选择的区域"
+      >
         <span
           v-for="loc in displayedLocations"
           :key="'inline-' + loc.id"
@@ -30,6 +47,15 @@
           :title="formatInlineLocation(loc)"
         >
           <span class="inline-chip-text">{{ formatInlineLocation(loc) }}</span>
+          <button
+            class="inline-chip-remove"
+            type="button"
+            :aria-label="`移除 ${formatInlineLocation(loc)}`"
+            title="移除"
+            @click.stop="removeLocation(loc.id)"
+          >
+            ×
+          </button>
         </span>
         <span v-if="hiddenCount > 0" class="inline-chip inline-chip-more">+{{ hiddenCount }}</span>
       </div>
@@ -99,7 +125,7 @@ import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 import SearchOverlay from './SearchOverlay.vue'
-import { Search } from 'lucide-vue-next'
+import { Search, SlidersHorizontal } from 'lucide-vue-next'
 
 // 建议列表最大返回条数（覆盖 36 条邮编）
 const SUGGESTION_LIMIT = 100
@@ -145,6 +171,7 @@ const hiddenCount = computed(() => Math.max(0, (selectedLocations.value?.length 
 const selectedLocations = computed(() => propertiesStore.selectedLocations)
 
 const searchPlaceholder = computed(() => t('search.ph'))
+const effectivePlaceholder = computed(() => ((selectedLocations.value?.length || 0) > 0 ? '' : searchPlaceholder.value))
 
 /* 输入焦点与内嵌标签可见性控制 */
 const isInputFocused = ref(false)
@@ -269,6 +296,20 @@ const handleFocus = () => {
 
 const handleBlur = () => {
   isInputFocused.value = false
+}
+
+// 中文注释：点击内嵌标签区域时，将焦点回到输入框，便于继续键入
+const focusInput = () => {
+  searchInputRef.value?.focus?.()
+}
+
+// 中文注释：移除一个已选择的区域标签
+const removeLocation = (id) => {
+  try {
+    propertiesStore.removeSelectedLocation(id)
+  } catch (e) {
+    console.warn('移除区域失败', e)
+  }
 }
 
 /* 承接 SearchOverlay 内“筛选”按钮事件：关闭 Overlay 并打开筛选面板 */
@@ -487,7 +528,7 @@ watch(
   transition: all 0.2s ease;
 
   /* 预留右侧空间：右边距(12px) + 命中区域(32px)；可由 token 控制 */
-  padding-right: 12px;
+  padding-right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px));
 }
 
 .search-input :deep(.el-input__wrapper):hover {
@@ -584,7 +625,8 @@ watch(
   display: flex;
   align-items: center;
   gap: var(--filter-chip-gap);
-  pointer-events: none; /* 不遮挡输入/点击 */
+  /* 允许点击：用于触发聚焦与移除标签 */
+  pointer-events: auto;
   overflow: hidden;
   white-space: nowrap;
 }
@@ -606,10 +648,10 @@ watch(
   align-items: center;
   gap: var(--filter-chip-gap);
   padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
-  border: 1px solid var(--filter-chip-border);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--filter-chip-radius);
-  background: var(--filter-chip-bg);
-  color: var(--filter-chip-text);
+  background: #e9eef2; /* 提升与浅色输入框的对比度 */
+  color: #3c475b; /* 深一点的中性蓝灰，增强可读性 */
   font-size: var(--filter-chip-font-size);
   font-weight: var(--filter-chip-font-weight);
   line-height: 1;
@@ -627,10 +669,33 @@ watch(
 }
 
 .inline-chip-more {
-  color: var(--filter-color-text-secondary);
-  background: var(--filter-chip-bg);
-  border: 1px solid var(--filter-chip-border);
+  color: #3c475b;
+  background: #e9eef2;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--filter-chip-radius);
+}
+/* Hover 态轻微加深，保持中性风格 */
+.inline-chip:hover,
+.inline-chip-more:hover {
+  background: #dee6ee;
+  color: #3c475b;
+}
+
+/* 移除按钮：仅按钮可点击，避免误拦截输入 */
+.inline-chip-remove {
+  pointer-events: auto;
+  margin-left: 6px;
+  border: none;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.inline-chip-remove:hover {
+  color: var(--color-text-primary);
 }
 
 .suggestion-item {
@@ -804,14 +869,27 @@ watch(
     width: 100%;
   }
 
-  /* 移动端搜索框样式优化：添加点击反馈效果 */
+  .search-input-container {
+    width: 334px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* 移动端搜索框样式优化：添加点击反馈效果 + 尺寸 334x60 */
   .search-input :deep(.el-input__wrapper) {
     cursor: pointer; /* 指示可点击 */
     transition: background-color 0.2s ease;
+    height: 60px;
+    min-height: 60px;
   }
 
   .search-input :deep(.el-input__wrapper:active) {
     background-color: var(--bg-hover); /* 点击时背景色变化 */
+  }
+
+  .search-input :deep(.el-input__inner) {
+    height: 60px;
+    line-height: 60px;
   }
 
   .location-suggestions {
@@ -834,6 +912,11 @@ watch(
 
   .suggestion-item {
     padding: 16px;
+  }
+
+  /* 移动端隐藏输入框右侧的筛选图标，改为点击整框打开筛选面板（前端表现：点击搜索框整体即可进入筛选） */
+  .filter-icon-btn {
+    display: none;
   }
 }
 </style>
