@@ -18,18 +18,6 @@
         <template #prefix>
           <Search class="spec-icon search-icon" />
         </template>
-        <template #suffix>
-          <!-- 中文注释：在输入框右侧提供“筛选”入口（桌面端）。点击后打开统一筛选面板 -->
-          <button
-            type="button"
-            class="filter-icon-btn"
-            v-if="!isMobile.value"
-            :aria-label="t('filter.open') || '打开筛选面板'"
-            @click.stop="emit('openFilterPanel')"
-          >
-            <SlidersHorizontal aria-hidden="true" />
-          </button>
-        </template>
       </el-input>
 
       <!-- 内嵌低调区域标签（占位显示），仅在未聚焦/未输入且有选区时展示 -->
@@ -125,7 +113,7 @@ import { ref, computed, watch, onMounted, onUnmounted, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 import SearchOverlay from './SearchOverlay.vue'
-import { Search, SlidersHorizontal } from 'lucide-vue-next'
+import { Search } from 'lucide-vue-next'
 
 // 建议列表最大返回条数（覆盖 36 条邮编）
 const SUGGESTION_LIMIT = 100
@@ -191,15 +179,19 @@ const formatInlineLocation = (loc) => {
   return loc.type === 'suburb' ? String(loc.name || '') : String(loc.name || '')
 }
 
+// 去重 Key 规范化：同一区域（type+name+postcode）视为同一项
+const normalizeKey = (loc) => {
+  if (!loc) return ''
+  return `${loc.type || ''}|${String(loc.name || '').toLowerCase()}|${loc.postcode || ''}`
+}
+
 // 删除这行，改为使用响应式数据
 // const locationSuggestions = computed(() => propertiesStore.locationSuggestions)
 
 const filteredSuggestions = computed(() => {
-  // 过滤掉已经选择的区域，避免重复显示
-  return locationSuggestions.value.filter((suggestion) => {
-    // 检查该建议是否已经在选中的区域列表中
-    return !selectedLocations.value.some((selected) => selected.id === suggestion.id)
-  })
+  // 过滤掉已经选择的区域，避免重复显示（使用规范化 Key 去重）
+  const keys = new Set(selectedLocations.value.map((s) => normalizeKey(s)))
+  return locationSuggestions.value.filter((suggestion) => !keys.has(normalizeKey(suggestion)))
 })
 
 // 方法
@@ -244,16 +236,11 @@ const loadNearbySuggestions = async () => {
   const lastLocation = selectedLocations.value[selectedLocations.value.length - 1]
   try {
     const result = await locationAPI.getNearbySuburbs(lastLocation.name)
-    // 过滤掉已经选择的区域，避免重复显示
+    // 过滤掉已经选择的区域，避免重复显示（使用规范化 Key 去重）
     const nearbyResults = result.nearby || []
-    nearbySuggestions.value = nearbyResults.filter((suggestion) => {
-      // 检查该建议是否已经在选中的区域列表中
-      return !selectedLocations.value.some(
-        (selected) =>
-          selected.id === suggestion.id ||
-          (selected.name === suggestion.name && selected.postcode === suggestion.postcode),
-      )
-    })
+    nearbySuggestions.value = nearbyResults.filter(
+      (suggestion) => !selectedLocations.value.some((selected) => normalizeKey(selected) === normalizeKey(suggestion)),
+    )
   } catch (error) {
     console.error('获取相邻区域失败:', error)
     nearbySuggestions.value = []
@@ -375,9 +362,9 @@ const handleKeydown = (event) => {
 }
 
 const selectLocation = async (location) => {
-  // 检查是否已经选中
-  const existingIndex = selectedLocations.value.findIndex((loc) => loc.id === location.id)
-  if (existingIndex !== -1) return
+  // 检查是否已经选中（使用规范化 Key 去重）
+  const exists = selectedLocations.value.some((loc) => normalizeKey(loc) === normalizeKey(location))
+  if (exists) return
 
   // 1) 添加选中区域为标签
   propertiesStore.addSelectedLocation(location)
@@ -400,18 +387,18 @@ const selectLocation = async (location) => {
 
 // 判断某建议是否已被选中
 const isSelected = (suggestion) => {
-  return selectedLocations.value.some((selected) => {
-    if (selected.id && suggestion.id) return selected.id === suggestion.id
-    // 兜底：按类型+名称（与 nearby 建议结构兼容）
-    return selected.type === suggestion.type && selected.name === suggestion.name
-  })
+  return selectedLocations.value.some((selected) => normalizeKey(selected) === normalizeKey(suggestion))
 }
 
 // 切换选择/取消（用于多选复选框或整行点击）
 const toggleSuggestion = async (suggestion) => {
   if (isSelected(suggestion)) {
-    propertiesStore.removeSelectedLocation(suggestion.id)
-    emit('locationSelected', { removed: true, id: suggestion.id })
+    // 移除规范化 Key 匹配的已选项，避免不同来源 id 不一致导致无法取消
+    const selected = selectedLocations.value.find((s) => normalizeKey(s) === normalizeKey(suggestion))
+    if (selected) {
+      propertiesStore.removeSelectedLocation(selected.id)
+      emit('locationSelected', { removed: true, id: selected.id })
+    }
     return
   }
   await selectLocation(suggestion)
@@ -527,8 +514,8 @@ watch(
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
 
-  /* 预留右侧空间：右边距(12px) + 命中区域(32px)；可由 token 控制 */
-  padding-right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px));
+  /* 右侧不再预留筛选按钮空间，保持与输入内边距一致 */
+  padding-right: var(--search-suffix-right, 12px);
 }
 
 .search-input :deep(.el-input__wrapper):hover {
@@ -618,12 +605,13 @@ watch(
 .inline-chips-overlay {
   position: absolute;
   left: 40px; /* 与前缀图标对齐（16px 图标 + 内补白） */
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 20px;
+  right: 12px;
+  top: 0;
+  bottom: 0;
+  transform: none;
+  height: 100%;
   display: flex;
-  align-items: center;
+  align-items: center; /* 垂直居中，使标签在输入框高度内居中对齐 */
   gap: var(--filter-chip-gap);
   /* 允许点击：用于触发聚焦与移除标签 */
   pointer-events: auto;
@@ -633,13 +621,8 @@ watch(
 
 /* 渐变遮罩，避免文字硬切（仅在必要时出现） */
 .inline-chips-overlay::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 24px;
-  background: linear-gradient(to right, rgb(255 255 255 / 0%), var(--filter-color-bg-primary));
+  display: none;
+  content: none;
 }
 
 /* 单个浅灰 chip */
@@ -655,6 +638,7 @@ watch(
   font-size: var(--filter-chip-font-size);
   font-weight: var(--filter-chip-font-weight);
   line-height: 1;
+  min-height: 32px; /* 紧凑高度（≈32px），与输入框内垂直居中配合 */
 }
 
 .inline-chip-icon {
@@ -692,6 +676,8 @@ watch(
   font-size: 14px;
   line-height: 1;
   padding: 0 2px;
+  display: inline-flex; /* 与文本中线对齐 */
+  align-items: center;  /* 垂直居中 */
 }
 
 .inline-chip-remove:hover {
@@ -881,6 +867,7 @@ watch(
     transition: background-color 0.2s ease;
     height: 60px;
     min-height: 60px;
+    padding-right: 12px; /* 移动端无后缀按钮，不再预留额外空间 */
   }
 
   .search-input :deep(.el-input__wrapper:active) {
@@ -890,6 +877,12 @@ watch(
   .search-input :deep(.el-input__inner) {
     height: 60px;
     line-height: 60px;
+  }
+
+  /* 移动端彻底隐藏后缀容器，避免任何残留占位 */
+  .search-input :deep(.el-input__suffix),
+  .search-input :deep(.el-input__suffix-inner) {
+    display: none;
   }
 
   .location-suggestions {
@@ -916,6 +909,14 @@ watch(
 
   /* 移动端隐藏输入框右侧的筛选图标，改为点击整框打开筛选面板（前端表现：点击搜索框整体即可进入筛选） */
   .filter-icon-btn {
+    display: none;
+  }
+
+  /* 移动端：取消右侧渐变遮罩，防止“缺口”；并与输入框右内边距对齐 */
+  .inline-chips-overlay {
+    right: 12px;
+  }
+  .inline-chips-overlay::after {
     display: none;
   }
 }

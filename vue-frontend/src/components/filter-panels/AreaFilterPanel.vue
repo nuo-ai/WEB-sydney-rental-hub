@@ -47,12 +47,7 @@
         </div>
       </template>
 
-      <!-- 空状态提示 -->
-      <div v-else class="location-empty">
-        <div class="empty-box" role="note" aria-live="polite">
-          <span class="empty-text">{{ locationEmptyLabel }}</span>
-        </div>
-      </div>
+      <!-- 空状态提示移除：不显示“未选择任何区域”提示 -->
 
       <!-- 区域选择器 -->
       <AreasSelector
@@ -168,10 +163,6 @@ const clearAllLabel = computed(() => {
   return v && v !== 'filter.clearAll' ? v : '清空全部'
 })
 
-const locationEmptyLabel = computed(() => {
-  const v = t('filter.locationEmpty')
-  return v && v !== 'filter.locationEmpty' ? v : '未选择任何区域'
-})
 
 // 格式化区域显示（仅展示 suburb 名称；postcode 仅显示自身）
 const formatLocation = (loc) => {
