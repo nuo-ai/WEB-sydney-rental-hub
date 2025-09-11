@@ -3,6 +3,7 @@
 /* 导入设计令牌系统 */
 @import './styles/design-tokens.css';
 @import './styles/typography.css';
+@import './styles/page-tokens.css';
 
 /* 新增：品牌蓝色与专业中性灰阶（基础层 tokens）
    中文注释：提供统一的蓝色品牌色族与中性灰阶，作为基础令牌被全站复用。
@@ -142,6 +143,24 @@
   --surface-3: #f0f2f5;
   --surface-4: #e8e8e8;
   --text-muted: #999999;
+}
+
+:root {
+  /* 语义状态与品牌补充令牌（仅新增，不影响现有样式；用于替换历史硬编码）
+     前端表现：错误/警告/成功/收藏/社交色统一来源，方便全站联动 */
+  --semantic-danger: #dc2626;
+  --semantic-danger-hover: #b91c1c;
+
+  --semantic-warning: #f59e0b;
+  --semantic-warning-weak: #fff3cd;
+
+  --semantic-success: #6fc168;
+
+  --semantic-favorite: #ffd700;
+  --semantic-favorite-hover: #ffed4e;
+
+  --brand-google: #ea4335;
+  --brand-facebook: #1877f2;
 }
 
 /* ========== 全局重置样式 ========== */

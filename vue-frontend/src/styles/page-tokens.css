@@ -1,0 +1,61 @@
+/**
+ * 页面级令牌（Page Tokens） - 新增文件
+ * 目的：为“新增页面”提供统一的页面骨架尺寸/间距/动效/断点基线
+ * 原则：仅新增，不覆盖现有 design-tokens.css / style.css 的变量，保证向后兼容与可回滚
+ */
+
+:root {
+  /* ===== 页面结构尺寸 =====
+     中文注释：页面两端留白与区块间距统一，避免每页各写各的 margin/padding */
+  --header-height: 56px;            /* 顶部区域（移动端导航/标题区）统一高度参考 */
+  --bottom-nav-height: 56px;        /* 底部导航高度，用于页面 padding-bottom 防遮挡 */
+
+  /* 左右内边距（移动/桌面分离），前端表现：页面根容器左右留白一致 */
+  --page-x-padding-mob: 16px;
+  --page-x-padding-desktop: 32px;
+
+  /* 页面主区块纵向间距（大节奏），不与组件内部 spacing 冲突 */
+  --page-section-gap: var(--space-6, 24px);
+  --page-section-gap-lg: var(--space-8, 32px);
+
+  /* ===== 响应式断点（语义化，仅作参考，不强制使用） ===== */
+  --bp-mob: 767px;
+  --bp-tab: 1024px;
+  --bp-desktop: 1280px;
+
+  /* ===== 动效节奏（统一时长与缓动） =====
+     中文注释：用于 hover/展开/收起等交互，保持全站一致的运动语言 */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* 可选：页面骨架帮助类（不影响现有页面，新增页可按需使用）
+   使用方式：
+   - 根容器使用 .page，自动获得左右 padding 与底部导航防遮挡
+   - 子区块使用 .page__header / __toolbar / __content / __footer，统一区块间距
+*/
+.page {
+  padding-left: var(--page-x-padding-mob);
+  padding-right: var(--page-x-padding-mob);
+  padding-bottom: var(--bottom-nav-height);
+}
+.page__header,
+.page__toolbar,
+.page__content,
+.page__footer {
+  margin-bottom: var(--page-section-gap);
+}
+@media (min-width: 768px) {
+  .page {
+    padding-left: var(--page-x-padding-desktop);
+    padding-right: var(--page-x-padding-desktop);
+    padding-bottom: 0; /* 通常桌面无底部导航固定 */
+  }
+  .page__header,
+  .page__toolbar,
+  .page__content,
+  .page__footer {
+    margin-bottom: var(--page-section-gap-lg);
+  }
+}

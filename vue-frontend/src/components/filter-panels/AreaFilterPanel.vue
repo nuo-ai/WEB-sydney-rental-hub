@@ -56,8 +56,8 @@
         @requestCount="debouncedRequestCount"
       />
 
-      <!-- 包含周边选项 -->
-      <div class="nearby-toggle">
+      <!-- 包含周边选项（特性开关控制） -->
+      <div v-if="SHOW_INCLUDE_NEARBY" class="nearby-toggle">
         <el-checkbox v-model="localIncludeNearby" @change="handleIncludeNearbyChange">
           {{ searchNearbyLabel }}
         </el-checkbox>
@@ -88,7 +88,9 @@ import { useRouter } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
 
-// 中文注释：区域筛选专用面板，拆分自原 FilterPanel
+ // 中文注释：区域筛选专用面板，拆分自原 FilterPanel
+// 中文注释：特性开关——控制“包含周边区域”UI 与透传是否启用（隐藏但保留代码，便于以后启用）
+const SHOW_INCLUDE_NEARBY = false
 
 const emit = defineEmits(['close'])
 
@@ -234,8 +236,10 @@ const buildFilterParams = () => {
     filterParams.postcodes = selectedPostcodes.join(',')
   }
 
-  // include_nearby 作为透传参数
-  filterParams.include_nearby = localIncludeNearby.value ? '1' : '0'
+  // include_nearby 作为透传参数（特性开关：隐藏则不透传）
+  if (SHOW_INCLUDE_NEARBY) {
+    filterParams.include_nearby = localIncludeNearby.value ? '1' : '0'
+  }
 
   return filterParams
 }
@@ -259,8 +263,13 @@ const updateUrlQuery = async (filterParams) => {
       delete newQuery.postcodes
     }
 
-    if (filterParams.include_nearby === '1') {
-      newQuery.include_nearby = '1'
+    // include_nearby（特性开关控制）
+    if (SHOW_INCLUDE_NEARBY) {
+      if (filterParams.include_nearby === '1') {
+        newQuery.include_nearby = '1'
+      } else {
+        delete newQuery.include_nearby
+      }
     } else {
       delete newQuery.include_nearby
     }
@@ -279,8 +288,10 @@ const applyFilters = async () => {
   try {
     const filterParams = buildFilterParams()
 
-    // 更新全局状态
-    propertiesStore.includeNearby = localIncludeNearby.value
+    // 更新全局状态（仅在特性开关启用时回写）
+    if (SHOW_INCLUDE_NEARBY) {
+      propertiesStore.includeNearby = localIncludeNearby.value
+    }
 
     // 应用筛选
     await propertiesStore.applyFilters(filterParams)

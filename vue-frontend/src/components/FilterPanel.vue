@@ -67,7 +67,7 @@
             @update:selected="onUpdateSelectedAreas"
             @requestCount="debouncedRequestCount"
           />
-          <div class="nearby-toggle">
+          <div v-if="SHOW_INCLUDE_NEARBY" class="nearby-toggle">
             <el-checkbox v-model="includeNearby" @change="handleIncludeNearbyChange">
               {{ searchNearbyLabel }}
             </el-checkbox>
@@ -210,6 +210,9 @@ import { useRouter, useRoute } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
 
+// 中文注释：特性开关——控制“包含周边区域”UI 与透传是否启用（隐藏但保留代码，便于以后启用）
+const SHOW_INCLUDE_NEARBY = false
+
 // 组件属性
 const props = defineProps({
   modelValue: {
@@ -344,7 +347,7 @@ const buildQueryFromFilters = (filterParams) => {
   if (filterParams.isFurnished === true) q.isFurnished = '1'
   put('suburb', filterParams.suburb)
   put('postcodes', filterParams.postcodes)
-  put('include_nearby', includeNearby.value ? '1' : '0')
+  if (SHOW_INCLUDE_NEARBY) put('include_nearby', includeNearby.value ? '1' : '0')
   return q
 }
 
@@ -430,7 +433,7 @@ const applyQueryToState = (query, store) => {
       }
     }
     // include_nearby
-    if (typeof query.include_nearby !== 'undefined') {
+    if (SHOW_INCLUDE_NEARBY && typeof query.include_nearby !== 'undefined') {
       includeNearby.value =
         String(query.include_nearby) === '1' || String(query.include_nearby) === 'true'
     }
@@ -620,7 +623,9 @@ const updateFilteredCount = async () => {
     filterParams.postcodes = selectedPostcodes.join(',')
   }
   // include_nearby 作为透传参数（后端未识别时无副作用）
-  filterParams.include_nearby = includeNearby.value ? '1' : '0'
+  if (SHOW_INCLUDE_NEARBY) {
+    filterParams.include_nearby = includeNearby.value ? '1' : '0'
+  }
 
   // 移除 null 值
   Object.keys(filterParams).forEach((key) => {
@@ -712,8 +717,10 @@ const applyFiltersToStore = async () => {
     if (selectedPostcodes.length > 0) {
       filterParams.postcodes = selectedPostcodes.join(',')
     }
-    // include_nearby 透传
-    filterParams.include_nearby = includeNearby.value ? '1' : '0'
+    // include_nearby 透传（特性开关）
+    if (SHOW_INCLUDE_NEARBY) {
+      filterParams.include_nearby = includeNearby.value ? '1' : '0'
+    }
 
     await propertiesStore.applyFilters(filterParams)
     emit('filtersChanged', filterParams)

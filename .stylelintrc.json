@@ -26,19 +26,12 @@
       }
     },
     {
-      "files": [
-        "vue-frontend/src/components/filter-panels/**/*.vue",
-        "vue-frontend/src/components/FilterPanel.vue",
-        "vue-frontend/src/components/SearchOverlay.vue",
-        "vue-frontend/src/views/PropertyDetail.vue",
-        "vue-frontend/src/components/PropertyCard.vue",
-        "vue-frontend/src/components/SearchBar.vue"
-      ],
+      "files": ["vue-frontend/src/**/*.vue"],
       "rules": {
         "color-no-hex": [true, { "severity": "warning" }],
         "color-named": ["never", { "severity": "warning" }],
         "scale-unlimited/declaration-strict-value": [
-          ["/color/", "fill", "stroke"],
+          ["/color/", "fill", "stroke", "background", "background-color", "border", "border-color", "box-shadow", "outline", "outline-color"],
           { "ignoreValues": ["transparent", "currentColor", "currentcolor", "inherit", "none"] }
         ]
       }

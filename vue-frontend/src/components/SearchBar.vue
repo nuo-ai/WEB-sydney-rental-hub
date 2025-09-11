@@ -591,7 +591,7 @@ watch(
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--color-bg-card);
   border: none;
   border-radius: 8px;
   box-shadow: var(--shadow-lg);
@@ -633,8 +633,8 @@ watch(
   padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--filter-chip-radius);
-  background: #e9eef2; /* 提升与浅色输入框的对比度 */
-  color: #3c475b; /* 深一点的中性蓝灰，增强可读性 */
+  background: var(--chip-bg);
+  color: var(--color-text-primary);
   font-size: var(--filter-chip-font-size);
   font-weight: var(--filter-chip-font-weight);
   line-height: 1;
@@ -653,16 +653,16 @@ watch(
 }
 
 .inline-chip-more {
-  color: #3c475b;
-  background: #e9eef2;
+  color: var(--color-text-primary);
+  background: var(--chip-bg);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--filter-chip-radius);
 }
 /* Hover 态轻微加深，保持中性风格 */
 .inline-chip:hover,
 .inline-chip-more:hover {
-  background: #dee6ee;
-  color: #3c475b;
+  background: var(--chip-bg-hover);
+  color: var(--color-text-primary);
 }
 
 /* 移除按钮：仅按钮可点击，避免误拦截输入 */
@@ -671,7 +671,7 @@ watch(
   margin-left: 6px;
   border: none;
   background: transparent;
-  color: #667085;
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
