@@ -48,13 +48,25 @@
 
       <!-- 标题区：面包屑 / H1 / 操作行（390 视口对齐参考站） -->
       <div class="container title-block">
-        <nav class="breadcrumbs">Home › NSW › {{ suburb || '—' }}</nav>
+        <nav class="breadcrumbs">
+          <template v-if="isMultiSelect">
+            首页/ NSW
+          </template>
+          <template v-else>
+            首页 › NSW › {{ suburb || '—' }}
+          </template>
+        </nav>
 
         <h1 class="page-h1">
-          {{ propertiesStore.totalCount }} Properties for rent in {{ suburb || 'Sydney' }}, NSW<span
-            v-if="postcode"
-            >, {{ postcode }}</span
-          >
+          <template v-if="isMultiSelect">
+            {{ propertiesStore.totalCount }} 套房源，覆盖及周边 {{ selectedLocationsCount }} 个郊区
+          </template>
+          <template v-else-if="hasSingleSelection">
+            {{ propertiesStore.totalCount }} 套房源在 {{ suburb || 'Sydney' }}, NSW
+          </template>
+          <template v-else>
+            {{ propertiesStore.totalCount }} 套待租房源在 {{ suburb || 'Sydney' }}, NSW<span v-if="postcode">, {{ postcode }}</span>
+          </template>
         </h1>
 
         <div class="actions-row">
@@ -233,6 +245,15 @@ const postcode = computed(() => {
   }
   return ''
 })
+
+// 选择状态：用于标题与面包屑的前端表现
+// 说明：统一在前端用选择数量来判断“单选/多选”，避免依赖 store 内部实现细节
+const selectedLocationsCount = computed(() => {
+  const list = propertiesStore.selectedLocations
+  return Array.isArray(list) ? list.length : 0
+})
+const hasSingleSelection = computed(() => selectedLocationsCount.value === 1)
+const isMultiSelect = computed(() => selectedLocationsCount.value > 1)
 
 // 定义事件发射器
 const emit = defineEmits(['updateNavVisibility'])

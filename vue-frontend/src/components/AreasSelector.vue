@@ -343,9 +343,6 @@ watch(
   border-radius: 6px;
 }
 
-.group {
-  /* 分组容器 */
-}
 
 .group-title {
   position: sticky;
