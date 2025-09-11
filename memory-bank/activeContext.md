@@ -2,6 +2,9 @@
 最后更新：2025-09-11
 
 今日快照（精简版，≤10行）
+- ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE：全站导航/首页/个人中心图标统一 lucide-vue-next + currentColor；移除 Font Awesome 引用；导航数据结构加入 iconComp；Logo 改 Home 图标；Profile 标签与按钮统一图标尺寸类。前端表现：图标风格统一，颜色随文字色继承，中性化，主题切换更稳。溯源：commit fe8f012..2a9dd4d
+- TOKENS-DEPRECATE-NOTES：在 assets/design-tokens.css 为 --color-accent/--font-size-base/--spacing-lg 增加 @deprecated 注释与替代建议（仅注释，零视觉改动）。前端表现：无变化。溯源：commit fe8f012..2a9dd4d
+- FALLBACK-SCAN-ZERO：全局扫描运行代码 var(--token, #/rgb/rgba) 兜底为 0；令牌定义入口豁免。前端表现：主题/深浅底切换不再出现顽固色。溯源：commit fe8f012..2a9dd4d
 - PAGE-TOKENS+SCAFFOLD+STYLELINT-GUARD+SEARCHBAR-TOKENIZED：新增页面级令牌与标准页面样板；Stylelint 扩至 src/**/*.vue 强制 var(--*)；SearchBar 首轮令牌化（chips/白底/hover 统一 tokens）。前端表现：新增页面结构节奏一致、搜索入口与筛选标签中性灰一致；可回滚。溯源：commit 5164a36..fe8f012
 - GUARDRAIL-COLOR-CLEANUP：移除 SearchOverlay 颜色兜底 var(--color-text-secondary, #6b7280) → var(--color-text-secondary)，零视觉改动，令牌合规收尾。（前端表现：文字仍为中性次级灰，无任何 UI 变化）
 - PROPERTYDETAIL-TOKENS-FINAL-P0：详情页 P0 收尾（价格/CTA/间距/地图占位等统一令牌；移除 color-accent/font-size-base/spacing-*；无逻辑改动）。溯源：commit f201a24..07805ab

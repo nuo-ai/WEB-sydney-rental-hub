@@ -706,7 +706,7 @@ header nav a svg,
 .bottom-nav a svg,
 [class*='nav'] a svg {
   color: currentColor !important;
-  fill: currentColor;
+  fill: none;
   stroke: currentColor;
 }
 
@@ -1483,6 +1483,14 @@ header nav .el-menu-item:hover,
   letter-spacing: -0.01em;
 }
 
+:root {
+  --spec-icon-size: 24px;
+  --spec-text-size: 16px;
+  --spec-line-height: 24px;
+  --spec-icon-gap: 6px;
+  --spec-item-gap: 10px;
+}
+
 /* 房型规格统一样式（bed/bath/car） */
 .spec-row {
   display: flex;
@@ -1497,7 +1505,7 @@ header nav .el-menu-item:hover,
 
 /* 单元与单元之间的水平间距：10px */
 .spec-item + .spec-item {
-  margin-left: 10px;
+  margin-left: var(--spec-item-gap);
 }
 
 /* 规范化图标在 24x24 视觉框内居中 */
@@ -1507,10 +1515,10 @@ header nav .el-menu-item:hover,
 .spec-item .far,
 .spec-item .fa-solid,
 .spec-item .el-icon {
-  width: 24px;
-  height: 24px;
-  font-size: 24px;
-  line-height: 24px;
+  width: var(--spec-icon-size);
+  height: var(--spec-icon-size);
+  font-size: var(--spec-icon-size);
+  line-height: var(--spec-line-height);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1518,9 +1526,9 @@ header nav .el-menu-item:hover,
 
 /* 文本 16px，且与图标之间 6px */
 .spec-item .spec-text {
-  font-size: 16px;
-  line-height: 24px;
-  margin-left: 6px;
+  font-size: var(--spec-text-size);
+  line-height: var(--spec-line-height);
+  margin-left: var(--spec-icon-gap);
 }
 
 /* === 房型规格 - 在 spec-row 场景下强覆盖，确保 24/16 与 6/10 生效 === */
@@ -1529,7 +1537,7 @@ header nav .el-menu-item:hover,
   gap: 0 !important;
 } /* 避免与 margin-left 叠加导致间距变宽 */
 .spec-row .spec-item + .spec-item {
-  margin-left: 10px !important;
+  margin-left: var(--spec-item-gap) !important;
 } /* 单元与单元间 10px */
 
 .spec-row .spec-item .spec-icon,
@@ -1538,10 +1546,10 @@ header nav .el-menu-item:hover,
 .spec-row .spec-item .far,
 .spec-row .spec-item .fa-solid,
 .spec-row .spec-item .el-icon {
-  width: 24px !important;
-  height: 24px !important;
-  font-size: 24px !important;
-  line-height: 24px !important;
+  width: var(--spec-icon-size) !important;
+  height: var(--spec-icon-size) !important;
+  font-size: var(--spec-icon-size) !important;
+  line-height: var(--spec-line-height) !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1549,20 +1557,20 @@ header nav .el-menu-item:hover,
 
 /* 文本 16px，且与图标之间 6px */
 .spec-row .spec-item .spec-text {
-  font-size: 16px !important;
-  line-height: 24px !important;
-  margin-left: 6px !important;
+  font-size: var(--spec-text-size) !important;
+  line-height: var(--spec-line-height) !important;
+  margin-left: var(--spec-icon-gap) !important;
 }
 
 /* 兜底：若有历史选择器直接作用于 i/span，这里强行提回规范 */
 .spec-row .spec-item i {
-  font-size: 24px !important;
-  width: 24px !important;
-  height: 24px !important;
-  line-height: 24px !important;
+  font-size: var(--spec-icon-size) !important;
+  width: var(--spec-icon-size) !important;
+  height: var(--spec-icon-size) !important;
+  line-height: var(--spec-line-height) !important;
 }
 .spec-row .spec-item span {
-  font-size: 16px !important;
+  font-size: var(--spec-text-size) !important;
 }
 /* === end === */
 .spec-item {

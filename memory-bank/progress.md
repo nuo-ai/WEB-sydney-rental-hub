@@ -5,6 +5,12 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-11｜ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE  
+  全站导航/首页/个人中心图标统一 lucide-vue-next + currentColor；移除 Font Awesome；导航加入 iconComp；Logo 改 Home 图标；Profile 标签与按钮统一尺寸类。前端表现：图标风格统一、颜色随文字继承。｜溯源：commit fe8f012..2a9dd4d
+- 2025-09-11｜TOKENS-DEPRECATE-NOTES  
+  在 assets/design-tokens.css 为 --color-accent/--font-size-base/--spacing-lg 添加 @deprecated 注释与替代建议（仅注释，零视觉改动）。｜溯源：commit fe8f012..2a9dd4d
+- 2025-09-11｜FALLBACK-SCAN-ZERO  
+  运行代码内 var(--token, #/rgb/rgba) 兜底为 0，令牌定义入口豁免；主题/深浅底更稳。｜溯源：commit fe8f012..2a9dd4d
 - 2025-09-11｜PAGE-TOKENS+SCAFFOLD+STYLELINT-GUARD+SEARCHBAR-TOKENIZED  
   新增 page-tokens.css 并全局引入，提供页面骨架/间距/动效基线；新增 _PageScaffoldExample.vue 标准样板；Stylelint 规则覆盖 color/background/border/fill/stroke/box-shadow/outline 强制 var(--*)；SearchBar 首批等价替换（chips/hover/白底/弱文案）。前端表现：新增页面结构统一、搜索入口与筛选标签风格一致，中性色体系无离散；可回滚。｜溯源：commit 5164a36..fe8f012
 - 2025-09-10｜LIST-CARD-PRICE-UNIFY  

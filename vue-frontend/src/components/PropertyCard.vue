@@ -510,7 +510,20 @@ const handleMoreAction = (command) => {
 .property-features {
   display: flex;
   align-items: center;
-  gap: 16px;
+  /* 中文注释：统一房型图标尺寸与间距，通过变量便于全局调参（前端表现：更紧凑、更对齐） */
+  /* 覆写全局 spec-* 变量，生效于本卡片 */
+  --spec-icon-size: 18px;       /* 图标尺寸 */
+  --spec-text-size: 14px;       /* 数字字号 */
+  --spec-line-height: 18px;     /* 行高与图标对齐 */
+  --spec-item-gap: 12px;        /* 三项之间的水平间距 */
+  --spec-icon-gap: 6px;         /* 图标与数字之间的间距 */
+
+  /* 兼容旧的 amenity 变量（保留以便回滚/参考，不参与最终计算） */
+  --amenity-icon-size: 18px;    /* 图标视觉尺寸 */
+  --amenity-item-gap: 12px;     /* 三项之间的水平间距 */
+  --amenity-icon-gap: 6px;      /* 图标与数字之间的间距 */
+
+  gap: 0; /* 间距交由 .spec-row 的 margin-left 控制，避免与 gap 叠加 */
   margin-bottom: 12px;
   color: var(--color-text-secondary);
 }
@@ -518,7 +531,17 @@ const handleMoreAction = (command) => {
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--amenity-icon-gap); /* 图标与数字间距 */
+}
+
+.feature-item .spec-icon {
+  width: var(--amenity-icon-size);
+  height: var(--amenity-icon-size);
+  flex: 0 0 auto; /* 避免被压缩导致光学不一致 */
+}
+
+.feature-item .spec-text {
+  line-height: 1; /* 数字与图标基线对齐，前端表现更稳 */
 }
 
 .feature-item span {
