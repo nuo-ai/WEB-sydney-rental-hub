@@ -9,6 +9,10 @@
           role="dialog"
           aria-modal="true"
           @click.stop
+          @mouseenter="$emit('panel-mouse-enter')"
+          @mouseleave="$emit('panel-mouse-leave')"
+          @focusin="$emit('panel-focus-in')"
+          @focusout="$emit('panel-focus-out')"
           tabindex="-1"
         >
           <div class="filter-dropdown-content">
@@ -56,7 +60,14 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue', 'close'])
+const emit = defineEmits([
+  'update:modelValue',
+  'close',
+  'panel-mouse-enter',
+  'panel-mouse-leave',
+  'panel-focus-in',
+  'panel-focus-out',
+])
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -355,12 +366,12 @@ onUnmounted(() => {
   overscroll-behavior: contain; /* 防止滚动穿透 */
 }
 
-/* 中文注释：过渡动画 */
+/* 中文注释：过渡动画 - 缩短至0.08s匹配快速悬停交互 */
 .dropdown-fade-enter-active,
 .dropdown-fade-leave-active {
   transition:
-    opacity 0.2s,
-    transform 0.2s;
+    opacity 0.08s,
+    transform 0.08s;
 }
 
 .dropdown-fade-enter-from,
