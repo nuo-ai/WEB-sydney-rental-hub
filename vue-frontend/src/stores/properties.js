@@ -2,6 +2,7 @@
 
 import { defineStore } from 'pinia'
 import { propertyAPI, locationAPI } from '@/services/api'
+import { canonicalizeArea, canonicalIdOf } from '@/utils/areas'
 
 // 特性开关：V2 参数映射（默认关闭以保持向后兼容）
 // 说明：开启后将把前端筛选状态映射为统一的后端白名单参数（suburbs/price_min/...）
@@ -508,7 +509,8 @@ export const usePropertiesStore = defineStore('properties', {
           }
         }
 
-        // 写入缓存
+        // 在写入缓存前做规范化，保证 id/type 一致
+        list = Array.isArray(list) ? list.map((n) => canonicalizeArea(n)).filter(Boolean) : []
         this.areasCache = { list, ts: now }
         return list
       } catch {
@@ -739,20 +741,28 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 设置选中的区域
     setSelectedLocations(locations) {
-      this.selectedLocations = locations
+      const arr = Array.isArray(locations) ? locations.map((l) => canonicalizeArea(l)).filter(Boolean) : []
+      const map = new Map()
+      for (const a of arr) {
+        if (a && a.id && !map.has(a.id)) map.set(a.id, a)
+      }
+      this.selectedLocations = Array.from(map.values())
     },
 
     // 添加选中区域
     addSelectedLocation(location) {
-      const existingIndex = this.selectedLocations.findIndex((loc) => loc.id === location.id)
+      const a = canonicalizeArea(location)
+      if (!a || !a.id) return
+      const existingIndex = this.selectedLocations.findIndex((loc) => canonicalIdOf(loc) === a.id)
       if (existingIndex === -1) {
-        this.selectedLocations.push(location)
+        this.selectedLocations.push(a)
       }
     },
 
     // 移除选中区域
     removeSelectedLocation(locationId) {
-      this.selectedLocations = this.selectedLocations.filter((loc) => loc.id !== locationId)
+      const targetId = String(locationId)
+      this.selectedLocations = this.selectedLocations.filter((loc) => canonicalIdOf(loc) !== targetId)
     },
 
     // 添加收藏

@@ -100,6 +100,7 @@
 
 import { ref, computed, onMounted, watch } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
+import { canonicalizeArea, canonicalIdOf } from '@/utils/areas'
 
 const props = defineProps({
   // 由父组件（FilterPanel）传入当前已选区域数组（store.selectedLocations）
@@ -119,47 +120,10 @@ const keyword = ref('')
 
 const placeholderText = '搜索区域'
 
-// 归一化：将任意后端/服务返回的区域对象，转为 store.selectedLocations 规范
-const normalizeArea = (raw) => {
-  if (!raw) return null
-  const name =
-    (typeof raw.name === 'string' && raw.name) ||
-    (typeof raw.suburb === 'string' && raw.suburb) ||
-    (typeof raw.label === 'string' && raw.label) ||
-    (raw.postcode ? String(raw.postcode) : '')
 
-  const postcode = raw.postcode
-    ? String(Math.floor(raw.postcode))
-    : raw.code
-      ? String(raw.code)
-      : raw.postcode_str
-        ? String(raw.postcode_str)
-        : ''
-
-  // 判定类型：明确给出 postcode/type 的优先，其次通过正则判断
-  const isPostcode =
-    raw.type === 'postcode' ||
-    (/^\d{4}$/.test(String(raw.name || '')) && !raw.suburb) ||
-    (/^\d{4}$/.test(postcode) && !name)
-
-  const type = isPostcode ? 'postcode' : raw.type || 'suburb'
-
-  const id = raw.id || (type === 'postcode' ? `postcode_${postcode}` : `suburb_${name}`)
-
-  const fullName = type === 'postcode' ? postcode : postcode ? `${name} NSW ${postcode}` : name
-
-  return {
-    id,
-    type,
-    name,
-    postcode,
-    fullName,
-  }
-}
-
-// 显示名称：postcode 用邮编，suburb 用全名（含NSW/邮编，若有）
+/* 显示名称：统一基于规范化对象，postcode 用邮编，suburb 用全名（含 NSW/邮编，若有） */
 const displayName = (raw) => {
-  const a = normalizeArea(raw)
+  const a = canonicalizeArea(raw)
   if (!a) return ''
   return a.type === 'postcode' ? a.postcode || a.name : a.fullName || a.name
 }
@@ -167,14 +131,12 @@ const displayName = (raw) => {
 // A→Z 分组 + 关键字过滤
 const filteredAreas = computed(() => {
   const kw = keyword.value.trim().toLowerCase()
-  // 中文注释：移除所有邮编，仅保留 suburb
-  const source = allAreas.value.filter((raw) => {
-    const a = normalizeArea(raw)
-    return a && a.type !== 'postcode'
-  })
+  // 先做规范化再过滤，仅保留 suburb
+  const source = (allAreas.value || [])
+    .map((raw) => canonicalizeArea(raw))
+    .filter((a) => a && a.type !== 'postcode')
   if (!kw) return source
-  return source.filter((raw) => {
-    const a = normalizeArea(raw)
+  return source.filter((a) => {
     const text = [a?.name, a?.fullName].filter(Boolean).join(' ').toLowerCase()
     return text.includes(kw)
   })
@@ -186,22 +148,17 @@ const grouped = computed(() => {
     const c = (a?.name || a?.fullName || a?.postcode || '').toString().charAt(0).toUpperCase()
     return /^[A-Z]$/.test(c) ? c : '#'
   }
-  for (const raw of filteredAreas.value) {
-    const a = normalizeArea(raw)
+  for (const a of filteredAreas.value) {
     if (!a) continue
     const L = getLetter(a)
     if (!groups.has(L)) groups.set(L, [])
-    groups.get(L).push(raw)
+    groups.get(L).push(a)
   }
   const arr = Array.from(groups.entries())
     .sort((x, y) => (x[0] === '#' ? 1 : y[0] === '#' ? -1 : x[0].localeCompare(y[0])))
     .map(([letter, items]) => ({
       letter,
-      items: items.sort((r1, r2) => {
-        const a1 = normalizeArea(r1)
-        const a2 = normalizeArea(r2)
-        return (a1?.name || '').localeCompare(a2?.name || '')
-      }),
+      items: items.sort((a1, a2) => (a1?.name || '').localeCompare(a2?.name || '')),
     }))
   return arr
 })
@@ -211,21 +168,21 @@ const onSearch = () => {
 }
 
 const areaKey = (raw) => {
-  const a = normalizeArea(raw)
-  return a?.id || JSON.stringify(a)
+  const id = canonicalIdOf(raw)
+  return id || JSON.stringify(raw)
 }
 
 const isSelected = (raw) => {
-  const a = normalizeArea(raw)
+  const a = canonicalizeArea(raw)
   if (!a) return false
-  return (props.selected || []).some((s) => s.id === a.id)
+  return (props.selected || []).some((s) => canonicalIdOf(s) === a.id)
 }
 
 const toggle = (raw) => {
-  const a = normalizeArea(raw)
+  const a = canonicalizeArea(raw)
   if (!a) return
   const curr = Array.isArray(props.selected) ? [...props.selected] : []
-  const idx = curr.findIndex((s) => s.id === a.id)
+  const idx = curr.findIndex((s) => canonicalIdOf(s) === a.id)
   if (idx >= 0) {
     curr.splice(idx, 1)
   } else {
@@ -245,12 +202,9 @@ const ensureAreasLoaded = async () => {
   try {
     loading.value = true
     const list = await store.getAllAreas?.()
-    // 中文注释：加载后即过滤掉所有邮编，仅保留 suburb
+    // 加载后统一规范化并过滤掉邮编，仅保留 suburb
     allAreas.value = Array.isArray(list)
-      ? list.filter((raw) => {
-          const a = normalizeArea(raw)
-          return a && a.type !== 'postcode'
-        })
+      ? list.map((raw) => canonicalizeArea(raw)).filter((a) => a && a.type !== 'postcode')
       : []
   } catch {
     allAreas.value = []
