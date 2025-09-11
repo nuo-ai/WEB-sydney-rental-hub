@@ -693,14 +693,40 @@ const handleAuthSuccess = () => {
   handleSeeTravelTimes()
 }
 
-// 获取可用日期显示
+/* 中文注释：统一“空出日期”前端表现与列表一致
+   规则：
+   - 无日期（缺失/空串） → 显示“立即入住”
+   - 日期 ≤ 今天        → 显示“立即入住”
+   - 无效日期字符串     → 显示“待定”
+   - 其余（未来日期）    → 按中文完整日期显示
+   兼容：若后端详情使用驼峰 availableDate，则做一次回退读取 */
 const getAvailableDate = () => {
-  if (!property.value || !property.value.available_date) {
+  const p = property.value
+  if (!p) return t('propertyDetail.dateTBD')
+
+  // 兼容别名 availableDate，并清理空白
+  const raw = (p.available_date ?? p.availableDate ?? '').toString().trim()
+
+  // 与列表卡片规则对齐：无日期 → 立即入住
+  if (!raw) {
+    return '立即入住'
+  }
+
+  const d = new Date(raw)
+  // 无效日期字符串 → 待定（避免显示 Invalid Date）
+  if (isNaN(d.getTime())) {
     return t('propertyDetail.dateTBD')
   }
-  const date = new Date(property.value.available_date)
+
+  // 与列表一致：日期 ≤ 今天 → 立即入住
+  const today = new Date()
+  if (d <= today) {
+    return '立即入住'
+  }
+
+  // 未来日期 → 中文完整日期
   const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
-  return date.toLocaleDateString('zh-CN', options)
+  return d.toLocaleDateString('zh-CN', options)
 }
 
 // 预加载下一张图片
