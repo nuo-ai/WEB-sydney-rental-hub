@@ -106,18 +106,18 @@
             </div>
 
             <!-- 房源特征 -->
-            <div class="property-features">
-              <div class="feature-item">
+            <div class="property-features spec-row">
+              <div class="feature-item spec-item">
                 <BedDouble class="spec-icon" />
-                <span>{{ property.bedrooms || 0 }}</span>
+                <span class="spec-text">{{ property.bedrooms || 0 }}</span>
               </div>
-              <div class="feature-item">
+              <div class="feature-item spec-item">
                 <Bath class="spec-icon" />
-                <span>{{ property.bathrooms || 0 }}</span>
+                <span class="spec-text">{{ property.bathrooms || 0 }}</span>
               </div>
-              <div class="feature-item">
+              <div class="feature-item spec-item">
                 <CarFront class="spec-icon" />
-                <span>{{ property.parking_spaces || 0 }}</span>
+                <span class="spec-text">{{ property.parking_spaces || 0 }}</span>
               </div>
             </div>
 
@@ -1274,29 +1274,29 @@ onBeforeRouteLeave(() => {
 .property-features {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px; /* 图标行到“可入住/押金” 24 */
+  /* 中文注释：详情页复用全局规格变量，保持与列表卡片一致（前端表现更紧凑、对齐） */
+  --spec-icon-size: 18px;     /* 图标尺寸 */
+  --spec-text-size: 14px;     /* 数字字号 */
+  --spec-line-height: 18px;   /* 数字与图标基线贴合 */
+  --spec-item-gap: 12px;      /* 三项之间的水平间距 */
+  --spec-icon-gap: 6px;       /* 图标与数字之间的间距 */
+  gap: 0; /* 间距交由 .spec-row 的 margin-left 控制，避免与 gap 叠加 */
+  margin-bottom: 12px; /* 与列表卡片一致：12px */
   color: var(--color-text-secondary);
 }
 
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0; /* 由全局 .spec-row/.spec-item 变量控制细节间距 */
 }
 
-.feature-item i {
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-}
+/* 移除本地对图标尺寸的硬编码，交由全局 spec 变量控制 */
 
+/* 本地仅保留颜色与字重，字号交由全局 spec 变量控制 */
 .feature-item span {
   color: var(--color-text-primary);
   font-weight: 600;
-  font-size: 16px;
 }
 
 .feature-type {
