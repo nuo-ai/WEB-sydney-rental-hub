@@ -447,6 +447,15 @@ watch(
 .search-bar-container {
   position: relative;
   width: 100%;
+
+  /* 中文注释：搜索栏变量接入 page-tokens 语义令牌；优先读令牌，保留兜底 */
+  --search-height: var(--search-h-desk, 44px);
+  --search-height-mob: var(--search-h-mob, 44px);
+  --sb-padding-x: var(--search-padding-x, 12px);
+  --sb-radius: var(--search-radius, 6px);
+  --search-icon-size: var(--search-icon, 16px);
+  --filter-chip-radius: var(--search-chip-radius, 16px);
+  --filter-chip-gap: var(--search-chip-gap, 8px);
 }
 
 /* 区域标签样式 */
@@ -510,9 +519,11 @@ watch(
 
 .search-input :deep(.el-input__wrapper) {
   position: relative; /* 作为绝对定位锚点，保证按钮贴右且不遮挡文字 */
-  border-radius: 2px;
+  border-radius: var(--sb-radius);
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
+  height: var(--search-height);
+  min-height: var(--search-height);
 
   /* 右侧不再预留筛选按钮空间，保持与输入内边距一致 */
   padding-right: var(--search-suffix-right, 12px);
@@ -530,8 +541,8 @@ watch(
 
 .search-icon {
   color: var(--color-text-secondary);
-  width: 16px;
-  height: 16px;
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
 }
 
 /* 说明：控制后缀区域的右内边距，确保图标距输入框右边界为 12px */
@@ -865,9 +876,9 @@ watch(
   .search-input :deep(.el-input__wrapper) {
     cursor: pointer; /* 指示可点击 */
     transition: background-color 0.2s ease;
-    height: 60px;
-    min-height: 60px;
-    padding-right: 12px; /* 移动端无后缀按钮，不再预留额外空间 */
+    height: var(--search-height-mob);
+    min-height: var(--search-height-mob);
+    padding-right: var(--search-suffix-right, 12px); /* 移动端无后缀按钮，不再预留额外空间 */
   }
 
   .search-input :deep(.el-input__wrapper:active) {
@@ -875,8 +886,8 @@ watch(
   }
 
   .search-input :deep(.el-input__inner) {
-    height: 60px;
-    line-height: 60px;
+    height: var(--search-height-mob);
+    line-height: var(--search-height-mob);
   }
 
   /* 移动端彻底隐藏后缀容器，避免任何残留占位 */

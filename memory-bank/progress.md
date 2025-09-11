@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-11｜SPEC-ROW-UNIFY-LIST+DETAIL  
+  全局引入规格变量 --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap 并变量化全局规则；列表与详情接入 spec-row/spec-item/spec-text，局部容器覆写为 18/14/18/6/12；移除局部硬编码尺寸；详情垂直间距统一为 12px。前端表现：列表与详情的“图标+数字”行在尺寸与横向间距完全一致。｜溯源：commit 5b7254c..25ff698
 - 2025-09-11｜ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE  
   全站导航/首页/个人中心图标统一 lucide-vue-next + currentColor；移除 Font Awesome；导航加入 iconComp；Logo 改 Home 图标；Profile 标签与按钮统一尺寸类。前端表现：图标风格统一、颜色随文字继承。｜溯源：commit fe8f012..2a9dd4d
 - 2025-09-11｜TOKENS-DEPRECATE-NOTES  

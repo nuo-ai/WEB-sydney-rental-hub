@@ -127,6 +127,41 @@ python scripts/run_backend.py  # localhost:8000
   - jsconfig.json 增加 "baseUrl": "." 并标准化 "@/*": ["src/*"]，与 Vite alias 一致
 - 溯源：commit 5164a36..fe8f012
 
+## 规格行（spec-row/spec-item/spec-text）变量与用法（2025-09-11）
+
+- 全局变量（src/style.css :root，提供默认值，允许局部覆写）
+  - --spec-icon-size: 24px
+  - --spec-text-size: 16px
+  - --spec-line-height: 24px
+  - --spec-icon-gap: 6px      /* 图标 ↔ 数字 */
+  - --spec-item-gap: 10px     /* 项目 ↔ 项目 */
+
+- 全局规则（保留有限 !important 作为历史兜底，不阻止“就近变量覆写”）
+  - .spec-row .spec-item + .spec-item { margin-left: var(--spec-item-gap) !important; }
+  - .spec-row .spec-item .spec-icon { width/height/line-height/font-size 使用 --spec-* 变量（带 !important） }
+  - .spec-row .spec-item .spec-text { font-size/line-height/margin-left 使用 --spec-* 变量（带 !important） }
+  - 组件容器自身 gap 应设为 0，避免与相邻项 margin-left 叠加导致间距过宽。
+
+- 容器就近覆写（与列表/详情当前实现一致）
+  - 在容器（如 .property-features）内设置：
+    --spec-icon-size: 18px;
+    --spec-text-size: 14px;
+    --spec-line-height: 18px;
+    --spec-item-gap: 12px;
+    --spec-icon-gap: 6px;
+  - 同时将容器 gap: 0；由 .spec-row 的 margin-left 统一控制横向间距。
+  - 数字元素需使用 .spec-text 类，以启用“图标↔数字间距”的变量化规则。
+
+- 文件与落地
+  - 全局：vue-frontend/src/style.css（新增变量与变量化全局规范）
+  - 列表卡：vue-frontend/src/components/PropertyCard.vue（容器就近覆写 18/14/18/6/12）
+  - 详情页：vue-frontend/src/views/PropertyDetail.vue（引入 spec-row/spec-item/spec-text；容器就近覆写一致；垂直间距统一为 12px）
+
+- 前端表现
+  - 列表与详情的“图标 + 数字”行在尺寸与横向间距完全一致：icon 18px、数字 14px、图标↔数字 6px、项目↔项目 12px、行下间距 12px。
+
+- 溯源：commit 5b7254c..25ff698
+
 ## 运行与集成增补（2025-09-06）
 
 - 部署（Netlify）配置

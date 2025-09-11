@@ -170,6 +170,29 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - **迁移状态**: 进行中；允许过渡期例外，不作为阻断项。
 - **迁移策略**: 对既有页面按需增量迁移，跨页面替换须评审；临时替换为其它图标库仅作为应急措施，修复后需恢复为 lucide。
 
+## 规格行（spec-row/spec-item/spec-text）与变量驱动（新增）
+
+- 目的：统一“图标 + 数字”信息行的尺寸与间距，避免局部硬编码导致视觉不一致（前端表现一致、可就地调参）。
+- 结构类：
+  - .spec-row：整行容器，横向排列；项目间距通过“相邻项 margin-left”提供。
+  - .spec-item：单元容器；内部 gap 置 0，避免与 margin 叠加。
+  - .spec-text：数字文本；用于触发“图标↔数字间距”与行高规则。
+- 全局变量（:root 定义，允许局部容器就近覆写）：
+  - --spec-icon-size（默认 24px）
+  - --spec-text-size（默认 16px）
+  - --spec-line-height（默认 24px）
+  - --spec-icon-gap（默认 6px，图标↔数字）
+  - --spec-item-gap（默认 10px，项目↔项目）
+- 规则：
+  - 横向间距来源统一：.spec-row .spec-item + .spec-item { margin-left: var(--spec-item-gap) }；
+    组件容器自身 gap 应设为 0，防止与 margin-left 相加导致过宽。
+  - 全局规则可带 !important 作为历史兜底，但不阻止“变量就近覆写”在容器内生效。
+  - 禁止在局部硬编码 i/span 的尺寸；应通过变量或在数字上添加 .spec-text。
+- 推荐覆写（当前列表/详情已采用）：
+  - 容器（如 .property-features）内设置：
+    --spec-icon-size: 18px; --spec-text-size: 14px; --spec-line-height: 18px; --spec-item-gap: 12px; --spec-icon-gap: 6px;
+- 溯源：commit 5b7254c..25ff698（PropertyCard / PropertyDetail 对齐统一）
+
 ## 计数器徽标（Pill/Badge）统一模式
 
 - 原则：计数器应在不同位数（单位数/双位数/99+）下保持布局稳定，不产生横向抖动；组件为“非交互”视觉，不响应 hover。
