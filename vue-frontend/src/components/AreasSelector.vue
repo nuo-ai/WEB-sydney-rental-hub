@@ -232,7 +232,7 @@ watch(
 <style scoped>
 .areas-selector {
   margin-top: 10px;
-  border-top: 1px solid var(--filter-color-border-default);
+  /* 简化：去掉头部与列表之间的横线分隔 */
   padding-top: 10px;
 }
 
@@ -328,7 +328,7 @@ watch(
   max-height: 280px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--filter-color-border-default);
+  border: none; /* 简化：移除外框横线 */
   border-radius: 6px;
   background: var(--filter-color-bg-primary);
 }
@@ -345,16 +345,7 @@ watch(
 
 
 .group-title {
-  position: sticky;
-  top: 0;
-  background: var(--filter-group-title-bg);
-  z-index: 2;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--filter-color-text-primary);
-  border-bottom: 1px solid var(--filter-group-title-border);
-  letter-spacing: 0.025em;
+  display: none; /* 简化：隐藏 A/B/C… 分组标题 */
 }
 
 .group-list {
@@ -364,7 +355,7 @@ watch(
 }
 
 .area-item {
-  border-bottom: 1px solid var(--filter-color-border-subtle);
+  border-bottom: none; /* 简化：移除每条之间的横线 */
   transition: background-color 0.15s ease;
 }
 

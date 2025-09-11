@@ -348,11 +348,13 @@ const applyFilters = async () => {
 /* 面板内容 */
 .panel-content {
   padding: 16px;
+  padding-bottom: 96px; /* 中文注释：为吸底按钮预留滚动空间，避免内容被覆盖或“差一点点看不全” */
+  /* 中文注释：滚动由外层 FilterDropdown 的 .filter-dropdown-content 承担，避免嵌套滚动导致 sticky 裁切 */
+}
 
-  /* 中文注释：主体可滚动，底部按钮 sticky 常驻 */
-  max-height: calc(100vh - 160px);
-  overflow: auto;
-  overscroll-behavior: contain;
+/* 中文注释：为外层滚动容器预留底部空间，确保 sticky 底部按钮完全可见，不被裁切 */
+:deep(.filter-dropdown-content) {
+  padding-bottom: 80px; /* 约等于按钮区高度 + 间距；若按钮尺寸有调整可微调该值 */
 }
 
 /* 区域列表样式 */
@@ -553,6 +555,7 @@ const applyFilters = async () => {
   background: var(--color-bg-card);
   padding-top: 12px;
   border-top: 1px solid var(--color-border-default);
+  z-index: 5; /* 中文注释：确保吸底按钮浮于内容之上，避免文本透出 */
 }
 
 .cancel-btn {
