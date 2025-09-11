@@ -29,29 +29,29 @@
   --motion-base: 180ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
 
-  /* ===== 导航栏（Navigation）语义令牌 =====
-     中文注释：统一移动/桌面的高度/内边距/间距/图标尺寸/活动态下划线与阴影；底栏安全区适配 */
-  --nav-h-mob: var(--header-height, 56px);           /* 前端表现：移动端顶部导航高度保持与 header 一致，便于统一 */
-  --nav-h-desk: 64px;                                 /* 前端表现：桌面端顶部导航高度略高，信息密度更舒适 */
-  --nav-px-mob: 16px;                                 /* 前端表现：移动端左右内边距与页面留白一致 */
-  --nav-px-desk: 24px;                                /* 前端表现：桌面端左右内边距稍加增大 */
-  --nav-gap: 8px;                                     /* 前端表现：导航内元素（logo/搜索/按钮）水平间距 */
-  --nav-icon: 20px;                                   /* 前端表现：导航内图标尺寸，统一大小避免跳动 */
-  --nav-active-underline: 2px;                        /* 前端表现：活动态下划线粗细 */
-  --nav-safe-area-bottom: env(safe-area-inset-bottom, 0px); /* 前端表现：底栏开启时适配安全区 */
-  --nav-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);          /* 前端表现：顶部细分隔线/阴影，弱化但可感知 */
+  /* ===== 导航（Navigation）语义令牌 =====
+     中文注释：统一导航高度/间距/图标尺寸/安全区，移动端底栏与顶部可共享 */
+  --nav-h-mob: 54px;               /* 移动端顶部/底部导航目标高度（按产品要求） */
+  --nav-h-desk: 64px;              /* 桌面端顶部导航目标高度 */
+  --nav-px-mob: 16px;              /* 移动端导航左右内边距 */
+  --nav-px-desk: 32px;             /* 桌面端导航左右内边距 */
+  --nav-gap: 24px;                 /* 导航项水平间距 */
+  --nav-icon: 16px;                /* 导航图标尺寸（宽高一致） */
+  --nav-active-underline: 2px;     /* 活动态下划线厚度 */
+  --nav-shadow: none;              /* 导航阴影开关（none 或设计系统阴影变量） */
+  --nav-safe-area-bottom: env(safe-area-inset-bottom, 0px); /* iOS 安全区 */
 
   /* ===== 搜索栏（Search）语义令牌 =====
-     中文注释：不改交互，只统一尺寸与圆角；各组件样式优先读令牌再兜底 */
-  --search-h-mob: 44px;                               /* 前端表现：移动端搜索条高度 */
-  --search-h-desk: 44px;                              /* 前端表现：桌面端基础保持一致（可后续按需提高） */
-  --search-radius: 6px;                               /* 前端表现：搜索条圆角 */
-  --search-padding-x: 12px;                           /* 前端表现：输入区左右内边距 */
-  --search-icon: 16px;                                /* 前端表现：前缀/后缀图标尺寸 */
-  --search-chip-radius: 16px;                         /* 前端表现：搜索推荐 Chip 圆角 */
-  --search-chip-gap: 8px;                             /* 前端表现：Chip 之间的水平/垂直间距 */
-  --search-suffix-right: 12px;                        /* 前端表现：后缀操作区域距离右侧的内边距 */
-  --search-suffix-hit: 32px;                          /* 前端表现：后缀点击热区（触达面积） */
+     中文注释：仅样式接线，不改变交互逻辑 */
+  --search-h-mob: 44px;            /* 移动/桌面统一 44，移动如需更高可覆盖 */
+  --search-h-desk: 44px;
+  --search-radius: 6px;
+  --search-padding-x: 12px;
+  --search-icon: 16px;
+  --search-chip-radius: 16px;
+  --search-chip-gap: 8px;
+  --search-suffix-right: 12px;     /* 输入框右侧图标/点击区右边距 */
+  --search-suffix-hit: 32px;       /* 右侧后缀命中区域（可点面积） */
 }
 
 /* 可选：页面骨架帮助类（不影响现有页面，新增页可按需使用）

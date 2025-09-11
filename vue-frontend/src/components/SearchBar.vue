@@ -448,14 +448,7 @@ watch(
   position: relative;
   width: 100%;
 
-  /* 中文注释：搜索栏变量接入 page-tokens 语义令牌；优先读令牌，保留兜底 */
-  --search-height: var(--search-h-desk, 44px);
-  --search-height-mob: var(--search-h-mob, 44px);
-  --sb-padding-x: var(--search-padding-x, 12px);
-  --sb-radius: var(--search-radius, 6px);
-  --search-icon-size: var(--search-icon, 16px);
-  --filter-chip-radius: var(--search-chip-radius, 16px);
-  --filter-chip-gap: var(--search-chip-gap, 8px);
+  /* 中文注释：搜索栏变量化（保持现状视觉），便于全站统一与后续微调 */
 }
 
 /* 区域标签样式 */
@@ -519,11 +512,11 @@ watch(
 
 .search-input :deep(.el-input__wrapper) {
   position: relative; /* 作为绝对定位锚点，保证按钮贴右且不遮挡文字 */
-  border-radius: var(--sb-radius);
+  border-radius: var(--search-radius);
   border: 1px solid var(--color-border-default);
   transition: all 0.2s ease;
-  height: var(--search-height);
-  min-height: var(--search-height);
+  height: var(--search-h-desk, 44px);
+  min-height: var(--search-h-desk, 44px);
 
   /* 右侧不再预留筛选按钮空间，保持与输入内边距一致 */
   padding-right: var(--search-suffix-right, 12px);
@@ -541,8 +534,8 @@ watch(
 
 .search-icon {
   color: var(--color-text-secondary);
-  width: var(--search-icon-size);
-  height: var(--search-icon-size);
+  width: var(--search-icon, 16px);
+  height: var(--search-icon, 16px);
 }
 
 /* 说明：控制后缀区域的右内边距，确保图标距输入框右边界为 12px */
@@ -623,7 +616,7 @@ watch(
   height: 100%;
   display: flex;
   align-items: center; /* 垂直居中，使标签在输入框高度内居中对齐 */
-  gap: var(--filter-chip-gap);
+  gap: var(--search-chip-gap, 8px);
   /* 允许点击：用于触发聚焦与移除标签 */
   pointer-events: auto;
   overflow: hidden;
@@ -640,10 +633,10 @@ watch(
 .inline-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--filter-chip-gap);
+  gap: var(--search-chip-gap, 8px);
   padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--filter-chip-radius);
+  border-radius: var(--search-chip-radius, 16px);
   background: var(--chip-bg);
   color: var(--color-text-primary);
   font-size: var(--filter-chip-font-size);
@@ -667,7 +660,7 @@ watch(
   color: var(--color-text-primary);
   background: var(--chip-bg);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--filter-chip-radius);
+  border-radius: var(--search-chip-radius, 16px);
 }
 /* Hover 态轻微加深，保持中性风格 */
 .inline-chip:hover,
@@ -876,8 +869,8 @@ watch(
   .search-input :deep(.el-input__wrapper) {
     cursor: pointer; /* 指示可点击 */
     transition: background-color 0.2s ease;
-    height: var(--search-height-mob);
-    min-height: var(--search-height-mob);
+    height: var(--search-h-mob, 44px);
+    min-height: var(--search-h-mob, 44px);
     padding-right: var(--search-suffix-right, 12px); /* 移动端无后缀按钮，不再预留额外空间 */
   }
 
@@ -886,8 +879,8 @@ watch(
   }
 
   .search-input :deep(.el-input__inner) {
-    height: var(--search-height-mob);
-    line-height: var(--search-height-mob);
+    height: var(--search-h-mob, 44px);
+    line-height: var(--search-h-mob, 44px);
   }
 
   /* 移动端彻底隐藏后缀容器，避免任何残留占位 */

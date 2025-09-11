@@ -10,7 +10,7 @@ import router from './router'
 // 导入设计系统样式（按顺序）
 import './styles/design-tokens.css' // 设计令牌
 import './styles/base-components.css' // 基础组件
-import './styles/page-tokens.css' // 页面级语义令牌（导航/搜索/底栏等）
+import './styles/page-tokens.css' // 页面级令牌（导航/搜索/安全区等语义变量）
 import './style.css' // 全局样式
 
 import { useAuthStore } from './stores/auth'

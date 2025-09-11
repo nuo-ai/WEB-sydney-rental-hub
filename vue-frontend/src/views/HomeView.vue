@@ -609,12 +609,20 @@ onUnmounted(() => {
   width: 100%;
 }
 
-/* 移动端Logo区域 */
+/* 移动端Logo区域
+   中文注释：用“一层控高 + 一层水平留白”的结构，避免多层 padding 叠加导致总高失控 */
 .mobile-logo-section {
-  padding: 8px 0 12px; /* 减少上下间距，上8px下12px */
+  height: var(--nav-h-mob, 54px); /* 目标总高度=54px */
+  padding-block: 0;               /* 垂直高度由容器控制，禁止再叠加上下padding */
   position: relative;
+  display: flex;
+  align-items: center;
+}
 
-  /* 移除高z-index，避免与fixed搜索栏产生叠加问题 */
+/* 仅在 LOGO 顶栏内部，移除通用 .container 的上下内边距，保留左右留白 */
+.mobile-logo-section > .container {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .mobile-logo {

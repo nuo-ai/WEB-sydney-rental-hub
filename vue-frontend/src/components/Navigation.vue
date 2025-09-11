@@ -1,5 +1,5 @@
 <template>
-  <!-- 移动端底部导航（Web 默认关闭；小程序启用：<Navigation :disableBottomNav="false" />） -->
+  <!-- 移动端底部导航 -->
   <nav v-if="isMobile && !disableBottomNav" class="bottom-nav">
     <div class="nav-container">
       <router-link
@@ -20,8 +20,8 @@
     <div class="top-nav-content">
       <!-- 左侧 Logo 和主导航 -->
       <div class="nav-left">
-        <router-link to="/" class="logo">
-          <span class="chinese-text">Juwo</span>
+        <router-link to="/" class="logo juwo">
+          <span class="brand-text">Juwo</span>
         </router-link>
 
         <div class="main-nav">
@@ -67,7 +67,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  // 中文注释：控制是否禁用底部导航。Web 默认为 true 关闭，小程序可通过 :disableBottomNav="false" 启用
+  // 中文注释：网站默认关闭底部导航；如需启用（如小程序场景），传入 :disableBottomNav="false"
   disableBottomNav: {
     type: Boolean,
     default: true,
@@ -188,11 +188,11 @@ onUnmounted(() => {
 <style scoped>
 /* 移动端底部导航 */
 .bottom-nav {
-  /* 中文注释：移动端底部导航变量化，读 page-tokens 令牌；高度含安全区 */
-  --nav-height: calc(var(--bottom-nav-height, var(--nav-h-mob, 56px)) + var(--nav-safe-area-bottom, 0px));
+  /* 中文注释：移动端底部导航变量化，读取 page tokens，确保高度=56px+安全区 */
+  --nav-height: calc(var(--nav-h-mob, 56px) + var(--nav-safe-area-bottom, 0px));
   --nav-padding-x: var(--nav-px-mob, 16px);
-  --nav-icon-size: var(--nav-icon, 20px);
-  --nav-item-gap: var(--nav-gap, 8px);
+  --nav-icon-size: var(--nav-icon, 16px);
+  --nav-item-gap: 4px;
 
   position: fixed;
   bottom: 0;
@@ -200,9 +200,10 @@ onUnmounted(() => {
   right: 0;
   background: white;
   border-top: 1px solid var(--color-border-default);
-  box-shadow: 0 -2px 8px rgb(0 0 0 / 6%);
+  box-shadow: var(--nav-shadow, none);
   z-index: 100;
   height: var(--nav-height);
+  padding-bottom: var(--nav-safe-area-bottom, 0px);
 }
 
 .nav-container {
@@ -211,7 +212,6 @@ onUnmounted(() => {
   align-items: center;
   height: 100%;
   padding: 0 var(--nav-padding-x);
-  padding-bottom: var(--nav-safe-area-bottom, 0px); /* 中文注释：内容上移，避免被系统手势区域遮挡 */
 }
 
 .nav-item {
@@ -230,7 +230,7 @@ onUnmounted(() => {
 .nav-item:hover,
 .nav-item.active {
   color: var(--color-text-primary);
-  background: #f7f8fa;
+  background: var(--bg-hover);
 }
 
 .nav-item .nav-icon {
@@ -245,11 +245,11 @@ onUnmounted(() => {
 
 /* 桌面端顶部导航 */
 .top-nav {
-  /* 中文注释：桌面端顶部导航变量化，读 page-tokens 令牌 */
+  /* 中文注释：桌面端顶部导航变量化，读取 page tokens */
   --nav-height: var(--nav-h-desk, 64px);
-  --nav-padding-x: var(--nav-px-desk, 24px);
-  --nav-gap: var(--nav-gap, 8px);
-  --nav-icon-size: var(--nav-icon, 20px);
+  --nav-padding-x: var(--nav-px-desk, 32px);
+  --nav-gap: var(--nav-gap, 24px);
+  --nav-icon-size: var(--nav-icon, 16px);
 
   position: fixed;
   top: 0;
@@ -258,7 +258,7 @@ onUnmounted(() => {
   background: white;
   border-bottom: 1px solid var(--color-border-default);
   height: var(--nav-height);
-  box-shadow: var(--nav-shadow, 0 1px 0 rgba(0, 0, 0, 0.06));
+  box-shadow: var(--nav-shadow, none);
   z-index: 60;
   transform: translateY(0);
   transition: transform 0.25s ease-in-out;
@@ -304,26 +304,10 @@ onUnmounted(() => {
   color: var(--juwo-primary);
 }
 
-.logo-icon {
-  width: 32px;
-  height: 32px;
-  background: var(--juwo-primary);
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-  transition: all 0.2s ease;
-}
 
-.logo:hover .logo-icon {
-  background: var(--juwo-primary-light);
-  transform: scale(1.05);
-}
-.logo-icon-svg {
-  width: 16px;
-  height: 16px;
+
+.brand-text {
+  color: var(--juwo-primary);
 }
 
 .main-nav {
@@ -348,7 +332,7 @@ onUnmounted(() => {
 .main-nav-item:hover,
 .main-nav-item.active {
   color: var(--color-text-primary);
-  background: #f7f8fa;
+  background: var(--bg-hover);
 }
 
 /* 当前路由活动态：2px 下划线（前端表现：清晰的当前页指示） */
@@ -389,8 +373,8 @@ onUnmounted(() => {
 
 .user-nav-item:hover,
 .user-nav-item.active {
-  color: var(--juwo-primary);
-  background: #f7f8fa;
+  color: var(--color-text-primary);
+  background: var(--bg-hover);
 }
 
 .user-nav-item .nav-icon {
