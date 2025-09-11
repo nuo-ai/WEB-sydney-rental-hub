@@ -46,7 +46,7 @@
       ></div>
 
       <!-- 标题区：面包屑 / H1 / 操作行（390 视口对齐参考站） -->
-      <div class="container title-block">
+      <div class="container title-block" :class="{ 'align-to-card': !useVirtualScroll }">
         <nav class="breadcrumbs">
           <template v-if="isMultiSelect">
             首页/ NSW
@@ -947,5 +947,14 @@ onUnmounted(() => {
 
 .empty-state .el-icon.empty-icon {
   color: var(--color-border-default);
+}
+
+/* 标题区与卡片右缘对齐（单列卡片场景）：
+   让 actions-row 使用与卡片一致的内容宽度，并以左侧为锚点 */
+@media (width >= 1024px) {
+  /* 始终让标题区操作行与卡片内容宽度一致（PC 断点） */
+  .title-block .actions-row {
+    width: var(--card-content-w);
+  }
 }
 </style>

@@ -148,6 +148,8 @@ onUnmounted(() => {
   height: 600px; /* 固定高度，确保虚拟滚动正常工作 */
   overflow: hidden auto;
   position: relative;
+  /* 中文注释：稳定预留滚动条轨道，避免出现/消失引发布局跳动并确保对齐 */
+  scrollbar-gutter: stable;
 }
 
 @media (width <= 768px) {
@@ -197,8 +199,8 @@ onUnmounted(() => {
 
 /* 滚动条样式优化 */
 .virtual-list-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: var(--scrollbar-w);
+  height: var(--scrollbar-w);
 }
 
 .virtual-list-container::-webkit-scrollbar-track {
