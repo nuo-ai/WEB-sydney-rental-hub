@@ -467,7 +467,7 @@ watch(
   background: var(--chip-bg);
   color: var(--color-text-secondary);
   border: none;
-  border-radius: 9999px;
+  border-radius: var(--search-chip-radius, 16px);
   font-size: 13px;
   font-weight: 500;
   padding: 6px 12px;
@@ -491,7 +491,7 @@ watch(
   cursor: pointer;
   font-size: 12px;
   padding: 2px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -635,10 +635,10 @@ watch(
   align-items: center;
   gap: var(--search-chip-gap, 8px);
   padding: var(--filter-chip-padding-y) var(--filter-chip-padding-x);
-  border: 1px solid var(--color-border-strong);
+  border: none;
   border-radius: var(--search-chip-radius, 16px);
   background: var(--chip-bg);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   font-size: var(--filter-chip-font-size);
   font-weight: var(--filter-chip-font-weight);
   line-height: 1;
@@ -657,9 +657,9 @@ watch(
 }
 
 .inline-chip-more {
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   background: var(--chip-bg);
-  border: 1px solid var(--color-border-strong);
+  border: none;
   border-radius: var(--search-chip-radius, 16px);
 }
 /* Hover 态轻微加深，保持中性风格 */
@@ -922,6 +922,11 @@ watch(
   }
   .inline-chips-overlay::after {
     display: none;
+  }
+
+  /* 移动端彻底隐藏筛选按钮（全局类名 filter-button），避免残留边缘 */
+  :global(.filter-button) {
+    display: none !important;
   }
 }
 </style>

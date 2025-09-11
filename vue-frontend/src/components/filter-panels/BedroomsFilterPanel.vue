@@ -27,7 +27,7 @@
     <!-- 面板内容 -->
     <div class="panel-content">
       <!-- 卧室数量选择 -->
-      <div class="filter-buttons-group">
+      <div class="filter-buttons-group segmented">
         <button
           v-for="option in bedroomOptions"
           :key="option.value"
@@ -43,7 +43,7 @@
       <!-- 浴室 -->
       <div class="section">
         <div class="section-label chinese-text">浴室</div>
-        <div class="filter-buttons-group">
+        <div class="filter-buttons-group segmented">
           <button
             v-for="option in bathroomOptions"
             :key="option.value"
@@ -60,7 +60,7 @@
       <!-- 车位 -->
       <div class="section">
         <div class="section-label chinese-text">车位</div>
-        <div class="filter-buttons-group">
+        <div class="filter-buttons-group segmented">
           <button
             v-for="option in parkingOptions"
             :key="option.value"
@@ -450,6 +450,40 @@ const applyFilters = async () => {
   border-color: var(--filter-color-selected-border);
   color: var(--filter-color-text-primary);
   font-weight: var(--filter-font-weight-semibold);
+}
+
+/* 连体分段样式：保留现有颜色/描边/填充，仅处理连体与圆角 */
+.filter-buttons-group.segmented {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  overflow: hidden;
+}
+
+.filter-buttons-group.segmented .filter-btn {
+  border-radius: 0; /* 中间段无圆角 */
+}
+
+.filter-buttons-group.segmented .filter-btn + .filter-btn {
+  margin-left: -1px; /* 折叠相邻边框，避免中缝变粗 */
+}
+
+/* 左右端圆角 2px */
+.filter-buttons-group.segmented .filter-btn:first-child {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.filter-buttons-group.segmented .filter-btn:last-child {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+/* 移动端保持连体不换行，如需可水平滚动 */
+@media (width <= 767px) {
+  .filter-buttons-group.segmented {
+    overflow-x: auto;
+  }
 }
 
 /* 底部操作按钮 */

@@ -6,8 +6,7 @@
       <div class="mobile-logo-section">
         <div class="container">
           <div class="mobile-logo">
-            <HomeIcon class="logo-icon-svg" aria-hidden="true" />
-            <span class="logo-text">JUWO 桔屋找房</span>
+            <span class="brand-text">Juwo</span>
           </div>
         </div>
       </div>
@@ -185,7 +184,7 @@ import SearchBar from '@/components/SearchBar.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
-import { Home as HomeIcon, Bell, ArrowUpDown } from 'lucide-vue-next'
+import { Bell, ArrowUpDown } from 'lucide-vue-next'
 
 /* 路由 */
 const router = useRouter()
@@ -617,12 +616,17 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-start;    /* 水平靠左 */
+  background: var(--color-bg-card);              /* 纯白背景 */
+  border-bottom: 1px solid var(--color-border-default); /* 底部分隔线 */
 }
 
 /* 仅在 LOGO 顶栏内部，移除通用 .container 的上下内边距，保留左右留白 */
 .mobile-logo-section > .container {
   padding-top: 0;
   padding-bottom: 0;
+  margin-left: 0;   /* 靠左贴齐，保留左右 padding 16px */
+  margin-right: auto;
 }
 
 .mobile-logo {
@@ -630,17 +634,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   font-size: 20px;
-  font-weight: 600;
-  color: var(--juwo-primary);
+  font-weight: 700;                    /* 粗体 */
+  color: var(--color-text-primary);    /* 黑色（主文案色） */
 }
 
-.logo-icon {
-  font-size: 24px;
-}
-.mobile-logo .logo-icon-svg {
-  width: 24px;
-  height: 24px;
-}
 
 /* 在桌面端隐藏移动端Logo */
 @media (width >= 769px) {
@@ -731,8 +728,8 @@ onUnmounted(() => {
 }
 
 .page-h1 {
-  font-size: 24px;
-  line-height: 28px;
+  font-size: 22px;
+  line-height: 26px;
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 14px;

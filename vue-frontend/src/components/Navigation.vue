@@ -307,7 +307,8 @@ onUnmounted(() => {
 
 
 .brand-text {
-  color: var(--juwo-primary);
+  color: var(--color-text-primary); /* PC 顶部 JUWO 文本：黑色 */
+  font-weight: 700;                 /* 加粗 */
 }
 
 .main-nav {
