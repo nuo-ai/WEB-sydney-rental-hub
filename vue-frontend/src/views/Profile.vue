@@ -4,11 +4,11 @@
     <header class="page-header">
       <div class="container">
         <button class="btn btn-icon" @click="$router.back()">
-          <i class="fas fa-arrow-left"></i>
+          <ArrowLeft class="icon-20" aria-hidden="true" />
         </button>
         <h1 class="page-title">个人中心</h1>
         <button class="btn btn-icon" @click="showSettings = true">
-          <i class="fas fa-cog"></i>
+          <Settings class="icon-20" aria-hidden="true" />
         </button>
       </div>
     </header>
@@ -22,7 +22,7 @@
             <div class="card-body">
               <div class="user-avatar">
                 <div class="avatar-placeholder">
-                  <i class="fas fa-user"></i>
+                  <User class="avatar-icon" aria-hidden="true" />
                 </div>
                 <button class="btn btn-sm btn-primary">更换头像</button>
               </div>
@@ -55,22 +55,22 @@
           </div>
           <div class="action-grid">
             <button class="action-card" @click="activeTab = 'favorites'">
-              <i class="fas fa-heart action-icon"></i>
+              <Heart class="action-icon-svg" aria-hidden="true" />
               <span class="action-label">我的收藏</span>
               <span class="badge" v-if="favoriteCount">{{ favoriteCount }}</span>
             </button>
             <button class="action-card" @click="activeTab = 'history'">
-              <i class="fas fa-history action-icon"></i>
+              <Clock class="action-icon-svg" aria-hidden="true" />
               <span class="action-label">浏览历史</span>
               <span class="badge" v-if="newHistoryCount">{{ newHistoryCount }}</span>
             </button>
             <button class="action-card" @click="activeTab = 'searches'">
-              <i class="fas fa-bell action-icon"></i>
+              <Bell class="action-icon-svg" aria-hidden="true" />
               <span class="action-label">搜索订阅</span>
               <span class="badge badge-dot" v-if="hasNewProperties"></span>
             </button>
             <button class="action-card" @click="activeTab = 'settings'">
-              <i class="fas fa-cog action-icon"></i>
+              <Settings class="action-icon-svg" aria-hidden="true" />
               <span class="action-label">账号设置</span>
             </button>
           </div>
@@ -86,7 +86,7 @@
               :class="['tab', { active: activeTab === tab.id }]"
               @click="activeTab = tab.id"
             >
-              <i :class="tab.icon"></i>
+              <component :is="tab.iconComp" class="tab-icon" aria-hidden="true" />
               <span>{{ tab.label }}</span>
             </button>
           </div>
@@ -96,7 +96,7 @@
             <!-- 我的收藏 -->
             <div v-if="activeTab === 'favorites'" class="favorites-content">
               <div v-if="favorites.length === 0" class="empty-state">
-                <i class="fas fa-heart empty-icon"></i>
+                <Heart class="empty-icon-svg" aria-hidden="true" />
                 <h4 class="empty-title">暂无收藏</h4>
                 <p class="empty-text">点击房源卡片上的心形图标即可收藏</p>
                 <button class="btn btn-primary" @click="$router.push('/')">去看看房源</button>
@@ -116,15 +116,15 @@
                     </div>
                     <div class="specs">
                       <span class="spec-item">
-                        <i class="fas fa-bed spec-icon"></i>
+                        <Bed class="spec-icon" aria-hidden="true" />
                         <span class="spec-value">{{ item.bedrooms }}</span>
                       </span>
                       <span class="spec-item">
-                        <i class="fas fa-bath spec-icon"></i>
+                        <Bath class="spec-icon" aria-hidden="true" />
                         <span class="spec-value">{{ item.bathrooms }}</span>
                       </span>
                       <span class="spec-item">
-                        <i class="fas fa-car spec-icon"></i>
+                        <Car class="spec-icon" aria-hidden="true" />
                         <span class="spec-value">{{ item.car_spaces }}</span>
                       </span>
                     </div>
@@ -168,10 +168,10 @@
                       <h4 class="search-name">{{ search.name }}</h4>
                       <div class="search-actions">
                         <button class="btn btn-icon btn-sm">
-                          <i class="fas fa-edit"></i>
+                          <Pencil class="btn-icon-svg" aria-hidden="true" />
                         </button>
                         <button class="btn btn-icon btn-sm">
-                          <i class="fas fa-trash"></i>
+                          <Trash2 class="btn-icon-svg" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -189,7 +189,7 @@
                 </div>
               </div>
               <button class="btn btn-primary btn-block">
-                <i class="fas fa-plus"></i>
+                <Plus class="btn-icon-svg" aria-hidden="true" />
                 创建新的搜索订阅
               </button>
             </div>
@@ -252,6 +252,7 @@ defineOptions({ name: 'ProfileView' })
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFavoritesStore } from '@/stores/favorites'
+import { ArrowLeft, Settings, Heart, Clock, Bell, User, Bed, Bath, Car, Pencil, Trash2, Plus } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
@@ -262,10 +263,10 @@ const userInfo = computed(() => authStore.user || {})
 // 标签页
 const activeTab = ref('favorites')
 const tabs = [
-  { id: 'favorites', label: '我的收藏', icon: 'fas fa-heart' },
-  { id: 'history', label: '浏览历史', icon: 'fas fa-history' },
-  { id: 'searches', label: '搜索订阅', icon: 'fas fa-bell' },
-  { id: 'settings', label: '账号设置', icon: 'fas fa-cog' },
+  { id: 'favorites', label: '我的收藏', iconComp: Heart },
+  { id: 'history', label: '浏览历史', iconComp: Clock },
+  { id: 'searches', label: '搜索订阅', iconComp: Bell },
+  { id: 'settings', label: '账号设置', iconComp: Settings },
 ]
 
 // 统计数据
@@ -809,6 +810,16 @@ const formatDate = (date) => {
 .btn-block {
   width: 100%;
 }
+
+/* Lucide 图标统一尺寸（继承父级 color，通过 currentColor 着色） */
+.icon-20 { width: 20px; height: 20px; }
+.tab-icon { width: 16px; height: 16px; }
+.action-icon-svg { width: 24px; height: 24px; }
+.avatar-icon { width: 40px; height: 40px; }
+.spec-icon { width: 16px; height: 16px; }
+.empty-icon-svg { width: 64px; height: 64px; }
+.btn-icon-svg { width: 16px; height: 16px; }
+
 
 /* 响应式 */
 @media (width <= 768px) {

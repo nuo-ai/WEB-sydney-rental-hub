@@ -1,7 +1,8 @@
 # 当前上下文与紧急焦点
-最后更新：2025-09-10
+最后更新：2025-09-11
 
 今日快照（精简版，≤10行）
+- PAGE-TOKENS+SCAFFOLD+STYLELINT-GUARD+SEARCHBAR-TOKENIZED：新增页面级令牌与标准页面样板；Stylelint 扩至 src/**/*.vue 强制 var(--*)；SearchBar 首轮令牌化（chips/白底/hover 统一 tokens）。前端表现：新增页面结构节奏一致、搜索入口与筛选标签中性灰一致；可回滚。溯源：commit 5164a36..fe8f012
 - GUARDRAIL-COLOR-CLEANUP：移除 SearchOverlay 颜色兜底 var(--color-text-secondary, #6b7280) → var(--color-text-secondary)，零视觉改动，令牌合规收尾。（前端表现：文字仍为中性次级灰，无任何 UI 变化）
 - PROPERTYDETAIL-TOKENS-FINAL-P0：详情页 P0 收尾（价格/CTA/间距/地图占位等统一令牌；移除 color-accent/font-size-base/spacing-*；无逻辑改动）。溯源：commit f201a24..07805ab
 - LIST-CARD-PRICE-TOKEN-UNIFY：列表卡价格色改主文案色；全局 --color-text-price 映射至 --color-text-primary，业务层禁用。溯源：commit 07805ab..a5da918
@@ -40,6 +41,10 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
+- [SPRINT-START] 设计系统合规性收尾冲刺 (P1, P2)
+  - [ ] [P1] 令牌定义梳理与清理 (@deprecated)
+  - [ ] [P1] 图标系统完全统一 (lucide + currentColor)
+  - [ ] [P2] 移除所有 var() 颜色兜底 (fallback)
 - [P1] 令牌定义梳理：assets/design-tokens.css 标注 deprecated（--color-accent/--font-size-base/--spacing-lg）并提供语义映射，禁止业务层调用。
 - [P1] 图标系统统一：components/icons/* 使用点扫描；无用移除、在用迁移至 lucide-vue-next + currentColor。
 - [P2] 渐进移除 var(--token, #xxx) fallback；新组件模板要求 icon 用 currentColor + 外层 class 控制颜色。

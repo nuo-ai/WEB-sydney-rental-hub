@@ -9,7 +9,7 @@
         class="nav-item"
         :class="{ active: isActive(item.path) }"
       >
-        <i :class="item.icon"></i>
+        <component :is="item.iconComp" class="nav-icon" aria-hidden="true" />
         <span class="chinese-text">{{ item.label }}</span>
       </router-link>
     </div>
@@ -22,7 +22,7 @@
       <div class="nav-left">
         <router-link to="/" class="logo">
           <div class="logo-icon">
-            <i class="fa-solid fa-home"></i>
+            <Home class="logo-icon-svg" aria-hidden="true" />
           </div>
           <span class="chinese-text">JUWO 桔屋找房</span>
         </router-link>
@@ -35,7 +35,7 @@
             class="main-nav-item"
             :class="{ active: isActive(item.path) }"
           >
-            <i :class="item.icon"></i>
+            <component :is="item.iconComp" class="nav-icon" aria-hidden="true" />
             <span class="chinese-text">{{ item.label }}</span>
           </router-link>
         </div>
@@ -50,7 +50,7 @@
           class="user-nav-item"
           :class="{ active: isActive(item.path) }"
         >
-          <i :class="item.icon"></i>
+          <component :is="item.iconComp" class="nav-icon" aria-hidden="true" />
           <span class="chinese-text">{{ item.label }}</span>
         </router-link>
       </div>
@@ -62,6 +62,7 @@
 defineOptions({ name: 'MainNavigation' })
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { Search, Heart, MessageSquare, Map, User, Home } from 'lucide-vue-next'
 
 // 定义导航栏显示状态的props
 const props = defineProps({
@@ -80,30 +81,35 @@ const navItems = [
     name: 'home',
     path: '/',
     icon: 'fa-solid fa-magnifying-glass',
+    iconComp: Search,
     label: '搜索',
   },
   {
     name: 'favorites',
     path: '/favorites',
     icon: 'fa-regular fa-heart',
+    iconComp: Heart,
     label: '收藏',
   },
   {
     name: 'chat',
     path: '/chat',
     icon: 'fa-solid fa-comments',
+    iconComp: MessageSquare,
     label: 'AI助手',
   },
   {
     name: 'map',
     path: '/map',
     icon: 'fa-regular fa-map',
+    iconComp: Map,
     label: '地图',
   },
   {
     name: 'profile',
     path: '/profile',
     icon: 'fa-regular fa-user',
+    iconComp: User,
     label: '我的',
   },
 ]
@@ -113,18 +119,21 @@ const mainNavItems = [
     name: 'home',
     path: '/',
     icon: 'fa-solid fa-magnifying-glass',
+    iconComp: Search,
     label: '搜索',
   },
   {
     name: 'favorites',
     path: '/favorites',
     icon: 'fa-regular fa-heart',
+    iconComp: Heart,
     label: '收藏',
   },
   {
     name: 'map',
     path: '/map',
     icon: 'fa-regular fa-map',
+    iconComp: Map,
     label: '地图',
   },
 ]
@@ -134,12 +143,14 @@ const userNavItems = [
     name: 'chat',
     path: '/chat',
     icon: 'fa-solid fa-comments',
+    iconComp: MessageSquare,
     label: 'AI助手',
   },
   {
     name: 'profile',
     path: '/profile',
     icon: 'fa-regular fa-user',
+    iconComp: User,
     label: '我的',
   },
 ]
@@ -213,8 +224,9 @@ onUnmounted(() => {
   background: #f7f8fa;
 }
 
-.nav-item i {
-  font-size: 20px;
+.nav-item .nav-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .nav-item span {
@@ -294,6 +306,10 @@ onUnmounted(() => {
   background: var(--juwo-primary-light);
   transform: scale(1.05);
 }
+.logo-icon-svg {
+  width: 16px;
+  height: 16px;
+}
 
 .main-nav {
   display: flex;
@@ -319,8 +335,9 @@ onUnmounted(() => {
   background: #f7f8fa;
 }
 
-.main-nav-item i {
-  font-size: 16px;
+.main-nav-item .nav-icon {
+  width: 16px;
+  height: 16px;
 }
 
 /* 右侧导航 */
@@ -348,8 +365,9 @@ onUnmounted(() => {
   background: #f7f8fa;
 }
 
-.user-nav-item i {
-  font-size: 16px;
+.user-nav-item .nav-icon {
+  width: 16px;
+  height: 16px;
 }
 
 /* 响应式适配 */

@@ -460,6 +460,27 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 若持续超阈，考虑后端提供轻量 count 端点或索引优化。
 - 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
 
+## 页面级令牌与骨架（新增）
+
+- 页面级令牌（:root）：统一页面“前端表现”的节奏与防遮挡
+  - 尺寸与间距：`--header-height: 56px; --bottom-nav-height: 56px;`
+  - 左右留白：`--page-x-padding-mob: 16px; --page-x-padding-desktop: 32px;`
+  - 区块节奏：`--page-section-gap: 24px; --page-section-gap-lg: 32px;`
+  - 动效基线：`--motion-fast: 120ms; --motion-base: 180ms; --easing-standard: cubic-bezier(0.2, 0, 0, 1)`
+- 标准页面骨架类名（可选帮助类）
+  - `.page` 作为根容器；`.page__header / .page__toolbar / .page__content / .page__footer` 作为主区块
+  - 移动端根容器默认 `padding-bottom: var(--bottom-nav-height)`，避免底部导航遮挡列表尾项
+- 目的：新增页面无需重新摸索留白/间距/动效，复制样板即可统一“前端表现”
+- 溯源：commit 5164a36..fe8f012（引入 page-tokens.css 与 _PageScaffoldExample.vue）
+
+## 设计护栏（Stylelint）（补充）
+
+- 规则范围：对 `color / background / background-color / border / border-color / box-shadow / outline / outline-color / fill / stroke` 强制使用 `var(--*)`
+- 白名单：`transparent / currentColor / currentcolor / inherit / none`
+- 豁免：设计令牌定义入口（如 `src/styles/design-tokens.css`、`src/style.css`）可出现颜色常量与变量定义
+- 作用域：`vue-frontend/src/**/*.vue`；用于阻断新增页面/组件的硬编码色回归
+- 溯源：commit 5164a36..fe8f012（扩展 .stylelintrc.json）
+
 ## 设计令牌合规长期规则（新增）
 
 - 非 CTA 交互中性化  

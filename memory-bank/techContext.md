@@ -1,7 +1,7 @@
 ![1757262958422](image/techContext/1757262958422.png)# 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-10
+**最后更新**: 2025-09-11
 
 ---
 
@@ -114,6 +114,18 @@ python scripts/run_backend.py  # localhost:8000
   - 长段落 measure 仅对 p 生效，富文本内其他块级元素（如 ul/ol、表格）如需限制应另行评估
 
 ---
+
+## 样式系统增补（2025-09-11）
+
+- 新文件与引入
+  - styles/page-tokens.css：页面级令牌（左右留白/区块节奏/底部导航防遮挡/动效）
+  - views/_PageScaffoldExample.vue：标准页面样板（.page + page__* 区块）
+  - docs/color-token-mapping.md：历史 #hex/rgb → tokens 映射权威表
+- Stylelint 护栏扩展
+  - .stylelintrc.json 覆盖 vue-frontend/src/**/*.vue；规则扩展至 color/background/border/fill/stroke/box-shadow/outline 强制 var(--*)；保留 transparent/currentColor/none/inherit 白名单；令牌定义文件豁免
+- 别名/编辑器一致性
+  - jsconfig.json 增加 "baseUrl": "." 并标准化 "@/*": ["src/*"]，与 Vite alias 一致
+- 溯源：commit 5164a36..fe8f012
 
 ## 运行与集成增补（2025-09-06）
 

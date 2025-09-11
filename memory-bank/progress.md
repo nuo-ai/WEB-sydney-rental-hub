@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-11｜PAGE-TOKENS+SCAFFOLD+STYLELINT-GUARD+SEARCHBAR-TOKENIZED  
+  新增 page-tokens.css 并全局引入，提供页面骨架/间距/动效基线；新增 _PageScaffoldExample.vue 标准样板；Stylelint 规则覆盖 color/background/border/fill/stroke/box-shadow/outline 强制 var(--*)；SearchBar 首批等价替换（chips/hover/白底/弱文案）。前端表现：新增页面结构统一、搜索入口与筛选标签风格一致，中性色体系无离散；可回滚。｜溯源：commit 5164a36..fe8f012
 - 2025-09-10｜LIST-CARD-PRICE-UNIFY  
   列表卡价格色改为主文案色；全局 --color-text-price 映射到 --color-text-primary，业务层禁用；无逻辑改动｜溯源：commit 07805ab..a5da918
 - 2025-09-10｜PROPERTYDETAIL-TOKENS-FINAL-P0  

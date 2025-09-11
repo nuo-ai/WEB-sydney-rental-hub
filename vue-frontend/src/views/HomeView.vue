@@ -6,7 +6,7 @@
       <div class="mobile-logo-section">
         <div class="container">
           <div class="mobile-logo">
-            <i class="fa-solid fa-house logo-icon"></i>
+            <HomeIcon class="logo-icon-svg" aria-hidden="true" />
             <span class="logo-text">JUWO 桔屋找房</span>
           </div>
         </div>
@@ -71,14 +71,14 @@
 
         <div class="actions-row">
           <div class="alert-left">
-            <IconBell size="20" />
+            <Bell :size="20" />
             <span class="label">Property alert</span>
             <el-switch v-model="alertOn" size="small" inactive-text="Off" />
           </div>
 
           <el-dropdown @command="onSortCommand" placement="bottom-end" :teleported="false">
             <button class="sort-btn" type="button">
-              <IconSort size="20" />
+              <ArrowUpDown :size="20" />
               <span class="label">Sort</span>
             </button>
             <template #dropdown>
@@ -185,8 +185,7 @@ import SearchBar from '@/components/SearchBar.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
-import IconBell from '@/components/icons/IconBell.vue'
-import IconSort from '@/components/icons/IconSort.vue'
+import { Home as HomeIcon, Bell, ArrowUpDown } from 'lucide-vue-next'
 
 /* 路由 */
 const router = useRouter()
@@ -629,6 +628,10 @@ onUnmounted(() => {
 
 .logo-icon {
   font-size: 24px;
+}
+.mobile-logo .logo-icon-svg {
+  width: 24px;
+  height: 24px;
 }
 
 /* 在桌面端隐藏移动端Logo */
