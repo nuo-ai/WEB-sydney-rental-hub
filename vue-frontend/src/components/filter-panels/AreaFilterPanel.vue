@@ -72,7 +72,6 @@
           type="primary"
           class="apply-btn"
           size="default"
-          :loading="countLoading"
           @click="applyFilters"
         >
           {{ applyText }}
@@ -574,6 +573,7 @@ const applyFilters = async () => {
   flex: 2;
   background-color: var(--juwo-primary);
   border-color: var(--juwo-primary);
+  transition: none !important; /* 中文注释：去掉多余动效（不做渐变/过渡） */
 }
 
 .apply-btn:hover {
