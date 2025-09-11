@@ -25,6 +25,7 @@
           <!-- PC端：搜索框和筛选标签在同一行 -->
           <div class="search-filter-row">
             <SearchBar
+              v-if="windowWidth <= 768"
               class="search-bar"
               @search="handleSearch"
               @locationSelected="handleLocationSelected"
