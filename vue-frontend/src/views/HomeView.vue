@@ -413,16 +413,57 @@ const initSearchBarHeight = async () => {
 
 // 生命周期
 onMounted(async () => {
-  // 只在没有数据时才加载，避免覆盖筛选结果
-  if (propertiesStore.filteredProperties.length === 0) {
-    loadProperties()
-  }
-
   // 从 URL 恢复排序（URL 状态同步）：存在 sort 时恢复并触发服务端排序透传
   const sortQ = route.query?.sort
   if (typeof sortQ === 'string' && sortQ) {
     sortValue.value = sortQ
     await propertiesStore.setSort(sortQ)
+  }
+
+  // 首次加载自动应用：若已存在“已选区域/或URL筛选参数”，自动等效一次“确定”
+  try {
+    const hasApplied =
+      propertiesStore.currentFilterParams &&
+      Object.keys(propertiesStore.currentFilterParams).length > 0
+
+    const hasSelections =
+      Array.isArray(propertiesStore.selectedLocations) &&
+      propertiesStore.selectedLocations.length > 0
+
+    const queryKeys = [
+      'suburbs',
+      'suburb',
+      'postcodes',
+      'date_from',
+      'date_to',
+      'price_min',
+      'price_max',
+      'bedrooms',
+      'isFurnished',
+      'bathrooms',
+      'parking',
+      'include_nearby',
+    ]
+    const queryHasAny = Object.keys(route.query || {}).some(
+      (k) => queryKeys.includes(k) && route.query[k] !== undefined && route.query[k] !== '',
+    )
+
+    if (!hasApplied && (hasSelections || queryHasAny)) {
+      // 将当前路由参数作为原始 filters 传入（store 内部会做契约映射与清洗）
+      const plainFilters = { ...(route.query || {}) }
+      await propertiesStore.applyFilters(plainFilters)
+    } else {
+      // 无可用上下文时才加载“无筛选”列表，避免覆盖筛选结果
+      if (propertiesStore.filteredProperties.length === 0) {
+        loadProperties()
+      }
+    }
+  } catch (e) {
+    // 兜底：若自动应用失败，不阻断页面
+    console.warn('auto-apply on first load failed (ignored):', e)
+    if (propertiesStore.filteredProperties.length === 0) {
+      loadProperties()
+    }
   }
 
   await initSearchBarHeight()
