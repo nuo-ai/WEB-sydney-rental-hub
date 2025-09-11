@@ -31,9 +31,17 @@
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
         <BaseButton variant="ghost" size="small" @click="clearAll">清除</BaseButton>
-        <BaseButton variant="primary" :loading="countLoading" @click="applyFilters">
+        <el-button class="cancel-btn" size="default" @click="$emit('close')">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
+          @click="applyFilters"
+        >
           {{ applyText }}
-        </BaseButton>
+        </el-button>
       </div>
     </div>
   </div>
@@ -338,8 +346,14 @@ const applyFilters = async () => {
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
-  gap: var(--filter-space-lg);
-  margin-top: var(--filter-space-xl);
+  gap: 12px;
+  margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  background: var(--color-bg-card);
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-default);
+  z-index: 5;
 }
 
 /* 滑块样式使用设计令牌 */
@@ -362,5 +376,26 @@ const applyFilters = async () => {
 
 .price-slider :deep(.el-slider__button:hover) {
   border-color: var(--filter-color-neutral-600);
+}
+/* 对齐“区域”面板的按钮样式 */
+.cancel-btn {
+  flex: 1;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+.cancel-btn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.apply-btn {
+  flex: 2;
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  transition: none !important;
+}
+.apply-btn:hover {
+  background-color: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
 }
 </style>

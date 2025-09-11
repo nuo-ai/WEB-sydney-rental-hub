@@ -184,13 +184,13 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="large" @click="closePanel">
+        <el-button class="cancel-btn" size="default" @click="closePanel">
           {{ $t('filter.cancel') }}
         </el-button>
         <el-button
           type="primary"
           class="apply-btn"
-          size="large"
+          size="default"
           @click="applyFilters"
           :disabled="!isDateRangeValid"
           :aria-label="`确定（${filteredCount} 条结果）`"
@@ -1234,32 +1234,25 @@ onMounted(() => {
   background-color: var(--color-border-strong);
 }
 
-/* 面板底部 - 使用设计令牌 */
+/* 面板底部 - 对齐区域面板样式 */
 .panel-footer {
   display: flex;
-  gap: var(--filter-btn-gap);
-  padding: var(--filter-space-3xl);
-  border-top: 1px solid var(--filter-panel-footer-border);
-  background: var(--filter-panel-bg);
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-default);
+  background: var(--color-bg-card);
 }
 
 .cancel-btn {
   flex: 1;
-  background: var(--filter-btn-secondary-bg);
-  border: 1px solid var(--filter-btn-secondary-border);
-  color: var(--filter-btn-secondary-color);
-  font-size: var(--filter-btn-font-size);
-  font-weight: var(--filter-btn-font-weight);
-  border-radius: var(--filter-btn-radius);
-  transition: var(--filter-transition-normal);
-
-  /* 移动端触摸目标优化 */
-  min-height: 48px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
 }
 
 .cancel-btn:hover {
-  border-color: var(--filter-btn-secondary-hover-border);
-  color: var(--filter-btn-secondary-hover-color);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
   background: var(--filter-color-hover-bg);
 }
 
@@ -1270,21 +1263,15 @@ onMounted(() => {
 
 .apply-btn {
   flex: 2;
-  background-color: var(--filter-btn-primary-bg);
-  border-color: var(--filter-btn-primary-bg);
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
   color: var(--filter-btn-primary-color);
-  font-size: var(--filter-btn-font-size);
-  font-weight: var(--filter-btn-font-weight);
-  border-radius: var(--filter-btn-radius);
-  transition: var(--filter-transition-normal);
-
-  /* 移动端触摸目标优化 */
-  min-height: 48px;
+  transition: none;
 }
 
 .apply-btn:hover {
-  background-color: var(--filter-btn-primary-hover-bg);
-  border-color: var(--filter-btn-primary-hover-bg);
+  background-color: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
 }
 
 .apply-btn:focus-visible {

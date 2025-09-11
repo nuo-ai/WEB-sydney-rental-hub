@@ -77,12 +77,17 @@
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
         <BaseButton variant="ghost" size="small" @click="clearAll">{{ anyLabel }}</BaseButton>
-        <BaseButton variant="secondary" @click="$emit('close')">
+        <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ cancelLabel }}
-        </BaseButton>
-        <BaseButton variant="primary" :loading="countLoading" @click="applyFilters">
+        </el-button>
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
+          @click="applyFilters"
+        >
           {{ applyText }}
-        </BaseButton>
+        </el-button>
         <!-- a11y：数量变化通过 aria-live 播报 -->
         <span class="sr-only" aria-live="polite">
           {{ previewCount !== null ? '可用结果 ' + previewCount + ' 条' : '' }}
@@ -450,8 +455,14 @@ const applyFilters = async () => {
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
-  gap: var(--filter-space-md);
-  margin-top: var(--filter-space-xl);
+  gap: 12px;
+  margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  background: var(--color-bg-card);
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-default);
+  z-index: 5;
 }
 
 /* 小节标题 */
@@ -477,5 +488,26 @@ const applyFilters = async () => {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+/* 对齐“区域”面板的按钮样式 */
+.cancel-btn {
+  flex: 1;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+.cancel-btn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.apply-btn {
+  flex: 2;
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  transition: none !important;
+}
+.apply-btn:hover {
+  background-color: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
 }
 </style>

@@ -33,17 +33,20 @@
         </el-checkbox>
       </div>
 
-      <!-- 底部操作按钮 -->
+      <!-- 底部操作按钮（对齐“区域”面板样式） -->
       <div class="panel-footer">
         <BaseButton variant="ghost" size="small" @click="clearAll">清除</BaseButton>
-        <BaseButton
-          variant="primary"
-          :loading="countLoading"
-          :disabled="countLoading"
+        <el-button class="cancel-btn" size="default" @click="$emit('close')">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
           @click="apply"
         >
           {{ applyText }}
-        </BaseButton>
+        </el-button>
         <span class="sr-only" aria-live="polite">{{ srLiveText }}</span>
       </div>
     </div>
@@ -233,8 +236,14 @@ const apply = async () => {
 /* 底部操作 */
 .panel-footer {
   display: flex;
-  gap: var(--filter-space-lg);
-  margin-top: var(--filter-space-md);
+  gap: 12px;
+  margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  background: var(--color-bg-card);
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-default);
+  z-index: 5;
 }
 
 /* sr-only 辅助样式 */
@@ -248,5 +257,26 @@ const apply = async () => {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+/* 对齐“区域”面板的按钮样式 */
+.cancel-btn {
+  flex: 1;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+.cancel-btn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.apply-btn {
+  flex: 2;
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  transition: none !important;
+}
+.apply-btn:hover {
+  background-color: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
 }
 </style>

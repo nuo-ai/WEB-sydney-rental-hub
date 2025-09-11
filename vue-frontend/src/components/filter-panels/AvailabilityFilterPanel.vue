@@ -38,17 +38,18 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <BaseButton variant="secondary" @click="$emit('close')">
+        <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ cancelLabel }}
-        </BaseButton>
-        <BaseButton
-          variant="primary"
-          :loading="countLoading"
+        </el-button>
+        <el-button
+          type="primary"
+          class="apply-btn"
+          size="default"
           :disabled="!isDateRangeValid"
           @click="applyFilters"
         >
           {{ applyText }}
-        </BaseButton>
+        </el-button>
       </div>
     </div>
   </div>
@@ -58,7 +59,6 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
-import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：空出时间筛选专用面板，拆分自原 FilterPanel
 
@@ -345,7 +345,34 @@ const applyFilters = async () => {
 /* 底部操作按钮 */
 .panel-footer {
   display: flex;
-  gap: var(--filter-space-lg);
-  margin-top: var(--filter-space-3xl);
+  gap: 12px;
+  margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  background: var(--color-bg-card);
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-default);
+  z-index: 5;
+}
+/* 对齐“区域”面板的按钮样式 */
+.cancel-btn {
+  flex: 1;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+.cancel-btn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+.apply-btn {
+  flex: 2;
+  background-color: var(--juwo-primary);
+  border-color: var(--juwo-primary);
+  transition: none !important;
+}
+.apply-btn:hover {
+  background-color: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
 }
 </style>
