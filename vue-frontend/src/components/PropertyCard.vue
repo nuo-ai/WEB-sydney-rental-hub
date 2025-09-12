@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { BedDouble, Bath, CarFront, Star, MoreHorizontal, Share2, EyeOff } from 'lucide-vue-next' // 导入 Lucide 图标
 import { usePropertiesStore } from '@/stores/properties'
@@ -146,9 +146,33 @@ const emit = defineEmits(['click', 'contact'])
 // 状态管理
 const propertiesStore = usePropertiesStore()
 
-// 响应式数据
+/* 响应式数据 */
 const currentImageIndex = ref(0)
-const imageHeight = ref('386px')
+/* 根据视口动态设置轮播高度（移动端更紧凑；避免内联 style 覆盖 CSS 的高度） */
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const imageHeight = computed(() => (windowWidth.value <= 767 ? '180px' : '386px'))
+
+const _onResize = () => {
+  try {
+    windowWidth.value = window.innerWidth
+  } catch {
+    /* no-op */
+  }
+}
+onMounted(() => {
+  try {
+    window.addEventListener('resize', _onResize, { passive: true })
+  } catch {
+    /* no-op */
+  }
+})
+onUnmounted(() => {
+  try {
+    window.removeEventListener('resize', _onResize)
+  } catch {
+    /* no-op */
+  }
+})
 
 // 计算属性
 const validImages = computed(() => {
@@ -581,11 +605,26 @@ const handleMoreAction = (command) => {
   }
 
   .property-image-container {
-    height: 250px;
+    height: 180px;
   }
 
   .property-carousel :deep(.el-carousel__container) {
-    height: 250px;
+    height: 180px;
+  }
+
+  /* 更紧凑的移动端内容间距（不影响桌面） */
+  .property-content {
+    padding: 12px;
+  }
+
+  .property-address {
+    margin-bottom: 8px;
+  }
+
+  .property-features {
+    --amenity-item-gap: 8px;
+    --amenity-icon-gap: 4px;
+    margin-bottom: 8px;
   }
 }
 

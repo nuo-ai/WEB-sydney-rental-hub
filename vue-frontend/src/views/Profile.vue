@@ -1,9 +1,24 @@
 <template>
   <div class="page profile-page">
     <!-- 1. 页面头部: 完全遵循样板和视觉标准 -->
-    <header class="page__header">
-      <h1 class="typo-h1">{{ pageTitle }}</h1>
+    <header class="page__header header-with-actions">
+      <!-- 返回上一页（无历史则回首页） -->
+      <button class="icon-btn back-btn" @click="goBack" aria-label="返回上一页">
+        <ArrowLeft class="icon" />
+      </button>
+
+      <h1 class="typo-h1 page-title">{{ pageTitle }}</h1>
+
+      <!-- 回到首页 -->
+      <router-link to="/">
+        <BaseButton variant="ghost" aria-label="回到首页">回到首页</BaseButton>
+      </router-link>
     </header>
+
+    <!-- 账号操作：退出登录（次要按钮样式） -->
+    <section class="page-section account-actions">
+      <BaseButton variant="secondary" @click="handleLogout">退出登录</BaseButton>
+    </section>
 
     <!-- 2. 页面内容区 -->
     <main class="page__content">
@@ -68,6 +83,9 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { ArrowLeft } from 'lucide-vue-next'
 // 假设你的 store 文件和基础组件路径如下
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
@@ -76,6 +94,28 @@ import BaseButton from '@/components/base/BaseButton.vue' // 确保路径正确
 defineOptions({ name: 'ProfileView' })
 
 const pageTitle = ref('我的中心')
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+// 返回上一页（无历史则回首页）
+const goBack = () => {
+  try {
+    if (window.history.length > 1) router.back()
+    else router.push('/')
+  } catch {
+    router.push('/')
+  }
+}
+
+// 退出登录并回到首页
+const handleLogout = () => {
+  try {
+    authStore.logout()
+  } finally {
+    router.push('/')
+  }
+}
 
 // 6. 从 Pinia Store 获取状态
 const propertiesStore = usePropertiesStore()
@@ -139,5 +179,62 @@ const recentHistory = computed(() => historyProperties.value.slice(0, 3))
   color: var(--color-text-secondary);
 }
 
-</style>
+.header-with-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
+.header-with-actions .page-title {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+}
+
+/* 统一图标按钮样式（令牌化） */
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease, transform .1s ease;
+}
+
+.icon-btn:hover {
+  background: var(--bg-hover);
+  color: var(--color-text-primary);
+}
+
+.icon-btn:active {
+  transform: translateY(1px);
+}
+
+.icon-btn .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* 账号操作区与标题之间的节奏 */
+.account-actions {
+  padding-top: 0;
+  margin-top: 8px;
+  margin-bottom: var(--page-section-gap, 24px);
+}
+
+/* 适配移动端：保证左右控件可点区域充足 */
+@media (width <= 767px) {
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+}
+</style>
