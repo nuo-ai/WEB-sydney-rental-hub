@@ -1,7 +1,7 @@
 ![1757262958422](image/techContext/1757262958422.png)# 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-11
+**最后更新**: 2025-09-12
 
 ---
 
@@ -126,6 +126,20 @@ python scripts/run_backend.py  # localhost:8000
 - 别名/编辑器一致性
   - jsconfig.json 增加 "baseUrl": "." 并标准化 "@/*": ["src/*"]，与 Vite alias 一致
 - 溯源：commit 5164a36..fe8f012
+
+## 视觉标准 v1 与样板约定（2025-09-12）
+
+- 文档与样板
+  - 新页面必须遵循 docs/new-page-visual-standard.md；基础骨架参考 views/_PageScaffoldExample.vue（.page + page__* 区块、移动端 padding-bottom 防遮挡）。
+  - 前端表现：移动端左右 16px、桌面 32px；区块间距 `--page-section-gap/lg`；空状态/骨架屏中性统一；图标/按钮/输入均走令牌与基类组件。
+- 图标与颜色
+  - 图标统一使用 lucide-vue-next，颜色继承 currentColor；禁止在图标内部硬编码色值，颜色由外层 class + 令牌控制。
+  - Stylelint 守卫要求 color/background/border/fill/stroke/box-shadow/outline 等必须使用 var(--*)（tokens 定义入口文件除外）。
+- 路由/命名一致性
+  - 路由懒加载引用与组件文件名保持一致（例如 ChatView.vue → `import('../views/ChatView.vue')`）；移除未使用路由以保证 HMR/构建稳定。
+- 导航策略（执行约定）
+  - 默认采用方案 A：主导航“搜索/收藏”，右侧“AI 助手/我的”；业务工具页（地图/对比/通勤）不进入顶栏，由业务场景页承载入口。
+  - 地图页当前隐藏（无按钮、无路由）；若需恢复，入口应在页面操作区而非顶栏。
 
 ## 规格行（spec-row/spec-item/spec-text）变量与用法（2025-09-11）
 

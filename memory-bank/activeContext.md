@@ -1,7 +1,13 @@
 # 当前上下文与紧急焦点
-最后更新：2025-09-11
+最后更新：2025-09-12
 
 今日快照（精简版，≤10行）
+- NAV-CLEANUP-A：顶栏按方案 A 收敛（主导航“搜索/收藏”，右侧“AI助手/我的”）；同步移除移动端底部导航“地图”项。前端表现：顶栏信息密度下降，聚焦“筛选→收藏”。溯源：47cab8b..125e590
+- HOME-MAP-ENTRY-REMOVED：HomeView 移除“地图视图”按钮（MapIcon/方法/样式删除）。前端表现：标题区右侧仅保“排序”下拉。溯源：47cab8b..125e590
+- ROUTER-CHAT-FIX：/chat 路由由 Chat.vue 更正为 ChatView.vue，修复 500。前端表现：AI 助手入口可正常进入。溯源：47cab8b..125e590
+- MAP-ROUTE-HIDDEN：移除 /map 路由，彻底隐藏地图页面。前端表现：无地图页面与导航入口。溯源：47cab8b..125e590
+- DOCS-VISUAL-STANDARD-V1：新增 docs/new-page-visual-standard.md；views/_PageScaffoldExample.vue 增补“前端表现要点”，去掉 lang="ts"。前端表现：新增页面骨架/令牌/文字/图标/空态/响应式统一。溯源：47cab8b..125e590
+- IA-FAVORITES-PROFILE：确立边界——Favorites 专注收藏列表与管理（单一真源 /favorites）；Profile 仅做“收藏概览 + 入口”。前端表现：避免“收藏”能力重复出现在“我的”。溯源：47cab8b..125e590
 - LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP：列表页 H1 字号/行高改 22/26 与价格主数字一致；卧室/浴室/车位数字选项改连体 segmented（左右端 2px 圆角，中段无圆角，相邻边框 -1px 折叠消缝）；视觉配色与状态逻辑不变（沿用令牌）；交互仍为单选 ≥N。溯源：commit 4146bd1
 - SPEC-ROW-UNIFY-LIST+DETAIL：引入全局规格变量 --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap 并变量化全局规则；列表与详情接入规范类 spec-row/spec-item/spec-text，局部容器就近覆写 18/14/18/6/12，移除局部硬编码尺寸，修正详情页垂直间距为 12px。前端表现：图标尺寸与横向间距在列表与详情完全一致。溯源：commit 5b7254c..25ff698
 - ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE：全站导航/首页/个人中心图标统一 lucide-vue-next + currentColor；移除 Font Awesome 引用；导航数据结构加入 iconComp；Logo 改 Home 图标；Profile 标签与按钮统一图标尺寸类。前端表现：图标风格统一，颜色随文字色继承，中性化，主题切换更稳。溯源：commit fe8f012..2a9dd4d
@@ -46,6 +52,8 @@
 - 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
 
 下一步
+- [P0] Profile 页结构化：收藏概览（最近3条 + 总数 + 查看全部 → /favorites）、历史浏览入口、已保存筛选与通知入口（占位），严格使用“新页面视觉标准 v1”。溯源：47cab8b..125e590
+- [P0] 保存筛选（本地版）：FilterPanel 顶部“保存/订阅”入口 + Profile“我的筛选”管理（占位；后续接 Supabase 通知）。溯源：47cab8b..125e590
 - [SPRINT-START] 设计系统合规性收尾冲刺 (P1, P2)
   - [ ] [P1] 令牌定义梳理与清理 (@deprecated)
   - [ ] [P1] 图标系统完全统一 (lucide + currentColor)

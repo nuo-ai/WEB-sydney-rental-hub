@@ -584,3 +584,18 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - PR 审查要点：
   - 若发现 `var(--*, #xxx)`/`var(--*, rgb/rgba/命名色)`，一律要求改为“纯令牌”；如对应 token 尚未存在，应先在根 tokens 定义入口补齐后再使用。
 - 溯源：progress 2025-09-10｜FILTER-PANELS-HOVER-NEUTRAL & ENTRY-CHIPS-TOKENIZED（commit 0b6e146..806d3a3）
+
+## 信息架构与导航策略（新增 2025-09-12）
+
+- 收藏与我的的边界
+  - 原则：收藏（/favorites）是“收藏管理”的唯一真源；“我的”（/profile）只承载“收藏概览 + 入口”，不复制完整管理能力（排序/批量/对比/备注/标签）。
+  - 前端表现：在“我的”页仅展示最近 3 条收藏与“查看全部收藏”按钮，点击进入 /favorites。避免两处页面功能重叠。
+- 导航策略
+  - 默认采用方案 A：主导航仅保“搜索/收藏”，右侧为“AI 助手/我的”。业务工具页（如 地图/对比/通勤）不进入顶栏，由业务场景页提供入口。
+  - 地图入口（如需）在首页/列表页“操作区”提供按钮，而非顶栏。
+- 路由命名一致性
+  - 组件文件名与路由引用保持一致（如 ChatView.vue → import('../views/ChatView.vue')）。
+  - 移除未使用的路由配置与冗余视图，确保热更新与构建稳定。
+- 回滚与兼容
+  - 导航策略可通过修改 Navigation.vue 中数据数组快速回滚；“我的”页移除概览模块即可回退到纯设置页。
+- 溯源：47cab8b..125e590（NAV-CLEANUP-A / ROUTER-CHAT-FIX / HOME-MAP-ENTRY-REMOVED / DOCS-VISUAL-STANDARD-V1）

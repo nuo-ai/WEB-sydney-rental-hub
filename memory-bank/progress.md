@@ -5,6 +5,14 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-12｜NAV-CLEANUP-A  
+  顶栏按方案 A 收敛（主导航“搜索/收藏”，右侧“AI助手/我的”）；同步隐藏地图入口与路由。前端表现：顶栏更聚焦。｜溯源：47cab8b..125e590
+- 2025-09-12｜HOME-MAP-ENTRY-REMOVED  
+  HomeView 移除“地图视图”按钮（MapIcon/方法/样式删除），仅保排序下拉。｜溯源：47cab8b..125e590
+- 2025-09-12｜ROUTER-CHAT-FIX  
+  /chat 路由由 Chat.vue 更正为 ChatView.vue，修复 500 报错。｜溯源：47cab8b..125e590
+- 2025-09-12｜DOCS-VISUAL-STANDARD-V1  
+  新增 docs/new-page-visual-standard.md；样板 _PageScaffoldExample.vue 增补“前端表现要点”。｜溯源：47cab8b..125e590
 - 2025-09-11｜LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP  
   列表页 H1 字号/行高改 22/26 与价格主数字一致；卧室/浴室/车位数字选项连体 segmented（左右端 2px 圆角；相邻边框 -1px 折叠消缝）；视觉配色与状态逻辑不变，交互仍为单选 ≥N。｜溯源：commit 4146bd1
 - 2025-09-11｜SPEC-ROW-UNIFY-LIST+DETAIL  

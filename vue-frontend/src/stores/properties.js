@@ -238,6 +238,9 @@ export const usePropertiesStore = defineStore('properties', {
     // 收藏状态 (localStorage作为临时方案)
     favoriteIds: JSON.parse(localStorage.getItem('juwo-favorites') || '[]'),
     favoritePropertiesData: [],
+    // 新增：收藏与历史的对象数组（用于 Profile 展示；从 localStorage 恢复）
+    favoritePropertiesList: JSON.parse(localStorage.getItem('juwo-favorite-props') || '[]'),
+    historyPropertiesList: JSON.parse(localStorage.getItem('juwo-history-props') || '[]'),
 
     // 历史记录
     viewHistory: JSON.parse(localStorage.getItem('juwo-history') || '[]'),
@@ -272,14 +275,42 @@ export const usePropertiesStore = defineStore('properties', {
 
     // 获取收藏房源列表
     favoriteProperties: (state) => {
-      // 优先从专门的收藏数据中获取
+      // 优先使用对象列表（按最近添加顺序），用于 Profile 展示
+      if (Array.isArray(state.favoritePropertiesList) && state.favoritePropertiesList.length > 0) {
+        return state.favoritePropertiesList
+      }
+      // 其次使用专门的收藏数据
       if (state.favoritePropertiesData.length > 0) {
         return state.favoritePropertiesData
       }
-      // 兼容旧逻辑：从allProperties中过滤
+      // 兼容旧逻辑：从 allProperties 过滤
       return state.allProperties.filter((property) =>
         state.favoriteIds.includes(String(property.listing_id)),
       )
+    },
+
+    // 新增：获取浏览历史的房源对象列表（按最近浏览顺序）
+    historyProperties: (state) => {
+      // 若已有对象数组，直接返回
+      if (Array.isArray(state.historyPropertiesList) && state.historyPropertiesList.length > 0) {
+        return state.historyPropertiesList
+      }
+      // 兼容旧逻辑：根据 id 列表映射到已有的房源对象集合
+      const sources = [
+        ...(Array.isArray(state.favoritePropertiesData) ? state.favoritePropertiesData : []),
+        ...(Array.isArray(state.filteredProperties) ? state.filteredProperties : []),
+        ...(Array.isArray(state.allProperties) ? state.allProperties : []),
+      ]
+      const byId = new Map()
+      for (const p of sources) {
+        if (p && p.listing_id != null) {
+          const id = String(p.listing_id)
+          if (!byId.has(id)) byId.set(id, p)
+        }
+      }
+      return (Array.isArray(state.viewHistory) ? state.viewHistory : [])
+        .map((id) => byId.get(String(id)))
+        .filter(Boolean)
     },
 
     // 获取区域建议数据
@@ -765,12 +796,33 @@ export const usePropertiesStore = defineStore('properties', {
       this.selectedLocations = this.selectedLocations.filter((loc) => canonicalIdOf(loc) !== targetId)
     },
 
-    // 添加收藏
-    addFavorite(propertyId) {
-      const id = String(propertyId)
+    // 添加收藏（同时支持传入 id 或完整房源对象）
+    addFavorite(propertyOrId) {
+      const isObj = propertyOrId && typeof propertyOrId === 'object'
+      const id = isObj ? String(propertyOrId.listing_id) : String(propertyOrId)
+      if (!id) return
+
+      // id 列表去重追加
       if (!this.favoriteIds.includes(id)) {
         this.favoriteIds.push(id)
         localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
+      }
+
+      // 若传入对象，则维护对象数组与数据缓存
+      if (isObj) {
+        // favoritePropertiesList：用于 Profile 直接渲染最近条目（放到最前）
+        this.favoritePropertiesList = Array.isArray(this.favoritePropertiesList)
+          ? this.favoritePropertiesList.filter((p) => String(p?.listing_id) !== id)
+          : []
+        this.favoritePropertiesList.unshift(propertyOrId)
+
+        // favoritePropertiesData：沿用旧结构，若不存在则追加（末尾即可）
+        if (!this.favoritePropertiesData.find((p) => String(p?.listing_id) === id)) {
+          this.favoritePropertiesData.push(propertyOrId)
+        }
+
+        // 持久化对象数组
+        localStorage.setItem('juwo-favorite-props', JSON.stringify(this.favoritePropertiesList))
       }
     },
 
@@ -1028,6 +1080,32 @@ export const usePropertiesStore = defineStore('properties', {
       await this.fetchProperties()
     },
 
+    // 新增：添加浏览历史（按最近浏览排序，最多 50 条）
+    addHistory(property) {
+      try {
+        const id = property && typeof property === 'object' ? String(property.listing_id) : String(property)
+        if (!id) return
+        // 先移除已有，再添加到最前
+        this.historyPropertiesList = Array.isArray(this.historyPropertiesList) ? this.historyPropertiesList.filter((p) => String(p?.listing_id) !== id) : []
+        if (property && typeof property === 'object') {
+          this.historyPropertiesList.unshift(property)
+        }
+        // 限制长度
+        if (this.historyPropertiesList.length > 50) {
+          this.historyPropertiesList = this.historyPropertiesList.slice(0, 50)
+        }
+        // 同步 id 列表
+        const ids = (Array.isArray(this.viewHistory) ? this.viewHistory : []).filter((x) => String(x) !== id)
+        ids.unshift(id)
+        this.viewHistory = ids.slice(0, 50)
+        // 持久化
+        localStorage.setItem('juwo-history-props', JSON.stringify(this.historyPropertiesList))
+        localStorage.setItem('juwo-history', JSON.stringify(this.viewHistory))
+      } catch (e) {
+        console.warn('addHistory failed', e)
+      }
+    },
+
     // 记录浏览历史
     logHistory(propertyId) {
       const id = String(propertyId)
@@ -1067,5 +1145,10 @@ export const usePropertiesStore = defineStore('properties', {
         this.compareList.push(propertyId)
       }
     },
+  },
+  // 可选持久化配置（存在 pinia-plugin-persistedstate 时生效；否则忽略）
+  persist: {
+    key: 'properties',
+    paths: ['favoritePropertiesList','historyPropertiesList','favoriteIds','viewHistory','favoritePropertiesData']
   },
 })
