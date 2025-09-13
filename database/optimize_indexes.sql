@@ -90,10 +90,16 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_properties_bath_parking
 ON properties (bathrooms, parking_spaces)
 WHERE bathrooms IS NOT NULL AND parking_spaces IS NOT NULL;
 
--- 场景3：家具状态筛选（字符串类型）
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_properties_furnished 
-ON properties (is_furnished)
-WHERE is_furnished IN ('yes', 'no');
+-- 场景3：家具状态筛选（布尔类型）
+-- 注意：is_furnished 为 BOOLEAN，布尔列整体选择性较低，采用部分索引更有效
+-- 当查询包含 WHERE is_furnished = TRUE / FALSE 时可命中对应部分索引
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_properties_furnished_true 
+ON properties (listing_id)
+WHERE is_furnished = TRUE;
+
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_properties_furnished_false 
+ON properties (listing_id)
+WHERE is_furnished = FALSE;
 
 -- ============================================================================
 -- 7. 分页优化索引 - 支持高效的游标分页

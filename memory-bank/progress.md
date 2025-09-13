@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-12｜MOBILE-CARD-COMPACT  
+  移动端 PropertyCard 高度 250→180；内容内边距 16→12；规格间距 12→8/6→4；窗口变化自动适配高度；桌面不变。前端表现：首屏可见更多卡片，视觉更紧凑。｜溯源：commit 008be0c..0e36a05
+- 2025-09-12｜PROFILE-NAV-ACTIONS  
+  Profile 页头新增“返回/回到首页”，并提供“退出登录”次要按钮；返回优先 router.back()，无历史回首页；退出调用 authStore.logout() 后回首页。前端表现：二级页导航更可发现。｜溯源：commit 008be0c..0e36a05
 - 2025-09-12｜NAV-CLEANUP-A  
   顶栏按方案 A 收敛（主导航“搜索/收藏”，右侧“AI助手/我的”）；同步隐藏地图入口与路由。前端表现：顶栏更聚焦。｜溯源：47cab8b..125e590
 - 2025-09-12｜HOME-MAP-ENTRY-REMOVED  

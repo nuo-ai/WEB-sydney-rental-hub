@@ -72,7 +72,7 @@
           <div class="alert-left">
             <Bell :size="20" />
             <span class="label">Property alert</span>
-            <el-switch v-model="alertOn" size="small" inactive-text="Off" />
+            <BaseToggle v-model="alertOn" size="sm" aria-label="Property alert" />
           </div>
 
           <div class="actions-right">
@@ -187,6 +187,7 @@ import FilterPanel from '@/components/FilterPanel.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import { Bell, ArrowUpDown } from 'lucide-vue-next'
+import BaseToggle from '@/components/base/BaseToggle.vue'
 
 /* 路由 */
 const router = useRouter()

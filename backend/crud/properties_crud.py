@@ -238,7 +238,8 @@ def get_all_properties_from_db(
                     property_features=row[13],
                     latitude=row[14],
                     longitude=row[15],
-                    geom_wkt=row[16]
+                    geom_wkt=row[16],
+                    is_furnished=row[18]
                 ))
         logging.info(f"Fetched {len(properties_list)} properties for the current page.")
     except psycopg2.Error as e:
@@ -262,7 +263,7 @@ def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
                     listing_id, address, suburb, rent_pw, bedrooms, bathrooms, property_type,
                     property_url, postcode, bond, parking_spaces, 
                     CAST(available_date AS TEXT), images, property_features, 
-                    latitude, longitude, ST_AsText(geom) AS geom_wkt, property_description AS description,
+                    latitude, longitude, ST_AsText(geom) AS geom_wkt, is_furnished, property_description AS description,
                     property_headline, inspection_times
                 FROM properties 
                 WHERE listing_id = %s
@@ -282,15 +283,16 @@ def get_property_by_id_from_db(listing_id: strawberry.ID) -> Optional[Property]:
                     postcode=str(row[8]) if row[8] is not None else None,
                     bond=row[9],
                     parking_spaces=row[10],
-                    available_date=row[11], # Already cast to TEXT in query
+                    available_date=row[11],  # Already cast to TEXT in query
                     images=row[12],
                     property_features=row[13],
                     latitude=row[14],
                     longitude=row[15],
                     geom_wkt=row[16],
-                    description=row[17], # This line now correctly maps from 'property_description AS description'
-                    property_headline=row[18] if len(row) > 18 else None, # 添加property_headline字段
-                    inspection_times=row[19] if len(row) > 19 else None
+                    is_furnished=row[17],
+                    description=row[18],  # from 'property_description AS description'
+                    property_headline=row[19] if len(row) > 19 else None,
+                    inspection_times=row[20] if len(row) > 20 else None
                 )
                 logging.info(f"Fetched property with ID {listing_id} from DB.")
             else:

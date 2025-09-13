@@ -18,7 +18,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, date
 # import os # os and load_dotenv are now handled in server.db
 import logging
-from typing import Any, Dict, List, Optional, TypeVar, Generic
+from typing import Any, Dict, List, Optional, TypeVar, Generic, Tuple
 import json
 import asyncio
 import os
@@ -185,7 +185,7 @@ def decode_cursor(cursor: str) -> str:
     return base64.urlsafe_b64decode(cursor.encode('utf-8')).decode('utf-8')
 
 # Asynchronous pagination logic adapted for psycopg2
-async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> (List[Dict], PaginationInfo):
+async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> Tuple[List[Dict], PaginationInfo]:
     def _db_calls():
         with db_conn.cursor() as cursor:
             cursor.execute(count_query, params)
@@ -1390,13 +1390,18 @@ async def get_properties(
         )
         params.append(date_to)
     
-    # Add furnished filter - is_furnished field is a string ("yes"/"no"/"unknown")
+    # 中文注释：修正家具筛选逻辑
+    # 原实现将 is_furnished 视为字符串('yes'/'no'/'unknown')，但数据库字段为 BOOLEAN，导致筛选条件永远不命中。
+    # 现改为：前端 isFurnished=true -> is_furnished = TRUE；isFurnished=false -> is_furnished = FALSE
+    # 注意：不再把 false 等同于 ('no' OR 'unknown')，避免用户未勾选时产生误导性过滤。
     if isFurnished is not None:
+        # 兼容历史三态字符串/布尔存储：将 is_furnished 统一转为文本后做集合匹配，避免类型不一致导致的 500
+        # true 分支：'t','true','yes','1' 均视为有家具
+        # false 分支：'f','false','no','0' 均视为无家具
         if isFurnished:
-            conditions.append("is_furnished = 'yes'")
+            conditions.append("NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1')")
         else:
-            # When not furnished, include both 'no' and 'unknown'
-            conditions.append("(is_furnished = 'no' OR is_furnished = 'unknown')")
+            conditions.append("NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('f','false','no','0')")
     
     # Build WHERE clause
     where_clause = ""

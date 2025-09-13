@@ -2,6 +2,8 @@
 最后更新：2025-09-12
 
 今日快照（精简版，≤10行）
+- MOBILE-CARD-COMPACT：移动端 PropertyCard 图片高 250→180、内容内边距 16→12、规格间距 12→8/6→4；桌面不变；窗口变化动态适配高度。前端表现：首屏可见更多卡片，视觉更紧凑。溯源：commit 008be0c..0e36a05
+- PROFILE-NAV-ACTIONS：Profile 页头新增“返回/回到首页”与“退出登录”按钮；返回优先 router.back() 无历史退首页；退出调用 authStore.logout() 再回首页。前端表现：二级页导航更可发现。溯源：commit 008be0c..0e36a05
 - NAV-CLEANUP-A：顶栏按方案 A 收敛（主导航“搜索/收藏”，右侧“AI助手/我的”）；同步移除移动端底部导航“地图”项。前端表现：顶栏信息密度下降，聚焦“筛选→收藏”。溯源：47cab8b..125e590
 - HOME-MAP-ENTRY-REMOVED：HomeView 移除“地图视图”按钮（MapIcon/方法/样式删除）。前端表现：标题区右侧仅保“排序”下拉。溯源：47cab8b..125e590
 - ROUTER-CHAT-FIX：/chat 路由由 Chat.vue 更正为 ChatView.vue，修复 500。前端表现：AI 助手入口可正常进入。溯源：47cab8b..125e590

@@ -3,9 +3,9 @@
     <!-- 1. 页面头部: 完全遵循样板和视觉标准 -->
     <header class="page__header header-with-actions">
       <!-- 返回上一页（无历史则回首页） -->
-      <button class="icon-btn back-btn" @click="goBack" aria-label="返回上一页">
-        <ArrowLeft class="icon" />
-      </button>
+      <BaseIconButton aria-label="返回上一页" @click="goBack">
+        <ArrowLeft />
+      </BaseIconButton>
 
       <h1 class="typo-h1 page-title">{{ pageTitle }}</h1>
 
@@ -26,7 +26,7 @@
       <!-- 3. 第一个区块：我的收藏 -->
       <section class="page-section">
         <div class="section-header">
-          <h2 class="typo-h2">我的收藏</h2>
+          <h2 class="typo-h2">我的收藏（共 {{ favoritesCount }}）</h2>
           <!-- 只有在有收藏项时才显示“查看全部”按钮 -->
           <router-link to="/favorites" v-if="favoriteProperties.length > 0">
             <BaseButton variant="ghost">查看全部</BaseButton>
@@ -50,7 +50,7 @@
       <!-- 4. 第二个区块：最近浏览 -->
       <section class="page-section">
         <div class="section-header">
-          <h2 class="typo-h2">最近浏览</h2>
+          <h2 class="typo-h2">最近浏览（共 {{ historyCount }}）</h2>
         </div>
 
         <!-- 动态内容：历史记录列表或空状态 -->
@@ -90,6 +90,7 @@ import { ArrowLeft } from 'lucide-vue-next'
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
 import BaseButton from '@/components/base/BaseButton.vue' // 确保路径正确
+import BaseIconButton from '@/components/base/BaseIconButton.vue'
 
 defineOptions({ name: 'ProfileView' })
 
@@ -121,6 +122,12 @@ const handleLogout = () => {
 const propertiesStore = usePropertiesStore()
 const favoriteProperties = computed(() => propertiesStore.favoriteProperties || [])
 const historyProperties = computed(() => propertiesStore.historyProperties || [])
+
+// 中文注释：概览页只回显总数（避免越权到管理页）
+// 为什么：Profile 仅承担“收藏概览 + 入口”，完整管理在 /favorites。
+// 前端表现：标题显示“（共 N）/（共 M）”，下方仅渲染最近 3 条。
+const favoritesCount = computed(() => favoriteProperties.value.length)
+const historyCount = computed(() => historyProperties.value.length)
 
 // 7. 实现业务逻辑：只取最近的3条记录
 const recentFavorites = computed(() => favoriteProperties.value.slice(0, 3))

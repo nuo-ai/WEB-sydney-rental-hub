@@ -124,8 +124,8 @@ def clean_data(df):
         'has_study': 'has_study_room'              # 完整描述更符合用户搜索习惯
     }, inplace=True)
 
-    # 处理特性列，现在使用varchar('yes', 'no', 'unknown')而非布尔值
-    # 这种三态设计比布尔值更适合悉尼租房市场，因为很多特性在房源描述中可能未明确提及
+    # 处理特性列：标准化为布尔；无法判定时置为 None（数据库将写入 NULL）
+    # 为什么：后端与数据库模式均使用 BOOLEAN，保持端到端一致，避免语义漂移
     feature_cols = [
         'has_air_conditioning', 'is_furnished', 'has_balcony', 'has_dishwasher',
         'has_laundry', 'has_built_in_wardrobe', 'has_gym', 'has_pool',
@@ -134,25 +134,19 @@ def clean_data(df):
         'has_intercom', 'has_lift', 'has_garbage_disposal', 'has_city_view',
         'has_water_view'
     ]
+    def _to_bool(v):
+        s = str(v).strip().lower()
+        if s in ('yes', 'true', '1'):
+            return True
+        if s in ('no', 'false', '0'):
+            return False
+        return None  # 未知 -> NULL
+    
     for col in feature_cols:
         if col in df.columns:
-            # 转换为小写并映射值，同时支持新旧格式
-            # 这种设计确保了系统能处理不同来源和不同时期的数据格式
-            df[col] = df[col].astype(str).str.lower().map({
-                'yes': 'yes', 
-                'no': 'no', 
-                'unknown': 'unknown',
-                'true': 'yes',   # 兼容旧格式
-                'false': 'no',   # 兼容旧格式
-                '1': 'yes',      # 兼容旧格式
-                '0': 'no',       # 兼容旧格式
-                'nan': 'unknown',
-                'none': 'unknown'
-            }).fillna('unknown')  # 默认未知，避免空值影响筛选功能
+            df[col] = df[col].apply(_to_bool)
         else:
-            # 如果列不存在，填充为'unknown'而非null
-            # 这样可以避免SQL查询中的null比较问题
-            df[col] = 'unknown'
+            df[col] = None
     # 处理数值列，确保类型一致性和数据有效性
     numeric_cols = ['rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces']
     for col in numeric_cols:
@@ -222,7 +216,7 @@ def clean_data(df):
         'images', 'property_features', 'agent_profile_url', 'agent_logo_url',
         'enquiry_form_action', 'geom', 'cover_image', 'furnishing_status',
         'air_conditioning_type',
-        # Feature flags (now varchar instead of boolean)
+        # Feature flags (BOOLEAN)
         'is_furnished', 'has_air_conditioning', 'has_built_in_wardrobe', 'has_laundry',
         'has_dishwasher', 'has_parking', 'has_gas_cooking', 'has_heating', 'has_intercom',
         'has_lift', 'has_gym', 'has_pool', 'has_garbage_disposal', 'has_study_room',
