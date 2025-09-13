@@ -1,114 +1,109 @@
-# Implementation Plan
+# Implementation Plan (Furnishing Semantics Fix)
+
+TODOs（按执行顺序，一次只做一小步）
+- [ ] DB 迁移（事务化）
+  - [ ] 审阅/完善 migration：database/migrations/2025-09-13-fix-feature-booleans.sql（删除特征列历史 CHECK；统一特征列为 BOOLEAN）
+  - [ ] 在开发库执行迁移（失败即回滚），确认所有特征列类型为 BOOLEAN（TRUE/FALSE/NULL）
+- [ ] ETL 集中判定（加开关，默认启用）
+  - [ ] 在 database/process_csv.py 新增函数：derive_is_furnished(row)（否定优先/模糊为未知/冲突为未知/肯定最后）
+  - [ ] 新增 load_overrides()/apply_overrides()，支持 database/furnishing_overrides.json 单条热修
+  - [ ] 在 clean_data() 接入集中判定与 overrides，最终 is_furnished 仅产出 True/False/None
+  - [ ] 增加特征开关 USE_ETL_FURNISHED（默认 true），出现异常可一键关闭回退旧逻辑
+- [ ] 重跑 ETL（开发一次跑完）
+  - [ ] C:\Python313\python.exe scripts\automated_data_update_with_notifications.py --run-once
+- [ ] 清缓存（避免旧数据干扰前端表现）
+  - [ ] POST /api/cache/invalidate?invalidate_all=true
+  - [ ] 可选：POST /api/cache/invalidate?property_id=17580846
+- [ ] 验收（前端表现）
+  - [ ] 详情：GET /api/properties/17580846 → is_furnished 为 true/false/null（非 'yes'/'no'）
+  - [ ] 点名筛选：/api/properties?listing_id=17580846&isFurnished=true&page=1&page_size=1 → 若非有家具应为空
+  - [ ] 全量：勾选“有家具”后列表显著收敛（目标≈33，以本批 CSV 为准）
+- [ ] （可选）Verification SQL 增强
+  - [ ] 在 database/verification_queries.sql 增加：异常值计数/分布统计/关键词一致性抽检
+- [ ] 文档与记录
+  - [ ] 在 reports/feature-boolean-normalization.md 记录执行步骤、结果截图/计数、fallout 与改进
+- [ ] 第二阶段（可选、灰度）Crawler Minimal Changes（不判定，仅瘦身输出）
+  - [ ] rent_pw/bond 输出为整数（不带小数）
+  - [ ] available_date 不做“自动改 Available now”，只抄页面原文（若页面为 Available now 则保留）
+  - [ ] 删除 is_furnished、has_*、image_1..4 等“结论/冗余列”；保留 images 阵列、features_raw/furnishing_status_raw 等证据
+  - [ ] 增加 schema_version（如 crawler.v2）、scraped_at；ETL 双格式兼容，稳定后去旧分支
+- [ ] 准备中文 Commit Message（验收 ok 后给出）
+
+---
 
 [Overview]
-为移动端网站的“顶部导航 + 搜索栏”建立品牌蓝基线，并关闭底部导航；同时预留可配置的底部导航变体（供后续小程序复用）。方案通过语义令牌与组件级开关实现，保证向后兼容与易回滚。
+目标：在不破坏现有工作流的前提下，修复“有家具（前端表现：勾选后仅显示带家具）”的筛选准确性。重心放在 ETL 与数据库：统一特征列为 BOOLEAN、把“是否带家具”的判断集中到 ETL（爬虫只爬不判），并提供最小风险的爬虫“小补丁”以保持“原貌采集”。
 
-本次改造聚焦于：
-- 统一导航/搜索的尺寸、间距、圆角、图标大小与交互反馈，前端表现与示例参考一致（轻量、克制）。
-- 清理顶部导航左侧图标，仅保留“Juwo”文字标识，颜色使用品牌蓝（--juwo-primary）。
-- 在网站默认关闭底部导航；通过组件 prop 与 CSS 令牌实现“随时可开启”的底栏变体，供未来小程序直接复用。
-- 所有新数值先落在组件与 page-tokens.css 的语义令牌，后续可在不改结构前提下快速调整。
+范围与思路
+- 第一阶段（最小侵入、可回滚）：不改爬虫逻辑、不删字段；数据库去除拦路的旧 CHECK 并统一 BOOLEAN；ETL 新增“否定优先/模糊为未知/冲突为未知/肯定最后”的推断逻辑（可一键开关），清缓存后验收。前端表现：勾选“有家具”仅返回 TRUE；17580846 若无家具则不再出现。
+- 第二阶段（可选、灰度）：对爬虫输出“瘦身”，只保留“最少可用字段 + 证据（evidence）”，不输出任何布尔特征结论；ETL 继续负责判定。全程版本化、向后兼容。
 
 [Types]  
-类型系统不做新增；仅定义“CSS 语义令牌”与“组件 Prop”的约束。
-
-语义令牌（CSS Variables，单位 px 除非注明）：
-- 导航（移动/桌面）
-  - --nav-h-mob: 56
-  - --nav-h-desk: 64
-  - --nav-px-mob: 16
-  - --nav-px-desk: 32
-  - --nav-gap: 24
-  - --nav-icon: 16
-  - --nav-active-underline: 2
-  - --nav-shadow: none（字符串，可选值 'none' 或阴影tokens）
-  - --bottom-nav-height: 56（用于页面 padding-bottom 防遮挡）
-  - --nav-safe-area-bottom: env(safe-area-inset-bottom, 0px)
-- 搜索栏
-  - --search-h-mob: 44
-  - --search-h-desk: 44
-  - --search-radius: 6
-  - --search-padding-x: 12
-  - --search-icon: 16
-  - --search-chip-radius: 16
-  - --search-chip-gap: 8
-  - --search-suffix-right: 12
-  - --search-suffix-hit: 32
-
-组件 Prop：
-- Navigation（src/components/Navigation.vue）
-  - disableBottomNav?: boolean（默认 true；true=网站关闭底栏，false=显示底栏；小程序可设为 false）
-  - isHidden?: boolean（已有，控制顶部隐藏）
+数据库层统一特征列为 BOOLEAN（TRUE/FALSE/NULL），NULL 表示未知/不确定；移除历史 CHECK 限制，避免 ETL 回滚。
+- 白名单列：has_air_conditioning, has_balcony, has_dishwasher, has_laundry, has_built_in_wardrobe, has_gym, has_pool, has_parking, allows_pets, has_security_system, has_storage, has_study_room, has_garden, has_gas_cooking, has_heating, has_intercom, has_lift, has_garbage_disposal, has_city_view, has_water_view, is_furnished
+- 映射规则：('t','true','yes','1')→TRUE；('f','false','no','0')→FALSE；其余→NULL
+- 可选：新增 JSONB 字段 is_furnished_evidence（保存 ETL 的判定依据，便于审计与回放），本阶段可不加。
 
 [Files]
-本次涉及的文件均为既有文件追加修改；不新增依赖与构建配置。
-
-- 新文件：无
-
-- 修改文件：
-  1) vue-frontend/src/styles/page-tokens.css
-     - 新增上述“导航/搜索”语义令牌（含注释与断点示例），不覆盖现有值，仅提供默认基线。
-  2) vue-frontend/src/components/Navigation.vue
-     - 模板：移除左侧 logo 图标，仅保留“Juwo”文字；新增 disableBottomNav prop；底栏显示条件修改为 v-if="isMobile && !disableBottomNav"。
-     - 样式：移动端高度改为 var(--nav-h-mob, 56px)；顶部/底部导航内边距/间距/图标尺寸等读令牌；底栏高度包含安全区 calc(var(--nav-h-mob, 56px) + var(--nav-safe-area-bottom, 0px))；活动态 2px 下划线读令牌。
-  3) vue-frontend/src/components/SearchBar.vue
-     - 样式：高度/圆角/图标尺寸/左右内边距/Chip 圆角与间距统一读搜索令牌；提交按钮（如展示）颜色使用 --juwo-primary。
-     - 逻辑：不改交互（移动端点击整框进入筛选；桌面展示建议列表）；仅在样式层读令牌。
-  4) 如存在布局容器（App.vue/Layout.vue/Navigation 调用处）
-     - 传入 :disableBottomNav="true"（网站默认）；若未集中调用则保持组件默认 true 即可。
-
-- 删除/移动文件：无
-
-- 配置更新：无
+- New
+  - database/migrations/2025-09-13-fix-feature-booleans.sql
+    - 删除“仅与特征列相关”的历史 CHECK
+    - 将白名单特征列 ALTER TYPE→BOOLEAN（USING CASE 按映射规则）
+  - reports/feature-boolean-normalization.md
+    - 执行顺序、缓存失效方法、API/SQL 验收清单、失败排查（重点说明：冲突→NULL 策略）
+- Modify
+  - database/process_csv.py
+    - clean_data()：接入“集中判定”结果写库（新开关控制）
+    - New: derive_is_furnished(row) 依据 title/description/features/furnishing_status 进行判定
+    - New: load_overrides()/apply_overrides() 支持单条热修（开发期方便点名校准）
+  - database/verification_queries.sql（可选增强）
+    - 异常值统计、分布统计、关键词一致性抽检 SQL
 
 [Functions]
-函数签名不新增，仅对现有属性读取与模板条件做小改。
-
-- 新增/修改
-  - Navigation.vue
-    - defineProps 增加：disableBottomNav?: Boolean = true
-    - 模板条件：<nav v-if="isMobile && !disableBottomNav" class="bottom-nav">（替换原先 v-if="isMobile"）
-  - SearchBar.vue
-    - 无函数改动；样式变量化，不影响 handleFocus/handleInput 等既有行为
-
-- 移除：无
+- New（database/process_csv.py）
+  - derive_is_furnished(row: pandas.Series) -> Optional[bool]
+    - 优先级：否定 > 模糊/条件 > 肯定；冲突→None；无证据→None
+    - 否定：unfurnished|no furniture|without furniture|不带家具 → FALSE
+    - 模糊/条件：partly/partial/semi‑furnished|optional|can be furnished|部分带家具/可配 → NULL
+    - 肯定：fully furnished|furnished|带家具（且未命中否定/模糊）→ TRUE
+    - 仅将 title/description/features/furnishing_status 作为证据；“内置/固定装置/公共配套”（A/C、balcony、gym、dishwasher、built‑in 等）不得当家具
+  - load_overrides(path="database/furnishing_overrides.json") -> Dict[int, Optional[bool]]
+  - apply_overrides(listing_id: int, inferred: Optional[bool], overrides: Dict) -> Optional[bool]
+- Modified
+  - clean_data(df)：最终 is_furnished = apply_overrides(listing_id, derive_is_furnished(row), overrides)；只产出 True/False/None
 
 [Classes]
-CSS 类组织不变，补充令牌读取与安全区计算。
-
-- 新增/修改的关键样式（示意）
-  - .top-nav: height: var(--nav-h-desk, 64px)
-  - .top-nav-content: padding-inline: var(--nav-px-desk, 32px)
-  - .nav-left/.main-nav: gap: var(--nav-gap, 24px)
-  - .main-nav-item.active::after: height: var(--nav-active-underline, 2px)
-  - .bottom-nav: height: calc(var(--nav-h-mob, 56px) + var(--nav-safe-area-bottom, 0px))
-  - .nav-container: padding-inline: var(--nav-px-mob, 16px)
-  - .nav-icon: width/height: var(--nav-icon, 16px)
-  - 搜索类：wrapper/inner 高度/圆角/内边距引用 --search-*；Chip 圆角/间距引用 --search-chip-*；后缀间距引用 --search-suffix-*
+- 无新增/修改/删除（函数化实现即可）。
 
 [Dependencies]
-不新增第三方依赖；继续使用 lucide-vue-next 图标与 Element Plus 组件。
+- 无新增三方依赖；正则与 JSON 读取使用标准库。数据库操作沿用现有 psycopg2；迁移使用纯 SQL。
 
 [Testing]
-采用手动验证 + 断点检查，保证视觉与交互符合预期。
-
-- 断点自测（宽度 360、390、768、1024）
-  - 顶部导航：移动 56/桌面 64 稳定；左侧仅“Juwo”文字；活动路由 2px 下划线；无过度阴影。
-  - 底部导航：默认不出现（网站）；将 disableBottomNav 置 false 可临时启用验证，安全区计算正确。
-  - 搜索栏：移动/桌面高度 44；圆角 6；左右 12；前缀图标 16；Chip 圆角 16、间距 8；右侧后缀对齐 12；按钮（若展示）品牌蓝。
-  - 交互：移动端点击整框进入筛选；桌面建议列表键盘导航与选择正常。
-- 回归：过滤/Overlay/相邻区域推荐等逻辑不受样式改动影响。
+- API（前端表现）
+  - 详情：GET /api/properties/17580846 → "is_furnished": true/false/null（不出现 'yes'/'no' 字符串）
+  - 点名筛选：/api/properties?listing_id=17580846&isFurnished=true&page=1&page_size=1 → 若非有家具，应返回空
+  - 全量：勾选“有家具”（前端表现：筛选按钮高亮，列表显著变短）→ 期望 ≈33（以本批 CSV 为准）
+- SQL（可选）
+  - 异常值：任一特征列不存在非 {TRUE,FALSE,NULL}
+  - 分布：COUNT(*) FILTER (WHERE is_furnished IS TRUE/FALSE/NULL)
+  - 一致性抽检：含“furnished”短语但判 NULL 的样本、含“unfurnished”短语但判 TRUE 的样本，人工复核校正规则/overrides
 
 [Implementation Order]
-先令牌再接线，逐步下沉到组件，最后开关验证底栏变体。
+1) 数据库迁移（事务化，可回滚）
+2) ETL 集中判定（加开关，默认启用）
+3) 重跑 ETL（本地一次跑完）
+4) 清缓存
+5) 验收（点名 + 全量）
+6) 观察期（overrides 热修、记录报告）
+7) 第二阶段（可选，灰度）爬虫瘦身（只爬不判，保留证据字段；ETL 双格式兼容）
 
-1) page-tokens.css：补齐 nav/search 语义令牌（含安全区变量），仅新增。
-2) Navigation.vue：
-   - 新增 disableBottomNav prop（默认 true）
-   - 去除左侧 logo 图标，仅保留文字“Juwo”
-   - 桌/移样式改为引用 nav 令牌；底栏高度含安全区
-   - 活动态下划线读令牌
-3) SearchBar.vue：样式统一读 search 令牌（高度/圆角/内边距/图标/Chip/后缀）
-4) 若需要的容器处：显式传入 :disableBottomNav="true"（或保持默认）
-5) 验证四断点前端表现；如需微调，优先改令牌值而非结构
-6) 将“底栏变体使用说明”加入注释（供小程序直接启用）
+[风险与回滚]
+- 爬虫：第一阶段零改动，风险≈0
+- 数据库：迁移全事务，失败即回滚；如需，可反向 ALTER 或从备份恢复
+- ETL：新增开关 USE_ETL_FURNISHED，异常可一键关闭回退旧行为
+- 前端表现：仅“有家具”更准确，其它功能不受影响；如数量异常，优先核查 ETL 日志与缓存状态
+
+[附：Crawler Minimal Changes（第二阶段字段建议）]
+- 保留最小集合：listing_id, property_url, source, scraped_at, schema_version, address, suburb, state, postcode_raw, property_type_raw, rent_pw_raw, bond_raw, bedrooms_raw, bathrooms_raw, parking_spaces_raw, available_date_raw, inspection_times_raw, images（数组或 JSON 字符串）, latitude_raw, longitude_raw, property_headline, description_raw, features_raw（数组原文）, furnishing_status_raw（若有）
+- 移除：任何布尔特征结论（is_furnished/has_*）与 image_1..4；由 ETL 统一判定/解析
+- 版本化灰度：ETL 在 schema_version 期间双格式兼容，稳定后去旧分支

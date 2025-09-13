@@ -155,6 +155,23 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - 在后端添加契约单元测试/契约快照测试，校验两个端点的字段一致性（至少对关键字段如 `inspection_times`）。
   - 在 PR 审查清单中加入“端点字段一致性检查”项。
 
+## 家具筛选兼容与质量闭环（新增 2025-09-13）
+
+- 家具筛选兼容守卫（后端）
+  - 原则：历史上 is_furnished 可能为 text/三态；当数据未完全布尔化时，列表筛选用“统一成文本再判断”的写法，避免类型不匹配导致 500。
+  - 模式：NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1') / ('f','false','no','0')。
+  - 回退：当列完成布尔化（ETL/迁移）后，恢复等号比较（is_furnished = TRUE/FALSE），并启用部分索引（TRUE/FALSE）提速。
+  - 溯源：commit 0e36a05..3064c42（FURNISHED-FILTER-COMPAT）
+
+- 家具判定“质量闭环”报告
+  - 内容：database/verification_queries.sql 内置 positive/negative/neutral 关键词，输出 A（肯定但 ≠TRUE）/B（否定但=TRUE）/C（中性但非 NULL）三类样本，另含近 7 日 TopN 与汇总分布。
+  - 用途：每日巡检“文案 ↔ 布尔”的不一致来源；辅助人工纠偏与后续 ETL 规则迭代。
+  - 溯源：commit 0e36a05..3064c42（FURNISHING-QUALITY-LOOP-V1）
+
+- 选择性缓存失效端点
+  - /api/cache/invalidate 支持 property_id/全量失效；修复/迁移后应触发，确保“前端表现”立即一致。
+  - 溯源：后端 Cache 设计（FastAPI Cache/Redis），与契约一致性章节配套
+
 ## 前端样式一致性（新增）
 
 - 页面背景与卡片

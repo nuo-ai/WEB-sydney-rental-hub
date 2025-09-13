@@ -141,3 +141,28 @@ SELECT
 FROM matches
 GROUP BY polarity
 ORDER BY polarity;
+
+-- F：三态分布快照（活跃房源，全量）
+-- 目的（为什么做）：一次性量化 TRUE/FALSE/NULL 占比，直观看“只显示带家具”结果是否合理收敛；同时暴露冲突→NULL 是否异常膨胀
+SELECT
+  COUNT(*) FILTER (WHERE is_furnished IS TRUE)  AS furnished_true,
+  COUNT(*) FILTER (WHERE is_furnished IS FALSE) AS furnished_false,
+  COUNT(*) FILTER (WHERE is_furnished IS NULL)  AS furnished_null,
+  COUNT(*)                                      AS total
+FROM properties
+WHERE is_active = TRUE;
+
+-- F.1：三态分布（最近30天窗口，可选）
+SELECT
+  COUNT(*) FILTER (WHERE is_furnished IS TRUE)  AS furnished_true_30d,
+  COUNT(*) FILTER (WHERE is_furnished IS FALSE) AS furnished_false_30d,
+  COUNT(*) FILTER (WHERE is_furnished IS NULL)  AS furnished_null_30d,
+  COUNT(*)                                      AS total_30d
+FROM properties
+WHERE is_active = TRUE
+  AND COALESCE(available_date, CURRENT_DATE) >= CURRENT_DATE - INTERVAL '30 days';
+
+-- F.2：点名核对（示例：17580846）
+SELECT listing_id, is_furnished
+FROM properties
+WHERE listing_id IN (17580846);

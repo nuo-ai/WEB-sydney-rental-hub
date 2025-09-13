@@ -342,3 +342,11 @@ python scripts/run_backend.py  # localhost:8000
   - NameLocationModal：“跳过”按钮改 --juwo-primary（移除旧红色）
 - 规范补充：禁止在运行代码中保留 var(--token, #hex) 形式的兜底（仅 tokens 定义文件可例外）；PR 必须消除该模式，避免主题/深浅底不一致。
 - 溯源：commit 9984dff..806d3a3｜progress 2025-09-10
+
+---
+
+## 家具筛选与审计（2025-09-13）
+
+- 背景：历史 is_furnished 可能为 boolean/text/三态混存，勾选“家具”时容易触发 500。
+- 现状：后端 /api/properties 使用兼容表达式（NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1') / ('f','false','no','0')）止血；前端表现：勾选不再 500，只返回“有家具”。
+- 日检脚本：database/verification_queries.sql（A/B/C 可疑 + 7日 TopN + 汇总）；运行参考 reports/README.md；契约与索引说明见 docs/contracts/furnishing.md。

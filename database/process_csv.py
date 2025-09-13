@@ -7,6 +7,7 @@ import glob
 import logging
 from datetime import datetime
 import json # 用于处理配置和输出结构化数据
+import re
 
 # 处理 dotenv 导入 - 添加错误处理来解决 Pylance 警告
 try:
@@ -86,6 +87,102 @@ def get_db_connection():
         logging.error(f"An unexpected error occurred while connecting to the database: {e}")
         raise
 
+# ========= 家具语义判定（集中到 ETL 层）=========
+# 特征开关：出现异常时可一键回退旧逻辑
+USE_ETL_FURNISHED = os.getenv("USE_ETL_FURNISHED", "true").strip().lower() in ("1", "true", "yes")
+
+# 预编译正则：否定 > 模糊/条件 > 肯定
+_NEG_PAT = re.compile(r"\b(unfurnished|no\s+furniture|without\s+furniture|不带家具)\b", re.IGNORECASE)
+_AMB_PAT = re.compile(r"\b(partly|partial|semi-?furnished|optional|can\s+be\s+furnished|部分带家具|可配)\b", re.IGNORECASE)
+_POS_PAT = re.compile(r"\b(fully\s+furnished|furnished|带家具)\b", re.IGNORECASE)
+
+def _text_evidence_from_row(row):
+    """仅聚合标题与正文用于兜底判定，排除 property_features 与 furnishing_status。"""
+    parts = []
+    for key in ("property_headline", "property_description"):
+        try:
+            v = row.get(key)
+        except AttributeError:
+            v = row[key] if key in row else None
+        if v is None:
+            continue
+        if isinstance(v, (list, tuple)):
+            parts.extend([str(x) for x in v if x is not None])
+        else:
+            parts.append(str(v))
+    blob = " ".join(parts).strip()
+    return blob
+
+def derive_is_furnished(row):
+    """两阶段判定：
+    阶段1（高置信度）：仅看 property_features 标签（优先，精确匹配）；
+    阶段2（兜底）：仅看标题/正文文本正则（否定 > 模糊 > 肯定）；无证据→None。
+    """
+    # 阶段1：features 精确判定（大小写不敏感，等值/整体匹配）
+    try:
+        feats = row.get('property_features') if hasattr(row, 'get') else row['property_features']
+    except Exception:
+        feats = None
+
+    if feats:
+        feat_text = str(feats).lower()
+        # 只看标准标签含义，优先否定
+        has_unf = bool(re.search(r'\bunfurnished\b', feat_text))
+        has_fur = bool(re.search(r'\bfurnished\b', feat_text))
+        if has_unf and has_fur:
+            return None  # 冲突 → 未知
+        if has_unf:
+            return False
+        if has_fur:
+            return True
+        # 其他词（如 partly/optional/can be furnished/家电词等）不在阶段1内给结论，转入阶段2
+
+    # 阶段2：标题/正文兜底（不再使用 furnishing_status / features）
+    try:
+        blob = _text_evidence_from_row(row).lower()
+    except Exception:
+        return None
+    if not blob:
+        return None
+
+    has_neg = bool(_NEG_PAT.search(blob))
+    has_amb = bool(_AMB_PAT.search(blob))
+    has_pos = bool(_POS_PAT.search(blob))
+
+    # 冲突处理：若命中否定且同时出现肯定/模糊 → 未知
+    if has_neg and (has_pos or has_amb):
+        return None
+    if has_neg:
+        return False
+    if has_amb:
+        return None
+    if has_pos:
+        return True
+    return None
+
+def load_overrides(path="database/furnishing_overrides.json"):
+    """加载点名覆盖表。用于开发期快速热修个别房源。
+    格式: { "17580846": false, "123456": true }"""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        # 统一 key 为字符串，值允许 true/false/null
+        return {str(k): (v if v in (True, False, None) else None) for k, v in data.items()}
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        logging.warning(f"加载 overrides 失败，将忽略: {e}")
+        return {}
+
+def apply_overrides(listing_id, inferred, overrides):
+    """应用点名覆盖：有覆盖优先覆盖；否则使用推断结果。"""
+    if listing_id is None:
+        return inferred
+    try:
+        return overrides.get(str(int(listing_id)), inferred)
+    except Exception:
+        return inferred
+
 def clean_data(df):
     """清洗和转换数据框。
     
@@ -147,6 +244,28 @@ def clean_data(df):
             df[col] = df[col].apply(_to_bool)
         else:
             df[col] = None
+    # —— ETL 集中判定接入：仅针对 is_furnished，其他特征列保持原有兜底布尔化 —— 
+    if USE_ETL_FURNISHED:
+        try:
+            overrides = load_overrides()
+        except Exception as e:
+            logging.warning(f"加载 overrides 失败（使用空覆盖，继续运行）：{e}")
+            overrides = {}
+        def _infer_row(row):
+            """对单行进行家具判定并应用点名覆盖。出错时兜底返回现有布尔映射结果。"""
+            try:
+                inferred = derive_is_furnished(row)
+                # 若推断为 None，则写入 None；不强行沿用旧值
+                lid = row.get('listing_id') if hasattr(row, 'get') else row['listing_id']
+                return apply_overrides(lid, inferred, overrides)
+            except Exception as e:
+                logging.debug(f"derive_is_furnished 异常，使用原值兜底: {e}")
+                try:
+                    return row.get('is_furnished')
+                except Exception:
+                    return None
+        df['is_furnished'] = df.apply(_infer_row, axis=1)
+
     # 处理数值列，确保类型一致性和数据有效性
     numeric_cols = ['rent_pw', 'bond', 'bedrooms', 'bathrooms', 'parking_spaces']
     for col in numeric_cols:
@@ -258,7 +377,7 @@ def load_data_to_db(df, conn):
         try:
             # 1. Get existing properties from DB for comparison
             logging.info("Fetching existing properties from database for comparison...")
-            cursor.execute("SELECT listing_id, rent_pw, is_active, available_date, inspection_times, postcode, property_headline FROM properties")
+            cursor.execute("SELECT listing_id, rent_pw, is_active, available_date, inspection_times, postcode, property_headline, is_furnished FROM properties")
             db_properties = {
                 row[0]: {
                     'rent_pw': row[1],
@@ -267,6 +386,7 @@ def load_data_to_db(df, conn):
                     'inspection_times': row[4],
                     'postcode': (str(row[5]) if row[5] is not None else ''),
                     'property_headline': row[6],
+                    'is_furnished': row[7],
                 } for row in cursor.fetchall()
             }
             db_ids = set(db_properties.keys())
@@ -290,7 +410,8 @@ def load_data_to_db(df, conn):
                         (row.get('available_date') or None) != existing['available_date'] or
                         (row.get('inspection_times') or None) != existing['inspection_times'] or
                         new_postcode != existing['postcode'] or
-                        (row.get('property_headline') or None) != existing['property_headline']
+                        (row.get('property_headline') or None) != existing['property_headline'] or
+                        (row.get('is_furnished') != existing.get('is_furnished'))
                     )
                     if changed:
                         updated_listings.append(row)
@@ -327,6 +448,7 @@ def load_data_to_db(df, conn):
                     inspection_times = %s,
                     postcode = %s,
                     property_headline = %s,
+                    is_furnished = %s,
                     status = 'updated',
                     status_changed_at = %s,
                     is_active = TRUE
@@ -344,6 +466,7 @@ def load_data_to_db(df, conn):
                         row.get('inspection_times'),
                         str(row.get('postcode') or '').strip(),
                         row.get('property_headline'),
+                        row.get('is_furnished'),
                         datetime.now().isoformat(),
                         row['listing_id'],
                     ))
@@ -356,7 +479,7 @@ def load_data_to_db(df, conn):
             active_off_market_ids = [pid for pid in off_market_ids if db_properties[pid]['is_active']]
 
             if active_off_market_ids:
-                off_market_query = "UPDATE properties SET is_active = FALSE, status = 'off-market', status_changed_at = %s WHERE listing_id IN %s"
+                off_market_query = "UPDATE properties SET is_active = FALSE, status = 'off-market', status_changed_at = %s, is_furnished = NULL WHERE listing_id IN %s"
                 cursor.execute(off_market_query, (datetime.now().isoformat(), tuple(active_off_market_ids)))
                 logging.info(f"Marked {len(active_off_market_ids)} properties as off-market.")
 

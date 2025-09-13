@@ -1232,6 +1232,7 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
         "latitude": prop.latitude,
         "longitude": prop.longitude,
         "geom_wkt": prop.geom_wkt,
+        "is_furnished": prop.is_furnished,
         "description": prop.description,  # Add description field
         "property_headline": prop.property_headline,  # 添加房源标题字段
         "inspection_times": prop.inspection_times  # 补充看房时间字段，修复刷新后消失
@@ -1256,6 +1257,10 @@ async def get_properties(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     isFurnished: Optional[bool] = None,
+    # 兼容参数（V2/部分入口）：如传入 furnished=true，则等价于 isFurnished=true
+    furnished: Optional[bool] = None,
+    # 点名过滤（便于校验）
+    listing_id: Optional[str] = None,
     # 排序参数（白名单）：price_asc/available_date_asc/suburb_az/inspection_earliest
     sort: Optional[str] = None,
 ):
@@ -1283,6 +1288,16 @@ async def get_properties(
     # 始终只返回活跃的房源（关键修复：过滤已下架房源）
     conditions.append("is_active = TRUE")
     
+    # 指定 listing_id 时做点名过滤（便于校验/复现单条）
+    if listing_id:
+        try:
+            lid = int(listing_id)
+            conditions.append("listing_id = %s")
+            params.append(lid)
+        except (ValueError, TypeError):
+            # 忽略非法 id，不影响其他条件
+            pass
+
     # Add suburb filter - support multiple suburbs (comma-separated)
     if suburb:
         # Split by comma and trim whitespace
@@ -1390,15 +1405,11 @@ async def get_properties(
         )
         params.append(date_to)
     
-    # 中文注释：修正家具筛选逻辑
-    # 原实现将 is_furnished 视为字符串('yes'/'no'/'unknown')，但数据库字段为 BOOLEAN，导致筛选条件永远不命中。
-    # 现改为：前端 isFurnished=true -> is_furnished = TRUE；isFurnished=false -> is_furnished = FALSE
-    # 注意：不再把 false 等同于 ('no' OR 'unknown')，避免用户未勾选时产生误导性过滤。
-    if isFurnished is not None:
-        # 兼容历史三态字符串/布尔存储：将 is_furnished 统一转为文本后做集合匹配，避免类型不一致导致的 500
-        # true 分支：'t','true','yes','1' 均视为有家具
-        # false 分支：'f','false','no','0' 均视为无家具
-        if isFurnished:
+    # 家具筛选（兼容 isFurnished 与 furnished 两个键；仅当显式为 true/false 时才筛）
+    # 说明：将 is_furnished 统一转为文本后做集合匹配，避免历史 text/三态导致的 500；不会把 'unknown' 当 true/false
+    effectiveFurnished = isFurnished if isFurnished is not None else furnished
+    if effectiveFurnished is not None:
+        if effectiveFurnished:
             conditions.append("NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1')")
         else:
             conditions.append("NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('f','false','no','0')")

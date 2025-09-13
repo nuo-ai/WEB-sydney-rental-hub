@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-13｜FURNISHED-FILTER-COMPAT  
+  勾选“家具”不再 500；仅显示确认为“有家具”的房源（后端采用兼容写法，前端表现不变）。｜溯源：commit 0e36a05..3064c42
+- 2025-09-13｜FURNISHING-QUALITY-LOOP-V1  
+  新增审计 SQL（关键词正/负/中性 vs 布尔 A/B/C + 7日TopN + 汇总）与运行文档，支持日检；不改前端。｜溯源：commit 0e36a05..3064c42
 - 2025-09-12｜MOBILE-CARD-COMPACT  
   移动端 PropertyCard 高度 250→180；内容内边距 16→12；规格间距 12→8/6→4；窗口变化自动适配高度；桌面不变。前端表现：首屏可见更多卡片，视觉更紧凑。｜溯源：commit 008be0c..0e36a05
 - 2025-09-12｜PROFILE-NAV-ACTIONS  
