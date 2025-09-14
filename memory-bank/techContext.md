@@ -1,7 +1,7 @@
 ![1757262958422](image/techContext/1757262958422.png)# 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-12
+**最后更新**: 2025-09-15
 
 ---
 
@@ -45,6 +45,16 @@ vue-frontend/
 ---
 
 ## 筛选系统技术约定（2025-09-14）
+
+### 2025-09-15 补充（P0 落地）
+- 前端 composable：useFilterPreviewCount
+  - 统一“应用（N）”预估逻辑；内置并发序号守卫（丢弃过期响应）、300ms 防抖、onUnmounted 清理定时器。
+  - 计数失败返回 null（不再回退 0），前端表现：按钮文案退回“应用/确定”，避免误导。
+  - 已接入分面：Area/Price/Bedrooms/Availability/More；Area 入口仍保 200ms 入口节流 + 300ms 统一防抖。
+- V1 契约兜底：仅选邮编时自动展开为多个 suburb 注入 suburb CSV（计数与列表口径一致）。
+- 后端实施约定（与 systemPatterns 对齐）：
+  - 统一 WHERE 构建器：_build_where_and_params_for_properties 产出 WHERE 与参数；列表与计数严格共用，防漂移；统一参数化占位。
+  - REST 多值 OR 参数参数化：/api/properties 的 bedrooms/bathrooms/parking 改为 %s 占位 + params.extend(...)，移除字符串拼接。
 
 - Pinia API
   - applyFilters(filters, options = { sections?: string[] })

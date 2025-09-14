@@ -2,6 +2,9 @@
 最后更新：2025-09-14
 
 今日快照（精简版，≤10行）
+- FILTER-P0-UNIFIED-BE-FE：后端统一筛选构建器 + REST 多值 OR 参数化；前端 useFilterPreviewCount 统一“应用（N）”并发/防抖/卸载清理；计数失败返回 null 做失败降级（按钮退回“应用/确定”）。前端表现：预估 N 更稳定，失败不误报 0；只选邮编可生效。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
+- AREA/PRICE/BEDROOMS/AVAIL/MORE-PREVIEW：五个分面接入全局 previewDraft + composable；Area 入口 200ms 节流 + 统一 300ms 防抖；URL 仅写非空。前端表现：PC 分离式与移动端统一面板的“应用（N）/确定（N）”一致。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
+- POSTCODE-EXPAND-V1：V1 契约下仅选“邮编”时自动展开为多个 suburb 注入 suburb CSV，计数与列表口径一致。前端表现：只选邮编时数量与列表一致。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
 - FILTER-SECTION-BOUNDARY：Pinia applyFilters 新增 options.sections；PC 各面板与移动端统一面板按分组传入，前端表现：每次“应用”只影响本组，跨面板不覆盖。溯源：commit fceb35f..e8e25d5
 - REGION-GUARD-RELAX（预览计数修复）：getFilteredCount/applyFilters 的“区域必选”守卫放宽，若本次 params/filters 含 suburb/suburbs/postcodes 即允许计数/请求；仅在 selectedLocations 为空且本次参数也无区域时短路。前端表现：选区（草稿/URL）后“应用（N）”立即反映真实数量。溯源：commit fceb35f..e8e25d5
 - FURNISHING-SEMANTICS-PHASE1：ETL 两阶段（features 优先→标题/正文兜底，排除 furnishing_status）；下架 off-market 同步置空 is_furnished；执行一次性清理 SQL；固化 PowerShell 运维模板。前端表现：勾选“有家具”更准确；详情/直查不误读下架旧 TRUE。溯源：commit 3064c42..f288eef

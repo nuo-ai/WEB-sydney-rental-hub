@@ -3,6 +3,11 @@
 ---
  
 ## 筛选系统 v2 模式（新增 2025-09-14）
+
+### 2025-09-15 补充
+- 预估计数 composable（useFilterPreviewCount）：统一“应用（N）”口径，内置并发序号守卫、防抖与组件卸载清理；计数失败返回 null 执行“失败降级”，前端表现为按钮退回“应用/确定”，避免误报 0。
+- 后端 WHERE 构建器模式：统一使用 `_build_where_and_params_for_properties` 产出 WHERE 与参数，列表查询与计数查询严格共用，防止条件/参数漂移；参数化占位杜绝 SQL 注入；排序仅允许最小白名单（ASC/DESC）。
+- REST 多值 OR 条件参数化：/api/properties 中 bedrooms/bathrooms/parking 的多值/下限 OR 条件改为 `%s` 占位并统一 `params.extend(...)`，禁止字符串拼接，确保安全与可维护。
 - 分组边界：Pinia `applyFilters(filters, { sections })`；组件按所属分组传入（Area/Price/Bedrooms/Availability/More），移动端统一面板可一次传多分组。仅删除这些分组旧键再合并，避免跨面板覆盖。
 - 预览口径：`getPreviewCount` 先按分组“精准删键”再合入草稿，清空场景需 `clearPreviewDraft` + `markPreviewSection` 触发删旧键；预览与应用映射一致。
 - URL 同步：仅在“应用后”写入且仅写本分组非空参数；刷新/直链可复现；顶部标签仅读“已应用”。

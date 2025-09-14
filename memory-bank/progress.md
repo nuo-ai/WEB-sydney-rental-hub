@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-15｜FILTER-P0-UNIFIED-COUNT  
+  后端统一 WHERE 构建器 + REST 多值 OR 参数化；前端 useFilterPreviewCount 统一“应用（N）”计数（并发守卫/防抖/卸载清理）；计数失败返回 null 做失败降级，V1 契约下仅选邮编自动展开为 suburb CSV，预估与列表口径一致。｜溯源：e8e25d5..41b7586
 - 2025-09-14｜FILTER-SECTION-BOUNDARY  
   Pinia applyFilters 新增 options.sections；PC/移动面板按分组传入；仅更新本组，跨面板不覆盖。｜溯源：commit fceb35f..e8e25d5
 - 2025-09-14｜REGION-GUARD-RELAX  

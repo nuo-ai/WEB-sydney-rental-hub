@@ -1244,6 +1244,7 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
 @app.get("/api/properties", tags=["Properties"], response_model=APIResponse[List[Dict]])
 @cache(expire=900, key_builder=cache_key_by_url)  # Cache for 15 minutes（包含URL查询参数到缓存键）
 async def get_properties(
+    request: Request,
     pagination: PaginationParams = Depends(), 
     db: Any = Depends(get_db_conn_dependency),
     # Filter parameters
@@ -1268,6 +1269,43 @@ async def get_properties(
     Get a paginated list of properties with optional filters.
     Supports both page-based and cursor-based pagination.
     """
+    # --- BE-002: 查询参数白名单校验（防注入/契约一致） ---
+    # 中文注释：在不改变现有键语义的前提下拦截未知键，并对白名单排序值做严格校验
+    try:
+        # 允许的查询键（V1 契约，保持与前端现状一致）
+        allowed_keys = {
+            "suburb", "property_type", "bedrooms", "bathrooms", "parking",
+            "minPrice", "maxPrice", "date_from", "date_to",
+            "isFurnished", "furnished",
+            "listing_id",
+            "page", "page_size", "cursor", "sort",
+        }
+        qp_keys = set(request.query_params.keys())
+        unknown_keys = sorted(list(qp_keys - allowed_keys))
+        invalid_values = {}
+
+        # 排序值白名单：其余值一律 400，兜底排序在后续仍为 listing_id ASC
+        allowed_sorts = {"price_asc", "available_date_asc", "suburb_az", "inspection_earliest"}
+        if "sort" in request.query_params:
+            s_raw = (request.query_params.get("sort") or "").strip().lower()
+            if s_raw and s_raw not in allowed_sorts:
+                invalid_values["sort"] = {"got": s_raw, "allowed": sorted(list(allowed_sorts))}
+
+        if unknown_keys or invalid_values:
+            return error_response(
+                code=ErrorCodes.BAD_REQUEST,
+                message="Invalid query parameters",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                details={
+                    "unknown_keys": unknown_keys or None,
+                    "allowed_keys": sorted(list(allowed_keys)),
+                    "invalid_values": invalid_values or None,
+                }
+            )
+    except Exception as _be002_e:
+        # 容错：白名单校验异常不应阻断正常查询，记录日志后继续
+        logger.warning(f"Whitelist validation failed but skipped: {_be002_e}")
+
     # Build the base query with filters - 只选择列表页需要的字段，减少数据传输
     # 排除大字段如 description 和 property_features，提升性能
     base_query = """SELECT 
