@@ -640,19 +640,20 @@ export const usePropertiesStore = defineStore('properties', {
       this.error = null
 
       try {
-        // Store 守卫：未选择区域时直接短路返回，避免无意义请求
-        if (
-          this.featureFlags?.requireRegionBeforeFilter &&
-          !hasRegionSelected(this.selectedLocations)
-        ) {
-          // 清空当前结果，维持一致 UI 行为（按钮已禁用，此处为双保险）
-          this.filteredProperties = []
-          this.totalCount = 0
-          this.totalPages = 0
-          this.hasNext = false
-          this.hasPrev = false
-          this.currentPage = 1
-          return
+        // Store 守卫：当“未选择区域”且“本次提交也不含区域键”时，才短路返回（允许草稿/URL 区域参与本次请求）
+        if (this.featureFlags?.requireRegionBeforeFilter && !hasRegionSelected(this.selectedLocations)) {
+          const hasParamRegion =
+            (filters && (filters.suburb || filters.suburbs || filters.postcodes)) ? true : false
+          if (!hasParamRegion) {
+            // 清空当前结果，维持一致 UI 行为（按钮已禁用，此处为双保险）
+            this.filteredProperties = []
+            this.totalCount = 0
+            this.totalPages = 0
+            this.hasNext = false
+            this.hasPrev = false
+            this.currentPage = 1
+            return
+          }
         }
         // 统一通过映射层构造请求参数
         // 目的：维持 V1 行为（默认），并可通过开关无缝切至 V2 契约（suburbs/price_min/...）
@@ -1003,12 +1004,13 @@ export const usePropertiesStore = defineStore('properties', {
     // 获取筛选后的结果数量
     async getFilteredCount(params = {}) {
       try {
-        // Store 守卫：未选择区域时计数恒为 0（不触发网络请求）
-        if (
-          this.featureFlags?.requireRegionBeforeFilter &&
-          !hasRegionSelected(this.selectedLocations)
-        ) {
-          return 0
+        // Store 守卫：当“未选择区域”且“本次参数也不含区域键”时，计数为 0（允许草稿/URL 参数触发计数）
+        if (this.featureFlags?.requireRegionBeforeFilter) {
+          const hasParamRegion =
+            (params && (params.suburb || params.suburbs || params.postcodes)) ? true : false
+          if (!hasRegionSelected(this.selectedLocations) && !hasParamRegion) {
+            return 0
+          }
         }
         // 计数亦走统一映射，确保与列表参数一致
         // 中文注释：P0 稳定策略——仅当显式开启开关时才走 V2，禁用“按需切换”以防契约不一致
