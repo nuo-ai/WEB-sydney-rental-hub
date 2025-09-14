@@ -5,6 +5,10 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-14｜FILTER-SECTION-BOUNDARY  
+  Pinia applyFilters 新增 options.sections；PC/移动面板按分组传入；仅更新本组，跨面板不覆盖。｜溯源：commit fceb35f..e8e25d5
+- 2025-09-14｜REGION-GUARD-RELAX  
+  放宽区域必选守卫：params/filters 含 suburb/suburbs/postcodes 即允许计数/请求；仅在确无区域时短路。前端预览数量即时正确。｜溯源：commit fceb35f..e8e25d5
 - 2025-09-14｜FURNISHING-SEMANTICS-PHASE1  
   ETL 两阶段判定：features 精确匹配优先，标题/正文兜底；排除 furnishing_status；下架 off-market 同步置空 is_furnished；执行一次性清理 SQL。前端表现：勾选“有家具”更准确，详情/直查不误读下架旧 TRUE。｜溯源：commit 3064c42..f288eef
 - 2025-09-13｜FURNISHED-FILTER-COMPAT  

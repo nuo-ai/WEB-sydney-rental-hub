@@ -1323,40 +1323,52 @@ async def get_properties(
     if bedrooms:
         bedroom_values = bedrooms.split(',')
         bedroom_conditions = []
+        bedroom_params: List[int] = []
         for value in bedroom_values:
             value = value.strip()
             if value == '4+':
-                bedroom_conditions.append("bedrooms >= 4")
+                bedroom_conditions.append("bedrooms >= %s")
+                bedroom_params.append(4)
             elif value.isdigit():
-                bedroom_conditions.append(f"bedrooms = {int(value)}")
+                bedroom_conditions.append("bedrooms = %s")
+                bedroom_params.append(int(value))
         if bedroom_conditions:
             conditions.append(f"({' OR '.join(bedroom_conditions)})")
+            params.extend(bedroom_params)
     
     # Add bathrooms filter (handle comma-separated values)
     if bathrooms:
         bathroom_values = bathrooms.split(',')
         bathroom_conditions = []
+        bathroom_params: List[int] = []
         for value in bathroom_values:
             value = value.strip()
             if value == '3+':
-                bathroom_conditions.append("bathrooms >= 3")
+                bathroom_conditions.append("bathrooms >= %s")
+                bathroom_params.append(3)
             elif value.isdigit():
-                bathroom_conditions.append(f"bathrooms = {int(value)}")
+                bathroom_conditions.append("bathrooms = %s")
+                bathroom_params.append(int(value))
         if bathroom_conditions:
             conditions.append(f"({' OR '.join(bathroom_conditions)})")
+            params.extend(bathroom_params)
     
     # Add parking filter (handle comma-separated values)
     if parking:
         parking_values = parking.split(',')
         parking_conditions = []
+        parking_params: List[int] = []
         for value in parking_values:
             value = value.strip()
             if value == '2+':
-                parking_conditions.append("parking_spaces >= 2")
+                parking_conditions.append("parking_spaces >= %s")
+                parking_params.append(2)
             elif value.isdigit():
-                parking_conditions.append(f"parking_spaces = {int(value)}")
+                parking_conditions.append("parking_spaces = %s")
+                parking_params.append(int(value))
         if parking_conditions:
             conditions.append(f"({' OR '.join(parking_conditions)})")
+            params.extend(parking_params)
     
     # Add price range filters
     if minPrice is not None:

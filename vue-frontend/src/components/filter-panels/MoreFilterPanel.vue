@@ -58,6 +58,7 @@ import { ref, computed, inject, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import BaseButton from '@/components/base/BaseButton.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：更多（高级）筛选面板。仅在“应用”时提交到 store；与其它分离式面板一致。
 
@@ -68,11 +69,12 @@ const t = inject('t') || ((k) => k)
 /* 本地状态（默认值：未勾选）仅保留“带家具” */
 const furnished = ref(false)
 
-/* 计数相关（应用（N）） */
-const previewCount = ref(null)
-const countLoading = ref(false)
-let _countTimer = null
-let _countSeq = 0 // 中文注释：计数请求序号，丢弃过期响应，避免“应用（N）”回退
+/* 计数相关（应用（N）） - 使用通用 composable 统一并发/防抖/清理 */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'more',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
 const applyText = computed(() =>
   typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
 )
@@ -88,41 +90,13 @@ const buildFilterParams = () => {
   return p
 }
 
-/* 计数：将草稿覆盖到当前已应用条件（保障必要关联） */
-const computePreviewCount = async () => {
-  const seq = ++_countSeq
-  try {
-    countLoading.value = true
-    const draft = buildFilterParams()
-    // 中文注释：当“更多”分组为空（未勾选）时，也要从 base 中剔除旧键：clear → mark，再计算预览
-    if (Object.keys(draft).length === 0) {
-      propertiesStore.clearPreviewDraft('more')
-      propertiesStore.markPreviewSection('more')
-    } else {
-      propertiesStore.updatePreviewDraft('more', draft)
-    }
-    const n = await propertiesStore.getPreviewCount()
-    if (seq === _countSeq) {
-      previewCount.value = Number.isFinite(n) ? n : 0
-    }
-  } catch (e) {
-    if (seq === _countSeq) {
-      previewCount.value = null
-    }
-    console.warn('获取更多筛选预估数量失败', e)
-  } finally {
-    if (seq === _countSeq) {
-      countLoading.value = false
-    }
-  }
-}
-
-/* 监听与首算（300ms 防抖） */
+/* 监听与首算（通过 composable 防抖） */
 watch(furnished, () => {
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
+  scheduleCompute()
 })
-onMounted(() => computePreviewCount())
+onMounted(() => {
+  void computeNow()
+})
 
 /* 清除：重置并触发计数 */
 const clearAll = () => {
@@ -130,8 +104,7 @@ const clearAll = () => {
   // 中文注释：清理并标记该分组参与预览（即便草稿为空也删除 base 中旧键）
   propertiesStore.clearPreviewDraft('more')
   propertiesStore.markPreviewSection('more')
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
+  scheduleCompute()
 }
 
 // i18n 文案（带回退）

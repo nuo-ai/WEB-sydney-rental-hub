@@ -2,6 +2,8 @@
 最后更新：2025-09-14
 
 今日快照（精简版，≤10行）
+- FILTER-SECTION-BOUNDARY：Pinia applyFilters 新增 options.sections；PC 各面板与移动端统一面板按分组传入，前端表现：每次“应用”只影响本组，跨面板不覆盖。溯源：commit fceb35f..e8e25d5
+- REGION-GUARD-RELAX（预览计数修复）：getFilteredCount/applyFilters 的“区域必选”守卫放宽，若本次 params/filters 含 suburb/suburbs/postcodes 即允许计数/请求；仅在 selectedLocations 为空且本次参数也无区域时短路。前端表现：选区（草稿/URL）后“应用（N）”立即反映真实数量。溯源：commit fceb35f..e8e25d5
 - FURNISHING-SEMANTICS-PHASE1：ETL 两阶段（features 优先→标题/正文兜底，排除 furnishing_status）；下架 off-market 同步置空 is_furnished；执行一次性清理 SQL；固化 PowerShell 运维模板。前端表现：勾选“有家具”更准确；详情/直查不误读下架旧 TRUE。溯源：commit 3064c42..f288eef
 - FURNISHED-FILTER-COMPAT：修复“勾选家具时报错”。后端兼容历史存储，勾选后不再 500，只显示“有家具”。前端表现：列表更干净。溯源：commit 0e36a05..3064c42
 - MOBILE-CARD-COMPACT：移动端 PropertyCard 图片高 250→180、内容内边距 16→12、规格间距 12→8/6→4；桌面不变；窗口变化动态适配高度。前端表现：首屏可见更多卡片，视觉更紧凑。溯源：commit 008be0c..0e36a05

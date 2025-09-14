@@ -47,6 +47,114 @@ def _map_row_to_property_info_for_commute(prop: Property) -> PropertyInfoForComm
         images=prop.images
     )
 
+# =========================
+# 统一筛选参数构建器（数据/计数共用）
+# 为什么：避免数据查询与计数查询的条件“漂移”，确保口径一致，并集中管理参数化拼接
+# 注意：仅构建 WHERE 子句与对应参数；排序/分页在调用处处理
+# =========================
+def _build_where_and_params_for_properties(
+    *,
+    suburb: Optional[str] = None,
+    property_type: Optional[str] = None,
+    min_bedrooms: Optional[int] = None,
+    max_bedrooms: Optional[int] = None,
+    min_rent_pw: Optional[int] = None,
+    max_rent_pw: Optional[int] = None,
+    available_after: Optional[datetime.date] = None,
+    available_before: Optional[datetime.date] = None,
+    has_air_conditioning: Optional[bool] = None,
+    is_furnished: Optional[bool] = None,
+    has_balcony: Optional[bool] = None,
+    has_dishwasher: Optional[bool] = None,
+    has_laundry: Optional[bool] = None,
+    has_built_in_wardrobe: Optional[bool] = None,
+    has_gym: Optional[bool] = None,
+    has_pool: Optional[bool] = None,
+    has_parking: Optional[bool] = None,
+    allows_pets: Optional[bool] = None,
+    has_security_system: Optional[bool] = None,
+    has_storage: Optional[bool] = None,
+    has_study_room: Optional[bool] = None,
+    has_garden: Optional[bool] = None,
+    has_intercom: Optional[bool] = None,
+    has_gas: Optional[bool] = None,
+    has_heating: Optional[bool] = None,
+    has_ensuite: Optional[bool] = None,
+    is_north_facing: Optional[bool] = None,
+    is_newly_built: Optional[bool] = None,
+    has_water_view: Optional[bool] = None,
+) -> Tuple[str, list]:
+    # 中文注释：始终只返回活跃房源，统一第一条条件
+    conditions: List[str] = ["is_active = TRUE"]
+    params: List[Any] = []
+
+    # 文本/范围筛选（参数化，防 SQL 注入）
+    if suburb:
+        conditions.append("suburb ILIKE %s")
+        params.append(f"%{suburb}%")
+
+    if property_type:
+        conditions.append("TRIM(LOWER(property_type)) LIKE TRIM(LOWER(%s))")
+        params.append(f"%{property_type}%")
+
+    if min_bedrooms is not None:
+        conditions.append("bedrooms >= %s")
+        params.append(min_bedrooms)
+
+    if max_bedrooms is not None:
+        conditions.append("bedrooms <= %s")
+        params.append(max_bedrooms)
+
+    if min_rent_pw is not None:
+        conditions.append("rent_pw >= %s")
+        params.append(min_rent_pw)
+
+    if max_rent_pw is not None:
+        conditions.append("rent_pw <= %s")
+        params.append(max_rent_pw)
+
+    if available_after is not None:
+        conditions.append("available_date >= %s")
+        params.append(available_after)
+
+    if available_before is not None:
+        conditions.append("available_date <= %s")
+        params.append(available_before)
+
+    # 布尔类统一收敛，防止分支遗漏
+    boolean_filters = {
+        'has_air_conditioning': has_air_conditioning,
+        'is_furnished': is_furnished,
+        'has_balcony': has_balcony,
+        'has_dishwasher': has_dishwasher,
+        'has_laundry': has_laundry,
+        'has_built_in_wardrobe': has_built_in_wardrobe,
+        'has_gym': has_gym,
+        'has_pool': has_pool,
+        'has_parking': has_parking,
+        'allows_pets': allows_pets,
+        'has_security_system': has_security_system,
+        'has_storage': has_storage,
+        'has_study_room': has_study_room,
+        'has_garden': has_garden,
+        'has_intercom': has_intercom,
+        'has_gas': has_gas,
+        'has_heating': has_heating,
+        'has_ensuite': has_ensuite,
+        'is_north_facing': is_north_facing,
+        'is_newly_built': is_newly_built,
+        'has_water_view': has_water_view,
+    }
+    for field, value in boolean_filters.items():
+        if value is not None:
+            conditions.append(f"{field} = %s")
+            params.append(value)
+
+    where_clause_str = ""
+    if conditions:
+        where_clause_str = " WHERE " + " AND ".join(conditions)
+    return where_clause_str, params
+
 # 已移除本地的 get_db_connection，使用 db.py 中的连接池版本
 
 def get_all_properties_from_db(
@@ -87,8 +195,6 @@ def get_all_properties_from_db(
     """Fetches properties from the database with multiple filter options, sorting, and pagination."""
     conn = get_db_connection()
     properties_list = []
-    params_data = [] # Parameters for the data query
-    params_count = [] # Parameters for the count query
     
     select_clause = """
         SELECT 
@@ -104,106 +210,63 @@ def get_all_properties_from_db(
         FROM properties
     """
     count_select_clause = "SELECT COUNT(*) FROM properties"
-    
-    conditions = []
-    
-    # 始终只返回活跃的房源（修复：GraphQL也需要过滤下架房源）
-    conditions.append("is_active = TRUE")
-    
-    # Build conditions and params for both data and count queries
-    # Ensure params_data and params_count are populated identically for the WHERE clause
-    if suburb:
-        conditions.append("suburb ILIKE %s")
-        params_data.append(f"%{suburb}%")
-        params_count.append(f"%{suburb}%")
-    
-    if property_type:
-        conditions.append("TRIM(LOWER(property_type)) LIKE TRIM(LOWER(%s))")
-        params_data.append(f"%{property_type}%")
-        params_count.append(f"%{property_type}%")
-        logging.info(f"Filtering by property_type: {property_type}")
-    
-    if min_bedrooms is not None:
-        conditions.append("bedrooms >= %s")
-        params_data.append(min_bedrooms)
-        params_count.append(min_bedrooms)
-    
-    if max_bedrooms is not None:
-        conditions.append("bedrooms <= %s")
-        params_data.append(max_bedrooms)
-        params_count.append(max_bedrooms)
-    
-    if min_rent_pw is not None:
-        conditions.append("rent_pw >= %s")
-        params_data.append(min_rent_pw)
-        params_count.append(min_rent_pw)
-    
-    if max_rent_pw is not None:
-        conditions.append("rent_pw <= %s")
-        params_data.append(max_rent_pw)
-        params_count.append(max_rent_pw)
-    
-    if available_after is not None:
-        conditions.append("available_date >= %s")
-        params_data.append(available_after)
-        params_count.append(available_after)
-        logging.info(f"Filtering by available_after: {available_after}")
-    
-    if available_before is not None:
-        conditions.append("available_date <= %s")
-        params_data.append(available_before)
-        params_count.append(available_before)
-        logging.info(f"Filtering by available_before: {available_before}")
 
-    boolean_filters = {
-        'has_air_conditioning': has_air_conditioning,
-        'is_furnished': is_furnished,
-        'has_balcony': has_balcony,
-        'has_dishwasher': has_dishwasher,
-        'has_laundry': has_laundry,
-        'has_built_in_wardrobe': has_built_in_wardrobe,
-        'has_gym': has_gym,
-        'has_pool': has_pool,
-        'has_parking': has_parking,
-        'allows_pets': allows_pets,
-        'has_security_system': has_security_system,
-        'has_storage': has_storage,
-        'has_study_room': has_study_room,
-        'has_garden': has_garden,
-        'has_intercom': has_intercom,
-        'has_gas': has_gas,
-        'has_heating': has_heating,
-        'has_ensuite': has_ensuite,
-        'is_north_facing': is_north_facing,
-        'is_newly_built': is_newly_built,
-        'has_water_view': has_water_view
-    }
+    # 中文注释：使用统一构建器生成 WHERE 与参数（数据/计数共用）
+    where_clause_str, base_params = _build_where_and_params_for_properties(
+        suburb=suburb,
+        property_type=property_type,
+        min_bedrooms=min_bedrooms,
+        max_bedrooms=max_bedrooms,
+        min_rent_pw=min_rent_pw,
+        max_rent_pw=max_rent_pw,
+        available_after=available_after,
+        available_before=available_before,
+        has_air_conditioning=has_air_conditioning,
+        is_furnished=is_furnished,
+        has_balcony=has_balcony,
+        has_dishwasher=has_dishwasher,
+        has_laundry=has_laundry,
+        has_built_in_wardrobe=has_built_in_wardrobe,
+        has_gym=has_gym,
+        has_pool=has_pool,
+        has_parking=has_parking,
+        allows_pets=allows_pets,
+        has_security_system=has_security_system,
+        has_storage=has_storage,
+        has_study_room=has_study_room,
+        has_garden=has_garden,
+        has_intercom=has_intercom,
+        has_gas=has_gas,
+        has_heating=has_heating,
+        has_ensuite=has_ensuite,
+        is_north_facing=is_north_facing,
+        is_newly_built=is_newly_built,
+        has_water_view=has_water_view,
+    )
 
-    for field, value in boolean_filters.items():
-        if value is not None:
-            conditions.append(f"{field} = %s")
-            params_data.append(value)
-            params_count.append(value)
-
-    where_clause_str = ""
-    if conditions:
-        where_clause_str = " WHERE " + " AND ".join(conditions)
-        
     data_query = select_clause + where_clause_str
     count_query_str = count_select_clause + where_clause_str
-    
-    order_by_clause_str = " ORDER BY listing_id ASC" # Default sort
+
+    # 中文注释：排序白名单（最小改动）——仅允许 'rentPw'，方向仅允许 ASC/DESC
+    sd = (sort_direction or "ASC").upper()
+    if sd not in ("ASC", "DESC"):
+        sd = "ASC"
+    order_by_clause_str = " ORDER BY listing_id ASC"  # 默认
     if sort_by == "rentPw":
-        order_by_clause_str = f" ORDER BY rent_pw {sort_direction}"
-    
+        order_by_clause_str = f" ORDER BY rent_pw {sd}"
     data_query += order_by_clause_str
-    
+
+    # 数据查询参数 = base_params + 分页
+    params_data = list(base_params)
     if limit is not None:
         data_query += " LIMIT %s"
         params_data.append(limit)
     if offset is not None:
         data_query += " OFFSET %s"
         params_data.append(offset)
+
+    # 计数查询参数 = base_params（严格共用口径）
+    params_count = list(base_params)
 
     total_count = 0
     try:

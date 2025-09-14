@@ -59,6 +59,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：空出时间筛选专用面板，拆分自原 FilterPanel
 
@@ -132,16 +133,15 @@ const initialDates = computed(() => {
 const localStartDate = ref(initialDates.value.startDate)
 const localEndDate = ref(initialDates.value.endDate)
 
-/* 实时计数：应用（N） */
-const previewCount = ref(null)
-const countLoading = ref(false)
-let _countTimer = null
-let _countSeq = 0 // 中文注释：计数请求序号；丢弃过期响应，避免“应用（N）”被旧结果回退
-const applyText = computed(() => {
-  // 中文注释：当有计数结果时展示“应用（N）”，否则显示“应用”
-  if (typeof previewCount.value === 'number') return `应用（${previewCount.value}）`
-  return '应用'
-})
+/* 实时计数：应用（N） - 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'availability',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
+)
 
 // 检查日期范围是否有效
 const isDateRangeValid = computed(() => {
@@ -198,52 +198,17 @@ const buildFilterParams = () => {
   return filterParams
 }
 
-/* 计算预估数量：与当前已应用条件合并，然后覆盖空出时间为草稿值 */
-const computePreviewCount = async () => {
-  // 中文注释：当“开始/结束”都选且不合法时，直接显示 0，避免不必要请求与跳变
-  if (
-    localStartDate.value &&
-    localEndDate.value &&
-    new Date(localStartDate.value).getTime() > new Date(localEndDate.value).getTime()
-  ) {
-    previewCount.value = 0
-    return
-  }
 
-  const seq = ++_countSeq
-  try {
-    countLoading.value = true
-    const draft = buildFilterParams()
-    // 中文注释：当清空日期时，也需要从 base 中剔除旧的 date_from/date_to：clear → mark，再计算预览
-    if (Object.keys(draft).length === 0) {
-      propertiesStore.clearPreviewDraft('availability')
-      propertiesStore.markPreviewSection('availability')
-    } else {
-      propertiesStore.updatePreviewDraft('availability', draft)
-    }
-    const n = await propertiesStore.getPreviewCount()
-    if (seq === _countSeq) {
-      previewCount.value = Number.isFinite(n) ? n : 0
-    }
-  } catch (err) {
-    if (seq === _countSeq) {
-      previewCount.value = null
-    }
-    console.warn('获取空出时间预估数量失败', err)
-  } finally {
-    if (seq === _countSeq) {
-      countLoading.value = false
-    }
-  }
-}
-
-/* 监听日期变化，300ms 防抖后触发计数；挂载后也计算一次 */
+/* 监听日期变化：仅在日期合法时触发计算；挂载后也计算一次 */
 watch([localStartDate, localEndDate], () => {
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
+  if (isDateRangeValid.value) {
+    scheduleCompute()
+  }
 })
 onMounted(() => {
-  computePreviewCount()
+  if (isDateRangeValid.value) {
+    void computeNow()
+  }
 })
 
 // 将筛选参数添加到 URL

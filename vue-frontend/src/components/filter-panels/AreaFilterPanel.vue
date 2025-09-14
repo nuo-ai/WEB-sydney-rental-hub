@@ -87,6 +87,7 @@ import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
  // 中文注释：区域筛选专用面板，拆分自原 FilterPanel
 // 中文注释：特性开关——控制“包含周边区域”UI 与透传是否启用（隐藏但保留代码，便于以后启用）
@@ -109,35 +110,19 @@ const localIncludeNearby = ref(propertiesStore.includeNearby ?? true) // 包含�
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.draftSelectedLocations || [])
 
-// 预览计数（应用（N））
-const previewCount = ref(null)
-const countLoading = ref(false)
-let _countSeq = 0 // 中文注释：计数请求序号；丢弃过期响应，避免“应用（N）”被旧结果回退
+/* 预览计数（应用（N））- 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'area',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
 const applyText = computed(() =>
   typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
 )
 
-// 统一预览计数：将“区域”草稿合入全局草稿，由 Store 统一计算
+/* 兼容占位：统一通过 composable 计算 */
 const computePreviewCount = async () => {
-  const seq = ++_countSeq
-  try {
-    countLoading.value = true
-    const draft = buildFilterParams()
-    propertiesStore.updatePreviewDraft('area', draft)
-    const n = await propertiesStore.getPreviewCount()
-    if (seq === _countSeq) {
-      previewCount.value = Number.isFinite(n) ? n : 0
-    }
-  } catch (e) {
-    if (seq === _countSeq) {
-      previewCount.value = null
-    }
-    console.warn('获取区域预估数量失败', e)
-  } finally {
-    if (seq === _countSeq) {
-      countLoading.value = false
-    }
-  }
+  await computeNow()
 }
 
 // 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
@@ -217,7 +202,7 @@ const debouncedRequestCount = (() => {
   return () => {
     if (tid) clearTimeout(tid)
     tid = setTimeout(() => {
-      computePreviewCount()
+      scheduleCompute()
       tid = null
     }, 200)
   }
@@ -230,7 +215,7 @@ onMounted(() => {
   } catch {
     /* 忽略非关键错误 */
   }
-  computePreviewCount()
+  void computeNow()
 })
 
 // 组件卸载时清理“区域”分组草稿，避免小蓝点残留

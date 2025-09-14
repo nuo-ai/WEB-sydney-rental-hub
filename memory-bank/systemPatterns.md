@@ -1,7 +1,15 @@
 ![1757267579081](image/systemPatterns/1757267579081.png)![1757075026513](image/systemPatterns/1757075026513.png)# 系统设计模式与最佳实践
 
 ---
-
+ 
+## 筛选系统 v2 模式（新增 2025-09-14）
+- 分组边界：Pinia `applyFilters(filters, { sections })`；组件按所属分组传入（Area/Price/Bedrooms/Availability/More），移动端统一面板可一次传多分组。仅删除这些分组旧键再合并，避免跨面板覆盖。
+- 预览口径：`getPreviewCount` 先按分组“精准删键”再合入草稿，清空场景需 `clearPreviewDraft` + `markPreviewSection` 触发删旧键；预览与应用映射一致。
+- URL 同步：仅在“应用后”写入且仅写本分组非空参数；刷新/直链可复现；顶部标签仅读“已应用”。
+- 区域守卫：当 `featureFlags.requireRegionBeforeFilter=true` 时，仅在 `selectedLocations` 为空且本次 `params/filters` 也不含 `suburb/suburbs/postcodes` 才短路；草稿/URL 带区域允许计数/请求。
+- 分页/排序：计数与列表彻底解耦；`applyFilters` 固定 `page=1/page_size=state.pageSize`，`fetchProperties` 以本次 pagination 覆盖历史，防止 `page_size=1` 污染。
+- 观测：超 800ms 打印 `[FILTER-PERF]`；请求参数打印 `[FILTER-DEBUG]` 便于排查。
+ 
 ## 核心架构原则
 
 ### 数据流架构 (Data Flow Architecture)

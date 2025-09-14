@@ -44,6 +44,28 @@ vue-frontend/
 
 ---
 
+## 筛选系统技术约定（2025-09-14）
+
+- Pinia API
+  - applyFilters(filters, options = { sections?: string[] })
+    - 若传入 options.sections，则仅按这些分组删除旧键再合并本次参数，避免跨面板覆盖；应用成功后对这些分组执行 clearPreviewDraft（双保险）。
+    - 未传 sections 时，维持原有“由参数键 + 预览痕迹推断分组”的兜底行为。
+  - getPreviewCount(extraDraft?)：先按分组“精准删键”，再合并草稿；清空场景需 clearPreviewDraft(section) + markPreviewSection(section) 触发删旧键，保证预览与应用一致。
+- 分组职责（SECTION_KEY_MAP）
+  - area: suburb/suburbs/postcodes/include_nearby
+  - price: minPrice/maxPrice/price_min/price_max
+  - bedrooms: bedrooms/bathrooms/bathrooms_min/parking/parking_min
+  - availability: date_from/date_to
+  - more: isFurnished/furnished
+- 区域守卫（featureFlags.requireRegionBeforeFilter）
+  - 放宽逻辑：仅当 selectedLocations 为空 且 本次 params/filters 也不含 suburb/suburbs/postcodes 时，getFilteredCount 返回 0、applyFilters 短路；若本次参数携带区域（含 URL/草稿融合的区域）则允许计数/请求。
+- URL 同步与标签
+  - URL 仅在“应用后”写入，并且仅写本分组非空参数；刷新/直链可复现；顶部标签只读“已应用”。
+- 分页/排序解耦
+  - 计数与列表彻底解耦；applyFilters 固定 page=1/page_size=state.pageSize；fetchProperties 以本次 pagination 覆盖历史，防止 page_size=1 污染列表。
+- 可观测性
+  - 超 800ms 打印 [FILTER-PERF]；关键请求参数打印 [FILTER-DEBUG]（开发期可按需精简）。
+
 ## 3. 性能优化成果 🎯
 
 **多项性能突破**:

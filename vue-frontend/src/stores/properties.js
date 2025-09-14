@@ -1093,7 +1093,8 @@ export const usePropertiesStore = defineStore('properties', {
         return response.pagination?.total || 0
       } catch (error) {
         console.error('获取筛选数量失败:', error)
-        return 0
+        // 中文注释：返回 null 以便前端“失败降级”（按钮退回“应用/确定”，不误显示 0）
+        return null
       }
     },
 
@@ -1134,7 +1135,8 @@ export const usePropertiesStore = defineStore('properties', {
         return await this.getFilteredCount(merged)
       } catch (e) {
         console.warn('getPreviewCount 失败', e)
-        return 0
+        // 中文注释：预估计数失败时返回 null，由各面板根据 null 进行“失败降级”处理
+        return null
       }
     },
 

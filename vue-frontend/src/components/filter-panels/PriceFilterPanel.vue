@@ -52,6 +52,7 @@ import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import BaseButton from '@/components/base/BaseButton.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：价格筛选专用面板，拆分自原 FilterPanel
 
@@ -93,52 +94,25 @@ const STEP = 25
 const minDisplay = computed(() => `$${Number(localPriceRange.value[0]).toLocaleString()}`)
 const maxDisplay = computed(() => `$${Number(localPriceRange.value[1]).toLocaleString()}`)
 
-/* 实时计数：应用（N） */
-const previewCount = ref(null)
-const countLoading = ref(false)
-let _countTimer = null
-let _countSeq = 0 // 中文注释：计数请求序号，用于丢弃过期响应，避免“应用（N）”回退
-const applyText = computed(() => {
-  if (typeof previewCount.value === 'number') return `应用（${previewCount.value}）`
-  return '应用'
-})
+/* 实时计数：应用（N） - 使用通用 composable 统一管理（防抖 + 并发守卫 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'price',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
+)
 
-const computePreviewCount = async () => {
-  const seq = ++_countSeq
-  try {
-    countLoading.value = true
-    const params = buildFilterParams()
-    // 中文注释：当价格回到“不限范围”时，也要从 base 中剔除旧价位键：clear → mark，再计算预览
-    if (Object.keys(params).length === 0) {
-      propertiesStore.clearPreviewDraft('price')
-      propertiesStore.markPreviewSection('price')
-    } else {
-      propertiesStore.updatePreviewDraft('price', params)
-    }
-    const n = await propertiesStore.getPreviewCount()
-    if (seq === _countSeq) {
-      previewCount.value = Number.isFinite(n) ? n : 0
-    }
-  } catch (err) {
-    if (seq === _countSeq) {
-      previewCount.value = null
-    }
-    console.warn('获取价格预估数量失败', err)
-  } finally {
-    if (seq === _countSeq) {
-      countLoading.value = false
-    }
-  }
-}
 
-/* 监听滑轨，防抖触发计数 */
+/* 监听滑轨，防抖触发计数（统一经由 composable） */
 watch(localPriceRange, () => {
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
+  scheduleCompute()
 })
 
 onMounted(() => {
-  computePreviewCount()
+  // 初次打开计算一次预估数
+  void computeNow()
 })
 
 // 价格范围文本显示
@@ -159,11 +133,8 @@ const handlePriceChange = () => {
 
 const clearAll = () => {
   localPriceRange.value = [MIN_PRICE, MAX_PRICE]
-  // 中文注释：清理并标记该分组参与预览（即便草稿为空也删除 base 中旧键）
-  propertiesStore.clearPreviewDraft('price')
-  propertiesStore.markPreviewSection('price')
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
+  // 交由 composable 清理/标记与触发（空草稿会自动从 base 中剔除旧键）
+  scheduleCompute()
 }
 
 // 构建筛选参数

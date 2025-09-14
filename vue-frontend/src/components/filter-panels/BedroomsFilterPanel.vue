@@ -102,6 +102,7 @@ import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import BaseButton from '@/components/base/BaseButton.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：卧室筛选专用面板，拆分自原 FilterPanel
 
@@ -195,18 +196,15 @@ const localBedrooms = ref([...initialBedrooms.value])
 const localBathrooms = ref([...initialBathrooms.value])
 const localParking = ref([...initialParking.value])
 
-// 结果数量预估（用于“应用（N）”）
-const previewCount = ref(null)
-const countLoading = ref(false)
-let _countTimer = null
-let _countSeq = 0 // 中文注释：计数请求序号，丢弃过期响应，避免“应用（N）”被回退
-
-const applyText = computed(() => {
-  if (typeof previewCount.value === 'number') {
-    return `${applyLabel.value}（${previewCount.value}）`
-  }
-  return applyLabel.value
-})
+/* 结果数量预估（用于“应用（N）”）- 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'bedrooms',
+  () => buildFilterParamsBedroomsOnly(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `${applyLabel.value}（${previewCount.value}）` : applyLabel.value,
+)
 
 // 清空选择（不限）
 const clearAll = () => {
@@ -216,55 +214,17 @@ const clearAll = () => {
   localParking.value = []
   propertiesStore.clearPreviewDraft('bedrooms')
   propertiesStore.markPreviewSection('bedrooms')
-  computePreviewCount()
+  scheduleCompute()
 }
 
-// 触发计数（防抖 300ms）
-const computePreviewCount = async () => {
-  const seq = ++_countSeq
-  try {
-    countLoading.value = true
-    const params = buildFilterParamsBedroomsOnly()
-    // 中文注释：卧室面板仅管理 bedrooms；当清空时也要从 base 中剔除旧 bedrooms 键
-    if (Object.keys(params).length === 0) {
-      propertiesStore.clearPreviewDraft('bedrooms')
-      propertiesStore.markPreviewSection('bedrooms')
-    } else {
-      propertiesStore.updatePreviewDraft('bedrooms', params)
-    }
-    const n = await propertiesStore.getPreviewCount()
-    if (seq === _countSeq) {
-      previewCount.value = Number.isFinite(n) ? n : 0
-    }
-  } catch (e) {
-    // 中文注释：快速失败，不做本地估算
-    if (seq === _countSeq) {
-      previewCount.value = null
-    }
-    console.warn('获取卧室筛选结果数失败', e)
-  } finally {
-    if (seq === _countSeq) {
-      countLoading.value = false
-    }
-  }
-}
-
-watch(localBedrooms, () => {
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
-})
-watch(localBathrooms, () => {
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
-})
-watch(localParking, () => {
-  if (_countTimer) clearTimeout(_countTimer)
-  _countTimer = setTimeout(() => computePreviewCount(), 300)
-})
+// 触发计数（统一经由 composable）
+watch(localBedrooms, () => scheduleCompute())
+watch(localBathrooms, () => scheduleCompute())
+watch(localParking, () => scheduleCompute())
 
 // 初次打开时计算一次
 onMounted(() => {
-  computePreviewCount()
+  void computeNow()
 })
 
 // 判断卧室选项是否被选中
