@@ -261,7 +261,7 @@ const filters = ref({
 })
 
 /* 选区与“附近区域”开关 */
-const selectedLocations = computed(() => propertiesStore.selectedLocations || [])
+const selectedLocations = computed(() => propertiesStore.draftSelectedLocations || [])
 
 // 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
 const displaySelectedLocations = computed(() => {
@@ -299,11 +299,16 @@ const formatLocation = (loc) => {
   return loc.type === 'suburb' ? String(loc.name || '') : String(loc.name || '')
 }
 const removeLocation = (id) => {
-  propertiesStore.removeSelectedLocation(id)
+  // 改为仅操作“草稿”选区，未应用前不影响列表/标签
+  const temp = (propertiesStore.draftSelectedLocations || []).filter(
+    (loc) => String(loc?.id ?? '') !== String(id),
+  )
+  propertiesStore.setDraftSelectedLocations(temp)
   nextTick(() => updateFilteredCount())
 }
 const clearAllLocations = () => {
-  propertiesStore.setSelectedLocations([])
+  // 清空草稿选区；需“应用”后才真正生效
+  propertiesStore.setDraftSelectedLocations([])
   nextTick(() => updateFilteredCount())
 }
 const handleIncludeNearbyChange = () => {
@@ -323,13 +328,15 @@ const debouncedRequestCount = (() => {
 })()
 
 const onUpdateSelectedAreas = (newList) => {
-  // 中文注释：更新全局已选区域，但不触发 apply；仅刷新底部“显示结果 (N)”中的 N
-  propertiesStore.setSelectedLocations(Array.isArray(newList) ? newList : [])
+  // 改为仅更新草稿，不触发 apply；仅刷新底部“显示结果 (N)”
+  propertiesStore.setDraftSelectedLocations(Array.isArray(newList) ? newList : [])
   nextTick(() => debouncedRequestCount())
 }
 
 /* 本地计算的筛选结果数量 */
 const localFilteredCount = ref(0)
+const _countReqSeq = ref(0) // 中文注释：计数请求序号；防并发乱序响应覆盖新结果（前端表现：防止计数“跳回老数”）
+const _counting = ref(false) // 中文注释：计数中标记（可用于淡化/骨架态；当前未使用）
 
 /* 将筛选参数写入 URL 的 Query（只写非空参数；保持 V1 键名，最小改动） */
 const buildQueryFromFilters = (filterParams) => {
@@ -504,7 +511,7 @@ const filteredCount = computed(() => {
 const hasAppliedFilters = computed(() => {
   // 中文注释：将“已选区域”也视为筛选条件之一，确保当地区选择后即使计数为0也显示为0，而非回退到总数
   return (
-    selectedLocations.value.length > 0 ||
+    (propertiesStore.selectedLocations?.length || 0) > 0 ||
     filters.value.priceRange[0] > 0 ||
     filters.value.priceRange[1] < 5000 ||
     filters.value.bedrooms.length > 0 ||
@@ -609,14 +616,14 @@ const updateFilteredCount = async () => {
   }
 
   // 添加已选择的区域
-  const selectedSuburbs = propertiesStore.selectedLocations
+  const selectedSuburbs = (propertiesStore.draftSelectedLocations || [])
     .filter((loc) => loc.type === 'suburb')
     .map((loc) => loc.name)
   if (selectedSuburbs.length > 0) {
     filterParams.suburb = selectedSuburbs.join(',')
   }
   // 支持 postcodes（与 suburbs 区分；CSV）
-  const selectedPostcodes = propertiesStore.selectedLocations
+  const selectedPostcodes = (propertiesStore.draftSelectedLocations || [])
     .filter((loc) => loc.type === 'postcode')
     .map((loc) => loc.name)
   if (selectedPostcodes.length > 0) {
@@ -643,11 +650,21 @@ const updateFilteredCount = async () => {
 
   try {
     // 统一通过 store 入口获取计数，避免双通道不一致
+    const seq = ++_countReqSeq.value // 生成本次请求序号
+    _counting.value = true
     const total = await propertiesStore.getFilteredCount(filterParams)
-    localFilteredCount.value = total
+    // 仅当返回的结果仍对应“最新一次请求”时才落地，防止旧响应覆盖新状态
+    if (seq === _countReqSeq.value) {
+      localFilteredCount.value = total
+      _counting.value = false
+    } else {
+      // 丢弃过期响应（不改动 UI）
+    }
   } catch (error) {
     console.error('获取筛选计数失败:', error)
     // 快速失败：不做本地估算，不篡改现有计数，并就近提示错误
+    // 失败时统一恢复为 false，若下一次请求已开始会再次置为 true，不影响表现
+    _counting.value = false
     ElMessage.error('筛选计数失败，请稍后重试')
   }
 }
@@ -686,12 +703,18 @@ const handleFurnishedChange = () => {
 
 // 关闭面板方法
 const closePanel = () => {
+  // 关闭时丢弃未应用的区域草稿
+  try {
+    propertiesStore.resetDraftSelectedLocations()
+  } catch {
+    /* 忽略非关键错误 */
+  }
   visible.value = false
 }
 
 const applyFiltersToStore = async () => {
   try {
-    // 准备筛选参数，直接传递选中的值
+    // 准备筛选参数（以草稿为准），点击“应用”前不影响已应用条件
     const filterParams = {
       minPrice: filters.value.priceRange[0] > 0 ? filters.value.priceRange[0] : null,
       maxPrice: filters.value.priceRange[1] < 5000 ? filters.value.priceRange[1] : null,
@@ -704,14 +727,14 @@ const applyFiltersToStore = async () => {
     }
 
     // 添加已选择的区域
-    const selectedSuburbs = propertiesStore.selectedLocations
+    const selectedSuburbs = (propertiesStore.draftSelectedLocations || [])
       .filter((loc) => loc.type === 'suburb')
       .map((loc) => loc.name)
     if (selectedSuburbs.length > 0) {
       filterParams.suburb = selectedSuburbs.join(',')
     }
     // 支持 postcodes（与 suburbs 区分；CSV）
-    const selectedPostcodes = propertiesStore.selectedLocations
+    const selectedPostcodes = (propertiesStore.draftSelectedLocations || [])
       .filter((loc) => loc.type === 'postcode')
       .map((loc) => loc.name)
     if (selectedPostcodes.length > 0) {
@@ -722,7 +745,50 @@ const applyFiltersToStore = async () => {
       filterParams.include_nearby = includeNearby.value ? '1' : '0'
     }
 
-    await propertiesStore.applyFilters(filterParams)
+    // 计算本次触达的分组（精确删除与合并，仅影响当前修改的分组）
+    const beforeIds = (propertiesStore.selectedLocations || []).map((l) => String(l.id)).sort()
+    const draftIds = (propertiesStore.draftSelectedLocations || []).map((l) => String(l.id)).sort()
+    const areaChanged = JSON.stringify(beforeIds) !== JSON.stringify(draftIds)
+    const sections = []
+    // price
+    if (Object.prototype.hasOwnProperty.call(filterParams, 'minPrice') || Object.prototype.hasOwnProperty.call(filterParams, 'maxPrice')) {
+      sections.push('price')
+    }
+    // bedrooms（含浴室/车位）
+    if (
+      Object.prototype.hasOwnProperty.call(filterParams, 'bedrooms') ||
+      Object.prototype.hasOwnProperty.call(filterParams, 'bathrooms') ||
+      Object.prototype.hasOwnProperty.call(filterParams, 'parking')
+    ) {
+      sections.push('bedrooms')
+    }
+    // availability
+    if (
+      Object.prototype.hasOwnProperty.call(filterParams, 'date_from') ||
+      Object.prototype.hasOwnProperty.call(filterParams, 'date_to')
+    ) {
+      sections.push('availability')
+    }
+    // more（仅家具）：若已应用存在家具或本次勾选家具，则纳入以便清/设
+    {
+      const applied = propertiesStore.currentFilterParams || {}
+      const furnishedApplied = applied.isFurnished === true || applied.furnished === true
+      if (filterParams.isFurnished === true || furnishedApplied) {
+        sections.push('more')
+      }
+    }
+    // area：若草稿与已应用不同，或本次提交包含 suburb/postcodes，则纳入
+    if (areaChanged || Object.prototype.hasOwnProperty.call(filterParams, 'suburb') || Object.prototype.hasOwnProperty.call(filterParams, 'postcodes')) {
+      sections.push('area')
+    }
+
+    // 先将草稿区域应用为“已应用”，再统一调用 applyFilters（携带分组边界）
+    try {
+      propertiesStore.applySelectedLocations()
+    } catch {
+      /* 忽略非关键错误 */
+    }
+    await propertiesStore.applyFilters(filterParams, { sections })
     emit('filtersChanged', filterParams)
 
     // 将当前筛选写入 URL，便于刷新/分享复现
@@ -862,6 +928,12 @@ watch(visible, (newValue) => {
   if (newValue) {
     // 打开面板时的操作
     lockBodyScroll()
+    // 打开时同步草稿=已应用，再基于草稿计算预览计数
+    try {
+      propertiesStore.resetDraftSelectedLocations()
+    } catch {
+      /* 忽略非关键错误 */
+    }
     updateFilteredCount()
 
     // 添加键盘事件监听

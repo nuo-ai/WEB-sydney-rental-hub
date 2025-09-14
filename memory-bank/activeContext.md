@@ -1,7 +1,8 @@
 # 当前上下文与紧急焦点
-最后更新：2025-09-12
+最后更新：2025-09-14
 
 今日快照（精简版，≤10行）
+- FURNISHING-SEMANTICS-PHASE1：ETL 两阶段（features 优先→标题/正文兜底，排除 furnishing_status）；下架 off-market 同步置空 is_furnished；执行一次性清理 SQL；固化 PowerShell 运维模板。前端表现：勾选“有家具”更准确；详情/直查不误读下架旧 TRUE。溯源：commit 3064c42..f288eef
 - FURNISHED-FILTER-COMPAT：修复“勾选家具时报错”。后端兼容历史存储，勾选后不再 500，只显示“有家具”。前端表现：列表更干净。溯源：commit 0e36a05..3064c42
 - MOBILE-CARD-COMPACT：移动端 PropertyCard 图片高 250→180、内容内边距 16→12、规格间距 12→8/6→4；桌面不变；窗口变化动态适配高度。前端表现：首屏可见更多卡片，视觉更紧凑。溯源：commit 008be0c..0e36a05
 - PROFILE-NAV-ACTIONS：Profile 页头新增“返回/回到首页”与“退出登录”按钮；返回优先 router.back() 无历史退首页；退出调用 authStore.logout() 再回首页。前端表现：二级页导航更可发现。溯源：commit 008be0c..0e36a05
@@ -33,8 +34,8 @@
 - COMMUTE-I18N-TYPO：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；统一空状态/按钮/提示文案；ElMessage/ElMessageBox 使用 t()。前端表现：通勤页中文化一致、文字节奏与详情页对齐。溯源：commit 43f943e..ee6e006
 - TYPOGRAPHY+I18N-V1：新增 typography.css（基础/语义文字令牌与 .typo-* 工具类）；扩展轻量 i18n（locales/zh-CN.js + 合并策略）；PropertyCard 首批接入 $t 与 .typo-*（价格/单位/标签/菜单/辅助）。前端表现：UI 中文化，文字节奏统一，动态地址仍英文。溯源：commit 3e4ea72..c45d86a
 - UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY：PropertyCard“New”徽标改为品牌蓝 var(--brand-primary)，文字用 var(--color-text-inverse)；CommuteTimes“Add location”按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化。溯源：commit 3c7c150..3e4ea72
-- UI-TOKENS-PC-FILTER-LOCATION：PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；弹窗头部/输入/列表 hover/active 改中性令牌；价格滑块清理硬编码，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色。溯源：commit 82c3f37..3c7c150
-- LINT-GUARDRAIL-COLOR：stylelint 扩展拦截 background/border/outline/fill/stroke 的硬编码色与 rgba/hsla，强制使用 var(--*)；保留 design-tokens.css 与 style.css 的定义豁免。目的：杜绝新增页面颜色硬编码回归。溯源：commit 82c3f37..3c7c150
+- UI-TOKENS-PC-FILTER-LOCATION：PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；价格滑块清理硬编码，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色。溯源：commit 82c3f37..3c7c150
+- LINT-GUARDRAIL-COLOR：stylelint 扩展拦截 background/border/outline/fill/stroke 的硬编码色与 rgba/hsla/命名色，强制使用 var(--*)；保留 design-tokens.css 与 style.css 的定义豁免。目的：杜绝新增页面颜色硬编码回归。溯源：commit 82c3f37..3c7c150
 - DESIGN-TOKEN-COLOR-3：新增全局语义色令牌集（link visited/disabled、success/warn/danger/info soft-bg/border、favorite 三态、badge、divider、inverse/弱底/brand 别名）；首批等价替换：建议项边框/悬浮、次要文案、筛选按钮激活态统一 tokens。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色。溯源：commit ff73605..69c3e0e
 - DESIGN-TOKEN-FAVORITE-P0：收藏按钮与 PropertyCard 颜色 Token 化，未收藏=中性灰，hover=中性加深，已收藏=品牌蓝；卡片地址/副文案/分隔线/规格/操作按钮/图片计数器等硬编码改 Token；叠加遮罩改 overlay 令牌。溯源：commit ff73605
 - THEME-BRAND-BLUE-PURE：品牌主色切换为纯正蓝 #0057ff（hover #0047e5 / active #0036b3），令牌映射 --juwo-primary/--link-color 等已对齐；前端表现：主按钮/导航 hover/文本链接统一蓝色系，页面结构与焦点仍为中性灰；向后兼容，可回滚。溯源：commit d7ac639..1f0b27e
@@ -74,7 +75,7 @@
 - 2025-09-08｜SORT-P0
   列表排序功能落地：后端 /api/properties 支持 sort 白名单（price_asc/available_date_asc/suburb_az/inspection_earliest；inspection_earliest 暂等价 available_date_asc），稳定次序 listing_id ASC；前端 fetchProperties 统一兜底跨页保留排序。溯源：commit 7bd269b..54ba6c1
 - 2025-09-08｜MOBILE-SEARCH-DIRECT-FILTER
-  移动端搜索框直连筛选面板功能完成：移除中间 SearchOverlay 步骤，点击搜索框直接打开筛选面板；优化可访问性（aria-label/role 区分移动/桌面角色）；添加移动端点击反馈效果；保留内嵌标签回显；移除未使用变量，ESLint 合规。用户体验更直接高效｜溯源：commit 7bd269b
+  移动端搜索框直连筛选面板功能完成：移除中间 SearchOverlay 步骤，点击搜索框直接打开筛选面板；优化可访问性（aria-label/role 区分移动/桌面角色）；添加移动端点击反馈效果；保留内嵌标签回显；移除未使用变量，ESLint 合规。用户体验更直接高效｜溯源：移动端筛选面板优化任务
 - 2025-09-08｜SEARCH-OVERLAY-COMPONENT-REFACTOR
   SearchOverlay 组件化重构完成：使用 BaseChip/BaseListItem 替换自定义样式，彻底移除 location 图标（MapPin/Hash），与筛选面板风格完全统一。清理冗余样式代码，保留容器布局与特有功能（光标动画/徽标），ESLint 合规。用户验收通过｜溯源：SearchOverlay 组件化任务
 - 2025-09-08｜MOBILE-FILTER-PANEL-OPTIMIZATION

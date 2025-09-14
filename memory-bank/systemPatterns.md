@@ -172,6 +172,20 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
   - /api/cache/invalidate 支持 property_id/全量失效；修复/迁移后应触发，确保“前端表现”立即一致。
   - 溯源：后端 Cache 设计（FastAPI Cache/Redis），与契约一致性章节配套
 
+## 家具语义与下架一致性（新增 2025-09-14）
+- 数据源优先级（ETL 判定，前端表现更准确）：`property_features` 精确匹配优先（大小写不敏感；否定>肯定；冲突→NULL），若无结论再用“标题+正文”兜底（否定>模糊>肯定；无证据→NULL）；彻底排除 `furnishing_status`。
+- 下架一致性：当某房源在“最新 CSV”中缺失（off-market）时，同步 `is_furnished = NULL`，避免详情/导出等非列表路径误读历史 TRUE（列表本已依赖 `is_active=TRUE` 过滤）。
+- 更新触发修复：将 `is_furnished` 纳入预查询与变更判断，保证“仅 is_furnished 变化”也会触发 UPDATE，落库后清缓存即可在前端表现一致。
+- 缓存策略（FastAPICache）：缓存键为“完整 URL”，列表与详情互不影响；提供选择性失效端点 `/api/cache/invalidate?invalidate_all=true` 与 `?property_id=xxx`，修复/迁移后应触发。
+- 运维规范（本地固定用 PowerShell，禁跨壳）：
+  ```powershell
+  Set-Location 'C:\Users\nuoai\Desktop\WEB-sydney-rental-hub'
+  $env:USE_ETL_FURNISHED = 'true'
+  & 'C:\Python313\python.exe' 'scripts\automated_data_update_with_notifications.py' --run-once
+  Invoke-WebRequest -UseBasicParsing -Method POST -Uri 'http://localhost:8000/api/cache/invalidate?invalidate_all=true' | Out-Null
+  ```
+- 回滚与兜底：如需紧急回退集中判定，可临时设置 `$env:USE_ETL_FURNISHED='false'` 再跑 ETL；如需立刻止血单条，使用点名 SQL 将 `is_furnished=NULL` 并清缓存。
+
 ## 前端样式一致性（新增）
 
 - 页面背景与卡片

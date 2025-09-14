@@ -136,6 +136,7 @@ const localEndDate = ref(initialDates.value.endDate)
 const previewCount = ref(null)
 const countLoading = ref(false)
 let _countTimer = null
+let _countSeq = 0 // 中文注释：计数请求序号；丢弃过期响应，避免“应用（N）”被旧结果回退
 const applyText = computed(() => {
   // 中文注释：当有计数结果时展示“应用（N）”，否则显示“应用”
   if (typeof previewCount.value === 'number') return `应用（${previewCount.value}）`
@@ -199,18 +200,40 @@ const buildFilterParams = () => {
 
 /* 计算预估数量：与当前已应用条件合并，然后覆盖空出时间为草稿值 */
 const computePreviewCount = async () => {
+  // 中文注释：当“开始/结束”都选且不合法时，直接显示 0，避免不必要请求与跳变
+  if (
+    localStartDate.value &&
+    localEndDate.value &&
+    new Date(localStartDate.value).getTime() > new Date(localEndDate.value).getTime()
+  ) {
+    previewCount.value = 0
+    return
+  }
+
+  const seq = ++_countSeq
   try {
     countLoading.value = true
     const draft = buildFilterParams()
-    // 中文注释：将“空出时间”面板草稿合入全局草稿，由 Store 统一计算预览计数（与其它面板口径一致）
-    propertiesStore.updatePreviewDraft('availability', draft)
+    // 中文注释：当清空日期时，也需要从 base 中剔除旧的 date_from/date_to：clear → mark，再计算预览
+    if (Object.keys(draft).length === 0) {
+      propertiesStore.clearPreviewDraft('availability')
+      propertiesStore.markPreviewSection('availability')
+    } else {
+      propertiesStore.updatePreviewDraft('availability', draft)
+    }
     const n = await propertiesStore.getPreviewCount()
-    previewCount.value = Number.isFinite(n) ? n : 0
+    if (seq === _countSeq) {
+      previewCount.value = Number.isFinite(n) ? n : 0
+    }
   } catch (err) {
-    previewCount.value = null
+    if (seq === _countSeq) {
+      previewCount.value = null
+    }
     console.warn('获取空出时间预估数量失败', err)
   } finally {
-    countLoading.value = false
+    if (seq === _countSeq) {
+      countLoading.value = false
+    }
   }
 }
 
@@ -259,8 +282,14 @@ const applyFilters = async () => {
   try {
     const filterParams = buildFilterParams()
 
-    // 应用筛选
-    await propertiesStore.applyFilters(filterParams)
+    // 中文注释：当两端日期均为空等于“清空本分组”，需标记分组参与本次应用以删除旧键
+    if (Object.keys(filterParams).length === 0) {
+      propertiesStore.clearPreviewDraft('availability')
+      propertiesStore.markPreviewSection('availability')
+    }
+
+    // 应用筛选（仅 availability 分组）
+    await propertiesStore.applyFilters(filterParams, { sections: ['availability'] })
 
     // 更新 URL
     await updateUrlQuery(filterParams)

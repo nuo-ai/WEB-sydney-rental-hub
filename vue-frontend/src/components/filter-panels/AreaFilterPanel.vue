@@ -65,7 +65,7 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <el-button class="cancel-btn" size="default" @click="$emit('close')">
+        <el-button class="cancel-btn" size="default" @click="cancelAndClose">
           {{ $t('filter.cancel') }}
         </el-button>
         <el-button
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, nextTick, onMounted } from 'vue'
+import { ref, computed, inject, nextTick, onMounted, onUnmounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import AreasSelector from '@/components/AreasSelector.vue'
@@ -107,28 +107,36 @@ const propertiesStore = usePropertiesStore()
 const localIncludeNearby = ref(propertiesStore.includeNearby ?? true) // 包含周边区域
 
 // 计算属性
-const selectedLocations = computed(() => propertiesStore.selectedLocations || [])
+const selectedLocations = computed(() => propertiesStore.draftSelectedLocations || [])
 
 // 预览计数（应用（N））
 const previewCount = ref(null)
 const countLoading = ref(false)
+let _countSeq = 0 // 中文注释：计数请求序号；丢弃过期响应，避免“应用（N）”被旧结果回退
 const applyText = computed(() =>
   typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
 )
 
 // 统一预览计数：将“区域”草稿合入全局草稿，由 Store 统一计算
 const computePreviewCount = async () => {
+  const seq = ++_countSeq
   try {
     countLoading.value = true
     const draft = buildFilterParams()
     propertiesStore.updatePreviewDraft('area', draft)
     const n = await propertiesStore.getPreviewCount()
-    previewCount.value = Number.isFinite(n) ? n : 0
+    if (seq === _countSeq) {
+      previewCount.value = Number.isFinite(n) ? n : 0
+    }
   } catch (e) {
-    previewCount.value = null
+    if (seq === _countSeq) {
+      previewCount.value = null
+    }
     console.warn('获取区域预估数量失败', e)
   } finally {
-    countLoading.value = false
+    if (seq === _countSeq) {
+      countLoading.value = false
+    }
   }
 }
 
@@ -177,28 +185,30 @@ const removeLocation = (id) => {
   const index = tempLocations.findIndex((loc) => loc.id === id)
   if (index !== -1) {
     tempLocations.splice(index, 1)
-    propertiesStore.setSelectedLocations(tempLocations)
-    nextTick(() => debouncedRequestCount())
+    propertiesStore.setDraftSelectedLocations(tempLocations)
+    try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+    nextTick(() => computePreviewCount())
   }
 }
 
 // 清空所有区域
 const clearAllLocations = () => {
-  propertiesStore.setSelectedLocations([])
-  // 中文注释：清理“区域”分组的全局草稿，避免残留影响其它面板的预览口径
-  propertiesStore.clearPreviewDraft('area')
-  nextTick(() => debouncedRequestCount())
+  propertiesStore.setDraftSelectedLocations([])
+  try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+  nextTick(() => computePreviewCount())
 }
 
 // 包含周边区域变更
 const handleIncludeNearbyChange = () => {
+  try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
   nextTick(() => debouncedRequestCount())
 }
 
 // 更新区域列表
 const onUpdateSelectedAreas = (newList) => {
-  propertiesStore.setSelectedLocations(Array.isArray(newList) ? newList : [])
-  nextTick(() => debouncedRequestCount())
+  propertiesStore.setDraftSelectedLocations(Array.isArray(newList) ? newList : [])
+  try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+  nextTick(() => computePreviewCount())
 }
 
 // 延迟请求筛选计数
@@ -209,12 +219,29 @@ const debouncedRequestCount = (() => {
     tid = setTimeout(() => {
       computePreviewCount()
       tid = null
-    }, 250)
+    }, 200)
   }
 })()
 
-// 首次打开时计算一次
-onMounted(() => computePreviewCount())
+// 首次打开时初始化草稿并计算一次
+onMounted(() => {
+  try {
+    propertiesStore.resetDraftSelectedLocations()
+  } catch {
+    /* 忽略非关键错误 */
+  }
+  computePreviewCount()
+})
+
+// 组件卸载时清理“区域”分组草稿，避免小蓝点残留
+onUnmounted(() => {
+  try {
+    propertiesStore.clearPreviewDraft('area')
+    propertiesStore.resetDraftSelectedLocations()
+  } catch {
+    /* 忽略非关键错误 */
+  }
+})
 
 // 构建筛选参数
 const buildFilterParams = () => {
@@ -284,6 +311,17 @@ const updateUrlQuery = async (filterParams) => {
 }
 
 // 应用筛选
+const cancelAndClose = () => {
+  try {
+    propertiesStore.clearPreviewDraft('area')
+    propertiesStore.resetDraftSelectedLocations()
+  } catch {
+    /* 忽略非关键错误 */
+  }
+  emit('close')
+}
+
+// 应用筛选
 const applyFilters = async () => {
   try {
     const filterParams = buildFilterParams()
@@ -293,8 +331,15 @@ const applyFilters = async () => {
       propertiesStore.includeNearby = localIncludeNearby.value
     }
 
-    // 应用筛选
-    await propertiesStore.applyFilters(filterParams)
+    // 先应用草稿为已应用（仅区域）
+    try {
+      propertiesStore.applySelectedLocations()
+    } catch {
+      /* 忽略非关键错误 */
+    }
+
+    // 应用筛选（仅 area 分组）
+    await propertiesStore.applyFilters(filterParams, { sections: ['area'] })
 
     // 更新 URL
     await updateUrlQuery(filterParams)

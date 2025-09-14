@@ -199,6 +199,7 @@ const localParking = ref([...initialParking.value])
 const previewCount = ref(null)
 const countLoading = ref(false)
 let _countTimer = null
+let _countSeq = 0 // 中文注释：计数请求序号，丢弃过期响应，避免“应用（N）”被回退
 
 const applyText = computed(() => {
   if (typeof previewCount.value === 'number') {
@@ -209,29 +210,42 @@ const applyText = computed(() => {
 
 // 清空选择（不限）
 const clearAll = () => {
+  // 中文注释：清空“卧室”面板所管理的全部键（卧室/浴室/车位），符合“清空仅影响当前分组”
   localBedrooms.value = []
   localBathrooms.value = []
   localParking.value = []
-  // 中文注释：清理“卧室”分组的全局草稿，避免残留影响其它面板预览
   propertiesStore.clearPreviewDraft('bedrooms')
+  propertiesStore.markPreviewSection('bedrooms')
   computePreviewCount()
 }
 
 // 触发计数（防抖 300ms）
 const computePreviewCount = async () => {
+  const seq = ++_countSeq
   try {
     countLoading.value = true
-    const params = buildFilterParams()
-    // 中文注释：将“卧室”面板草稿合入全局草稿，由 Store 统一计算预览计数
-    propertiesStore.updatePreviewDraft('bedrooms', params)
+    const params = buildFilterParamsBedroomsOnly()
+    // 中文注释：卧室面板仅管理 bedrooms；当清空时也要从 base 中剔除旧 bedrooms 键
+    if (Object.keys(params).length === 0) {
+      propertiesStore.clearPreviewDraft('bedrooms')
+      propertiesStore.markPreviewSection('bedrooms')
+    } else {
+      propertiesStore.updatePreviewDraft('bedrooms', params)
+    }
     const n = await propertiesStore.getPreviewCount()
-    previewCount.value = Number.isFinite(n) ? n : 0
+    if (seq === _countSeq) {
+      previewCount.value = Number.isFinite(n) ? n : 0
+    }
   } catch (e) {
     // 中文注释：快速失败，不做本地估算
-    previewCount.value = null
+    if (seq === _countSeq) {
+      previewCount.value = null
+    }
     console.warn('获取卧室筛选结果数失败', e)
   } finally {
-    countLoading.value = false
+    if (seq === _countSeq) {
+      countLoading.value = false
+    }
   }
 }
 
@@ -291,18 +305,19 @@ const toggleParking = (value) => {
   }
 }
 
-// 构建筛选参数
-const buildFilterParams = () => {
+
+// 仅构建“卧室”分组的筛选参数（用于 per-panel 应用与预览）
+const buildFilterParamsBedroomsOnly = () => {
   const filterParams = {}
-  // 卧室数量（最少 N；'4+' → '4' 在 Store 映射层处理）
+  // 卧室
   if (localBedrooms.value.length > 0) {
     filterParams.bedrooms = localBedrooms.value.join(',')
   }
-  // 浴室（最少 N；'3+' → 3 在 Store 映射层处理）
+  // 浴室（'any' 将由 Store 映射忽略，不写 bathrooms_min）
   if (localBathrooms.value.length > 0) {
     filterParams.bathrooms = localBathrooms.value.join(',')
   }
-  // 车位（最少 N；'2+' → 2 在 Store 映射层处理；'0' 有效）
+  // 车位（'any' 将由 Store 映射忽略；'0' 如有则保留为有效值）
   if (localParking.value.length > 0) {
     filterParams.parking = localParking.value.join(',')
   }
@@ -315,28 +330,27 @@ const updateUrlQuery = async (filterParams) => {
     const currentQuery = { ...router.currentRoute.value.query }
     const newQuery = { ...currentQuery }
 
-    // 更新卧室参数
+    // 卧室
     if (filterParams.bedrooms) {
       newQuery.bedrooms = filterParams.bedrooms
     } else {
       delete newQuery.bedrooms
     }
 
-    // 更新浴室参数
-    if (filterParams.bathrooms) {
+    // 浴室：忽略 'any'
+    if (filterParams.bathrooms && filterParams.bathrooms !== 'any') {
       newQuery.bathrooms = filterParams.bathrooms
     } else {
       delete newQuery.bathrooms
     }
 
-    // 更新车位参数
-    if (filterParams.parking) {
+    // 车位：忽略 'any'，保留 '0'（如存在）
+    if (filterParams.parking && filterParams.parking !== 'any') {
       newQuery.parking = filterParams.parking
     } else {
       delete newQuery.parking
     }
 
-    // 仅当查询参数发生变化时才更新 URL
     if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
       await router.replace({ query: newQuery })
     }
@@ -348,15 +362,16 @@ const updateUrlQuery = async (filterParams) => {
 // 应用筛选
 const applyFilters = async () => {
   try {
-    const filterParams = buildFilterParams()
+    // 中文注释：卧室面板仅提交 bedrooms，避免误改“更多”分组（浴室/车位）
+    const filterParams = buildFilterParamsBedroomsOnly()
 
-    // 应用筛选
-    await propertiesStore.applyFilters(filterParams)
+    // 应用筛选（仅 bedrooms 分组）
+    await propertiesStore.applyFilters(filterParams, { sections: ['bedrooms'] })
 
-    // 更新 URL
+    // 更新 URL（仅写入已应用的 bedrooms）
     await updateUrlQuery(filterParams)
 
-    // 中文注释：应用成功后清理“卧室”分组的预览草稿，防止下次打开显示过期草稿计数
+    // 中文注释：应用成功后清理“卧室”分组的预览草稿
     propertiesStore.clearPreviewDraft('bedrooms')
 
     // 关闭面板

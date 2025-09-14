@@ -72,6 +72,7 @@ const furnished = ref(false)
 const previewCount = ref(null)
 const countLoading = ref(false)
 let _countTimer = null
+let _countSeq = 0 // 中文注释：计数请求序号，丢弃过期响应，避免“应用（N）”回退
 const applyText = computed(() =>
   typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
 )
@@ -89,18 +90,30 @@ const buildFilterParams = () => {
 
 /* 计数：将草稿覆盖到当前已应用条件（保障必要关联） */
 const computePreviewCount = async () => {
+  const seq = ++_countSeq
   try {
     countLoading.value = true
     const draft = buildFilterParams()
-    // 中文注释：将“更多”面板草稿合并进全局预览草稿，统一由 Store 计算预览计数
-    propertiesStore.updatePreviewDraft('more', draft)
+    // 中文注释：当“更多”分组为空（未勾选）时，也要从 base 中剔除旧键：clear → mark，再计算预览
+    if (Object.keys(draft).length === 0) {
+      propertiesStore.clearPreviewDraft('more')
+      propertiesStore.markPreviewSection('more')
+    } else {
+      propertiesStore.updatePreviewDraft('more', draft)
+    }
     const n = await propertiesStore.getPreviewCount()
-    previewCount.value = Number.isFinite(n) ? n : 0
+    if (seq === _countSeq) {
+      previewCount.value = Number.isFinite(n) ? n : 0
+    }
   } catch (e) {
-    previewCount.value = null
+    if (seq === _countSeq) {
+      previewCount.value = null
+    }
     console.warn('获取更多筛选预估数量失败', e)
   } finally {
-    countLoading.value = false
+    if (seq === _countSeq) {
+      countLoading.value = false
+    }
   }
 }
 
@@ -114,8 +127,9 @@ onMounted(() => computePreviewCount())
 /* 清除：重置并触发计数 */
 const clearAll = () => {
   furnished.value = false
-  // 中文注释：清理“更多”分组的全局草稿，避免残留影响其它面板的预览口径
+  // 中文注释：清理并标记该分组参与预览（即便草稿为空也删除 base 中旧键）
   propertiesStore.clearPreviewDraft('more')
+  propertiesStore.markPreviewSection('more')
   if (_countTimer) clearTimeout(_countTimer)
   _countTimer = setTimeout(() => computePreviewCount(), 300)
 }
@@ -158,7 +172,7 @@ const updateUrlQuery = async (filterParams) => {
 const apply = async () => {
   try {
     const filterParams = buildFilterParams()
-    await propertiesStore.applyFilters(filterParams)
+    await propertiesStore.applyFilters(filterParams, { sections: ['more'] })
     await updateUrlQuery(filterParams)
     // 中文注释：应用成功后清理“更多”分组的预览草稿，避免下次打开显示过期的草稿计数
     propertiesStore.clearPreviewDraft('more')

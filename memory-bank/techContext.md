@@ -350,3 +350,36 @@ python scripts/run_backend.py  # localhost:8000
 - 背景：历史 is_furnished 可能为 boolean/text/三态混存，勾选“家具”时容易触发 500。
 - 现状：后端 /api/properties 使用兼容表达式（NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1') / ('f','false','no','0')）止血；前端表现：勾选不再 500，只返回“有家具”。
 - 日检脚本：database/verification_queries.sql（A/B/C 可疑 + 7日 TopN + 汇总）；运行参考 reports/README.md；契约与索引说明见 docs/contracts/furnishing.md。
+
+---
+
+## 本地运维固定命令（PowerShell）与特性开关（新增 2025-09-14）
+
+- 终端要求：固定使用 Windows PowerShell 执行本地 Python/SQL/HTTP；不要在 WSL/bash 里运行这些命令（避免路径与引号解析问题）。
+- 进入项目根目录：
+  ```powershell
+  Set-Location 'C:\Users\nuoai\Desktop\WEB-sydney-rental-hub'
+  ```
+- ETL 特性开关（覆盖 CSV 的 is_furnished，启用集中判定）：
+  ```powershell
+  # 查看
+  $env:USE_ETL_FURNISHED
+  # 开启
+  $env:USE_ETL_FURNISHED = 'true'
+  ```
+- 跑 ETL（写回 is_furnished 三态布尔）：
+  ```powershell
+  & 'C:\Python313\python.exe' 'scripts\automated_data_update_with_notifications.py' --run-once
+  ```
+- 执行 SQL 迁移（一次性清理等）：
+  ```powershell
+  & 'C:\Python313\python.exe' 'scripts\run_sql_migration.py' 'database\migrations\2025-09-14-off-market-null-is-furnished.sql'
+  ```
+- 清缓存（选择性失效）：
+  ```powershell
+  # 全量
+  Invoke-WebRequest -UseBasicParsing -Method POST -Uri 'http://localhost:8000/api/cache/invalidate?invalidate_all=true' | Out-Null
+  # 单条
+  Invoke-WebRequest -UseBasicParsing -Method POST -Uri 'http://localhost:8000/api/cache/invalidate?property_id=17580846' | Out-Null
+  ```
+- 说明：FastAPICache 以“完整 URL”为 key；列表与详情各自独立，修复/迁移后请按需失效对应 URL 的缓存。

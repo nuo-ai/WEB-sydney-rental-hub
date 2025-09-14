@@ -97,24 +97,37 @@ const maxDisplay = computed(() => `$${Number(localPriceRange.value[1]).toLocaleS
 const previewCount = ref(null)
 const countLoading = ref(false)
 let _countTimer = null
+let _countSeq = 0 // 中文注释：计数请求序号，用于丢弃过期响应，避免“应用（N）”回退
 const applyText = computed(() => {
   if (typeof previewCount.value === 'number') return `应用（${previewCount.value}）`
   return '应用'
 })
 
 const computePreviewCount = async () => {
+  const seq = ++_countSeq
   try {
     countLoading.value = true
     const params = buildFilterParams()
-    // 中文注释：将“价格”面板草稿合入全局草稿，由 Store 统一计算预览计数
-    propertiesStore.updatePreviewDraft('price', params)
+    // 中文注释：当价格回到“不限范围”时，也要从 base 中剔除旧价位键：clear → mark，再计算预览
+    if (Object.keys(params).length === 0) {
+      propertiesStore.clearPreviewDraft('price')
+      propertiesStore.markPreviewSection('price')
+    } else {
+      propertiesStore.updatePreviewDraft('price', params)
+    }
     const n = await propertiesStore.getPreviewCount()
-    previewCount.value = Number.isFinite(n) ? n : 0
+    if (seq === _countSeq) {
+      previewCount.value = Number.isFinite(n) ? n : 0
+    }
   } catch (err) {
-    previewCount.value = null
+    if (seq === _countSeq) {
+      previewCount.value = null
+    }
     console.warn('获取价格预估数量失败', err)
   } finally {
-    countLoading.value = false
+    if (seq === _countSeq) {
+      countLoading.value = false
+    }
   }
 }
 
@@ -146,8 +159,9 @@ const handlePriceChange = () => {
 
 const clearAll = () => {
   localPriceRange.value = [MIN_PRICE, MAX_PRICE]
-  // 中文注释：清理“价格”分组的全局草稿，避免残留影响其它面板的预览口径
+  // 中文注释：清理并标记该分组参与预览（即便草稿为空也删除 base 中旧键）
   propertiesStore.clearPreviewDraft('price')
+  propertiesStore.markPreviewSection('price')
   if (_countTimer) clearTimeout(_countTimer)
   _countTimer = setTimeout(() => computePreviewCount(), 300)
 }
@@ -202,7 +216,7 @@ const applyFilters = async () => {
     const filterParams = buildFilterParams()
 
     // 应用筛选
-    await propertiesStore.applyFilters(filterParams)
+    await propertiesStore.applyFilters(filterParams, { sections: ['price'] })
 
     // 更新 URL
     await updateUrlQuery(filterParams)

@@ -209,6 +209,18 @@ const hasRegionSelected = (selectedLocations = []) => {
   }
 }
 
+/**
+ * 分组→所管理的键名（用于“预览合并”时从 base 中精准剔除旧键）
+ * 场景：当某分组（如 area）被“清空/取消选择”时，即便草稿为空，也应先删除 base 中旧的 suburb/postcodes 等键，再叠加草稿
+ */
+const SECTION_KEY_MAP = {
+  area: ['suburb', 'suburbs', 'postcodes', 'include_nearby'],
+  price: ['minPrice', 'maxPrice', 'price_min', 'price_max'],
+  bedrooms: ['bedrooms', 'bathrooms', 'bathrooms_min', 'parking', 'parking_min'],
+  availability: ['date_from', 'date_to'],
+  more: ['isFurnished', 'furnished'],
+}
+
 export const usePropertiesStore = defineStore('properties', {
   state: () => ({
     // 房源数据
@@ -231,6 +243,8 @@ export const usePropertiesStore = defineStore('properties', {
     // 搜索状态
     searchQuery: '',
     selectedLocations: [],
+    // 草稿：区域选择（仅面板内临时编辑，点击“应用”前不影响已应用条件）
+    draftSelectedLocations: [],
 
     // 区域缓存（15分钟TTL）
     areasCache: { list: [], ts: 0 },
@@ -621,7 +635,7 @@ export const usePropertiesStore = defineStore('properties', {
     },
 
     // 应用筛选条件
-    async applyFilters(filters) {
+    async applyFilters(filters, options = {}) {
       this.loading = true
       this.error = null
 
@@ -710,24 +724,88 @@ export const usePropertiesStore = defineStore('properties', {
           }
         })
 
+        // 分组级合并：仅更新本次涉及的分组，保留其它已应用条件
+        const baseParams = { ...(this.currentFilterParams || {}) }
+        const touchedSections = new Set()
+        try {
+          // 优先使用调用方显式分组，避免误删其它分组键
+          if (Array.isArray(options?.sections) && options.sections.length > 0) {
+            options.sections.forEach((s) => touchedSections.add(s))
+          } else {
+            // 兜底：基于本次参数键与全局草稿痕迹推断
+            Object.entries(SECTION_KEY_MAP).forEach(([section, keys]) => {
+              // 1) 通过本次参数键命中分组
+              if (keys.some((k) => Object.prototype.hasOwnProperty.call(mappedParams, k))) {
+                touchedSections.add(section)
+              }
+              // 2) 通过全局草稿痕迹命中分组（PC 分离式面板场景）
+              if (
+                this.previewDraftSections &&
+                Object.prototype.hasOwnProperty.call(this.previewDraftSections, section)
+              ) {
+                touchedSections.add(section)
+              }
+            })
+          }
+        } catch {
+          /* 忽略非关键错误 */
+        }
+
+        // 从基底删除被触达分组的旧键
+        touchedSections.forEach((section) => {
+          const keys = SECTION_KEY_MAP[section] || []
+          keys.forEach((k) => {
+            if (Object.prototype.hasOwnProperty.call(baseParams, k)) {
+              delete baseParams[k]
+            }
+          })
+        })
+
+        // 合并出最终参数，并补齐分页与排序
+        let mergedParams = { ...baseParams, ...mappedParams }
+        mergedParams.page = 1
+        mergedParams.page_size = this.pageSize
+        if ((mergedParams.sort == null || mergedParams.sort === '') && this.sort) {
+          mergedParams.sort = this.sort
+        }
+
+        // 再次清理空值，确保请求参数干净
+        Object.keys(mergedParams).forEach((key) => {
+          if (
+            mergedParams[key] === null ||
+            mergedParams[key] === undefined ||
+            mergedParams[key] === ''
+          ) {
+            delete mergedParams[key]
+          }
+        })
+
         // 记录“当前已应用的筛选条件”，供翻页/改每页大小复用
-        this.currentFilterParams = { ...mappedParams }
+        this.currentFilterParams = { ...mergedParams }
+        // 若调用方显式指定了分组，应用成功后清理这些分组的草稿（双保险）
+        if (Array.isArray(options?.sections) && options.sections.length > 0) {
+          try {
+            options.sections.forEach((s) => this.clearPreviewDraft(s))
+          } catch {
+            /* 忽略非关键错误 */
+          }
+        }
 
         // 中文注释：调试输出本次请求参数（仅用于开发定位，生产可注释）
         {
           let __dbg = ''
           try {
-            __dbg = JSON.stringify(mappedParams)
+            __dbg = JSON.stringify(mergedParams)
           } catch (err) {
             void err
             __dbg = '[unserializable]'
           }
 
-          console.debug('[FILTER-DEBUG][applyFilters] mappedParams:', __dbg)
+          console.debug('[FILTER-DEBUG][applyFilters] mergedParams:', __dbg)
         }
         const t0 =
           typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
-        const response = await propertyAPI.getListWithPagination(mappedParams)
+        const response = await propertyAPI.getListWithPagination(mergedParams)
         const t1 =
           typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()
         const dur = t1 - t0
@@ -778,6 +856,43 @@ export const usePropertiesStore = defineStore('properties', {
         if (a && a.id && !map.has(a.id)) map.set(a.id, a)
       }
       this.selectedLocations = Array.from(map.values())
+    },
+
+    // 新增：设置“草稿”区域选择（不影响已应用 selectedLocations）
+    setDraftSelectedLocations(locations) {
+      const arr = Array.isArray(locations) ? locations.map((l) => canonicalizeArea(l)).filter(Boolean) : []
+      const map = new Map()
+      for (const a of arr) {
+        if (a && a.id && !map.has(a.id)) map.set(a.id, a)
+      }
+      this.draftSelectedLocations = Array.from(map.values())
+    },
+
+    // 新增：草稿=已应用（打开面板时调用）
+    resetDraftSelectedLocations() {
+      const arr = Array.isArray(this.selectedLocations) ? this.selectedLocations : []
+      this.draftSelectedLocations = arr.map((l) => ({ ...l }))
+    },
+
+    // 新增：应用草稿 -> 已应用，同时保持草稿与已应用一致
+    applySelectedLocations() {
+      const arr = Array.isArray(this.draftSelectedLocations) ? this.draftSelectedLocations : []
+      this.selectedLocations = arr.map((l) => ({ ...l }))
+      this.draftSelectedLocations = arr.map((l) => ({ ...l }))
+    },
+
+    // 新增：判断草稿与已应用是否不一致（用于“小蓝点”）
+    hasAreaDraftDiff() {
+      const a = Array.isArray(this.selectedLocations) ? this.selectedLocations : []
+      const d = Array.isArray(this.draftSelectedLocations) ? this.draftSelectedLocations : []
+      if (a.length !== d.length) return true
+      const norm = (list) => list.map((l) => canonicalIdOf(l)).sort()
+      const as = norm(a)
+      const ds = norm(d)
+      for (let i = 0; i < as.length; i++) {
+        if (as[i] !== ds[i]) return true
+      }
+      return false
     },
 
     // 添加选中区域
@@ -983,13 +1098,37 @@ export const usePropertiesStore = defineStore('properties', {
     // 统一预览计数：合并“已应用条件 + 全局草稿 + 额外草稿”，并调用后端计数
     async getPreviewCount(extraDraft = {}) {
       try {
-        // 中文注释：统一口径——以 Store 为单一真源聚合草稿，避免各面板“各算各的”
+        // 中文注释：统一口径——以 Store 为单一真源聚合草稿；当某分组出现时，先从 base 中剔除该分组“所管理的键”，再叠加草稿
         const base = this.currentFilterParams || {}
-        const mergedPreview = Object.values(this.previewDraftSections || {}).reduce((acc, obj) => {
-          if (obj && typeof obj === 'object') return { ...acc, ...obj }
+        const draftSections = this.previewDraftSections || {}
+
+        // 1) 复制 base，并对出现的分组进行“精准删键”（即便该分组草稿为空，也应删除 base 中的旧键）
+        const baseClean = { ...base }
+        try {
+          Object.keys(draftSections).forEach((section) => {
+            const keys = SECTION_KEY_MAP[section]
+            if (Array.isArray(keys)) {
+              keys.forEach((k) => {
+                if (k in baseClean) delete baseClean[k]
+              })
+            }
+          })
+        } catch {
+          /* 忽略非关键错误 */
+        }
+
+        // 2) 聚合草稿（忽略 __mark 等非参数字段）
+        const mergedPreview = Object.values(draftSections).reduce((acc, obj) => {
+          if (obj && typeof obj === 'object') {
+            const next = { ...obj }
+            if ('__mark' in next) delete next.__mark
+            return { ...acc, ...next }
+          }
           return acc
         }, {})
-        const merged = { ...base, ...mergedPreview, ...extraDraft }
+
+        // 3) 组合为最终计数参数
+        const merged = { ...baseClean, ...mergedPreview, ...extraDraft }
         return await this.getFilteredCount(merged)
       } catch (e) {
         console.warn('getPreviewCount 失败', e)
@@ -1021,6 +1160,18 @@ export const usePropertiesStore = defineStore('properties', {
         const next = { ...this.previewDraftSections }
         delete next[section]
         this.previewDraftSections = next
+      }
+    },
+
+    // 标记某个分组参与本次预览（即便草稿为空也算“出现过”）
+    // 场景：区域被清空/取消选择时，需要从 base 中剔除旧的 suburb/postcodes，再计算预览
+    markPreviewSection(section) {
+      if (!section) return
+      const prev = this.previewDraftSections?.[section] || {}
+      const next = { ...prev, __mark: true }
+      this.previewDraftSections = {
+        ...this.previewDraftSections,
+        [section]: next,
       }
     },
 

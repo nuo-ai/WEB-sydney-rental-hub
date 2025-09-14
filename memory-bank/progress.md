@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-14｜FURNISHING-SEMANTICS-PHASE1  
+  ETL 两阶段判定：features 精确匹配优先，标题/正文兜底；排除 furnishing_status；下架 off-market 同步置空 is_furnished；执行一次性清理 SQL。前端表现：勾选“有家具”更准确，详情/直查不误读下架旧 TRUE。｜溯源：commit 3064c42..f288eef
 - 2025-09-13｜FURNISHED-FILTER-COMPAT  
   勾选“家具”不再 500；仅显示确认为“有家具”的房源（后端采用兼容写法，前端表现不变）。｜溯源：commit 0e36a05..3064c42
 - 2025-09-13｜FURNISHING-QUALITY-LOOP-V1  

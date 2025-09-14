@@ -7,10 +7,10 @@
         <button
           ref="areaTabRef"
           class="filter-tab"
-          :class="{ active: activePanel === 'area' }"
+          :class="{ active: activePanel === 'area', applied: areaApplied }"
           @click.stop="togglePanel('area', $event)"
         >
-          <span class="chinese-text">区域</span>
+          <span class="chinese-text">{{ areaTabText }}</span>
           <svg
             v-if="activePanel !== 'area'"
             class="chevron-icon"
@@ -62,10 +62,10 @@
         <button
           ref="bedroomsTabRef"
           class="filter-tab"
-          :class="{ active: activePanel === 'bedrooms' }"
+          :class="{ active: activePanel === 'bedrooms', applied: bedroomsApplied }"
           @click.stop="togglePanel('bedrooms', $event)"
         >
-          <span class="chinese-text">卧室</span>
+          <span class="chinese-text">{{ bedroomsTabText }}</span>
           <svg
             v-if="activePanel !== 'bedrooms'"
             class="chevron-icon"
@@ -117,10 +117,10 @@
         <button
           ref="priceTabRef"
           class="filter-tab"
-          :class="{ active: activePanel === 'price' }"
+          :class="{ active: activePanel === 'price', applied: priceApplied }"
           @click.stop="togglePanel('price', $event)"
         >
-          <span class="chinese-text">价格</span>
+          <span class="chinese-text">{{ priceTabText }}</span>
           <svg
             v-if="activePanel !== 'price'"
             class="chevron-icon"
@@ -172,10 +172,10 @@
         <button
           ref="availabilityTabRef"
           class="filter-tab"
-          :class="{ active: activePanel === 'availability' }"
+          :class="{ active: activePanel === 'availability', applied: availabilityApplied }"
           @click.stop="togglePanel('availability', $event)"
         >
-          <span class="chinese-text">空出时间</span>
+          <span class="chinese-text">{{ availabilityTabText }}</span>
           <svg
             v-if="activePanel !== 'availability'"
             class="chevron-icon"
@@ -227,10 +227,10 @@
         <button
           ref="moreTabRef"
           class="filter-tab"
-          :class="{ active: activePanel === 'more' }"
+          :class="{ active: activePanel === 'more', applied: moreApplied }"
           @click.stop="togglePanel('more', $event)"
         >
-          <span class="chinese-text">更多</span>
+          <span class="chinese-text">{{ moreTabText }}</span>
           <svg
             v-if="activePanel !== 'more'"
             class="chevron-icon"
@@ -310,6 +310,7 @@ import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
 import PriceFilterPanel from './filter-panels/PriceFilterPanel.vue'
 import AvailabilityFilterPanel from './filter-panels/AvailabilityFilterPanel.vue'
 import MoreFilterPanel from './filter-panels/MoreFilterPanel.vue'
+import { usePropertiesStore } from '@/stores/properties'
 
 // 中文注释：PC端改为分离式下拉面板，移动端保持统一大面板
 // 使用 requestOpenFullPanel 事件触发移动端的统一面板
@@ -320,6 +321,88 @@ const emit = defineEmits(['requestOpenFullPanel'])
 
 // 响应式状态
 const activePanel = ref(null) // 'area', 'bedrooms', 'price', 'availability', 'more' 或 null
+
+// 依赖 Store 的“已应用参数 + 草稿”用于顶部标签文案与小蓝点
+const propertiesStore = usePropertiesStore()
+const appliedParams = computed(() => propertiesStore.currentFilterParams || {})
+
+/* 移除未应用变更小蓝点相关计算，保留 applied 文案与高亮 */
+
+// 1) 区域
+const areaApplied = computed(() => (propertiesStore.selectedLocations?.length || 0) > 0)
+/* removed: areaHasDraft */
+const areaTabText = computed(() => {
+  const list = propertiesStore.selectedLocations || []
+  if (!list.length) return '区域'
+  const names = list.map((l) => (l?.name ? String(l.name) : '')).filter(Boolean)
+  if (!names.length) return '区域'
+  const first = names[0]
+  const more = Math.max(0, names.length - 1)
+  return more > 0 ? `${first} +${more}` : first
+})
+
+// 2) 卧室
+const bedroomsApplied = computed(() => {
+  const v = appliedParams.value?.bedrooms
+  return v !== undefined && v !== null && String(v) !== ''
+})
+/* removed: bedroomsHasDraft */
+const bedroomsTabText = computed(() => {
+  if (!bedroomsApplied.value) return '卧室'
+  const v = String(appliedParams.value?.bedrooms)
+  if (v === '0' || v.toLowerCase() === 'studio') return 'Studio'
+  return v.endsWith('+') ? `${v}卧` : `${v}卧`
+})
+
+// 3) 价格
+const priceApplied = computed(() => {
+  const p = appliedParams.value || {}
+  const min = p.minPrice ?? p.price_min
+  const max = p.maxPrice ?? p.price_max
+  return (min != null && min !== '') || (max != null && max !== '')
+})
+/* removed: priceHasDraft */
+const priceTabText = computed(() => {
+  const p = appliedParams.value || {}
+  const min = p.minPrice ?? p.price_min
+  const max = p.maxPrice ?? p.price_max
+  const minNum = min != null && min !== '' ? Number(min) : null
+  const maxNum = max != null && max !== '' ? Number(max) : null
+  if (minNum == null && maxNum == null) return '价格'
+  if (minNum != null && maxNum != null) return `$${minNum} - $${maxNum}`
+  if (minNum != null) return `≥$${minNum}`
+  return `≤$${maxNum}`
+})
+
+// 4) 空出时间
+const availabilityApplied = computed(() => {
+  const p = appliedParams.value || {}
+  return (p.date_from && String(p.date_from) !== '') || (p.date_to && String(p.date_to) !== '')
+})
+/* removed: availabilityHasDraft */
+const availabilityTabText = computed(() => {
+  const p = appliedParams.value || {}
+  const from = p.date_from ? String(p.date_from).slice(0, 10) : null
+  const to = p.date_to ? String(p.date_to).slice(0, 10) : null
+  if (from && to) return `${from} - ${to}`
+  if (from) return `From ${from}`
+  if (to) return `Until ${to}`
+  return '空出时间'
+})
+
+// 5) 更多
+const moreApplied = computed(() => {
+  const p = appliedParams.value || {}
+  // 中文注释：与当前 UI 对齐——“更多”仅体现带家具 Furnished，浴室/车位归“卧室”面板管理
+  return p.isFurnished === true || p.furnished === true
+})
+/* removed: moreHasDraft */
+const moreTabText = computed(() => {
+  const p = appliedParams.value || {}
+  // 中文注释：仅在 Furnished 为 true 时显示；否则显示“更多”
+  if (p.isFurnished === true || p.furnished === true) return 'Furnished'
+  return '更多'
+})
 
 // 面板触发元素引用
 const areaTabRef = ref(null)
@@ -489,6 +572,7 @@ onUnmounted(() => {
     background-color 0.2s ease,
     color 0.2s ease;
   white-space: nowrap;
+  position: relative; /* 为小蓝点定位 */
 }
 
 .filter-tab:hover {
@@ -523,7 +607,7 @@ onUnmounted(() => {
   padding: 0 12px;
   gap: 2px;
   border: 1px solid var(--color-border-default);
-  border-radius: 9999px;
+  border-radius: var(--filter-radius-lg);
   background: var(--color-bg-card);
   color: var(--color-text-secondary);
   font-weight: 500;
@@ -541,6 +625,14 @@ onUnmounted(() => {
   width: 16px;
   height: 16px;
 }
+
+/* 已应用高亮（严格使用 design token，与 active 保持一致风格） */
+.filter-tab.applied {
+  background: var(--chip-bg-selected);
+  color: var(--color-text-primary);
+}
+
+/* 移除小蓝点样式 */
 
 /* 更多筛选面板占位 */
 .more-filter-placeholder {
