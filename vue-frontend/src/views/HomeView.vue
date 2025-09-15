@@ -57,15 +57,7 @@
         </nav>
 
         <h1 class="page-h1">
-          <template v-if="isMultiSelect">
-            {{ propertiesStore.totalCount }} 套房源，覆盖及周边 {{ selectedLocationsCount }} 个郊区
-          </template>
-          <template v-else-if="hasSingleSelection">
-            {{ propertiesStore.totalCount }} 套房源在 {{ suburb || 'Sydney' }}, NSW
-          </template>
-          <template v-else>
-            {{ propertiesStore.totalCount }} 套待租房源在 {{ suburb || 'Sydney' }}, NSW<span v-if="postcode">, {{ postcode }}</span>
-          </template>
+          {{ propertiesStore.totalCount }} 套{{ bedroomsText }}房源，覆盖 {{ selectedLocationsCount }} 个区域
         </h1>
 
         <div class="actions-row">
@@ -245,15 +237,16 @@ const suburb = computed(() => {
   }
   return ''
 })
-const postcode = computed(() => {
-  const list = propertiesStore.selectedLocations
-  if (Array.isArray(list) && list.length) {
-    const first = list[0]
-    // 常见 4 位邮编；若对象自带 postcode 字段优先
-    const pc = first?.postcode || first?.name
-    return typeof pc === 'string' && /^\d{4}$/.test(pc) ? pc : ''
-  }
-  return ''
+
+// 统一标题中的“Y卧”文案（基于已应用条件）
+// 规则：'0' 或 'studio' → 'Studio '；'4+' 等原样 + '卧'；未设置卧室则省略“Y卧”
+const bedroomsText = computed(() => {
+  const b = propertiesStore.currentFilterParams?.bedrooms
+  if (!b) return ''
+  const s = String(b).split(',')[0]
+  if (!s) return ''
+  if (s === '0' || s.toLowerCase() === 'studio') return 'Studio '
+  return `${s}卧`
 })
 
 // 选择状态：用于标题与面包屑的前端表现
@@ -262,7 +255,6 @@ const selectedLocationsCount = computed(() => {
   const list = propertiesStore.selectedLocations
   return Array.isArray(list) ? list.length : 0
 })
-const hasSingleSelection = computed(() => selectedLocationsCount.value === 1)
 const isMultiSelect = computed(() => selectedLocationsCount.value > 1)
 
 // 定义事件发射器
