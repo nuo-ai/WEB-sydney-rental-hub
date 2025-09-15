@@ -14,6 +14,21 @@
 - 区域守卫：当 `featureFlags.requireRegionBeforeFilter=true` 时，仅在 `selectedLocations` 为空且本次 `params/filters` 也不含 `suburb/suburbs/postcodes` 才短路；草稿/URL 带区域允许计数/请求。
 - 分页/排序：计数与列表彻底解耦；`applyFilters` 固定 `page=1/page_size=state.pageSize`，`fetchProperties` 以本次 pagination 覆盖历史，防止 `page_size=1` 污染。
 - 观测：超 800ms 打印 `[FILTER-PERF]`；请求参数打印 `[FILTER-DEBUG]` 便于排查。
+
+### URL 幂等与仅写非空键（新增 2025-09-15）
+- 模式：最终写入点清洗 + 幂等对比。`sanitizeQueryParams` 过滤空值键并稳定键序，`isSameQuery` 比较新旧查询；相同则不写，避免 replace 循环。
+- 落地点：FilterPanel 统一面板、Price/Bedrooms/Availability/More/Area 五个分面、HomeView.sort。
+- 前端表现：应用后 URL 可直链/刷新恢复，不写空键；地址栏不抖动；按钮“应用（N）/确定（N）”与列表 total 对齐。
+- 溯源：commit 17527a4..c713d9f
+- 预估计数 composable（useFilterPreviewCount）：统一“应用（N）”口径，内置并发序号守卫、防抖与组件卸载清理；计数失败返回 null 执行“失败降级”，前端表现为按钮退回“应用/确定”，避免误报 0。
+- 后端 WHERE 构建器模式：统一使用 `_build_where_and_params_for_properties` 产出 WHERE 与参数，列表查询与计数查询严格共用，防止条件/参数漂移；参数化占位杜绝 SQL 注入；排序仅允许最小白名单（ASC/DESC）。
+- REST 多值 OR 条件参数化：/api/properties 中 bedrooms/bathrooms/parking 的多值/下限 OR 条件改为 `%s` 占位并统一 `params.extend(...)`，禁止字符串拼接，确保安全与可维护。
+- 分组边界：Pinia `applyFilters(filters, { sections })`；组件按所属分组传入（Area/Price/Bedrooms/Availability/More），移动端统一面板可一次传多分组。仅删除这些分组旧键再合并，避免跨面板覆盖。
+- 预览口径：`getPreviewCount` 先按分组“精准删键”再合入草稿，清空场景需 `clearPreviewDraft` + `markPreviewSection` 触发删旧键；预览与应用映射一致。
+- URL 同步：仅在“应用后”写入且仅写本分组非空参数；刷新/直链可复现；顶部标签仅读“已应用”。
+- 区域守卫：当 `featureFlags.requireRegionBeforeFilter=true` 时，仅在 `selectedLocations` 为空且本次 `params/filters` 也不含 `suburb/suburbs/postcodes` 才短路；草稿/URL 带区域允许计数/请求。
+- 分页/排序：计数与列表彻底解耦；`applyFilters` 固定 `page=1/page_size=state.pageSize`，`fetchProperties` 以本次 pagination 覆盖历史，防止 `page_size=1` 污染。
+- 观测：超 800ms 打印 `[FILTER-PERF]`；请求参数打印 `[FILTER-DEBUG]` 便于排查。
  
 ## 核心架构原则
 

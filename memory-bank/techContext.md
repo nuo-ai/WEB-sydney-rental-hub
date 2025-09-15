@@ -2,6 +2,7 @@
 
 **文档状态**: 生存文档 (Living Document)
 **最后更新**: 2025-09-15
+（本页含 FE-UI-004 URL 幂等补充与 E2E 运行方式，溯源 commit 17527a4..c713d9f）
 
 ---
 
@@ -45,6 +46,17 @@ vue-frontend/
 ---
 
 ## 筛选系统技术约定（2025-09-14）
+### 2025-09-15 补充（FE-UI-004：URL 幂等与仅写非空键）
+- 最终写入点清洗 + 幂等对比：在写 URL 前调用 `sanitizeQueryParams(input)` 过滤空键并按字母序稳定键序；使用 `isSameQuery(curr,next)` 对比，若一致则不写，避免 replace 循环。
+- 落地点：FilterPanel 统一面板、Price/Bedrooms/Availability/More/Area 五个分面、HomeView.sort。
+- 前端表现：应用后 URL 可直链/刷新恢复；地址栏不抖动；不写空键；按钮“应用（N）/确定（N）”与列表 total 对齐。
+- 实现文件：
+  - `vue-frontend/src/utils/query.js`：`sanitizeQueryParams`、`isSameQuery`
+  - `vue-frontend/src/components/FilterPanel.vue` 与 `src/components/filter-panels/*`
+  - `vue-frontend/src/views/HomeView.vue`（排序入口）
+- E2E 冒烟：`tests/e2e/url-idempotence.spec.ts`（Playwright）
+  - 重复选择相同排序项两次，URL 不变（幂等）
+  - 切换不同排序后 URL 仅写有效键，断言无空键/空值
 
 ### 2025-09-15 补充（P0 落地）
 - 前端 composable：useFilterPreviewCount
@@ -89,6 +101,7 @@ vue-frontend/
 ---
 
 ## 4. 开发环境
+### 4.1 前后端本地运行
 
 ```bash
 # Vue前端开发环境
@@ -98,6 +111,24 @@ npm run dev              # localhost:5173
 # 后端API服务
 cd ../
 python scripts/run_backend.py  # localhost:8000
+```
+
+### 4.2 Playwright E2E（URL 幂等冒烟）
+前置：确保前端 :5173 与后端 :8000 已运行（playwright.config.js 已设置 baseURL=http://localhost:5173）
+```bash
+# 安装依赖（如首次）
+npx playwright install
+
+# 仅运行本专项冒烟（2 条）
+npx playwright test -g "URL 幂等与仅写非空键"
+
+# 查看 HTML 报告
+npx playwright show-report
+```
+测试文件与断言：
+- tests/e2e/url-idempotence.spec.ts
+  - 重复选择“按最小价格”两次 → URL search 应保持不变
+  - 切换“按空出时间” → URL 仅包含有效键；断言 searchParams 无空键/空值
 ```
 
 **当前运行状态**:

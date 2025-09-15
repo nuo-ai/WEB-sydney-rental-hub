@@ -5,6 +5,8 @@
 - 详细过程请查看对应 commit/PR；Memory Bank 不再复制过程性细节。
 
 近 30 天里程碑
+- 2025-09-15｜FE-UI-004-URL-IDEMPOTENCE  
+  最终写入点清洗 + 幂等对比：新增 utils/query.sanitizeQueryParams/isSameQuery；接入 FilterPanel + 五个分面 + HomeView.sort；新增 Playwright 冒烟（URL 幂等与仅写非空键）。前端表现：应用后 URL 可直链/刷新、不抖动；不写空键。｜溯源：commit 17527a4..c713d9f
 - 2025-09-15｜FILTER-P0-UNIFIED-COUNT  
   后端统一 WHERE 构建器 + REST 多值 OR 参数化；前端 useFilterPreviewCount 统一“应用（N）”计数（并发守卫/防抖/卸载清理）；计数失败返回 null 做失败降级，V1 契约下仅选邮编自动展开为 suburb CSV，预估与列表口径一致。｜溯源：e8e25d5..41b7586
 - 2025-09-14｜FILTER-SECTION-BOUNDARY  

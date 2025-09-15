@@ -50,8 +50,24 @@ app.post('/api/properties/search', async (req, res) => {
     }
 
     const query = `
-      query GetUniversityCommute($universityName: UniversityNameEnum!, $limit: Int!) {
-        get_university_commute_profile(university_name: $universityName, limit: $limit) {
+      query GetUniversityCommute(
+        $universityName: UniversityNameEnum!,
+        $limit: Int!,
+        $offset: Int,
+        $min_rent_pw: Int,
+        $max_rent_pw: Int,
+        $min_bedrooms: Int,
+        $max_commute_minutes: Int
+      ) {
+        get_university_commute_profile(
+          university_name: $universityName,
+          limit: $limit,
+          offset: $offset,
+          min_rent_pw: $min_rent_pw,
+          max_rent_pw: $max_rent_pw,
+          min_bedrooms: $min_bedrooms,
+          max_commute_minutes: $max_commute_minutes
+        ) {
           directWalkOptions {
             items {
               property {
@@ -74,7 +90,15 @@ app.post('/api/properties/search', async (req, res) => {
 
     const response = await graphqlClient.post('', {
       query,
-      variables: { universityName: university, limit: 50 }
+      variables: {
+        universityName: university,
+        limit: 50,
+        offset: 0,
+        min_rent_pw,
+        max_rent_pw,
+        min_bedrooms: bedrooms,
+        max_commute_minutes
+      }
     });
 
     if (response.data?.errors) {
@@ -82,26 +106,32 @@ app.post('/api/properties/search', async (req, res) => {
     }
 
     const walkOptions = response.data?.data?.get_university_commute_profile?.directWalkOptions;
-    let properties = walkOptions?.items || [];
+    const items = walkOptions?.items || [];
+    let properties = items;
 
-    // 应用筛选
-    if (bedrooms !== undefined) {
-      properties = properties.filter(item => item.property.bedrooms === bedrooms);
-    }
-    if (max_rent_pw) {
-      properties = properties.filter(item => item.property.rent_pw <= max_rent_pw);
-    }
-    if (min_rent_pw) {
-      properties = properties.filter(item => item.property.rent_pw >= min_rent_pw);
-    }
-    if (max_commute_minutes) {
-      properties = properties.filter(item => 
-        item.walkTimeToUniversityMinutes <= max_commute_minutes
-      );
+    // 可选回滚：默认关闭 Node 二次筛选；如需临时回退，设置 ENABLE_NODE_POST_FILTER=true
+    if (process.env.ENABLE_NODE_POST_FILTER === 'true') {
+      if (bedrooms !== undefined) {
+        properties = properties.filter(item => item.property.bedrooms === bedrooms);
+      }
+      if (max_rent_pw !== undefined) {
+        properties = properties.filter(item => item.property.rent_pw <= max_rent_pw);
+      }
+      if (min_rent_pw !== undefined) {
+        properties = properties.filter(item => item.property.rent_pw >= min_rent_pw);
+      }
+      if (max_commute_minutes !== undefined) {
+        properties = properties.filter(item => 
+          item.walkTimeToUniversityMinutes <= max_commute_minutes
+        );
+      }
     }
 
     // 计算统计信息
-    const totalFound = properties.length;
+    let totalFound = walkOptions?.totalCount ?? properties.length;
+    if (process.env.ENABLE_NODE_POST_FILTER === 'true') {
+      totalFound = properties.length;
+    }
     const rents = properties.map(p => p.property.rent_pw).filter(r => r > 0);
     const avgRent = rents.length > 0 ? Math.round(rents.reduce((a, b) => a + b, 0) / rents.length) : 0;
     const walkTimes = properties.map(p => p.walkTimeToUniversityMinutes).filter(t => t !== undefined);

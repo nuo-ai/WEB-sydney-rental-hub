@@ -135,7 +135,9 @@ class Query:
         min_rent_pw: Optional[int] = None, # Corrected default value assignment
         max_rent_pw: Optional[int] = None, # Corrected default value assignment
         min_bedrooms: Optional[int] = None, # Corrected default value assignment
-        property_type: Optional[str] = None # Corrected default value assignment
+        max_bedrooms: Optional[int] = None, # New: support equality via min=max=bedrooms
+        property_type: Optional[str] = None, # Corrected default value assignment
+        max_commute_minutes: Optional[int] = None # New: constrain walk radius by minutes
     ) -> UniversityCommuteProfile:
         # Step 1: Get university coordinates
         logging.info(f"Resolver: Fetching coordinates for {university_name.value}")
@@ -196,8 +198,12 @@ class Query:
             property_filters["max_rent_pw"] = max_rent_pw
         if min_bedrooms is not None:
             property_filters["min_bedrooms"] = min_bedrooms
+        if max_bedrooms is not None:
+            property_filters["max_bedrooms"] = max_bedrooms
         if property_type is not None:
             property_filters["property_type"] = property_type
+        if max_commute_minutes is not None:
+            property_filters["max_commute_minutes"] = max_commute_minutes
         
         # Get walk radius for the university
         uni_key = university_name.value.upper()
@@ -222,6 +228,19 @@ class Query:
                 limit=limit,
                 offset=offset,
                 filters=property_filters
+            )
+        except ValueError as e:
+            # 中文注释：当严格模式开启且出现无效筛选键时，将详细信息暴露到 GraphQL 错误扩展中，便于前端提示
+            msg = str(e)
+            invalid_keys = []
+            if ":" in msg:
+                try:
+                    invalid_keys = [k for k in msg.split(":", 1)[1].split(",") if k]
+                except Exception:
+                    invalid_keys = []
+            raise strawberry.GraphQLError(
+                "Invalid filter keys",
+                extensions={"invalidKeys": invalid_keys or None}
             )
         except Exception as e:
             logging.error(f"Resolver: Error calling get_direct_walk_properties_crud: {e}", exc_info=True)

@@ -1,7 +1,8 @@
 # 当前上下文与紧急焦点
-最后更新：2025-09-14
+最后更新：2025-09-15
 
 今日快照（精简版，≤10行）
+- FE-UI-004-URL-IDEMPOTENCE：最终写入点清洗 + 幂等对比。新增 utils/query.sanitizeQueryParams/isSameQuery；接入 FilterPanel + 五个分面 + HomeView.sort；新增 Playwright 冒烟（URL 幂等与仅写非空键）。前端表现：应用后 URL 可直链/刷新、不抖动；不写空键；按钮“应用（N）”与列表 total 对齐。溯源：commit 17527a4..c713d9f
 - FILTER-P0-UNIFIED-BE-FE：后端统一筛选构建器 + REST 多值 OR 参数化；前端 useFilterPreviewCount 统一“应用（N）”并发/防抖/卸载清理；计数失败返回 null 做失败降级（按钮退回“应用/确定”）。前端表现：预估 N 更稳定，失败不误报 0；只选邮编可生效。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
 - AREA/PRICE/BEDROOMS/AVAIL/MORE-PREVIEW：五个分面接入全局 previewDraft + composable；Area 入口 200ms 节流 + 统一 300ms 防抖；URL 仅写非空。前端表现：PC 分离式与移动端统一面板的“应用（N）/确定（N）”一致。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
 - POSTCODE-EXPAND-V1：V1 契约下仅选“邮编”时自动展开为多个 suburb 注入 suburb CSV，计数与列表口径一致。前端表现：只选邮编时数量与列表一致。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
