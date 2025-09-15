@@ -54,15 +54,12 @@
 
 <script setup>
 import { ref, computed, inject } from 'vue'
-import { useRouter } from 'vue-router'
-import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import { usePropertiesStore } from '@/stores/properties'
 import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：更多（高级）筛选面板。仅在“应用”时提交到 store；与其它分离式面板一致。
 
 const emit = defineEmits(['close'])
-const router = useRouter()
 const t = inject('t') || ((k) => k)
 
 /* 本地状态（默认值：未勾选）仅保留“带家具” */
@@ -102,41 +99,23 @@ const furnishedLabel = computed(() => {
 
 const propertiesStore = usePropertiesStore()
 
-/* 同步 URL（仅写入非空/有效参数） */
-const updateUrlQuery = async (filterParams) => {
-  try {
-    const currentQuery = { ...(router.currentRoute.value.query || {}) }
-    const merged = { ...currentQuery }
+/* 同步 URL（PC 模式不再使用；由 Save search 统一应用后再更新 URL） */
 
-    // 带家具：仅当为 true 时写入
-    if (filterParams.isFurnished === true) {
-      merged.isFurnished = '1'
-    } else {
-      delete merged.isFurnished
-    }
-
-    // 幂等比对（sanitize 后对比），相同则不写，避免无意义 replace 循环
-    const nextQuery = sanitizeQueryParams(merged)
-    const currQuery = sanitizeQueryParams(currentQuery)
-    if (!isSameQuery(currQuery, nextQuery)) {
-      await router.replace({ query: nextQuery })
-    }
-  } catch (e) {
-    console.warn('同步 URL 查询参数失败（more）：', e)
-  }
-}
-
-/* 应用筛选（提交到 store） */
+/* 应用筛选（PC：仅写入全局草稿，不触发查询/不改 URL；由“Save search”统一应用） */
 const apply = async () => {
   try {
     const filterParams = buildFilterParams()
-    await propertiesStore.applyFilters(filterParams, { sections: ['more'] })
-    await updateUrlQuery(filterParams)
-    // 中文注释：应用成功后清理“更多”分组的预览草稿，避免下次打开显示过期的草稿计数
-    propertiesStore.clearPreviewDraft('more')
+    if (propertiesStore?.setDraftFilters) {
+      propertiesStore.setDraftFilters({
+        isFurnished: filterParams.isFurnished === true ? true : undefined,
+      })
+    }
+    if (propertiesStore?.clearPreviewDraft) {
+      propertiesStore.clearPreviewDraft('more')
+    }
     emit('close')
   } catch (err) {
-    console.error('应用更多筛选失败:', err)
+    console.error('写入更多筛选草稿失败:', err)
   }
 }
 </script>

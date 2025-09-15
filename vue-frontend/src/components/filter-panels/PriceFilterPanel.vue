@@ -50,16 +50,12 @@
 <script setup>
 import { ref, inject, computed } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
-import { useRouter } from 'vue-router'
-import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：价格筛选专用面板，拆分自原 FilterPanel
 
 const emit = defineEmits(['close'])
 
-// 路由：用于 URL Query 同步
-const router = useRouter()
 
 // 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
 const t = inject('t') || ((k) => k)
@@ -136,54 +132,22 @@ const buildFilterParams = () => {
   return filterParams
 }
 
-// 将筛选参数添加到 URL
-const updateUrlQuery = async (filterParams) => {
-  try {
-    const currentQuery = { ...(router.currentRoute.value.query || {}) }
-    const merged = { ...currentQuery }
 
-    // 更新价格参数（仅保留非空键）
-    if (filterParams.minPrice) {
-      merged.minPrice = filterParams.minPrice
-    } else {
-      delete merged.minPrice
-    }
-
-    if (filterParams.maxPrice) {
-      merged.maxPrice = filterParams.maxPrice
-    } else {
-      delete merged.maxPrice
-    }
-
-    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
-    const nextQuery = sanitizeQueryParams(merged)
-    const currQuery = sanitizeQueryParams(currentQuery)
-    if (!isSameQuery(currQuery, nextQuery)) {
-      await router.replace({ query: nextQuery })
-    }
-  } catch (e) {
-    console.warn('同步 URL 查询参数失败:', e)
-  }
-}
-
-// 应用筛选
+/* PC：仅写入全局草稿，不触发查询/不改 URL；由“Save search”统一应用 */
 const applyFilters = async () => {
   try {
     const filterParams = buildFilterParams()
-
-    // 应用筛选
-    await propertiesStore.applyFilters(filterParams, { sections: ['price'] })
-
-    // 更新 URL
-    await updateUrlQuery(filterParams)
-
-    // 中文注释：应用成功后清理“价格”分组的预览草稿，防止下次打开显示过期草稿计数
-    propertiesStore.clearPreviewDraft('price')
-
-    // 关闭面板
+    propertiesStore.setDraftFilters({
+      minPrice: filterParams.minPrice,
+      maxPrice: filterParams.maxPrice,
+    })
+    // 可选：清理旧的分组草稿
+    if (propertiesStore?.clearPreviewDraft) {
+      propertiesStore.clearPreviewDraft('price')
+    }
     emit('close')
   } catch (error) {
-    console.error('应用价格筛选失败:', error)
+    console.error('写入价格草稿失败:', error)
   }
 }
 </script>

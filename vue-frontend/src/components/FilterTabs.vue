@@ -276,6 +276,44 @@
           <MoreFilterPanel @close="activePanel = null" />
         </FilterDropdown>
       </div>
+
+      <!-- Save search -->
+      <div class="save-search-entry">
+        <button class="save-search-btn" @click.stop="toggleSavePopover">
+          Save search
+        </button>
+        <div
+          v-if="showSavePopover"
+          class="save-popover"
+          role="dialog"
+          aria-label="Save search"
+        >
+          <div class="save-popover-row">
+            <label class="save-label">Name your search</label>
+            <input v-model="saveName" class="save-input" type="text" />
+          </div>
+          <div class="save-popover-row">
+            <label class="save-label">Email frequency</label>
+            <select v-model="saveFrequency" class="save-select">
+              <option value="instant">Instant</option>
+              <option value="daily">Daily</option>
+              <option value="never">Never</option>
+            </select>
+          </div>
+          <button class="save-primary" @click="handleSaveClick">Save</button>
+        </div>
+
+        <!-- 轻量提示条 + Copy Link -->
+        <div
+          v-if="saveToast"
+          class="save-toast"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="toast-text">Search Saved!</span>
+          <button class="toast-copy" @click="copyLink">{{ copyBtnText }}</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -459,6 +497,81 @@ const isMobile = computed(() => {
   return viewportWidth.value < 768
 })
 
+// Save search（骨架，仅UI，不改变现有触发时机）
+const showSavePopover = ref(false)
+const saveName = ref('')
+const saveFrequency = ref('instant')
+
+const defaultSaveName = computed(() => {
+  const list = propertiesStore.selectedLocations || []
+  if (list.length) {
+    const names = list.map((l) => (l?.name ? String(l.name) : '')).filter(Boolean)
+    const first = names[0]
+    const more = Math.max(0, names.length - 1)
+    return more > 0 ? `${first} +${more}` : first
+  }
+  // 兜底用搜索词或固定占位
+  return propertiesStore.searchQuery || 'Sydney'
+})
+const toggleSavePopover = () => {
+  // 打开时初始化默认名称
+  if (!showSavePopover.value && !saveName.value) {
+    saveName.value = defaultSaveName.value
+  }
+  showSavePopover.value = !showSavePopover.value
+}
+const saveToast = ref(false)
+const copyBtnText = ref('Copy Link')
+let saveToastTimer = null
+let copyTextTimer = null
+
+const handleSaveClick = async () => {
+  try {
+    // 关闭浮层
+    showSavePopover.value = false
+
+    // 应用“全局草稿”到已应用条件，触发一次真实查询
+    const filters = propertiesStore.buildFiltersFromDraft({})
+    await propertiesStore.applyFilters(filters, { /* 不显式传 sections，走统一合并 */ })
+
+    // 成功提示（3s 自动消失）
+    saveToast.value = true
+    if (saveToastTimer) clearTimeout(saveToastTimer)
+    saveToastTimer = setTimeout(() => {
+      saveToast.value = false
+    }, 3000)
+
+    // 重置“Copy Link”按钮文案
+    if (copyTextTimer) {
+      clearTimeout(copyTextTimer)
+      copyTextTimer = null
+    }
+    copyBtnText.value = 'Copy Link'
+  } catch (e) {
+    console.warn('Save search apply failed', e)
+    // 失败也展示提示，但不改变复制按钮文案
+    saveToast.value = true
+    if (saveToastTimer) clearTimeout(saveToastTimer)
+    saveToastTimer = setTimeout(() => {
+      saveToast.value = false
+    }, 3000)
+  }
+}
+
+const copyLink = async () => {
+  try {
+    const url = typeof window !== 'undefined' ? window.location.href : ''
+    if (url) await navigator.clipboard.writeText(url)
+    copyBtnText.value = 'Copied!'
+    if (copyTextTimer) clearTimeout(copyTextTimer)
+    copyTextTimer = setTimeout(() => {
+      copyBtnText.value = 'Copy Link'
+    }, 2000)
+  } catch (e) {
+    console.warn('Copy link failed', e)
+  }
+}
+
 // 切换面板显示状态
 const togglePanel = (panel, evt) => {
   const wasOpen = activePanel.value === panel
@@ -497,6 +610,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  if (saveToastTimer) clearTimeout(saveToastTimer)
+  if (copyTextTimer) clearTimeout(copyTextTimer)
 })
 </script>
 
@@ -652,5 +767,97 @@ onUnmounted(() => {
   padding: 20px;
   text-align: center;
   color: var(--color-text-secondary);
+}
+/* Save search */
+.save-search-entry {
+  position: relative;
+  margin-left: 8px;
+}
+.save-search-btn {
+  padding: 10px 14px;
+  background: var(--juwo-primary);
+  color: var(--color-text-inverse, #fff);
+  border: 1px solid var(--juwo-primary);
+  border-radius: var(--filter-radius-lg);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+.save-search-btn:hover {
+  background: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
+}
+.save-popover {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 280px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 1000;
+}
+.save-popover-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.save-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.save-input, .save-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+}
+.save-primary {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--juwo-primary);
+  color: var(--color-text-inverse, #fff);
+  border: 1px solid var(--juwo-primary);
+  border-radius: 6px;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+.save-primary:hover {
+  background: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
+}
+
+/* Save toast */
+.save-toast {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #e6f7ec; /* 轻量绿色背景 */
+  border: 1px solid #9ad0a8;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.toast-text {
+  font-weight: 600;
+}
+.toast-copy {
+  background: transparent;
+  border: none;
+  color: var(--juwo-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+.toast-copy:hover {
+  text-decoration: underline;
 }
 </style>

@@ -166,6 +166,12 @@ const removeLocation = (id) => {
 // 清空所有区域
 const clearAllLocations = () => {
   propertiesStore.setDraftSelectedLocations([])
+  // 同步清理全局草稿中的区域相关键，避免残留影响“保存搜索”
+  try {
+    propertiesStore.setDraftFilters({ suburb: undefined, postcodes: undefined })
+  } catch {
+    /* 忽略非关键错误 */
+  }
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
 }
 
@@ -231,6 +237,7 @@ const buildFilterParams = () => {
 }
 
 // 将筛选参数添加到 URL
+/* eslint-disable-next-line no-unused-vars */
 const updateUrlQuery = async (filterParams) => {
   try {
     const currentQuery = { ...(router.currentRoute.value.query || {}) }
@@ -287,31 +294,21 @@ const applyFilters = async () => {
   try {
     const filterParams = buildFilterParams()
 
-    // 更新全局状态（仅在特性开关启用时回写）
-    if (SHOW_INCLUDE_NEARBY) {
-      propertiesStore.includeNearby = localIncludeNearby.value
-    }
-
-    // 先应用草稿为已应用（仅区域）
+    // PC 模式：仅写入“全局草稿”，不触发查询、不改 URL；由“Save search”统一应用
     try {
-      propertiesStore.applySelectedLocations()
+      propertiesStore.setDraftFilters({
+        suburb: filterParams.suburb,
+        postcodes: filterParams.postcodes,
+        ...(SHOW_INCLUDE_NEARBY ? { include_nearby: filterParams.include_nearby } : {}),
+      })
     } catch {
       /* 忽略非关键错误 */
     }
 
-    // 应用筛选（仅 area 分组）
-    await propertiesStore.applyFilters(filterParams, { sections: ['area'] })
-
-    // 更新 URL
-    await updateUrlQuery(filterParams)
-
-    // 应用成功后清理“区域”分组的预览草稿，防止下次打开显示过期草稿计数
-    propertiesStore.clearPreviewDraft('area')
-
     // 关闭面板
     emit('close')
   } catch (error) {
-    console.error('应用区域筛选失败:', error)
+    console.error('应用区域筛选（写入草稿）失败:', error)
   }
 }
 </script>

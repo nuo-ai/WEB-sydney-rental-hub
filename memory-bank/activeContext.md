@@ -105,11 +105,11 @@
 - 原子任务清单（逐步执行）
   - [x] A1 禁用 PC 面板级计数（useFilterPreviewCount）
   - [ ] A2 清理 PC 预估计数相关逻辑（定时器/并发/防抖）
-  - [ ] B1 store 引入 draft/applied 与 applyDraft()/resetDraft()
-  - [ ] B2 AreaFilterPanel 绑定 draftFilters（样例）
+  - [x] B1 store 引入 draft/applied 与 applyDraft()/resetDraft()
+  - [x] B2 AreaFilterPanel 绑定 draftFilters（样例）
   - [ ] B3 推广至 Price/Bedrooms/Availability/More
-  - [ ] C1 FilterTabs：新增 Save search + Popover（Name/Frequency/Save）骨架
-  - [ ] C2 成功提示与 Copy Link
+  - [x] C1 FilterTabs：新增 Save search + Popover（Name/Frequency/Save）骨架
+  - [x] C2 成功提示与 Copy Link
   - [ ] D1 顶部标题“X 套 Y 卧房源，覆盖 Z 个区域(=选中区域数量)”
   - [ ] D2 URL 仅在保存后写入/解析（可分享/回放）
   - [ ] E1 后端 SavedSearch 模型与迁移（id, user_id, name, filters JSON, email_frequency, created_at, updated_at）
