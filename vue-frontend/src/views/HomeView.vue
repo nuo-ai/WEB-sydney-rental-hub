@@ -188,6 +188,7 @@ import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import { Bell, ArrowUpDown } from 'lucide-vue-next'
 import BaseToggle from '@/components/base/BaseToggle.vue'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 
 /* 路由 */
 const router = useRouter()
@@ -211,10 +212,18 @@ const focusSection = ref(null) // 指定面板打开时的聚焦分组
 const sortValue = ref('')
 const handleSortChange = async (val) => {
   try {
-    const newQuery = { ...route.query }
-    if (val) newQuery.sort = val
-    else delete newQuery.sort
-    await router.replace({ query: newQuery })
+    const currentQuery = { ...(route.query || {}) }
+    const merged = { ...currentQuery }
+    if (val) merged.sort = val
+    else delete merged.sort
+
+    // URL 幂等：仅当变更后与当前不同才写入；并清理空值，稳定键顺序
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+
     await propertiesStore.setSort(val)
   } catch (e) {
     console.error('排序切换失败:', e)

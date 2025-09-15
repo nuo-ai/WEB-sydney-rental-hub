@@ -1,51 +1,35 @@
-# Pull Request Template
+# PR 模板（筛选与计数专项）
 
-## Summary
-- What problem does this PR solve?
-- Briefly describe the approach and scope.
+## 变更摘要
+- [ ] BE-002 白名单/未知键（如涉及）
+- [ ] QA-001 用例/断言（如涉及）
+- [ ] 文档同步（API_ENDPOINTS.md / TASKS.md / One Pager）
 
-## Related Issues
-- Closes #
-- Related #
+## 前端表现（必须项）
+- 用户看到的效果：
+  - [ ] “应用（N）/确定（N）”是否稳定（不回跳旧值）
+  - [ ] 失败降级：计数失败时按钮退回“应用/确定”，不误显示“0 条”
+  - [ ] 仅选邮编：N 与应用后列表总数一致（V1 兜底）
+  - [ ] URL 幂等：仅写非空有效键，刷新/直链可恢复
 
-## Changes
-- [ ] Backend (FastAPI/Celery)
-- [ ] Frontend (Vue 3)
-- [ ] MCP Server (TypeScript)
-- [ ] Scripts/ETL/Database
-- Key changes:
-  - 
+## 验收与回归
+- [ ] 同步更新/新增 QA 用例（tests/api/*）
+- [ ] total 与分页累加一致
+- [ ] 排序白名单有效，非法 400
+- [ ] 未知键 400（错误体含 unknown_keys/allowed_keys/invalid_values）
 
-## Screenshots / Demos
-- UI changes: include before/after or a short GIF.
+## 风险与回滚
+- 风险点：
+- 回滚策略：
+  - [ ] 关闭白名单校验 / 恢复旧参数写入 / 禁用新排序项
+  - [ ] 回退至稳定 commit
 
-## How To Test
-- Env: copy `.env.example` to `.env` and set required keys.
-- Backend:
-  - `pip install -r requirements.txt`
-  - `uvicorn backend.main:app --reload --port 8000`
-  - Optional targeted test: `python backend/test_auth.py` or `python scripts/test_api.py`
-- Frontend:
-  - `cd vue-frontend && npm install && npm run dev`
-  - Optional e2e: `npx playwright test` (dev server on 5173)
-- MCP Server:
-  - `cd mcp-server && npm install && npm run build && npm start`
-- List specific steps to verify the change:
-  1. 
-  2. 
+## 影响面与兼容性
+- [ ] 与 V1 契约兼容
+- [ ] 不改变现有筛选/分页/日期/家具语义
+- [ ] 缓存键包含完整 URL（避免污染）
 
-## Risk & Rollback
-- Risk level: Low / Medium / High
-- Rollback plan: steps to revert and data migration notes.
-
-## Checklist
-- [ ] Conventional Commit message (feat/fix/docs/refactor, scope if relevant)
-- [ ] Updated docs if needed (README/AGENTS/SECURITY)
-- [ ] Lint passes: `cd vue-frontend && npm run lint`
-- [ ] Backend runs locally without errors
-- [ ] Tests/scripts executed (list which)
-- [ ] No secrets or credentials committed
-
-## Additional Notes
-- Architecture or trade-offs, follow-ups, and out-of-scope items.
-
+## 清单（勾选后再合并）
+- [ ] 自测通过；本地运行 QA-001 用例通过
+- [ ] 文档已更新（API_ENDPOINTS.md、docs/roadmap/TASKS.md）
+- [ ] 评审人已指定

@@ -51,6 +51,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import BaseButton from '@/components/base/BaseButton.vue'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
@@ -156,25 +157,27 @@ const buildFilterParams = () => {
 // 将筛选参数添加到 URL
 const updateUrlQuery = async (filterParams) => {
   try {
-    const currentQuery = { ...router.currentRoute.value.query }
-    const newQuery = { ...currentQuery }
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
-    // 更新价格参数
+    // 更新价格参数（仅保留非空键）
     if (filterParams.minPrice) {
-      newQuery.minPrice = filterParams.minPrice
+      merged.minPrice = filterParams.minPrice
     } else {
-      delete newQuery.minPrice
+      delete merged.minPrice
     }
 
     if (filterParams.maxPrice) {
-      newQuery.maxPrice = filterParams.maxPrice
+      merged.maxPrice = filterParams.maxPrice
     } else {
-      delete newQuery.maxPrice
+      delete merged.maxPrice
     }
 
-    // 仅当查询参数发生变化时才更新 URL
-    if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
-      await router.replace({ query: newQuery })
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
     }
   } catch (e) {
     console.warn('同步 URL 查询参数失败:', e)

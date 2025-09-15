@@ -59,6 +59,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：空出时间筛选专用面板，拆分自原 FilterPanel
@@ -214,25 +215,27 @@ onMounted(() => {
 // 将筛选参数添加到 URL
 const updateUrlQuery = async (filterParams) => {
   try {
-    const currentQuery = { ...router.currentRoute.value.query }
-    const newQuery = { ...currentQuery }
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
-    // 更新日期参数
+    // 更新日期参数（仅保留非空键）
     if (filterParams.date_from) {
-      newQuery.date_from = filterParams.date_from
+      merged.date_from = filterParams.date_from
     } else {
-      delete newQuery.date_from
+      delete merged.date_from
     }
 
     if (filterParams.date_to) {
-      newQuery.date_to = filterParams.date_to
+      merged.date_to = filterParams.date_to
     } else {
-      delete newQuery.date_to
+      delete merged.date_to
     }
 
-    // 仅当查询参数发生变化时才更新 URL
-    if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
-      await router.replace({ query: newQuery })
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
     }
   } catch (e) {
     console.warn('同步 URL 查询参数失败:', e)

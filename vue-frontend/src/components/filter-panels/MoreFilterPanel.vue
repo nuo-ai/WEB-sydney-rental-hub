@@ -56,6 +56,7 @@
 <script setup>
 import { ref, computed, inject, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import { usePropertiesStore } from '@/stores/properties'
 import BaseButton from '@/components/base/BaseButton.vue'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
@@ -122,19 +123,21 @@ const propertiesStore = usePropertiesStore()
 /* 同步 URL（仅写入非空/有效参数） */
 const updateUrlQuery = async (filterParams) => {
   try {
-    const currentQuery = { ...router.currentRoute.value.query }
-    const newQuery = { ...currentQuery }
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
     // 带家具：仅当为 true 时写入
     if (filterParams.isFurnished === true) {
-      newQuery.isFurnished = '1'
+      merged.isFurnished = '1'
     } else {
-      delete newQuery.isFurnished
+      delete merged.isFurnished
     }
 
-    // 幂等比对
-    if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
-      await router.replace({ query: newQuery })
+    // 幂等比对（sanitize 后对比），相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
     }
   } catch (e) {
     console.warn('同步 URL 查询参数失败（more）：', e)

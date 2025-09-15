@@ -207,6 +207,7 @@ import { ref, computed, watch, onMounted, nextTick, inject } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
 
@@ -791,10 +792,14 @@ const applyFiltersToStore = async () => {
     await propertiesStore.applyFilters(filterParams, { sections })
     emit('filtersChanged', filterParams)
 
-    // 将当前筛选写入 URL，便于刷新/分享复现
+    // 将当前筛选写入 URL，便于刷新/分享复现（仅写非空有效键；避免无意义 replace 循环）
     try {
-      const query = buildQueryFromFilters(filterParams)
-      await router.replace({ query })
+      const raw = buildQueryFromFilters(filterParams)
+      const nextQuery = sanitizeQueryParams(raw)
+      const currQuery = sanitizeQueryParams(route.query || {})
+      if (!isSameQuery(currQuery, nextQuery)) {
+        await router.replace({ query: nextQuery })
+      }
     } catch (e) {
       console.warn('同步 URL 查询参数失败:', e)
     }

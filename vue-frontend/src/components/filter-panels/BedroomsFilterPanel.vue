@@ -101,6 +101,7 @@
 import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import BaseButton from '@/components/base/BaseButton.vue'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
@@ -287,32 +288,35 @@ const buildFilterParamsBedroomsOnly = () => {
 // 将筛选参数添加到 URL
 const updateUrlQuery = async (filterParams) => {
   try {
-    const currentQuery = { ...router.currentRoute.value.query }
-    const newQuery = { ...currentQuery }
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
     // 卧室
     if (filterParams.bedrooms) {
-      newQuery.bedrooms = filterParams.bedrooms
+      merged.bedrooms = filterParams.bedrooms
     } else {
-      delete newQuery.bedrooms
+      delete merged.bedrooms
     }
 
     // 浴室：忽略 'any'
     if (filterParams.bathrooms && filterParams.bathrooms !== 'any') {
-      newQuery.bathrooms = filterParams.bathrooms
+      merged.bathrooms = filterParams.bathrooms
     } else {
-      delete newQuery.bathrooms
+      delete merged.bathrooms
     }
 
     // 车位：忽略 'any'，保留 '0'（如存在）
     if (filterParams.parking && filterParams.parking !== 'any') {
-      newQuery.parking = filterParams.parking
+      merged.parking = filterParams.parking
     } else {
-      delete newQuery.parking
+      delete merged.parking
     }
 
-    if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
-      await router.replace({ query: newQuery })
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
     }
   } catch (e) {
     console.warn('同步 URL 查询参数失败:', e)

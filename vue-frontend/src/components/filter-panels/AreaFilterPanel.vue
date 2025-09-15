@@ -85,6 +85,7 @@
 import { ref, computed, inject, nextTick, onMounted, onUnmounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
@@ -259,36 +260,38 @@ const buildFilterParams = () => {
 // 将筛选参数添加到 URL
 const updateUrlQuery = async (filterParams) => {
   try {
-    const currentQuery = { ...router.currentRoute.value.query }
-    const newQuery = { ...currentQuery }
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
     // 更新区域相关参数
     if (filterParams.suburb) {
-      newQuery.suburb = filterParams.suburb
+      merged.suburb = filterParams.suburb
     } else {
-      delete newQuery.suburb
+      delete merged.suburb
     }
 
     if (filterParams.postcodes) {
-      newQuery.postcodes = filterParams.postcodes
+      merged.postcodes = filterParams.postcodes
     } else {
-      delete newQuery.postcodes
+      delete merged.postcodes
     }
 
     // include_nearby（特性开关控制）
     if (SHOW_INCLUDE_NEARBY) {
       if (filterParams.include_nearby === '1') {
-        newQuery.include_nearby = '1'
+        merged.include_nearby = '1'
       } else {
-        delete newQuery.include_nearby
+        delete merged.include_nearby
       }
     } else {
-      delete newQuery.include_nearby
+      delete merged.include_nearby
     }
 
-    // 仅当查询参数发生变化时才更新 URL
-    if (JSON.stringify(newQuery) !== JSON.stringify(currentQuery)) {
-      await router.replace({ query: newQuery })
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
     }
   } catch (e) {
     console.warn('同步 URL 查询参数失败:', e)

@@ -11,6 +11,29 @@
 - 第三阶段（P1｜中高风险，需评审）
 - 附录：测试矩阵（最少覆盖）
 
+最新进展（2025-09-15）
+- BE-002 完成：/api/properties 增加查询参数/排序白名单校验；未知键/非法 sort 返回 400（APIResponse 错误体含 unknown_keys/allowed_keys/invalid_values）。保持 V1 行为与口径不变。
+- QA-001 最小回归落地并通过：10 passed；覆盖 total 与分页累加一致、排序白名单、未知键 400、listing_id 点名过滤；为避免硬编码，从 /api/locations/all 动态选择 suburb。
+- 文档更新：backend/API_ENDPOINTS.md 已对齐白名单与错误体样例，补充 QA-001 运行说明与“前端表现”。
+
+执行记录（溯源）
+- BE-002：backend/main.py（/api/properties 白名单）+ backend/API_ENDPOINTS.md（文档）；tests/api/test_properties_filters.py 覆盖；本地结果 10 passed；最近 commit: 17527a4
+- QA-001：核心断言包含“total 与分页累加一致”“排序白名单”“未知键 400”“listing_id 点名过滤”；动态从 /api/locations/all 选择 suburb，避免硬编码
+- 关联文件：backend/main.py、backend/API_ENDPOINTS.md、tests/api/test_properties_filters.py
+
+验收口径（前端表现）
+- “应用（N）/确定（N）”不回跳旧值；关闭面板后无“幽灵计数”
+- 计数失败降级：返回 null → 按钮退回“应用/确定”，不误显示“0 条”
+- 仅选邮编：前端展开为 suburb CSV（V1 兜底），N 与应用后列表总数一致
+- URL 幂等：仅写非空有效键，刷新/直链可恢复
+- 排序：白名单生效；非法值 400
+
+下一步（建议执行顺序）
+1) FE-UI-004（P0）：全分面 URL 幂等自查与修正（仅写非空有效键，“应用后列表 total 对齐”）
+2) REL-001（P0）：10% 金丝雀，观察 p95、失败降级率、错误率；异常回滚
+3) DOC-001（P0）：一页纸架构与 PR 模板收尾；在仓库根新增 pytest.ini 或在 dev 依赖加入 pytest-timeout 以消除测试超时告警
+4) BE-003/FE-STORE-002（P1 预研）：V2 契约与前端映射双轨方案设计与影子流量对比
+
 ================================================================================
 
 第一阶段（P0｜本周完成，低风险可回滚）
@@ -150,6 +173,10 @@ ID: DOC-001
 
 ================================================================================
 
+风险与回滚
+- 风险：契约误用（未知键/非法 sort）、灰度期间计数失败率上升、URL 幂等遗漏导致条件漂移
+- 回滚：关闭白名单校验；恢复旧 UI 参数写入策略；禁用新排序项；必要时回退至上一个稳定 commit
+
 第二阶段（P0 收尾与稳定｜下周前半）
 
 ID: FE-UI-004
@@ -243,3 +270,7 @@ ID: QA-003
 - 卸载：关闭面板后不再有残留计时器/请求
 - 失败降级：计数失败 -> 按钮文案退回“应用/确定”，轻量错误提示，不刷新列表
 - 分页与排序：white-list 有效，非法被拒且记录日志
+
+测试基座配置
+- 建议引入 pytest-timeout 或新增 pytest.ini 注册 markers=timeout，设定默认超时，消除 PytestUnknownMarkWarning
+- CI 建议：采集 HTML 报告/失败快照/慢用例统计；暴露 p95/失败率指标
