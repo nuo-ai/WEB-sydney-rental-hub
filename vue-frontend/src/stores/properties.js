@@ -272,8 +272,6 @@ export const usePropertiesStore = defineStore('properties', {
     currentFilterParams: {},
     // 全局“草稿”聚合（各面板未应用的改动，按 section 聚合；用于统一预览计数口径）
     previewDraftSections: {},
-    // 新增：全局 draftFilters（为 Save search 做铺垫；暂不影响现有行为）
-    draftFilters: {},
     // 排序状态（UI占位；后端暂不识别时仅透传且不做前端本地排序）
     sort: '',
   }),
@@ -882,31 +880,6 @@ export const usePropertiesStore = defineStore('properties', {
       const arr = Array.isArray(this.draftSelectedLocations) ? this.draftSelectedLocations : []
       this.selectedLocations = arr.map((l) => ({ ...l }))
       this.draftSelectedLocations = arr.map((l) => ({ ...l }))
-    },
-
-    // ========== Save search 预备：全局筛选草稿（不改变现有触发时机） ==========
-    // 说明：以下方法用于后续将“保存搜索”与“应用筛选”解耦。当前仅提供数据结构与辅助方法，不在任意现有流程中自动调用。
-    setDraftFilters(partialDraft = {}) {
-      // 中文注释：合并草稿，仅保留非空键；undefined/null/'' 会删除对应键
-      const cleaned = { ...(partialDraft || {}) }
-      Object.keys(cleaned).forEach((k) => {
-        const v = cleaned[k]
-        if (v === undefined || v === null || v === '') delete cleaned[k]
-      })
-      this.draftFilters = { ...(this.draftFilters || {}), ...cleaned }
-    },
-    resetDraftFilters() {
-      // 中文注释：将草稿重置为“当前已应用的筛选条件”
-      const base = this.currentFilterParams || {}
-      this.draftFilters = { ...base }
-    },
-    buildFiltersFromDraft(base = {}) {
-      // 中文注释：从草稿生成一次性的 filters 快照（不触发网络请求）
-      const merged = { ...(base || {}), ...(this.draftFilters || {}) }
-      Object.keys(merged).forEach((k) => {
-        if (merged[k] === undefined || merged[k] === null || merged[k] === '') delete merged[k]
-      })
-      return merged
     },
 
     // 新增：判断草稿与已应用是否不一致（用于“小蓝点”）

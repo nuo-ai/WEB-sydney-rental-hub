@@ -86,32 +86,5 @@
   SearchOverlay 组件化重构完成：使用 BaseChip/BaseListItem 替换自定义样式，彻底移除 location 图标（MapPin/Hash），与筛选面板风格完全统一。清理冗余样式代码，保留容器布局与特有功能（光标动画/徽标），ESLint 合规。用户验收通过｜溯源：SearchOverlay 组件化任务
 - 2025-09-08｜MOBILE-FILTER-PANEL-OPTIMIZATION
   移动端筛选面板细节优化完成：全面迁移到设计令牌系统，优化触摸目标尺寸(44px+)，添加滚动锁定防穿透，完善键盘导航(ESC关闭)，增强可访问性支持(focus-visible)，优化iOS安全区适配。所有样式统一使用filter-*设计令牌，移动端按钮最小48px触摸目标，底部按钮52px。用户验收通过｜溯源：移动端筛选面板优化任务
-- 2025-09-08｜DESIGN-SYSTEM-COMPLETE  
+- 2025-09-08｜DESIGN-SYSTEM-COMPLETE
   设计系统全面完成：阶段1-创建设计令牌文件与基础组件；阶段2-应用到所有筛选面板(Price/Bedrooms/Availability/More)；阶段3-创建组件库文档。所有筛选面板现已遵循统一的现代化设计标准，使用中性灰色调、微妙圆角、一致间距系统｜溯源：设计系统实施任务
-
-## PC 筛选重构 · Save search 驱动（2025-09-15）
-- 决策摘要
-  - PC 仅保一个总计标题：“X 套 Y 卧房源，覆盖 Z 个区域（Z=选中区域数量）”
-  - “More”右侧新增 Save search（命名 + 提醒频率），保存后提示并提供 Copy Link
-  - Save 前不计数、不更新列表、不改 URL；仅编辑草稿 draftFilters
-  - 保存后 draft→applied，一次性触发查询与 URL 写入；移动端统一面板不受影响
-  - 后端持久化：保存“命名搜索 + 提醒频率 + filters”，支持跨设备
-
-- 技术要点
-  - 前端双态：draftFilters / appliedFilters；仅 Save 时应用
-  - PC 面板级计数关闭；移动端 unified 面板保留 preview 能力
-  - 已有后端“筛选=计数”单一真源与 Node 透传，无需改接口，仅变更触发时机
-
-- 原子任务清单（逐步执行）
-  - [x] A1 禁用 PC 面板级计数（useFilterPreviewCount）
-  - [ ] A2 清理 PC 预估计数相关逻辑（定时器/并发/防抖）
-  - [x] B1 store 引入 draft/applied 与 applyDraft()/resetDraft()
-  - [x] B2 AreaFilterPanel 绑定 draftFilters（样例）
-  - [ ] B3 推广至 Price/Bedrooms/Availability/More
-  - [x] C1 FilterTabs：新增 Save search + Popover（Name/Frequency/Save）骨架
-  - [x] C2 成功提示与 Copy Link
-  - [ ] D1 顶部标题“X 套 Y 卧房源，覆盖 Z 个区域(=选中区域数量)”
-  - [ ] D2 URL 仅在保存后写入/解析（可分享/回放）
-  - [ ] E1 后端 SavedSearch 模型与迁移（id, user_id, name, filters JSON, email_frequency, created_at, updated_at）
-  - [ ] E2 保存/更新/获取 API（或 GraphQL Mutation，鉴权）
-  - [ ] E3 前端对接持久化（登录用户跨设备；未登录降级 URL/本地）

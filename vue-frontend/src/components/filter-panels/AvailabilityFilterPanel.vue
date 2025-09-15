@@ -5,22 +5,29 @@
       <!-- 日期选择 -->
       <div class="date-picker-group">
         <el-date-picker
-          v-model="localRange"
-          type="daterange"
-          :disabled-date="disableBeforeToday"
-          :start-placeholder="startDateLabel"
-          :end-placeholder="endDateLabel"
-          :range-separator="toLabel"
+          v-model="localStartDate"
+          type="date"
+          :placeholder="startDateLabel"
           size="large"
-          class="date-range filter-field"
+          class="date-picker-start filter-field"
           :editable="false"
           :input-attrs="{ inputmode: 'none' }"
           :teleported="true"
           placement="top-start"
-          popper-class="availability-date-popper"
-          :unlink-panels="false"
-          @change="handleRangeChange"
-          @visible-change="onPickerVisibleChange"
+          @change="handleStartDateChange"
+        />
+        <span class="date-separator">{{ toLabel }}</span>
+        <el-date-picker
+          v-model="localEndDate"
+          type="date"
+          :placeholder="endDateLabel"
+          size="large"
+          class="date-picker-end filter-field"
+          :editable="false"
+          :input-attrs="{ inputmode: 'none' }"
+          :teleported="true"
+          placement="top-start"
+          @change="handleEndDateChange"
         />
       </div>
 
@@ -31,7 +38,6 @@
 
       <!-- 底部操作按钮 -->
       <div class="panel-footer">
-        <BaseButton variant="ghost" size="small" @click="clearAll">清空</BaseButton>
         <el-button class="cancel-btn" size="default" @click="$emit('close')">
           {{ cancelLabel }}
         </el-button>
@@ -50,14 +56,18 @@
 </template>
 
 <script setup>
-import { ref, inject, computed, nextTick } from 'vue'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
-import BaseButton from '@/components/base/BaseButton.vue'
+import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：空出时间筛选专用面板，拆分自原 FilterPanel
 
 const emit = defineEmits(['close'])
 
+// 路由：用于 URL Query 同步
+const router = useRouter()
 
 // 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
 const t = inject('t') || ((k) => k)
@@ -120,18 +130,19 @@ const initialDates = computed(() => {
   return { startDate, endDate }
 })
 
-/* 本地状态（daterange 模式） */
-const localRange = ref(
-  initialDates.value.startDate || initialDates.value.endDate
-    ? [initialDates.value.startDate, initialDates.value.endDate]
-    : null,
-)
-/* 为向后兼容保留 computed：原有逻辑仍读取 localStartDate/localEndDate */
-const localStartDate = computed(() => (localRange.value?.[0] ? localRange.value[0] : null))
-const localEndDate = computed(() => (localRange.value?.[1] ? localRange.value[1] : null))
+// 本地状态（用于保存用户选择，但不立即应用）
+const localStartDate = ref(initialDates.value.startDate)
+const localEndDate = ref(initialDates.value.endDate)
 
-/* PC：关闭面板级计数，按钮文案固定 */
-const applyText = computed(() => '应用')
+/* 实时计数：应用（N） - 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'availability',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
+)
 
 // 检查日期范围是否有效
 const isDateRangeValid = computed(() => {
@@ -141,27 +152,27 @@ const isDateRangeValid = computed(() => {
   return true
 })
 
-/* 处理范围变更（保持 start ≤ end） */
-const handleRangeChange = (range) => {
-  // 中文注释：Element Plus 已基本保证范围合法，这里兜底交换异常输入
-  if (!Array.isArray(range) || range.length < 2) {
-    localRange.value = null
-    return
-  }
-  const [start, end] = range
-  if (start && end && new Date(start).getTime() > new Date(end).getTime()) {
-    localRange.value = [end, start]
-  } else {
-    localRange.value = [start || null, end || null]
+// 处理开始日期变更
+const handleStartDateChange = (date) => {
+  // 若选中的开始日期晚于当前结束日期，立即"交换两端"，保持 start ≤ end
+  const currentEnd = localEndDate.value
+  localStartDate.value = date
+  if (date && currentEnd && new Date(date).getTime() > new Date(currentEnd).getTime()) {
+    localStartDate.value = currentEnd
+    localEndDate.value = date
   }
 }
 
-const clearAll = () => {
-  // 中文注释：清空本地日期范围；PC 关闭面板级计数，不触发预估
-  localRange.value = null
+// 处理结束日期变更
+const handleEndDateChange = (date) => {
+  // 若选中的结束日期早于当前开始日期，立即"交换两端"，保持 start ≤ end
+  const currentStart = localStartDate.value
+  localEndDate.value = date
+  if (date && currentStart && new Date(date).getTime() < new Date(currentStart).getTime()) {
+    localEndDate.value = currentStart
+    localStartDate.value = date
+  }
 }
-
-/* daterange 模式不再需要独立结束日期处理函数 */
 
 // 辅助函数：格式化日期为YYYY-MM-DD
 const formatDateToYYYYMMDD = (date) => {
@@ -172,18 +183,6 @@ const formatDateToYYYYMMDD = (date) => {
   const day = String(d.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
-
-/* 禁用今天以前的日期（PC 分离式专用）
-   说明：以“今天 00:00:00”为比较基线，严格禁用过去日期；
-   前端表现：过去日期不可点击/选择；不影响 URL 幂等与仅写非空键逻辑。 */
-const disableBeforeToday = (date) => {
-  if (!date) return false
-  const now = new Date()
-  const base = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-  const cand = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
-  return cand < base
-}
-
 
 /* 构建筛选参数（仅空出时间草稿） */
 const buildFilterParams = () => {
@@ -201,103 +200,75 @@ const buildFilterParams = () => {
 }
 
 
+/* 监听日期变化：仅在日期合法时触发计算；挂载后也计算一次 */
+watch([localStartDate, localEndDate], () => {
+  if (isDateRangeValid.value) {
+    scheduleCompute()
+  }
+})
+onMounted(() => {
+  if (isDateRangeValid.value) {
+    void computeNow()
+  }
+})
 
-/* 面板打开时对日历单元格做轻量级标注：今天之前/之后
-   说明（中文注释，解释“为什么”）：
-   - Element Plus 单日历不暴露 cell-class-name，无法仅用 props 精确区分“今天之前/之后”
-   - 这里在弹层打开后读取“当前面板的年/月”和单元格“日”文本，构造日期并与今天比较
-   - 仅添加类名 is-before-today / is-after-today，纯样式区分，不改变选择能力，避免破坏现有功能
-   - 通过 MutationObserver 监听面板内部变更（切换月份/年份）后重新标注，保持一致性
-*/
-const observers = new WeakMap()
+// 将筛选参数添加到 URL
+const updateUrlQuery = async (filterParams) => {
+  try {
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
-const onPickerVisibleChange = async (visible) => {
-  await nextTick()
-  const poppers = document.querySelectorAll('.availability-date-popper')
-  poppers.forEach((popper) => {
-    if (visible) {
-      setupPopperObserver(popper)
-      classifyCells(popper)
+    // 更新日期参数（仅保留非空键）
+    if (filterParams.date_from) {
+      merged.date_from = filterParams.date_from
     } else {
-      teardownPopperObserver(popper)
+      delete merged.date_from
     }
-  })
-}
 
-function setupPopperObserver(popper) {
-  if (observers.has(popper)) return
-  const observer = new MutationObserver(() => classifyCells(popper))
-  observer.observe(popper, { childList: true, subtree: true })
-  observers.set(popper, observer)
-}
+    if (filterParams.date_to) {
+      merged.date_to = filterParams.date_to
+    } else {
+      delete merged.date_to
+    }
 
-function teardownPopperObserver(popper) {
-  const ob = observers.get(popper)
-  if (ob) {
-    ob.disconnect()
-    observers.delete(popper)
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+  } catch (e) {
+    console.warn('同步 URL 查询参数失败:', e)
   }
 }
 
-
-function classifyCells(rootEl) {
-  const today = new Date()
-  const base = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()
-
-  const tds = rootEl.querySelectorAll('.el-date-table td')
-  tds.forEach((td) => {
-    td.classList.remove('is-before-today', 'is-after-today')
-
-    // 跳过禁用/跨月/今天，避免与 today 样式冲突
-    if (
-      td.classList.contains('prev-month') ||
-      td.classList.contains('next-month') ||
-      td.classList.contains('disabled') ||
-      td.classList.contains('today')
-    ) {
-      return
-    }
-
-    // 优先读取 aria-label 或 data-date（Element Plus 单元格通常携带 YYYY-MM-DD）
-    const raw =
-      td.getAttribute('aria-label') ||
-      td.getAttribute('data-date') ||
-      td.dataset?.date ||
-      ''
-
-    const ts = raw ? new Date(raw).getTime() : NaN
-    if (Number.isNaN(ts)) return
-
-    const cellBase = new Date(new Date(ts).getFullYear(), new Date(ts).getMonth(), new Date(ts).getDate()).getTime()
-
-    if (cellBase > base) {
-      td.classList.add('is-after-today')
-    } else if (cellBase < base) {
-      td.classList.add('is-before-today')
-    }
-  })
-}
-
-
-/* PC：仅写入全局草稿，不触发查询/不改 URL；由“Save search”统一应用 */
+// 应用筛选
 const applyFilters = async () => {
+  // 日期范围有效性检查
   if (!isDateRangeValid.value) return
+
   try {
     const filterParams = buildFilterParams()
-    // 写入全局 draftFilters；空值代表删除键
-    if (propertiesStore?.setDraftFilters) {
-      propertiesStore.setDraftFilters({
-        date_from: filterParams.date_from,
-        date_to: filterParams.date_to,
-      })
-    }
-    // 清理本分组预览草稿
-    if (propertiesStore?.clearPreviewDraft) {
+
+    // 中文注释：当两端日期均为空等于“清空本分组”，需标记分组参与本次应用以删除旧键
+    if (Object.keys(filterParams).length === 0) {
       propertiesStore.clearPreviewDraft('availability')
+      propertiesStore.markPreviewSection('availability')
     }
+
+    // 应用筛选（仅 availability 分组）
+    await propertiesStore.applyFilters(filterParams, { sections: ['availability'] })
+
+    // 更新 URL
+    await updateUrlQuery(filterParams)
+
+    // 中文注释：应用成功后清理“空出时间”分组的预览草稿，防止下次打开显示过期草稿计数
+    propertiesStore.clearPreviewDraft('availability')
+
+    // 关闭面板
     emit('close')
   } catch (error) {
-    console.error('写入日期草稿失败:', error)
+    console.error('应用日期筛选失败:', error)
   }
 }
 </script>
@@ -347,8 +318,17 @@ const applyFilters = async () => {
   ) !important;
 }
 
+:deep(.el-date-picker__popper) {
+  z-index: 10002 !important; /* 高于筛选面板 */
+}
 
+:deep(.el-popper) {
+  z-index: 10002 !important;
+}
 
+:deep(.el-picker__popper) {
+  z-index: 10002 !important;
+}
 
 /* 日期错误提示 */
 .date-error {
@@ -391,115 +371,5 @@ const applyFilters = async () => {
 .apply-btn:hover {
   background-color: var(--juwo-primary-light);
   border-color: var(--juwo-primary-light);
-}
-/* 日期面板主题覆盖：今天高亮、选中主色、上下月弱化 */
-/* 中文注释：仅覆盖日期面板内部元素，避免影响其他组件 */
-:deep(.el-date-table td .el-date-table-cell__text) {
-  border-radius: 8px;
-}
-
-/* 今天：主色描边 + 淡色背景 + 小圆点标记，便于首次打开快速定位 */
-:deep(.el-date-table td.today .el-date-table-cell__text) {
-  position: relative;
-  border: 2px solid var(--juwo-primary); /* 设计令牌：主色描边 */
-  /* 设计令牌：主色浅混合作为背景，提高辨识度且不抢选中态 */
-  background-color: color-mix(in oklab, var(--juwo-primary) 12%, transparent);
-  color: var(--color-text-primary); /* 设计令牌：主文案色 */
-}
-:deep(.el-date-table td.today .el-date-table-cell__text)::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--juwo-primary);
-}
-
-/* 选中：使用设计系统主色，文字白色，前端表现“已选中特别明确” */
-:deep(.el-date-table td.current .el-date-table-cell__text),
-:deep(.el-date-table td.is-selected .el-date-table-cell__text) {
-  background-color: transparent !important;
-  color: var(--juwo-primary) !important; /* 设计令牌：主色 */
-  font-weight: var(--font-weight-bold) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* 范围选择（daterange）：起止主色、区间浅主色 */
-:deep(.el-date-table td.start-date .el-date-table-cell__text),
-:deep(.el-date-table td.end-date .el-date-table-cell__text) {
-  background-color: transparent !important;
-  color: var(--juwo-primary) !important; /* 设计令牌：主色 */
-  font-weight: var(--font-weight-bold) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-:deep(.el-date-table td.in-range .el-date-table-cell__text) {
-  /* 设计令牌：使用主色系的浅色衍生（保持与系统一致）；文字使用主文案色 */
-  background-color: color-mix(in oklab, var(--juwo-primary) 12%, transparent) !important;
-  color: var(--color-text-primary) !important;
-}
-
-/* 悬停/聚焦：主色浅色衍生，保证层级感 */
-:deep(.el-date-table td.available:not(.current):hover .el-date-table-cell__text),
-:deep(.el-date-table td:hover .el-date-table-cell__text) {
-  background-color: color-mix(in oklab, var(--juwo-primary) 10%, transparent);
-}
-
-/* 上/下月弱化：对比更明确（虽非“过去/未来”，但能显著降低非当前月干扰） */
-:deep(.el-date-table td.prev-month .el-date-table-cell__text),
-:deep(.el-date-table td.next-month .el-date-table-cell__text) {
-  color: var(--color-text-disabled);
-  opacity: 0.6;
-}
-
-/* 禁用态（若业务设置了 disabled-date）：进一步降低对比，防误触 */
-:deep(.el-date-table td.disabled .el-date-table-cell__text) {
-  color: var(--color-text-disabled);
-  opacity: 0.35;
-}
-
-/* 今天之前/之后：提升时间方向可读性（不改变可选性，仅视觉区分） */
-:deep(.availability-date-popper .el-date-table td.is-before-today .el-date-table-cell__text) {
-  color: var(--color-text-secondary) !important;
-  opacity: 0.8 !important;
-}
-:deep(.availability-date-popper .el-date-table td.is-after-today .el-date-table-cell__text) {
-  /* 设计令牌：主文案色 + 加粗（若无加粗令牌，则后续在全局补充） */
-  color: var(--color-text-primary) !important;
-  font-weight: var(--font-weight-bold) !important;
-}
-
-/* 弹出层自定义类：与筛选面板层级对齐，避免被遮住或遮错对象 */
-:deep(.availability-date-popper) {
-  z-index: 10002;
-}
-
-/* 移动端年份/月份切换触控增强：增大图标按钮与标题热区，便于点击 */
-@media (max-width: 768px) {
-  :deep(.el-date-picker__header) {
-    padding: 8px 12px;
-  }
-  :deep(.el-date-picker__header .el-picker-panel__icon-btn) {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    margin: 0 2px;
-  }
-  :deep(.el-date-picker__header-label) {
-    padding: 6px 10px;
-    min-height: 36px;
-    font-size: 16px;
-    border-radius: 8px;
-  }
-  :deep(.el-year-table td .cell),
-  :deep(.el-month-table td .cell) {
-    min-width: 44px;
-    min-height: 36px;
-    line-height: 36px;
-    border-radius: 8px;
-  }
 }
 </style>

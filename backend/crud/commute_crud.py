@@ -17,7 +17,6 @@ from typing import List, Optional, Dict, Any
 # from server.models.property_models import Property as DBProperty
 # from server.models.commute_models import UniversityNameEnum # If needed
 import math
-import os
 import psycopg2 # For psycopg2.Error
 from models.property_models import Property # Assuming this is a Pydantic model or dataclass for DB rows
 # CommuteProperty and PaginatedCommuteProperties are GraphQL types, so we'll return dicts matching their structure.
@@ -95,17 +94,6 @@ def get_direct_walk_properties_crud( # Changed to sync
 
     # a. Prepare work
     radius_meters = radius_km * 1000
-    # 可选：根据 max_commute_minutes 收缩半径（按 80 米/分钟近似），与学校配置半径取较小者
-    try:
-        mcm = filters.get('max_commute_minutes') if isinstance(filters, dict) else None
-        if mcm is not None:
-            minutes = float(mcm)
-            if minutes > 0:
-                max_by_minutes_m = int(minutes * 80)
-                radius_meters = min(radius_meters, max_by_minutes_m)
-    except Exception:
-        # 中文注释：若 max_commute_minutes 非法，忽略并记录警告，不影响现有行为
-        logging.warning('get_direct_walk_properties_crud: invalid max_commute_minutes, ignored', exc_info=False)
     
     # Parameters for the WHERE clause, starting with ST_DWithin's needs
     # ST_MakePoint(%s, %s) -> lon, lat for university
@@ -113,27 +101,13 @@ def get_direct_walk_properties_crud( # Changed to sync
     query_params_for_where = [university_longitude, university_latitude, radius_meters]
     
     # b. Dynamically build filter clauses for the WHERE clause
-    # 中文注释：使用 geography 以米为单位，确保半径与距离计算口径一致
-    where_clauses = [f"ST_DWithin(p.geom::geography, ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography, %s)"] 
+    where_clauses = [f"ST_DWithin(p.geom, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s)"] 
 
     valid_filters_map = {
         "min_rent_pw": ("p.rent_pw", ">="), "max_rent_pw": ("p.rent_pw", "<="),
         "min_bedrooms": ("p.bedrooms", ">="), "max_bedrooms": ("p.bedrooms", "<="),
         "property_type": ("p.property_type", "ILIKE"), "suburb": ("p.suburb", "ILIKE"),
     }
-
-    # 中文注释：未知筛选键处理——默认仅记录警告；当 COMMUTE_STRICT_FILTERS=true 时抛错
-    known_keys = set(valid_filters_map.keys()) | {'max_commute_minutes'}
-    if isinstance(filters, dict):
-        unknown_keys = [k for k in filters.keys() if k not in known_keys]
-        if unknown_keys:
-            strict = os.getenv('COMMUTE_STRICT_FILTERS', 'false').lower() in ('1', 'true', 'yes')
-            msg = f"unknown filter keys: {unknown_keys}"
-            if strict:
-                # 使用 ValueError 以便上层 GraphQL 捕获并映射为业务错误
-                raise ValueError(f"INVALID_FILTER_KEYS: {','.join(unknown_keys)}")
-            else:
-                logging.warning(f"CRUD: {msg}")
 
     for key, value in filters.items():
         if key in valid_filters_map and value is not None:
@@ -179,8 +153,8 @@ def get_direct_walk_properties_crud( # Changed to sync
                     p.available_date, p.images, p.property_features, p.latitude, p.longitude, 
                     ST_AsText(p.geom) AS geom_wkt,
                     ST_Distance(
-                        p.geom::geography,
-                        ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography -- for ST_Distance
+                        p.geom,
+                        ST_SetSRID(ST_MakePoint(%s, %s), 4326) -- for ST_Distance
                     ) AS distance_meters
                 FROM properties p
                 WHERE {full_where_clause} -- for ST_DWithin and filters

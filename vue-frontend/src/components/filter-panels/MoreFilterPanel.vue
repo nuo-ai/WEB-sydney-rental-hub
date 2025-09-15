@@ -47,26 +47,41 @@
         >
           {{ applyText }}
         </el-button>
+        <span class="sr-only" aria-live="polite">{{ srLiveText }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import { usePropertiesStore } from '@/stores/properties'
 import BaseButton from '@/components/base/BaseButton.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：更多（高级）筛选面板。仅在“应用”时提交到 store；与其它分离式面板一致。
 
 const emit = defineEmits(['close'])
+const router = useRouter()
 const t = inject('t') || ((k) => k)
 
 /* 本地状态（默认值：未勾选）仅保留“带家具” */
 const furnished = ref(false)
 
-/* PC：关闭面板级计数，按钮文案固定 */
-const applyText = computed(() => '应用')
+/* 计数相关（应用（N）） - 使用通用 composable 统一并发/防抖/清理 */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'more',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
+)
+const srLiveText = computed(() =>
+  typeof previewCount.value === 'number' ? `可用结果 ${previewCount.value} 条` : '',
+)
 
 /* 构建参数（仅 isFurnished） */
 const buildFilterParams = () => {
@@ -77,14 +92,20 @@ const buildFilterParams = () => {
 }
 
 /* 监听与首算（通过 composable 防抖） */
+watch(furnished, () => {
+  scheduleCompute()
+})
+onMounted(() => {
+  void computeNow()
+})
 
 /* 清除：重置并触发计数 */
 const clearAll = () => {
   furnished.value = false
-  // 中文注释：清理旧草稿；PC 关闭面板级计数，不触发预估
-  if (propertiesStore?.clearPreviewDraft) {
-    propertiesStore.clearPreviewDraft('more')
-  }
+  // 中文注释：清理并标记该分组参与预览（即便草稿为空也删除 base 中旧键）
+  propertiesStore.clearPreviewDraft('more')
+  propertiesStore.markPreviewSection('more')
+  scheduleCompute()
 }
 
 // i18n 文案（带回退）
@@ -99,23 +120,41 @@ const furnishedLabel = computed(() => {
 
 const propertiesStore = usePropertiesStore()
 
-/* 同步 URL（PC 模式不再使用；由 Save search 统一应用后再更新 URL） */
+/* 同步 URL（仅写入非空/有效参数） */
+const updateUrlQuery = async (filterParams) => {
+  try {
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
 
-/* 应用筛选（PC：仅写入全局草稿，不触发查询/不改 URL；由“Save search”统一应用） */
+    // 带家具：仅当为 true 时写入
+    if (filterParams.isFurnished === true) {
+      merged.isFurnished = '1'
+    } else {
+      delete merged.isFurnished
+    }
+
+    // 幂等比对（sanitize 后对比），相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+  } catch (e) {
+    console.warn('同步 URL 查询参数失败（more）：', e)
+  }
+}
+
+/* 应用筛选（提交到 store） */
 const apply = async () => {
   try {
     const filterParams = buildFilterParams()
-    if (propertiesStore?.setDraftFilters) {
-      propertiesStore.setDraftFilters({
-        isFurnished: filterParams.isFurnished === true ? true : undefined,
-      })
-    }
-    if (propertiesStore?.clearPreviewDraft) {
-      propertiesStore.clearPreviewDraft('more')
-    }
+    await propertiesStore.applyFilters(filterParams, { sections: ['more'] })
+    await updateUrlQuery(filterParams)
+    // 中文注释：应用成功后清理“更多”分组的预览草稿，避免下次打开显示过期的草稿计数
+    propertiesStore.clearPreviewDraft('more')
     emit('close')
   } catch (err) {
-    console.error('写入更多筛选草稿失败:', err)
+    console.error('应用更多筛选失败:', err)
   }
 }
 </script>

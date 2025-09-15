@@ -50,24 +50,8 @@ app.post('/api/properties/search', async (req, res) => {
     }
 
     const query = `
-      query GetUniversityCommute(
-        $universityName: UniversityNameEnum!,
-        $limit: Int!,
-        $offset: Int,
-        $min_rent_pw: Int,
-        $max_rent_pw: Int,
-        $min_bedrooms: Int,
-        $max_commute_minutes: Int
-      ) {
-        get_university_commute_profile(
-          university_name: $universityName,
-          limit: $limit,
-          offset: $offset,
-          min_rent_pw: $min_rent_pw,
-          max_rent_pw: $max_rent_pw,
-          min_bedrooms: $min_bedrooms,
-          max_commute_minutes: $max_commute_minutes
-        ) {
+      query GetUniversityCommute($universityName: UniversityNameEnum!, $limit: Int!) {
+        get_university_commute_profile(university_name: $universityName, limit: $limit) {
           directWalkOptions {
             items {
               property {
@@ -90,15 +74,7 @@ app.post('/api/properties/search', async (req, res) => {
 
     const response = await graphqlClient.post('', {
       query,
-      variables: {
-        universityName: university,
-        limit: 50,
-        offset: 0,
-        min_rent_pw,
-        max_rent_pw,
-        min_bedrooms: bedrooms,
-        max_commute_minutes
-      }
+      variables: { universityName: university, limit: 50 }
     });
 
     if (response.data?.errors) {
@@ -106,11 +82,26 @@ app.post('/api/properties/search', async (req, res) => {
     }
 
     const walkOptions = response.data?.data?.get_university_commute_profile?.directWalkOptions;
-    const items = walkOptions?.items || [];
-    const properties = items; // 信任后端口径：不在 Node 层做二次筛选
+    let properties = walkOptions?.items || [];
+
+    // 应用筛选
+    if (bedrooms !== undefined) {
+      properties = properties.filter(item => item.property.bedrooms === bedrooms);
+    }
+    if (max_rent_pw) {
+      properties = properties.filter(item => item.property.rent_pw <= max_rent_pw);
+    }
+    if (min_rent_pw) {
+      properties = properties.filter(item => item.property.rent_pw >= min_rent_pw);
+    }
+    if (max_commute_minutes) {
+      properties = properties.filter(item => 
+        item.walkTimeToUniversityMinutes <= max_commute_minutes
+      );
+    }
 
     // 计算统计信息
-    const totalFound = walkOptions?.totalCount ?? properties.length;
+    const totalFound = properties.length;
     const rents = properties.map(p => p.property.rent_pw).filter(r => r > 0);
     const avgRent = rents.length > 0 ? Math.round(rents.reduce((a, b) => a + b, 0) / rents.length) : 0;
     const walkTimes = properties.map(p => p.walkTimeToUniversityMinutes).filter(t => t !== undefined);

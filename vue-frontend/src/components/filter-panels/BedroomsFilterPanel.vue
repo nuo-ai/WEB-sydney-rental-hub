@@ -88,20 +88,29 @@
         >
           {{ applyText }}
         </el-button>
+        <!-- a11y：数量变化通过 aria-live 播报 -->
+        <span class="sr-only" aria-live="polite">
+          {{ previewCount !== null ? '可用结果 ' + previewCount + ' 条' : '' }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, inject, computed } from 'vue'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
+import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import BaseButton from '@/components/base/BaseButton.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：卧室筛选专用面板，拆分自原 FilterPanel
 
 const emit = defineEmits(['close'])
 
+// 路由：用于 URL Query 同步
+const router = useRouter()
 
 // 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
 const t = inject('t') || ((k) => k)
@@ -188,22 +197,36 @@ const localBedrooms = ref([...initialBedrooms.value])
 const localBathrooms = ref([...initialBathrooms.value])
 const localParking = ref([...initialParking.value])
 
-/* PC：关闭面板级计数，按钮文案固定 */
-const applyText = computed(() => applyLabel.value)
+/* 结果数量预估（用于“应用（N）”）- 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'bedrooms',
+  () => buildFilterParamsBedroomsOnly(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `${applyLabel.value}（${previewCount.value}）` : applyLabel.value,
+)
 
 // 清空选择（不限）
 const clearAll = () => {
-  // 中文注释：清空“卧室/浴室/车位”，不触发预估计数
+  // 中文注释：清空“卧室”面板所管理的全部键（卧室/浴室/车位），符合“清空仅影响当前分组”
   localBedrooms.value = []
   localBathrooms.value = []
   localParking.value = []
-  // 可选：清理旧草稿，避免残留状态
-  if (propertiesStore?.clearPreviewDraft) {
-    propertiesStore.clearPreviewDraft('bedrooms')
-  }
+  propertiesStore.clearPreviewDraft('bedrooms')
+  propertiesStore.markPreviewSection('bedrooms')
+  scheduleCompute()
 }
 
+// 触发计数（统一经由 composable）
+watch(localBedrooms, () => scheduleCompute())
+watch(localBathrooms, () => scheduleCompute())
+watch(localParking, () => scheduleCompute())
 
+// 初次打开时计算一次
+onMounted(() => {
+  void computeNow()
+})
 
 // 判断卧室选项是否被选中
 const isBedroomSelected = (value) => {
@@ -262,31 +285,63 @@ const buildFilterParamsBedroomsOnly = () => {
   return filterParams
 }
 
+// 将筛选参数添加到 URL
+const updateUrlQuery = async (filterParams) => {
+  try {
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
+
+    // 卧室
+    if (filterParams.bedrooms) {
+      merged.bedrooms = filterParams.bedrooms
+    } else {
+      delete merged.bedrooms
+    }
+
+    // 浴室：忽略 'any'
+    if (filterParams.bathrooms && filterParams.bathrooms !== 'any') {
+      merged.bathrooms = filterParams.bathrooms
+    } else {
+      delete merged.bathrooms
+    }
+
+    // 车位：忽略 'any'，保留 '0'（如存在）
+    if (filterParams.parking && filterParams.parking !== 'any') {
+      merged.parking = filterParams.parking
+    } else {
+      delete merged.parking
+    }
+
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+  } catch (e) {
+    console.warn('同步 URL 查询参数失败:', e)
+  }
+}
 
 // 应用筛选
 const applyFilters = async () => {
   try {
-    // 中文注释：PC 模式仅写入“全局草稿”，不触发查询/不改 URL；由“Save search”统一应用
+    // 中文注释：卧室面板仅提交 bedrooms，避免误改“更多”分组（浴室/车位）
     const filterParams = buildFilterParamsBedroomsOnly()
 
-    // 将 bedrooms/bathrooms/parking 写入全局 draftFilters
-    if (propertiesStore?.setDraftFilters) {
-      propertiesStore.setDraftFilters({
-        bedrooms: filterParams.bedrooms,
-        bathrooms: filterParams.bathrooms === 'any' ? undefined : filterParams.bathrooms,
-        parking: filterParams.parking === 'any' ? undefined : filterParams.parking,
-      })
-    }
+    // 应用筛选（仅 bedrooms 分组）
+    await propertiesStore.applyFilters(filterParams, { sections: ['bedrooms'] })
 
-    // 清理本分组预览草稿（防止残留小蓝点/过期状态）
-    if (propertiesStore?.clearPreviewDraft) {
-      propertiesStore.clearPreviewDraft('bedrooms')
-    }
+    // 更新 URL（仅写入已应用的 bedrooms）
+    await updateUrlQuery(filterParams)
+
+    // 中文注释：应用成功后清理“卧室”分组的预览草稿
+    propertiesStore.clearPreviewDraft('bedrooms')
 
     // 关闭面板
     emit('close')
   } catch (error) {
-    console.error('写入卧室草稿失败:', error)
+    console.error('应用卧室筛选失败:', error)
   }
 }
 </script>

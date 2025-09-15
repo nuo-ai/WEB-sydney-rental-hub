@@ -53,6 +53,7 @@
       <AreasSelector
         :selected="selectedLocations"
         @update:selected="onUpdateSelectedAreas"
+        @requestCount="debouncedRequestCount"
       />
 
       <!-- 包含周边选项（特性开关控制） -->
@@ -81,10 +82,13 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
+import { ref, computed, inject, nextTick, onMounted, onUnmounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
+import { useRouter } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
+import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
  // 中文注释：区域筛选专用面板，拆分自原 FilterPanel
 // 中文注释：特性开关——控制“包含周边区域”UI 与透传是否启用（隐藏但保留代码，便于以后启用）
@@ -92,6 +96,8 @@ const SHOW_INCLUDE_NEARBY = false
 
 const emit = defineEmits(['close'])
 
+// 路由：用于 URL Query 同步
+const router = useRouter()
 
 // 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
 const t = inject('t') || ((k) => k)
@@ -105,9 +111,20 @@ const localIncludeNearby = ref(propertiesStore.includeNearby ?? true) // 包含�
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.draftSelectedLocations || [])
 
-/* PC：关闭面板级计数，按钮文案固定 */
-const applyText = computed(() => '应用')
+/* 预览计数（应用（N））- 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
+const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
+  'area',
+  () => buildFilterParams(),
+  { debounceMs: 300 },
+)
+const applyText = computed(() =>
+  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
+)
 
+/* 兼容占位：统一通过 composable 计算 */
+const computePreviewCount = async () => {
+  await computeNow()
+}
 
 // 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
 const displaySelectedLocations = computed(() => {
@@ -156,33 +173,41 @@ const removeLocation = (id) => {
     tempLocations.splice(index, 1)
     propertiesStore.setDraftSelectedLocations(tempLocations)
     try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+    nextTick(() => computePreviewCount())
   }
 }
 
 // 清空所有区域
 const clearAllLocations = () => {
   propertiesStore.setDraftSelectedLocations([])
-  // 同步清理全局草稿中的区域相关键，避免残留影响“保存搜索”
-  try {
-    propertiesStore.setDraftFilters({ suburb: undefined, postcodes: undefined })
-  } catch {
-    /* 忽略非关键错误 */
-  }
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+  nextTick(() => computePreviewCount())
 }
 
 // 包含周边区域变更
 const handleIncludeNearbyChange = () => {
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+  nextTick(() => debouncedRequestCount())
 }
 
 // 更新区域列表
 const onUpdateSelectedAreas = (newList) => {
   propertiesStore.setDraftSelectedLocations(Array.isArray(newList) ? newList : [])
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
+  nextTick(() => computePreviewCount())
 }
 
-/* PC：关闭预估计数，不再需要延迟请求计数 */
+// 延迟请求筛选计数
+const debouncedRequestCount = (() => {
+  let tid = null
+  return () => {
+    if (tid) clearTimeout(tid)
+    tid = setTimeout(() => {
+      scheduleCompute()
+      tid = null
+    }, 200)
+  }
+})()
 
 // 首次打开时初始化草稿并计算一次
 onMounted(() => {
@@ -191,7 +216,7 @@ onMounted(() => {
   } catch {
     /* 忽略非关键错误 */
   }
-  /* PC：关闭预估计数，不在挂载时计算 */
+  void computeNow()
 })
 
 // 组件卸载时清理“区域”分组草稿，避免小蓝点残留
@@ -233,6 +258,45 @@ const buildFilterParams = () => {
 }
 
 // 将筛选参数添加到 URL
+const updateUrlQuery = async (filterParams) => {
+  try {
+    const currentQuery = { ...(router.currentRoute.value.query || {}) }
+    const merged = { ...currentQuery }
+
+    // 更新区域相关参数
+    if (filterParams.suburb) {
+      merged.suburb = filterParams.suburb
+    } else {
+      delete merged.suburb
+    }
+
+    if (filterParams.postcodes) {
+      merged.postcodes = filterParams.postcodes
+    } else {
+      delete merged.postcodes
+    }
+
+    // include_nearby（特性开关控制）
+    if (SHOW_INCLUDE_NEARBY) {
+      if (filterParams.include_nearby === '1') {
+        merged.include_nearby = '1'
+      } else {
+        delete merged.include_nearby
+      }
+    } else {
+      delete merged.include_nearby
+    }
+
+    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+  } catch (e) {
+    console.warn('同步 URL 查询参数失败:', e)
+  }
+}
 
 // 应用筛选
 const cancelAndClose = () => {
@@ -250,21 +314,31 @@ const applyFilters = async () => {
   try {
     const filterParams = buildFilterParams()
 
-    // PC 模式：仅写入“全局草稿”，不触发查询、不改 URL；由“Save search”统一应用
+    // 更新全局状态（仅在特性开关启用时回写）
+    if (SHOW_INCLUDE_NEARBY) {
+      propertiesStore.includeNearby = localIncludeNearby.value
+    }
+
+    // 先应用草稿为已应用（仅区域）
     try {
-      propertiesStore.setDraftFilters({
-        suburb: filterParams.suburb,
-        postcodes: filterParams.postcodes,
-        ...(SHOW_INCLUDE_NEARBY ? { include_nearby: filterParams.include_nearby } : {}),
-      })
+      propertiesStore.applySelectedLocations()
     } catch {
       /* 忽略非关键错误 */
     }
 
+    // 应用筛选（仅 area 分组）
+    await propertiesStore.applyFilters(filterParams, { sections: ['area'] })
+
+    // 更新 URL
+    await updateUrlQuery(filterParams)
+
+    // 应用成功后清理“区域”分组的预览草稿，防止下次打开显示过期草稿计数
+    propertiesStore.clearPreviewDraft('area')
+
     // 关闭面板
     emit('close')
   } catch (error) {
-    console.error('应用区域筛选（写入草稿）失败:', error)
+    console.error('应用区域筛选失败:', error)
   }
 }
 </script>
