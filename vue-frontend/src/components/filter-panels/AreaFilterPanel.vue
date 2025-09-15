@@ -83,8 +83,6 @@
 <script setup>
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
-import { useRouter } from 'vue-router'
-import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
 
@@ -94,8 +92,6 @@ const SHOW_INCLUDE_NEARBY = false
 
 const emit = defineEmits(['close'])
 
-// 路由：用于 URL Query 同步
-const router = useRouter()
 
 // 注入轻量 i18n（默认 zh-CN；若未提供则回退为 key）
 const t = inject('t') || ((k) => k)
@@ -237,46 +233,6 @@ const buildFilterParams = () => {
 }
 
 // 将筛选参数添加到 URL
-/* eslint-disable-next-line no-unused-vars */
-const updateUrlQuery = async (filterParams) => {
-  try {
-    const currentQuery = { ...(router.currentRoute.value.query || {}) }
-    const merged = { ...currentQuery }
-
-    // 更新区域相关参数
-    if (filterParams.suburb) {
-      merged.suburb = filterParams.suburb
-    } else {
-      delete merged.suburb
-    }
-
-    if (filterParams.postcodes) {
-      merged.postcodes = filterParams.postcodes
-    } else {
-      delete merged.postcodes
-    }
-
-    // include_nearby（特性开关控制）
-    if (SHOW_INCLUDE_NEARBY) {
-      if (filterParams.include_nearby === '1') {
-        merged.include_nearby = '1'
-      } else {
-        delete merged.include_nearby
-      }
-    } else {
-      delete merged.include_nearby
-    }
-
-    // 写入前做 sanitize，并与当前对比；相同则不写，避免无意义 replace 循环
-    const nextQuery = sanitizeQueryParams(merged)
-    const currQuery = sanitizeQueryParams(currentQuery)
-    if (!isSameQuery(currQuery, nextQuery)) {
-      await router.replace({ query: nextQuery })
-    }
-  } catch (e) {
-    console.warn('同步 URL 查询参数失败:', e)
-  }
-}
 
 // 应用筛选
 const cancelAndClose = () => {
