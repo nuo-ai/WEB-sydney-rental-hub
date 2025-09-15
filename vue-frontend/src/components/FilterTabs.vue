@@ -349,6 +349,8 @@ import PriceFilterPanel from './filter-panels/PriceFilterPanel.vue'
 import AvailabilityFilterPanel from './filter-panels/AvailabilityFilterPanel.vue'
 import MoreFilterPanel from './filter-panels/MoreFilterPanel.vue'
 import { usePropertiesStore } from '@/stores/properties'
+import { useRouter, useRoute } from 'vue-router'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 
 // 中文注释：PC端改为分离式下拉面板，移动端保持统一大面板
 // 使用 requestOpenFullPanel 事件触发移动端的统一面板
@@ -497,7 +499,10 @@ const isMobile = computed(() => {
   return viewportWidth.value < 768
 })
 
-// Save search（骨架，仅UI，不改变现有触发时机）
+const router = useRouter()
+const route = useRoute()
+
+// Save search（骨架 + 生效链路）
 const showSavePopover = ref(false)
 const saveName = ref('')
 const saveFrequency = ref('instant')
@@ -525,6 +530,45 @@ const copyBtnText = ref('Copy Link')
 let saveToastTimer = null
 let copyTextTimer = null
 
+async function updateUrlFromApplied() {
+  try {
+    // 以“已应用条件(currentFilterParams)”为单一真源写入 URL，仅保留非空键
+    const applied = { ...(propertiesStore.currentFilterParams || {}) }
+
+    // 过滤掉分页键；排序已由排序入口单独维护，这里只保留 route 上已有的 sort
+    delete applied.page
+    delete applied.page_size
+
+    const currentQuery = { ...(route.query || {}) }
+    const merged = { ...currentQuery }
+
+    // 先清理已存在的筛选相关键，再写入新值（避免旧键残留）
+    Object.keys(merged).forEach((k) => {
+      if (k !== 'sort' && Object.prototype.hasOwnProperty.call(merged, k) && Object.prototype.hasOwnProperty.call(applied, k)) {
+        delete merged[k]
+      }
+    })
+
+    // 写入非空键
+    Object.entries(applied).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && String(v) !== '') {
+        merged[k] = v
+      } else {
+        delete merged[k]
+      }
+    })
+
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+  } catch (e) {
+    // URL 写入失败不影响保存结果
+    console.warn('[SaveSearch] updateUrlFromApplied failed (ignored):', e)
+  }
+}
+
 const handleSaveClick = async () => {
   try {
     // 关闭浮层
@@ -533,6 +577,9 @@ const handleSaveClick = async () => {
     // 应用“全局草稿”到已应用条件，触发一次真实查询
     const filters = propertiesStore.buildFiltersFromDraft({})
     await propertiesStore.applyFilters(filters, { /* 不显式传 sections，走统一合并 */ })
+
+    // URL 同步（仅在 Save 后）
+    await updateUrlFromApplied()
 
     // 成功提示（3s 自动消失）
     saveToast.value = true
