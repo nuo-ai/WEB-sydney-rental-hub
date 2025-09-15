@@ -1,90 +1,24 @@
 # 当前上下文与紧急焦点
 最后更新：2025-09-15
 
-今日快照（精简版，≤10行）
-- FE-UI-004-URL-IDEMPOTENCE：最终写入点清洗 + 幂等对比。新增 utils/query.sanitizeQueryParams/isSameQuery；接入 FilterPanel + 五个分面 + HomeView.sort；新增 Playwright 冒烟（URL 幂等与仅写非空键）。前端表现：应用后 URL 可直链/刷新、不抖动；不写空键；按钮“应用（N）”与列表 total 对齐。溯源：commit 17527a4..c713d9f
-- FILTER-P0-UNIFIED-BE-FE：后端统一筛选构建器 + REST 多值 OR 参数化；前端 useFilterPreviewCount 统一“应用（N）”并发/防抖/卸载清理；计数失败返回 null 做失败降级（按钮退回“应用/确定”）。前端表现：预估 N 更稳定，失败不误报 0；只选邮编可生效。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
-- AREA/PRICE/BEDROOMS/AVAIL/MORE-PREVIEW：五个分面接入全局 previewDraft + composable；Area 入口 200ms 节流 + 统一 300ms 防抖；URL 仅写非空。前端表现：PC 分离式与移动端统一面板的“应用（N）/确定（N）”一致。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
-- POSTCODE-EXPAND-V1：V1 契约下仅选“邮编”时自动展开为多个 suburb 注入 suburb CSV，计数与列表口径一致。前端表现：只选邮编时数量与列表一致。溯源：TASK FILTER-P0-UNIFIED-COUNT｜2025-09-15
-- FILTER-SECTION-BOUNDARY：Pinia applyFilters 新增 options.sections；PC 各面板与移动端统一面板按分组传入，前端表现：每次“应用”只影响本组，跨面板不覆盖。溯源：commit fceb35f..e8e25d5
-- REGION-GUARD-RELAX（预览计数修复）：getFilteredCount/applyFilters 的“区域必选”守卫放宽，若本次 params/filters 含 suburb/suburbs/postcodes 即允许计数/请求；仅在 selectedLocations 为空且本次参数也无区域时短路。前端表现：选区（草稿/URL）后“应用（N）”立即反映真实数量。溯源：commit fceb35f..e8e25d5
-- FURNISHING-SEMANTICS-PHASE1：ETL 两阶段（features 优先→标题/正文兜底，排除 furnishing_status）；下架 off-market 同步置空 is_furnished；执行一次性清理 SQL；固化 PowerShell 运维模板。前端表现：勾选“有家具”更准确；详情/直查不误读下架旧 TRUE。溯源：commit 3064c42..f288eef
-- FURNISHED-FILTER-COMPAT：修复“勾选家具时报错”。后端兼容历史存储，勾选后不再 500，只显示“有家具”。前端表现：列表更干净。溯源：commit 0e36a05..3064c42
-- MOBILE-CARD-COMPACT：移动端 PropertyCard 图片高 250→180、内容内边距 16→12、规格间距 12→8/6→4；桌面不变；窗口变化动态适配高度。前端表现：首屏可见更多卡片，视觉更紧凑。溯源：commit 008be0c..0e36a05
-- PROFILE-NAV-ACTIONS：Profile 页头新增“返回/回到首页”与“退出登录”按钮；返回优先 router.back() 无历史退首页；退出调用 authStore.logout() 再回首页。前端表现：二级页导航更可发现。溯源：commit 008be0c..0e36a05
-- NAV-CLEANUP-A：顶栏按方案 A 收敛（主导航“搜索/收藏”，右侧“AI助手/我的”）；同步移除移动端底部导航“地图”项。前端表现：顶栏信息密度下降，聚焦“筛选→收藏”。溯源：47cab8b..125e590
-- HOME-MAP-ENTRY-REMOVED：HomeView 移除“地图视图”按钮（MapIcon/方法/样式删除）。前端表现：标题区右侧仅保“排序”下拉。溯源：47cab8b..125e590
-- ROUTER-CHAT-FIX：/chat 路由由 Chat.vue 更正为 ChatView.vue，修复 500。前端表现：AI 助手入口可正常进入。溯源：47cab8b..125e590
-- MAP-ROUTE-HIDDEN：移除 /map 路由，彻底隐藏地图页面。前端表现：无地图页面与导航入口。溯源：47cab8b..125e590
-- DOCS-VISUAL-STANDARD-V1：新增 docs/new-page-visual-standard.md；views/_PageScaffoldExample.vue 增补“前端表现要点”，去掉 lang="ts"。前端表现：新增页面骨架/令牌/文字/图标/空态/响应式统一。溯源：47cab8b..125e590
-- IA-FAVORITES-PROFILE：确立边界——Favorites 专注收藏列表与管理（单一真源 /favorites）；Profile 仅做“收藏概览 + 入口”。前端表现：避免“收藏”能力重复出现在“我的”。溯源：47cab8b..125e590
-- LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP：列表页 H1 字号/行高改 22/26 与价格主数字一致；卧室/浴室/车位数字选项改连体 segmented（左右端 2px 圆角，中段无圆角，相邻边框 -1px 折叠消缝）；视觉配色与状态逻辑不变（沿用令牌）；交互仍为单选 ≥N。溯源：commit 4146bd1
-- SPEC-ROW-UNIFY-LIST+DETAIL：引入全局规格变量 --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap 并变量化全局规则；列表与详情接入规范类 spec-row/spec-item/spec-text，局部容器就近覆写 18/14/18/6/12，移除局部硬编码尺寸，修正详情页垂直间距为 12px。前端表现：图标尺寸与横向间距在列表与详情完全一致。溯源：commit 5b7254c..25ff698
-- ICONS-LUCIDE-UNIFY-NAV+HOME+PROFILE：全站导航/首页/个人中心图标统一 lucide-vue-next + currentColor；移除 Font Awesome 引用；导航数据结构加入 iconComp；Logo 改 Home 图标；Profile 标签与按钮统一图标尺寸类。前端表现：图标风格统一，颜色随文字色继承，中性化，主题切换更稳。溯源：commit fe8f012..2a9dd4d
-- TOKENS-DEPRECATE-NOTES：在 assets/design-tokens.css 为 --color-accent/--font-size-base/--spacing-lg 增加 @deprecated 注释与替代建议（仅注释，零视觉改动）。前端表现：无变化。溯源：commit fe8f012..2a9dd4d
-- FALLBACK-SCAN-ZERO：全局扫描运行代码 var(--token, #/rgb/rgba) 兜底为 0；令牌定义入口豁免。前端表现：主题/深浅底切换不再出现顽固色。溯源：commit fe8f012..2a9dd4d
-- PAGE-TOKENS+SCAFFOLD+STYLELINT-GUARD+SEARCHBAR-TOKENIZED：新增页面级令牌与标准页面样板；Stylelint 扩至 src/**/*.vue 强制 var(--*)；SearchBar 首轮令牌化（chips/白底/hover 统一 tokens）。前端表现：新增页面结构节奏一致、搜索入口与筛选标签中性灰一致；可回滚。溯源：commit 5164a36..fe8f012
-- GUARDRAIL-COLOR-CLEANUP：移除 SearchOverlay 颜色兜底 var(--color-text-secondary, #6b7280) → var(--color-text-secondary)，零视觉改动，令牌合规收尾。（前端表现：文字仍为中性次级灰，无任何 UI 变化）
-- PROPERTYDETAIL-TOKENS-FINAL-P0：详情页 P0 收尾（价格/CTA/间距/地图占位等统一令牌；移除 color-accent/font-size-base/spacing-*；无逻辑改动）。溯源：commit f201a24..07805ab
-- LIST-CARD-PRICE-TOKEN-UNIFY：列表卡价格色改主文案色；全局 --color-text-price 映射至 --color-text-primary，业务层禁用。溯源：commit 07805ab..a5da918
-- PROPERTYDETAIL-TOKENS-UNIFY：详情页令牌化与图标统一（页灰背景 + 白卡容器、分隔线中性灰；移除 Font Awesome 与硬编码色/rgba 阴影；收藏高亮用品牌蓝；不改动数据流/对齐基线）。溯源：commit aaa5b8b..f201a24
-- COMMUTE/COMPARE-TOKENS-P1：通勤/对比模块完成残留令牌化与图标统一（CompareToolbar/CommuteCalculator/CommuteTimes/LocationCard/AddLocationModal/NameLocationModal）；前端表现：中性灰体系一致、图标统一 lucide、无硬编码色；溯源：commit 19328a9..aaa5b8b
-- FILTER-PANELS-HOVER-NEUTRAL：AreaFilterPanel 优先完成 chips/按钮 hover/focus 中性化（--chip-bg/--chip-bg-hover/--color-border-*），清理散点 hex；与 FilterTabs 统一。前端表现：面板交互反馈一致，无彩色跳变。溯源：commit 0b6e146..806d3a3
-- SEARCH-ENTRY-CHIPS-TOKENIZED：SearchBar 内嵌/回显标签去除 var(--*, #hex) 兜底，统一 --chip-* 与 --color-text-*；移动端 active 改 --bg-hover。前端表现：搜索入口与筛选标签完全同源。溯源：commit 0b6e146..806d3a3
-- DETAIL-DIVIDER-TOKEN：PropertyDetail 统一 --divider-color → var(--color-border-default)，移除品牌色/分隔线兜底。前端表现：详情页线条全中性灰，CTA/链接保留品牌蓝。溯源：commit 0b6e146..806d3a3
-- OVERLAY+NAME-MODAL：SearchOverlay 去除品牌/文字兜底；NameLocationModal“跳过”改为 --juwo-primary（去旧红）。前端表现：移动覆盖层与 CTA 色域一致。溯源：commit 0b6e146..806d3a3
-- DESIGN-TOKENS-COMPLIANCE-SPRINT：PropertyDetail 二/三批全面令牌化（卡片/容器背景、分隔线、弱底 hover、占位与地图容器等），主/副文案统一 --color-text-primary/secondary，交互弱底用 --bg-hover，容器/边框用 --color-bg-card/--color-border-default。前端表现：详情页视觉与交互反馈一致、中性化，品牌色仅用于 CTA/链接。溯源：commit 9984dff..0b6e146
-- FILTERTABS-FALLBACK-REMOVAL：移除 Chip 类样式 var(--chip-*, #hex) 的十六进制兜底，统一使用 --chip-bg/--chip-bg-hover/--chip-bg-selected。前端表现：筛选标签在不同主题/深浅底下表现一致，不再出现遗留浅绿/米色。溯源：commit 9984dff..0b6e146
-- GUARDRAIL-STYLELINT+HOOK：新增 npm script "lint:style" 与 pre-commit 条件执行 stylelint（存在即运行），配合 .stylelintrc.json 禁止 hex/rgb/hsla/命名色并强制 var(--*)；design-tokens.css、style.css 保持豁免。前端表现：新/改代码禁止硬编码颜色，设计令牌落地有保障。溯源：commit 9984dff..0b6e146
-- ADD-LOCATION-UNI-ZH：AddLocationModal/NameLocationModal 接入 i18n；大学名称中文映射（USYD/UNSW/UTS 等，校区括注保留英文），地址 formatted_address 保持英文；热门与选择回传 name=中文、address=英文；修复告警分支。前端表现：添加地址流程中文化，大学中文名 + 英文地址。溯源：commit ee6e006..9984dff
-- COMMUTE-I18N-TYPO：CommuteTimes/TransportModes/LocationCard 接入 $t 与 .typo-*；统一空状态/按钮/提示文案；ElMessage/ElMessageBox 使用 t()。前端表现：通勤页中文化一致、文字节奏与详情页对齐。溯源：commit 43f943e..ee6e006
-- TYPOGRAPHY+I18N-V1：新增 typography.css（基础/语义文字令牌与 .typo-* 工具类）；扩展轻量 i18n（locales/zh-CN.js + 合并策略）；PropertyCard 首批接入 $t 与 .typo-*（价格/单位/标签/菜单/辅助）。前端表现：UI 中文化，文字节奏统一，动态地址仍英文。溯源：commit 3e4ea72..c45d86a
-- UI-COLOR-BLUE-NEW-BADGE & ADD-LOCATION-SECONDARY：PropertyCard“New”徽标改为品牌蓝 var(--brand-primary)，文字用 var(--color-text-inverse)；CommuteTimes“Add location”按钮硬编码红替换为次要按钮令牌（secondary），补充 hover/focus 可达性。前端表现：新标签为蓝色、按钮中性灰一致化。溯源：commit 3c7c150..3e4ea72
-- UI-TOKENS-PC-FILTER-LOCATION：PC 分离式筛选标签与 Add/Name Location 弹窗全面令牌化；FilterTabs 激活态→中性选中底；价格滑块清理硬编码，统一走 tokens。前端表现：点击“卧室/价格/更多”与弹窗流程不再出现旧色。溯源：commit 82c3f37..3c7c150
-- LINT-GUARDRAIL-COLOR：stylelint 扩展拦截 background/border/outline/fill/stroke 的硬编码色与 rgba/hsla/命名色，强制使用 var(--*)；保留 design-tokens.css 与 style.css 的定义豁免。目的：杜绝新增页面颜色硬编码回归。溯源：commit 82c3f37..3c7c150
-- DESIGN-TOKEN-COLOR-3：新增全局语义色令牌集（link visited/disabled、success/warn/danger/info soft-bg/border、favorite 三态、badge、divider、inverse/弱底/brand 别名）；首批等价替换：建议项边框/悬浮、次要文案、筛选按钮激活态统一 tokens。前端表现：自动补全 hover/分隔线中性化，卡片副文为次级灰，筛选激活为中性选中底色。溯源：commit ff73605..69c3e0e
-- DESIGN-TOKEN-FAVORITE-P0：收藏按钮与 PropertyCard 颜色 Token 化，未收藏=中性灰，hover=中性加深，已收藏=品牌蓝；卡片地址/副文案/分隔线/规格/操作按钮/图片计数器等硬编码改 Token；叠加遮罩改 overlay 令牌。溯源：commit ff73605
-- THEME-BRAND-BLUE-PURE：品牌主色切换为纯正蓝 #0057ff（hover #0047e5 / active #0036b3），令牌映射 --juwo-primary/--link-color 等已对齐；前端表现：主按钮/导航 hover/文本链接统一蓝色系，页面结构与焦点仍为中性灰；向后兼容，可回滚。溯源：commit d7ac639..1f0b27e
-- PC-MOBILE-FILTER-OPTIONS-UNIFY：统一 PC 端与移动端浴室和车位筛选选项。修改 BedroomsFilterPanel.vue 中 bathroomOptions 添加 'any' 选项，parkingOptions 将 '0' 替换为 'any' 并将 '2+' 改为 '3+'，与移动端 FilterPanel.vue 保持一致。前端表现：PC 端浴室和车位选项现与移动端完全统一，提升用户体验一致性。溯源：commit 04bd237
-- INSPECTION-TIME-NAN-FIX：修复房源列表卡片显示"开放时间：NaN"问题。新增 hasValidInspectionTime 计算属性严格验证数据有效性，增强 formatInspectionTime 函数添加输入验证，更新模板条件渲染。前端表现：无有效看房时间时完全隐藏开放时间模块，与详情页修复保持一致。溯源：commit 7ff2e6c
-- SUPABASE-DATA-SYNC-P0：修复 Supabase 同步滞后与邮编小数点；ETL 扩展更新判定（available_date/inspection_times/postcode/property_headline），统一 postcode 4位字符串；前端表现：看房时间/空出日期与CSV一致，“NSW 2010.0”→“NSW 2010”。溯源：commit 53ff509..1b96baa
-- REGION-FILTER-P0-FIX：区域筛选彻底修复（V1 契约）。当仅选择“邮编”时，自动展开为其下属多个 suburb 并注入 suburb CSV；计数(getFilteredCount)与列表(applyFilters)口径一致；本地区域目录聚合 postcode.suburbs 作为兜底。溯源：commit a331c69..27b9cf6
-- FURNISHED-FILTER-FIX-V1：前端改为直接传 isFurnished=true（容错 true/'1'/1/'true'/'yes'），与后端 /api/properties 接口契约一致（SQL 基于 is_furnished yes/no/unknown）；添加 FILTER-DEBUG 输出以核对最终请求参数；ESLint 清理完毕。溯源：commit bade186（范围 48bad16..bade186）
-- PREVIEW-DRAFT-UNIFY-DONE：Area/Bedrooms/Price/Availability/More 五个面板全部接入全局 previewDraft + getPreviewCount，清除/应用时清理分组草稿，确保“应用（N）”与列表总数统一口径。溯源：bade186
-- FIX-FILTERS-COUNT-P0：禁用“按需 V2 映射”，统一走 V1 契约；V1 分支移除 isFurnished，避免后端不识别导致计数暴涨；计数与列表一致性恢复。溯源：commit 48bad16（范围 9627f69..48bad16）
-- MORE-PANEL-SIMPLIFY：仅保“带家具”开关；接入计数器（300ms 防抖）；按钮“清除/应用（N）”；aria-live 播报；URL 仅在 true 时写 isFurnished=1（保持“仅非空参数”）。溯源：48bad16
-- DROPDOWN-A11Y-TRAP：FilterDropdown 加固（锁定 body 滚动、Esc 关闭、Tab/Shift+Tab 焦点陷阱、关闭后焦点还原至触发器、首控聚焦）。溯源：48bad16
-- AREA/MORE：面板关闭按钮 tabindex="-1"，避免首焦点误落在关闭按钮。溯源：48bad16
-- V2 映射：保留白名单透传与 suburb→suburbs 兜底，但默认不开启（enableFilterV2=false）；待后端契约（furnished/布尔取值）对齐后再启用。溯源：48bad16
-- FILTER-TABS 定位：explicitPosition + early-return 修正已稳定（无 0,0 回归）。溯源：63ac851
+## 当前状态
+- **服务运行**：前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
+- **最新完成**：
+  - 筛选系统重构：创建了新的线性四步筛选流程
+  - useFilterWizard Composable：简化状态管理，统一筛选逻辑
+  - FilterWizard 组件：实现向导式筛选体验
+  - SearchResultHeader 组件：智能中文化结果描述
+- **当前焦点**：筛选系统核心组件已完成，需要集成到主页面并优化后端接口
 
-服务状态
-- 前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
+## 下一步计划
+- **[P0] Profile 页结构化**：收藏概览（最近3条 + 总数 + 查看全部 → /favorites）、历史浏览入口、已保存筛选占位，严格使用"新页面视觉标准 v1"
+- **[P0] 保存筛选（本地版）**：FilterPanel 顶部"保存/订阅"入口 + Profile"我的筛选"管理占位
+- **[P1] 令牌定义梳理**：assets/design-tokens.css 标注 deprecated（--color-accent/--font-size-base/--spacing-lg）并提供语义映射
+- **[P1] 图标系统统一**：components/icons/* 点扫描，迁移至 lucide-vue-next + currentColor
+- **[P2] 移除 var() 颜色兜底**：渐进清理 var(--token, #xxx) fallback
 
-下一步
-- [P0] Profile 页结构化：收藏概览（最近3条 + 总数 + 查看全部 → /favorites）、历史浏览入口、已保存筛选与通知入口（占位），严格使用“新页面视觉标准 v1”。溯源：47cab8b..125e590
-- [P0] 保存筛选（本地版）：FilterPanel 顶部“保存/订阅”入口 + Profile“我的筛选”管理（占位；后续接 Supabase 通知）。溯源：47cab8b..125e590
-- [SPRINT-START] 设计系统合规性收尾冲刺 (P1, P2)
-  - [ ] [P1] 令牌定义梳理与清理 (@deprecated)
-  - [ ] [P1] 图标系统完全统一 (lucide + currentColor)
-  - [ ] [P2] 移除所有 var() 颜色兜底 (fallback)
-- [P1] 令牌定义梳理：assets/design-tokens.css 标注 deprecated（--color-accent/--font-size-base/--spacing-lg）并提供语义映射，禁止业务层调用。
-- [P1] 图标系统统一：components/icons/* 使用点扫描；无用移除、在用迁移至 lucide-vue-next + currentColor。
-- [P2] 渐进移除 var(--token, #xxx) fallback；新组件模板要求 icon 用 currentColor + 外层 class 控制颜色。
-- [Guard] CI 验证 stylelint 新规则拦截效果；新增页面 PR 提示必须使用设计令牌。
-
-最新完成
-- 2025-09-10｜LIST-CARD-PRICE-UNIFY  
-  列表卡价格色改为主文案色；全局 --color-text-price 映射到 --color-text-primary，业务层禁用；无逻辑改动｜溯源：commit 07805ab..a5da918
-- 2025-09-10｜PROPERTYDETAIL-TOKENS-FINAL-P0  
-  详情页令牌化收尾：price 文本改为主文案色、CTA 统一品牌蓝、间距/字号令牌一致、地图占位间距令牌化；无逻辑改动｜溯源：commit f201a24..07805ab
-- 2025-09-08｜SORT-P0
-  列表排序功能落地：后端 /api/properties 支持 sort 白名单（price_asc/available_date_asc/suburb_az/inspection_earliest；inspection_earliest 暂等价 available_date_asc），稳定次序 listing_id ASC；前端 fetchProperties 统一兜底跨页保留排序。溯源：commit 7bd269b..54ba6c1
-- 2025-09-08｜MOBILE-SEARCH-DIRECT-FILTER
-  移动端搜索框直连筛选面板功能完成：移除中间 SearchOverlay 步骤，点击搜索框直接打开筛选面板；优化可访问性（aria-label/role 区分移动/桌面角色）；添加移动端点击反馈效果；保留内嵌标签回显；移除未使用变量，ESLint 合规。用户体验更直接高效｜溯源：移动端筛选面板优化任务
-- 2025-09-08｜SEARCH-OVERLAY-COMPONENT-REFACTOR
-  SearchOverlay 组件化重构完成：使用 BaseChip/BaseListItem 替换自定义样式，彻底移除 location 图标（MapPin/Hash），与筛选面板风格完全统一。清理冗余样式代码，保留容器布局与特有功能（光标动画/徽标），ESLint 合规。用户验收通过｜溯源：SearchOverlay 组件化任务
-- 2025-09-08｜MOBILE-FILTER-PANEL-OPTIMIZATION
-  移动端筛选面板细节优化完成：全面迁移到设计令牌系统，优化触摸目标尺寸(44px+)，添加滚动锁定防穿透，完善键盘导航(ESC关闭)，增强可访问性支持(focus-visible)，优化iOS安全区适配。所有样式统一使用filter-*设计令牌，移动端按钮最小48px触摸目标，底部按钮52px。用户验收通过｜溯源：移动端筛选面板优化任务
-- 2025-09-08｜DESIGN-SYSTEM-COMPLETE
-  设计系统全面完成：阶段1-创建设计令牌文件与基础组件；阶段2-应用到所有筛选面板(Price/Bedrooms/Availability/More)；阶段3-创建组件库文档。所有筛选面板现已遵循统一的现代化设计标准，使用中性灰色调、微妙圆角、一致间距系统｜溯源：设计系统实施任务
+## 技术提醒
+- **筛选系统**：V1 契约稳定，V2 映射默认关闭（enableFilterV2=false），可安全回滚
+- **设计令牌**：Stylelint 护栏已启用，新代码强制使用 var(--*)，禁止硬编码颜色
+- **Memory Bank 维护**：activeContext 仅保留当前与未来任务快照，已完成功能沉淀到 systemPatterns/progress
+- **运维约束**：本地固定用 PowerShell 执行 Python/SQL/HTTP，避免跨壳路径问题

@@ -1,38 +1,10 @@
-![1757267579081](image/systemPatterns/1757267579081.png)![1757075026513](image/systemPatterns/1757075026513.png)# 系统设计模式与最佳实践
+# 系统设计模式与最佳实践
 
 ---
- 
-## 筛选系统 v2 模式（新增 2025-09-14）
 
-### 2025-09-15 补充
-- 预估计数 composable（useFilterPreviewCount）：统一“应用（N）”口径，内置并发序号守卫、防抖与组件卸载清理；计数失败返回 null 执行“失败降级”，前端表现为按钮退回“应用/确定”，避免误报 0。
-- 后端 WHERE 构建器模式：统一使用 `_build_where_and_params_for_properties` 产出 WHERE 与参数，列表查询与计数查询严格共用，防止条件/参数漂移；参数化占位杜绝 SQL 注入；排序仅允许最小白名单（ASC/DESC）。
-- REST 多值 OR 条件参数化：/api/properties 中 bedrooms/bathrooms/parking 的多值/下限 OR 条件改为 `%s` 占位并统一 `params.extend(...)`，禁止字符串拼接，确保安全与可维护。
-- 分组边界：Pinia `applyFilters(filters, { sections })`；组件按所属分组传入（Area/Price/Bedrooms/Availability/More），移动端统一面板可一次传多分组。仅删除这些分组旧键再合并，避免跨面板覆盖。
-- 预览口径：`getPreviewCount` 先按分组“精准删键”再合入草稿，清空场景需 `clearPreviewDraft` + `markPreviewSection` 触发删旧键；预览与应用映射一致。
-- URL 同步：仅在“应用后”写入且仅写本分组非空参数；刷新/直链可复现；顶部标签仅读“已应用”。
-- 区域守卫：当 `featureFlags.requireRegionBeforeFilter=true` 时，仅在 `selectedLocations` 为空且本次 `params/filters` 也不含 `suburb/suburbs/postcodes` 才短路；草稿/URL 带区域允许计数/请求。
-- 分页/排序：计数与列表彻底解耦；`applyFilters` 固定 `page=1/page_size=state.pageSize`，`fetchProperties` 以本次 pagination 覆盖历史，防止 `page_size=1` 污染。
-- 观测：超 800ms 打印 `[FILTER-PERF]`；请求参数打印 `[FILTER-DEBUG]` 便于排查。
-
-### URL 幂等与仅写非空键（新增 2025-09-15）
-- 模式：最终写入点清洗 + 幂等对比。`sanitizeQueryParams` 过滤空值键并稳定键序，`isSameQuery` 比较新旧查询；相同则不写，避免 replace 循环。
-- 落地点：FilterPanel 统一面板、Price/Bedrooms/Availability/More/Area 五个分面、HomeView.sort。
-- 前端表现：应用后 URL 可直链/刷新恢复，不写空键；地址栏不抖动；按钮“应用（N）/确定（N）”与列表 total 对齐。
-- 溯源：commit 17527a4..c713d9f
-- 预估计数 composable（useFilterPreviewCount）：统一“应用（N）”口径，内置并发序号守卫、防抖与组件卸载清理；计数失败返回 null 执行“失败降级”，前端表现为按钮退回“应用/确定”，避免误报 0。
-- 后端 WHERE 构建器模式：统一使用 `_build_where_and_params_for_properties` 产出 WHERE 与参数，列表查询与计数查询严格共用，防止条件/参数漂移；参数化占位杜绝 SQL 注入；排序仅允许最小白名单（ASC/DESC）。
-- REST 多值 OR 条件参数化：/api/properties 中 bedrooms/bathrooms/parking 的多值/下限 OR 条件改为 `%s` 占位并统一 `params.extend(...)`，禁止字符串拼接，确保安全与可维护。
-- 分组边界：Pinia `applyFilters(filters, { sections })`；组件按所属分组传入（Area/Price/Bedrooms/Availability/More），移动端统一面板可一次传多分组。仅删除这些分组旧键再合并，避免跨面板覆盖。
-- 预览口径：`getPreviewCount` 先按分组“精准删键”再合入草稿，清空场景需 `clearPreviewDraft` + `markPreviewSection` 触发删旧键；预览与应用映射一致。
-- URL 同步：仅在“应用后”写入且仅写本分组非空参数；刷新/直链可复现；顶部标签仅读“已应用”。
-- 区域守卫：当 `featureFlags.requireRegionBeforeFilter=true` 时，仅在 `selectedLocations` 为空且本次 `params/filters` 也不含 `suburb/suburbs/postcodes` 才短路；草稿/URL 带区域允许计数/请求。
-- 分页/排序：计数与列表彻底解耦；`applyFilters` 固定 `page=1/page_size=state.pageSize`，`fetchProperties` 以本次 pagination 覆盖历史，防止 `page_size=1` 污染。
-- 观测：超 800ms 打印 `[FILTER-PERF]`；请求参数打印 `[FILTER-DEBUG]` 便于排查。
- 
 ## 核心架构原则
 
-### 数据流架构 (Data Flow Architecture)
+### 数据流架构
 ```bash
 # 核心数据流路径 (必须遵守)
 Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
@@ -41,10 +13,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 **禁止** ❌: AI Agent直接调用前端或其他反向依赖
 **原因**: 引入脆弱中间层，增加延迟，隐藏真正的错误源
 
----
-
-## 前端架构
-
+### 前端架构
 - **组件框架**: Vue 3 (Composition API)
 - **状态管理**: Pinia (单一数据源原则)
 - **路由系统**: Vue Router (SPA架构)
@@ -52,114 +21,83 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 
 ---
 
+## 筛选系统核心模式
+
+### URL 幂等与状态同步
+- **模式**: 最终写入点清洗 + 幂等对比
+- **实现**: `sanitizeQueryParams` 过滤空值键，`isSameQuery` 比较新旧查询
+- **效果**: 应用后 URL 可直链/刷新恢复，不写空键，地址栏不抖动
+
+### 预估计数统一
+- **composable**: useFilterPreviewCount 统一"应用（N）"口径
+- **特性**: 并发序号守卫、300ms 防抖、组件卸载清理
+- **降级**: 计数失败返回 null，按钮退回"应用/确定"
+
+### 分组边界隔离
+- **API**: `applyFilters(filters, { sections })`
+- **原则**: 仅删除指定分组旧键再合并，避免跨面板覆盖
+- **分组**: area/price/bedrooms/availability/more
+
+---
+
 ## CSS与布局模式
 
-### 分段控件（Segmented）模式（新增）
-- 目的：将一组“数字/枚举按钮”在视觉上连为整体，仅改变几何关系（相邻无缝、端部圆角 2px），不改变颜色/描边/填充/hover/active 等设计令牌与状态逻辑（保持前端表现一致）。
-- CSS 模式（容器 + 子项）：
-  ```css
-  /* 容器：不换行、无内间距缝隙、可溢出滚动 */
-  .filter-buttons-group.segmented {
-    display: inline-flex;
-    flex-wrap: nowrap;
-    gap: 0;
-    overflow: hidden;      /* PC 保持整条；移动端可配合 overflow-x:auto */
-  }
-  /* 子项：中段无圆角；相邻边框折叠避免 2px 中缝 */
-  .filter-buttons-group.segmented .filter-btn { border-radius: 0; }
-  .filter-buttons-group.segmented .filter-btn + .filter-btn { margin-left: -1px; }
-  /* 首尾端：仅左右两端 2px 圆角 */
-  .filter-buttons-group.segmented .filter-btn:first-child {
-    border-top-left-radius: 2px; border-bottom-left-radius: 2px;
-  }
-  .filter-buttons-group.segmented .filter-btn:last-child {
-    border-top-right-radius: 2px; border-bottom-right-radius: 2px;
-  }
-  @media (width <= 767px) {
-    .filter-buttons-group.segmented { overflow-x: auto; } /* 窄屏避免换行破坏连体 */
-  }
-  ```
-- 约束与可达性：
-  - 不在该模式内覆写颜色/描边/填充/hover/active，全部沿用既有设计令牌（如 --filter-color-*）。
-  - 交互逻辑不变（如单选 ≥N 语义）；键盘与 aria 语义保持原实现。
-- 适用：卧室/浴室/车位等数字选项行，或任意需要“连体分段”视觉的枚举组。
-- 溯源：commit 4146bd1（LIST-H1-PRICE-ALIGN + FILTER-SEGMENTED-BP）
+### 布局对齐策略
+- **统一容器**: `max-width: 1200px` 和 `padding: 0 32px`
+- **双层结构**: 外层容器全宽背景 + 内层居中内容区
+- **响应式断点**: 768px（平板）、1200px（桌面）、1920px（超宽）
 
-### 1. 样式作用域
-**模式** ✅: 将布局影响的CSS规则 (`overflow`, `position`, `display`) 限定在组件作用域内
-**反模式** ❌: 对顶级元素 (`body`, `html`) 应用全局 `overflow-x: hidden`
+### 设计令牌约束
+- **强制使用**: `var(--*)` 形式的 CSS 自定义属性
+- **禁止**: 硬编码颜色、`var(--token, #hex)` 兜底形式
+- **护栏**: Stylelint 规则拦截新增硬编码色
 
-### 2. 布局对齐策略
-**模式** ✅: 统一 `max-width: 1200px` 和 `padding: 0 32px` 确保垂直对齐
-**反模式** ❌: 不同容器的对齐方式不一致
-
-### 3. 全宽内容设计
-**模式** ✅: 双层结构实现：
-- 外层容器: `width: 100%` (背景)
-- 内层容器: 居中内容区
+### 分段控件（Segmented）模式
+- **目的**: 数字/枚举按钮视觉连体，仅改几何关系
+- **实现**: 相邻无缝、端部圆角 2px、边框折叠
+- **约束**: 不覆写颜色/状态逻辑，沿用既有设计令牌
 
 ---
 
 ## 状态管理原则
 
-**单一数据源**: 组件负责触发action，业务逻辑在store actions中处理
+### 单一数据源
+- **原则**: 组件负责触发action，业务逻辑在store actions中处理
+- **反模式** ❌: 在action中混合传入参数和未同步的旧state
 
-**反模式** ❌: 在action中混合传入参数和未同步的旧state
+### 特性开关模式
+- **V1→V2演进**: 映射函数 + 特性开关，默认关闭新契约
+- **回滚保障**: enableFilterV2=false，任何异常可一键回退
 
 ---
 
-## 移动端响应式模式
+## API 设计与契约一致性
 
-### 1. 渐进式间距系统
-匀速递增的间距级别：`8px → 12px → 16px`
-从核心元素到区域再到容器的视觉层次递增
+### 端点字段一致性
+- **原则**: 详情端点应为列表端点的"超集"（superset）
+- **避免**: 刷新或直链访问出现字段缺失导致的 UI 回退
+- **缓存策略**: 提供选择性失效端点，避免旧缓存污染
 
-### 2. 移动端滚动逻辑隔离
-桌面端 vs 移动端使用不同的滚动判断机制：
-- **桌面端**: `getBoundingClientRect()` 视窗位置判断
-- **移动端**: `offsetHeight` 实际DOM高度判断
+### 统一响应格式
+- **结构**: `{status, data, pagination, error}`
+- **建议**: 契约单元测试校验字段一致性
 
-### 3. 性能优化的高度计算策略
-使用缓存的DOM高度信息而非实时计算，以避免强制布局重计算
+---
 
-### 布局与对齐
-- 桌面端（≥1200px）正文容器不做水平居中，使用内容卡 .content-card 外边距计算实现精确对齐：
-  - 左：margin-left = 453px - var(--section-padding-x, 50px)
-  - 右：margin-right = 496px - var(--section-padding-x, 50px)
-- 不在多处硬编码 453/496，统一以变量/计算表达，减少维护成本。
-- 分隔线使用伪元素并锚定到正文内边距：left/right 以 var(--section-padding-x, 50px) 对齐。
+## 图标系统与组件化
 
-### 文本可读性
-- 超宽屏（默认 ≥1920px）对长段落仅限 p 的 measure（建议 68ch，可通过 --paragraph-measure 调整），不改变容器宽度与对齐，避免破坏地图/描述右缘一致性。
+### 统一图标库
+- **标准**: 全站使用 `lucide-vue-next` SVG 图标库
+- **导入**: `import { IconName } from 'lucide-vue-next'`
+- **使用**: `<IconName class="spec-icon" />`
+- **颜色**: `stroke: currentColor`，由外层控制
 
-### 响应式与兼容
-- <1200px 沿用移动端容器与内边距；Hero 大图始终全宽，自适应留白不受正文约束。
-- 覆盖层样式优先级以“有限 !important + 更具体选择器”为主，控制影响范围。
+### 规格行变量驱动
+- **全局变量**: --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap
+- **结构类**: .spec-row/.spec-item/.spec-text
+- **原则**: 统一"图标 + 数字"信息行的尺寸与间距
 
-### 变量化与可配置
-- 关键变量：--section-padding-x（默认 50px）、--paragraph-measure（默认 68ch）。
-- 调整对齐或行长时优先改变量，避免散点修改。
-
-## 输入框后缀对齐模式（新增）
-- 原则：后缀图标相对 `.el-input__wrapper` 绝对定位（position:absolute；right 使用令牌），文本占位通过 wrapper 的 `padding-right` 令牌化预留；禁止以 `.el-input__suffix` 作为定位锚点。
-- 为什么：suffix-inner 常不占满，clearable/内部结构变化会导致“看起来靠左”或覆盖占位符；以 wrapper 为锚点稳健且易于令牌化。
-- 实施：
-  - `.el-input__wrapper { position: relative; padding-right: calc(var(--search-suffix-right, 12px) + var(--search-suffix-hit, 32px)); }`
-  - `.filter-icon-btn { position:absolute; right: var(--search-suffix-right, 12px); top:50%; transform: translateY(-50%); }`
-  - SVG 图标 `stroke: currentColor`，颜色用 `var(--color-text-secondary)`；a11y：button + aria-label。
-- 令牌：
-  - `--search-suffix-right`: 右内边距，默认 12px
-  - `--search-suffix-hit`: 命中区域宽高，默认 32px（可调至 24–28px 以收紧命中范围）
-- 溯源：activeContext 2025-09-06｜UI-SEARCH-FILTER-SUFFIX
-
-## 移动端 Full-bleed 卡片模式（新增）
-- 原则：移动端卡片支持“满屏贴边（full-bleed）”，改变宽度不改变高度；桌面端不受影响。
-- 实施（@media ≤767px）：
-  - `.property-card { width:100vw; max-width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); border-radius:0; }`
-  - 保持图片容器/轮播高度不变（例如 250px），`object-fit: cover`。
-- 为什么：在移动端提供更沉浸的视觉，且不破坏既有内容节奏。
-- 注意：full-bleed 与全站容器 32px 留白是两种视觉范式；优先以“组件局部”实现，不影响全局容器规则。
-- 溯源：activeContext 2025-09-06｜UI-CARD-FULLBLEED-MOBILE
+---
 
 ## 经验教训总结
 
@@ -167,494 +105,3 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - **滚动判断差异**: 移动端和桌面端需要隔离的滚动处理逻辑
 - **布局统一**: 容器对齐不一致会导致视觉错位
 - **状态同步**: 异步action中参数与state的不一致会导致数据错误
-
----
-
-## API 设计与契约一致性（新增）
-
-- 原则：相同资源的列表端点与详情端点必须返回一致的字段集合，详情端点应为列表端点的“超集”（superset），避免刷新或直链访问出现字段缺失导致的 UI 回退。
-- 案例：`inspection_times` 需同时出现在 `/api/properties` 与 `/api/properties/{id}`。此次问题根因即为详情端点缺失该字段。
-- 约束：
-  - 新增字段时，优先在详情端点补齐，再在列表端点评估是否需要（考虑有效负载与性能）。
-  - 任何字段移除/更名，必须通过后端兼容层或版本化保证向后兼容。
-- 启用缓存（FastAPI Cache/Redis）时，更新接口契约后应提供选择性失效端点，避免旧缓存长期污染响应。
-  - 统一响应格式校验：所有 REST 端点返回 {status, data, pagination, error}；将该结构纳入契约/快照测试，与 techContext.md 保持一致。
-- 实施建议：
-  - 在后端添加契约单元测试/契约快照测试，校验两个端点的字段一致性（至少对关键字段如 `inspection_times`）。
-  - 在 PR 审查清单中加入“端点字段一致性检查”项。
-
-## 家具筛选兼容与质量闭环（新增 2025-09-13）
-
-- 家具筛选兼容守卫（后端）
-  - 原则：历史上 is_furnished 可能为 text/三态；当数据未完全布尔化时，列表筛选用“统一成文本再判断”的写法，避免类型不匹配导致 500。
-  - 模式：NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1') / ('f','false','no','0')。
-  - 回退：当列完成布尔化（ETL/迁移）后，恢复等号比较（is_furnished = TRUE/FALSE），并启用部分索引（TRUE/FALSE）提速。
-  - 溯源：commit 0e36a05..3064c42（FURNISHED-FILTER-COMPAT）
-
-- 家具判定“质量闭环”报告
-  - 内容：database/verification_queries.sql 内置 positive/negative/neutral 关键词，输出 A（肯定但 ≠TRUE）/B（否定但=TRUE）/C（中性但非 NULL）三类样本，另含近 7 日 TopN 与汇总分布。
-  - 用途：每日巡检“文案 ↔ 布尔”的不一致来源；辅助人工纠偏与后续 ETL 规则迭代。
-  - 溯源：commit 0e36a05..3064c42（FURNISHING-QUALITY-LOOP-V1）
-
-- 选择性缓存失效端点
-  - /api/cache/invalidate 支持 property_id/全量失效；修复/迁移后应触发，确保“前端表现”立即一致。
-  - 溯源：后端 Cache 设计（FastAPI Cache/Redis），与契约一致性章节配套
-
-## 家具语义与下架一致性（新增 2025-09-14）
-- 数据源优先级（ETL 判定，前端表现更准确）：`property_features` 精确匹配优先（大小写不敏感；否定>肯定；冲突→NULL），若无结论再用“标题+正文”兜底（否定>模糊>肯定；无证据→NULL）；彻底排除 `furnishing_status`。
-- 下架一致性：当某房源在“最新 CSV”中缺失（off-market）时，同步 `is_furnished = NULL`，避免详情/导出等非列表路径误读历史 TRUE（列表本已依赖 `is_active=TRUE` 过滤）。
-- 更新触发修复：将 `is_furnished` 纳入预查询与变更判断，保证“仅 is_furnished 变化”也会触发 UPDATE，落库后清缓存即可在前端表现一致。
-- 缓存策略（FastAPICache）：缓存键为“完整 URL”，列表与详情互不影响；提供选择性失效端点 `/api/cache/invalidate?invalidate_all=true` 与 `?property_id=xxx`，修复/迁移后应触发。
-- 运维规范（本地固定用 PowerShell，禁跨壳）：
-  ```powershell
-  Set-Location 'C:\Users\nuoai\Desktop\WEB-sydney-rental-hub'
-  $env:USE_ETL_FURNISHED = 'true'
-  & 'C:\Python313\python.exe' 'scripts\automated_data_update_with_notifications.py' --run-once
-  Invoke-WebRequest -UseBasicParsing -Method POST -Uri 'http://localhost:8000/api/cache/invalidate?invalidate_all=true' | Out-Null
-  ```
-- 回滚与兜底：如需紧急回退集中判定，可临时设置 `$env:USE_ETL_FURNISHED='false'` 再跑 ETL；如需立刻止血单条，使用点名 SQL 将 `is_furnished=NULL` 并清缓存。
-
-## 前端样式一致性（新增）
-
-- 页面背景与卡片
-  - 页面背景统一使用 `var(--color-bg-page)`，卡片/表面背景使用 `var(--color-bg-card)`，保持“页灰 + 卡片白”的视觉层次与列表页一致。
-- 栅格与容器
-  - 桌面端（≥1200px）统一容器 `max-width: 1200px`，左右内边距 `32px`；1920px 超宽断点仅居中不改变主容器宽度，避免“另一套主题”的观感。
-- 设计令牌约束
-  - 禁止硬编码颜色/边框/阴影/字号，统一使用 `src/style.css` 中的 tokens：如 `var(--color-text-primary/secondary)`, `var(--color-border-default)`, `var(--juwo-primary)` 等。
-  - 新增/引用 CSS 变量时，必须先在 `:root`（`src/style.css`）声明再使用；禁止使用未定义变量（避免样式回退）。
-  - 对详情页使用到的 tokens 已补齐映射：如 `--space-*`, `--bg-*`, `--shadow-xs`, `--brand-primary`, `--text-*`, `--link-color`。
-- 断点与响应式
-  - 统一断点：`768px`（平板）、`1200px`（桌面）、`1920px`（超宽）。优先小范围覆盖，避免在断点内“大改”造成体系分裂。
-- 兼容性原则
-  - 样式调整不得修改组件逻辑与数据流；以最小变更保证与首页风格、节奏一致。
-
-## 富文本渲染统一原则（PropertyDetail.description 实战沉淀）
-- 原则：页面中的富文本一律使用统一的 Markdown 渲染组件（如 MarkdownContent），组件内部完成 XSS 清理与必要的轻量预处理（GFM、换行转 <br>、项目符号 •/- 归一），页面侧仅负责容器样式与交互（折叠/展开）。
-- 为什么：避免在各视图重复手写 v-html，降低 XSS 风险；实现一致的列表/段落/强调/链接样式；便于全局升级与样式统一。
-- 技术权衡：不额外引入新依赖，优先复用既有组件；在保持体积可控的同时兼顾可读性与安全性。
-- 适用范围：PropertyDetail.description 以及后续所有富文本字段（如房源须知、注意事项等）。
-- 溯源：activeContext 2025-09-05｜DOCS-ALIGN-FINAL（任务 RICH-TEXT-UNIFY）
-- 落地状态：已在 PropertyDetail.description 应用；其它富文本按需迁移中。
-
-## 图标系统与组件化 (Icon System & Componentization)
-
-- **原则**: 全站图标统一使用 `lucide-vue-next` SVG 图标库，彻底弃用 Font Awesome (`<i>` 标签)。所有图标必须作为 Vue 组件导入和使用，并统一应用 `.spec-icon` 样式类。
-- **为什么**:
-    - **视觉一致性**: 确保全站所有图标风格、粗细、尺寸完全统一。
-    - **性能**: SVG-in-JS 方案支持摇树优化 (tree-shaking)，只打包用到的图标，减小最终构建体积。相比之下，字体图标库需要加载整个字体文件。
-    - **可维护性**: 通过组件化方式引用图标 (`<IconName />`)，代码更具可读性，且易于通过全局搜索进行管理和替换。
-    - **样式控制**: SVG 图标可以通过 CSS (`fill`, `stroke`) 进行更精确的颜色、大小和动画控制，无需依赖 `font-size` 和 `color` 等hacky的文本样式。
-- **实施规范**:
-    - **导入**: `import { IconName } from 'lucide-vue-next'`
-    - **使用**: `<IconName class="spec-icon" />`
-    - **样式**:
-        - 默认尺寸由 `.spec-icon` 全局控制 (e.g., `width: 24px; height: 24px;`)。
-        - 特殊区域（如按钮、下拉菜单）可局部覆盖尺寸，但需保持比例，如 `.action-btn .spec-icon { width: 22px; height: 22px; }`。
-        - 颜色通过 `color` 或 `fill` 属性继承或指定。
-- **反模式** ❌:
-    - 混合使用 Font Awesome 和 Lucide。
-    - 使用 `<i>` 标签或图像文件作为图标。
-    - 在组件内硬编码图标的 `width`, `height`, `color` 样式，破坏全局一致性。
-- **溯源**: 本次从 `PropertyCard.vue` 到 `PropertyDetail.vue` 的图标统一重构工作。
-- **迁移状态**: 进行中；允许过渡期例外，不作为阻断项。
-- **迁移策略**: 对既有页面按需增量迁移，跨页面替换须评审；临时替换为其它图标库仅作为应急措施，修复后需恢复为 lucide。
-
-## 规格行（spec-row/spec-item/spec-text）与变量驱动（新增）
-
-- 目的：统一“图标 + 数字”信息行的尺寸与间距，避免局部硬编码导致视觉不一致（前端表现一致、可就地调参）。
-- 结构类：
-  - .spec-row：整行容器，横向排列；项目间距通过“相邻项 margin-left”提供。
-  - .spec-item：单元容器；内部 gap 置 0，避免与 margin 叠加。
-  - .spec-text：数字文本；用于触发“图标↔数字间距”与行高规则。
-- 全局变量（:root 定义，允许局部容器就近覆写）：
-  - --spec-icon-size（默认 24px）
-  - --spec-text-size（默认 16px）
-  - --spec-line-height（默认 24px）
-  - --spec-icon-gap（默认 6px，图标↔数字）
-  - --spec-item-gap（默认 10px，项目↔项目）
-- 规则：
-  - 横向间距来源统一：.spec-row .spec-item + .spec-item { margin-left: var(--spec-item-gap) }；
-    组件容器自身 gap 应设为 0，防止与 margin-left 相加导致过宽。
-  - 全局规则可带 !important 作为历史兜底，但不阻止“变量就近覆写”在容器内生效。
-  - 禁止在局部硬编码 i/span 的尺寸；应通过变量或在数字上添加 .spec-text。
-- 推荐覆写（当前列表/详情已采用）：
-  - 容器（如 .property-features）内设置：
-    --spec-icon-size: 18px; --spec-text-size: 14px; --spec-line-height: 18px; --spec-item-gap: 12px; --spec-icon-gap: 6px;
-- 溯源：commit 5b7254c..25ff698（PropertyCard / PropertyDetail 对齐统一）
-
-## 计数器徽标（Pill/Badge）统一模式
-
-- 原则：计数器应在不同位数（单位数/双位数/99+）下保持布局稳定，不产生横向抖动；组件为“非交互”视觉，不响应 hover。
-- 结构：图标（可选）+ 文案（pill-label）+ 数字徽标（pill-badge）。推荐容器类名 `.image-counter`。
-- 样式规范（像素复刻基线）：
-  - 容器：display:inline-flex; align-items:center; justify-content:center; gap:8px; min-width:118px; height:40px; padding:0 14px; background:#fefefe; color:#3c475b; border:1px solid #cfd1d7; border-radius:4px; cursor:default; line-height:1; box-shadow:none; box-sizing:border-box。
-  - 文案 `.pill-label`：white-space:nowrap; line-height:1;（避免垂直偏移）。
-  - 数字 `.pill-badge`（默认）：22×22 圆形（width/height:22px; border-radius:100%），字体 12px/600；使用 `font-variant-numeric: tabular-nums`；`flex-shrink:0` 防止压缩。
-  - 两位及以上（含 99+）：为 `.pill-badge.two-digits` 设置 `width:auto; padding:0 4px; border-radius:11px`，自动切换为椭圆胶囊。
-- 数字规则：当计数 ≥ 100 时，显示 `99+`；当计数 ≥ 10 时，给数字徽标附加 `two-digits` 类。
-- 可访问性：容器需提供 `aria-label` 描述（如“照片数量”），图标 `aria-hidden="true"`。
-- 令牌化（可选）：若需与全局设计系统对齐，可将 #fefefe/#3c475b/#cfd1d7/#e6e9ed 替换为 `var(--color-bg-card) / var(--color-text-secondary) / var(--color-border-default) / var(--bg-secondary)` 等项目 tokens。
-- 适用范围：图片计数器、收藏计数、通知气泡等具有相同特征的计数场景。
-- 溯源：activeContext 2025-09-05｜UI-PILL-COUNTER（基于历史“成功过”的实现复刻与沉淀）
-
----
-
-## 筛选入口一致性（更新 v1）
-
-- 原则：筛选“单一真源”= FilterPanel + Pinia；FilterTabs 仅作为“入口/锚点”，不承载任何预设/快速选项/本地 applyFilters。
-- 平台策略：
-  - PC：显示 FilterTabs 分组 pill（区域/卧室/价格/空出时间）与“筛选”主按钮；点击任一项仅打开 FilterPanel，并传递分组意图。
-  - Mobile：仅保留“筛选”主按钮；不显示分组 pill，避免拥挤。
-- 事件契约：
-  - FilterTabs → emit('requestOpen', { section: 'area'|'bedrooms'|'price'|'availability'|null })
-  - 父(HomeView) → 接收后：showFilterPanel = true；focusSection = payload.section
-  - FilterPanel → props: focusSection（将滚动/聚焦到对应分组），v-model:open 控制显隐
-- 数据契约：
-  - 任何筛选更改仅在 FilterPanel 内部提交到 Pinia，并按需同步 URL；禁止在 FilterTabs 直接改 store 或 query。
-- 可达性与视觉：
-  - 遵循 EP-GUARDRAIL-FOCUS-GLOBAL；当 focusSection 变化时聚焦该分组首交互控件（仅PC）。
-- 回滚策略：
-  - 如需撤回 PC chips，移除 FilterTabs 渲染即可恢复“搜索后缀图标为唯一入口”的形态。
-- 溯源：activeContext 2025-09-07｜FILTER-TABS-PC-RETURN（代码已落地）；待补：FilterPanel.focusSection
-
-## 筛选入口一致性（v2·PC 专用，覆盖 v1 的 PC 策略）
-参见：分离式筛选面板尺寸与无内滚（卧室 380px，其他 520px；内部不出现滚动条）。
-- 目标：PC 端移除“筛选”主按钮；仅保分组 Chips（区域/卧室/价格/空出时间）+“更多”承载高级项。
-- 交互：点击任一 Chip 打开对应独立面板；“更多”打开高级筛选面板；各面板只负责收集条件与应用/重置。
-- 数据真源：仍以 Pinia 为唯一真源（apply/reset 在 store 层统一处理），并按需同步 URL；禁止在 Chips 内直接改 store state。
-- 可达性：遵循 EP-GUARDRAIL-FOCUS-GLOBAL；打开时聚焦面板首交互控件；Esc/点击遮罩关闭。
-- 回滚策略：若需回退到“统一 FilterPanel”形态，仅需将 Chips 触发恢复为 requestOpen(section) 并渲染统一 FilterPanel。
-
-### PC 分离式筛选实现细则（补充）
-- 容器与挂载
-  - 使用 FilterDropdown 作为通用下拉容器，teleport 到 body，避免层级干扰；overlay 支持 @click.self 关闭；仅允许单例面板同时打开（activePanel 单一）。
-  - 面板显隐采用 :modelValue 与 @update:modelValue 事件对偶，而非 v-model 布尔表达式（修复 v-model LHS 规范问题）。
-- 事件契约（PC/Mobile 分治）
-  - PC：FilterTabs 内部管理 activePanel 与触发 refs（area/bedrooms/price/availability/more），不对 store 与 URL 做直接写入。
-  - Mobile：FilterTabs 通过 emit('requestOpenFullPanel') 通知父级打开统一 FilterPanel；HomeView 接收后仅在移动端断点下打开；PC 忽略该触发。
-- 定位与滚动
-  - 下拉定位基于触发元素 getBoundingClientRect()，保证 minWidth≥触发宽度；max-height: calc(100vh - 40px)；overscroll-behavior: contain 防滚动穿透。
-  - 关闭条件：点击外部、Esc、断点切换到移动端时强制关闭。
-- 可达性
-  - 打开时将焦点置于面板首个可交互元素；Esc 关闭；Tab 流顺序仅在面板内可达（必要时增加焦点陷阱）。
-- 风险与回滚
-  - 该实现与 Mobile 统一面板并存，按断点切换；移除 FilterTabs 或改回触发统一面板即可回滚。
-
-## 前端状态同步与特性开关（新增）
-
-- 原则：以“映射函数 + 特性开关”的方式进行 V1 → V2 契约演进，默认关闭新契约，保障回滚路径。
-- 为什么：避免一次性切换导致的全站耦合风险；在验证窗口期内可快速切换回旧契约。
-- 实施：
-  - 在 store 层集中构造参数（mapFilterStateToApiParams），组件仅触发 action；
-  - 通过 enableFilterV2 控制输出参数集合（V1: suburb/minPrice/...；V2: suburbs/price_min/...）；
-  - 任何异常场景下可一键回退，确保向后兼容。
-- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
-
-## 数据同步与清洗原则（新增）
-- 原则：数据库为“单一真源”；ETL 需同时保证“字段规范化 + 关键字段变更即更新”；缓存层与UI展示应考虑TTL滞后。
-- Postcode 规范化：
-  - 入库前统一提取4位数字字符串（如 "2010.0" → "2010"），空值置空字符串，禁止浮点字符串写入。
-  - 为什么：CSV 列混型常使 pandas 推断为 float，写回 DB 变成 “2010.0”，导致前端地址出现小数点。
-- ETL 更新判定（关键字段）：
-  - 触发更新除 rent_pw 外，还需包含 available_date、inspection_times、postcode、property_headline 任一变化。
-  - 写回时同步更新 status/status_changed_at，保持 is_active=TRUE，确保前端展示跟随最新爬取数据。
-- 缓存与可见性：
-  - 若启用 Redis（默认TTL≈15分钟），修复落库后前端可能短暂滞后；等待TTL或选择性清理缓存。
-  - 后端建议提供“选择性失效”接口，避免旧缓存长期污染响应。
-- 溯源：commit 53ff509..1b96baa｜SUPABASE-DATA-SYNC-P0
-
-## 更多高级筛选模式（新增）
-- 原则：PC 端"更多"面板承载高级条件（furnished/bathrooms_min/parking_min）；仅在"应用"时提交到 Pinia；URL 仅写入非空参数。
-- 定位与交互：沿用分离式下拉（FilterDropdown）显式坐标策略、单例打开、ESC/外点关闭；打开时首控件获焦点，Tab 顺序在面板内闭环。
-- 数据契约：组件传入 isFurnished/bathrooms/parking 等键；Store 侧 mapFilterStateToApiParams 在 V2 下映射为 furnished/bathrooms_min/parking_min，V1 下透传且可被后端忽略。
-- 特性开关：默认 enableFilterV2=false；当检测到"高级键"（isFurnished/bathrooms/parking/postcodes）时，按需启用 V2 映射，保障无痛回滚。
-- URL 同步：仅写入 isFurnished=1、bathrooms=3+、parking=2+ 等非空值；刷新/直链可复现（读取逻辑可按需补充）。
-- 回滚策略：移除 FilterTabs 中对 MoreFilterPanel 的注册即可回退为占位；或关闭 V2 映射开关恢复旧契约。
-- 溯源：commit 7535437｜FILTER-MORE-PANEL-PC
-
-## 筛选面板设计系统（新增）
-- 原则：基于区域筛选面板现代化设计的成功模式，建立统一的设计系统确保所有筛选面板遵循相同的视觉标准。
-- 设计令牌：创建 `src/styles/design-tokens.css` 统一管理颜色、间距、字体、圆角、阴影等设计令牌；使用中性灰色调避免过度品牌化；微妙圆角(4-6px)现代但不过分。
-- 基础组件：构建可复用组件库 `src/components/base/`：
-  - BaseChip.vue：标签组件，支持 default/selected/hover 变体，可移除功能
-  - BaseSearchInput.vue：搜索输入框，内置搜索图标和清除按钮，支持键盘交互
-  - BaseButton.vue：按钮组件，支持 primary/secondary/ghost/danger 变体和 small/medium/large 尺寸
-  - BaseListItem.vue：列表项组件，支持选中/禁用/可点击状态，包含前置/后置插槽
-- 应用范围：已应用到所有筛选面板(AreaFilterPanel, PriceFilterPanel, BedroomsFilterPanel, AvailabilityFilterPanel, MoreFilterPanel)，替换硬编码样式为设计令牌，使用基础组件统一交互。
-- 文档：创建完整的组件库文档 `src/components/base/README.md`，包含使用指南、最佳实践、扩展指南。
-- 为什么：确保全站筛选面板视觉一致性，提高代码复用性，降低维护成本，建立可扩展的设计系统基础。
-- 溯源：activeContext 2025-09-08｜DESIGN-SYSTEM-COMPLETE
-
-## 分离式下拉定位模式（新增）
-- 原则：PC 分离式筛选使用“显式坐标优先”的定位策略，彻底规避 ref/布局时序导致的 0,0 问题。
-- 触发侧（FilterTabs）：
-  - 在点击事件中使用 currentTarget.getBoundingClientRect() 计算 { top: rect.bottom + 8, left: rect.left, width: max(rect.width, 280) }；
-  - 做左右 10px 视口边缘保护；窗口 resize 时若面板打开则重算；切至移动端断点（≤768px）强制关闭。
-- 面板侧（FilterDropdown）：
-  - 新增 props explicitPosition（{top,left,width}），若提供则优先使用，忽略 trigger 未就绪的影响；
-  - 修正 updatePosition 的 early-return：仅当“无 explicitPosition 且无 trigger”时才早退；
-  - 仍保留 trigger + getBoundingClientRect() 作为回退；首开追加 1–2 帧 rAF 轻量确认重算，稳住首帧。
-- 布局与层级：
-  - teleport 到 body，容器 position: fixed；max-height: calc(100vh - 40px)；overscroll-behavior: contain 防穿透；
-  - 仅允许单实例打开；点击外部/ESC 关闭；断点切换时自动关闭。
-- 风险与回滚：
-  - 删除 explicitPosition 传参即可回退到 trigger 测量模式；early-return 恢复旧逻辑仍可运行但可能出现 0,0。
-- 溯源：activeContext 2025-09-08｜FILTER-DROPDOWN-POSITION-FIX
-
----
-
-## 滚动与滚动条显示原则（新增）
-
-- 原则：抽屉/侧栏类容器仅保留“一个主纵向滚动条”；打开面板时锁定 body 滚动，避免出现页面滚动条与面板滚动条并列。
-- 滚动链控制：对面板与其内容区使用 `overscroll-behavior: contain`，阻断滚动穿透到底层页面或父级容器。
-- 内部长列表：允许局部滚动，但默认隐藏其滚动条条形（保留滚动能力），避免与主滚动条并列出现在右缘；或将滚动职责合并为面板主滚动。
-- 品牌色约束：滚动条/指示器统一中性灰，不得使用品牌色（品牌色仅用于 CTA）。
-- 变量化：统一使用 `--neutral-scrollbar-color / --neutral-scrollbar-hover-color` 管理滚动条颜色；必要时在组件内使用 `:deep` 精确覆盖。
-- 回滚策略：删除对应覆盖块即可回退；不影响逻辑层。
-- 实施建议：
-  - 样式（全局）：隐藏/中性化 Element Plus `el-scrollbar` 与原生滚动条条形
-    ```css
-    /* 全局中性化（已落地，摘录） */
-    :root {
-      --neutral-scrollbar-color: #c0c4cc;
-      --neutral-scrollbar-hover-color: #909399;
-    }
-    .el-scrollbar__thumb { background-color: var(--neutral-scrollbar-color) !important; }
-    .el-scrollbar__thumb:hover { background-color: var(--neutral-scrollbar-hover-color) !important; }
-    /* 面板内定向兜底：仅显示主滚动条，内部列表条形隐藏 */
-    .domain-filter-panel :deep(.el-scrollbar__bar) { background: transparent !important; }
-    .location-section :deep(.el-scrollbar__bar) { display: none !important; }
-    .location-section :deep(.el-scrollbar__thumb) { background: transparent !important; }
-    ```
-  - 逻辑（组件）：在面板显示时锁定 body 滚动，关闭时恢复
-    ```js
-    // 中文注释：锁定 body 滚动，防止页面滚动条与面板滚动条并列
-    const lockBodyScroll = () => {
-      document.documentElement.style.overflow = 'hidden'
-      document.body.style.overflow = 'hidden'
-    }
-    const unlockBodyScroll = () => {
-      document.documentElement.style.overflow = ''
-      document.body.style.overflow = ''
-    }
-    watch(visible, (on) => { on ? lockBodyScroll() : unlockBodyScroll() })
-    onUnmounted(() => unlockBodyScroll())
-    ```
-- 溯源：activeContext 2025-09-08｜UI-EP-SCROLL-NEUTRAL-1
-
-## 分离式筛选面板尺寸与无内滚（新增）
-- 原则：PC 端分离式筛选面板内部不出现滚动条；通过控量与压缩留白控制高度，仍遵循“仅一个主纵向滚动条”的系统原则。
-- 尺寸：PC 端所有筛选面板统一宽度为 380px；移动端最小宽度不少于触发器宽度（≥280px）。
-- 实施：
-  - FilterTabs.computePosition(el)：PC 下统一 width=380，并做左右 10px 视口边缘保护。
-  - 面板内部通过压缩留白与间距控制总高（示例：panel-content padding 12px；按钮组 gap 8px；section margin-bottom 8/16；三组各一行），整体高度≈320–360px，确保不触发内部滚动。
-  - PC 日期输入内部间距与令牌基线（仅 .filter-dropdown-container 作用域）：
-    - --filter-suffix-hit: 20px；--filter-suffix-right: 8px；--date-field-min-ch: 10ch
-    - 输入包装 padding-left: 8px；:deep(.el-input__suffix-inner) gap: 0
-    - .date-picker-group 不换行，column-gap: 6px；“至”分隔 margin: 0 2px
-    - 保留 1px 中性灰焦点环；禁黑色 UA outline（面板内）
-  - “应用（N）”计数采用 300ms 防抖，加载态禁点；错误快速失败，不做本地估算，保持可观测性。
-- 溯源：commit 9627f697｜FILTER-PANELS-UNIFY-380
-
-## 导航交互统一（新增）
-
-- 作用范围：仅在“导航容器”内的链接生效（nav / header nav / .nav / .navbar / .navigation / .top-nav / .bottom-nav / [class*="nav"]）
-- 行为准则：
-  - hover：color: var(--juwo-primary)；font-weight: inherit（不加粗）；background: transparent（不要灰底）
-  - focus / focus-visible：outline: none；box-shadow: none（仅导航链接移除，表单控件仍保留灰色可见焦点）
-  - 图标：color/fill/stroke: currentColor（图标随文字颜色变化）
-- 变量：在 :root 定义 `--nav-hover-color: var(--juwo-primary)` 统一管理
-- 与 Element Plus 的关系：覆盖导航容器内 `.el-menu-item:hover` 默认灰底为透明，仅改文字颜色
-- 可访问性权衡：满足“点击后不要浅灰外框”的品牌要求，仍保证表单/输入等交互组件的可见焦点与键盘可达性
-- 风险与回滚：
-  - 若个别非导航模块类名包含“nav”被误伤，可通过更精确选择器限定或在局部覆写
-  - 该规则块为追加内容，可整体删除快速回退
-- 溯源：progress 2025-09-06｜UI-NAV-GLOBAL-RULES（已落地）
-
-## 分页参数防串扰（新增）
-
-- 原则：计数请求（page_size=1）与列表请求必须彻底解耦；列表请求的 page/page_size 由“当前分页状态”显式决定，任何历史参数与缓存不得覆盖。
-- 为什么：计数端为了性能采用 page_size=1，若污染到列表端会出现“总数正确、每页仅 1 条”的异常。
-- 实施模式（Pinia）：
-  1) applyFilters(filters) 在保存 currentFilterParams 前强制写入：`page=1`、`page_size=this.pageSize`（使用当前每页设置，禁止硬编码）。
-  2) fetchProperties(params) 合并 `currentFilterParams` 与本次 `paginationParams` 后，显式覆盖：
-     ```js
-     requestParams.page = paginationParams.page
-     requestParams.page_size = paginationParams.page_size
-     ```
-     以本次分页为最高优先级，防止历史值（含 1）污染。
-  3) setCurrentPage(page) 与 setPageSize(size) 调用 fetchProperties 时显式传 `{ page, page_size }`。
-- 反模式 ❌：在组件侧直接拼接部分参数调用列表接口，绕开 store 的统一构造与守卫。
-- 溯源：activeContext 2025-09-06｜FILTER-PAGINATION-GUARD｜commit 23f186f
-
-## Location 回显与空态规则（新增）
-
-- 原则：FilterPanel 顶部常驻“区域 Location”区，保证用户在筛选面板内始终能看到当前区域选择的上下文。
-- 行为：
-  - 有选区：以灰色 chips 回显，支持单项移除与“清空全部”。
-  - 无选区：显示友好空态（提示“未选择区域”与弱链接“去选择区域”），避免清空后整块消失造成心智断裂。
-  - include_nearby：勾选项常驻该区，写入/恢复 URL（include_nearby=1/0），作为透传参数（后端未识别时无副作用）。
-  - i18n 回退：`filter.location/clearAll/searchNearby` 等 key 缺失时使用中文回退，禁止直出 key。
-- 事件命名：统一采用 kebab-case `open-filter-panel`（必要时兼容 camelCase），避免 DOM 事件大小写差异带来的监听失败。
-- 溯源：activeContext 2025-09-06｜FILTER-PANEL-LOCATION-SECTION｜commit 23f186f
-
-## 搜索框内嵌标签（Inline Chips）规则（新增）
-
-- 目的：在首页搜索框“内部”低调回显所选区域，避免在搜索框“上方”使用品牌色条幅干扰版面。
-- 展示条件：未聚焦、未输入、未打开移动 Overlay 且存在选区。
-- 视觉与交互：
-  - 浅灰 chip（中性边框/文字），前 2 项 + “+N” 汇总；单行，右侧渐变遮罩避免硬切。
-  - `pointer-events: none`，只做占位与信息回显，不拦截输入与点击（交互仍由输入框接管）。
-- 数据真相源：仅回显 Pinia `selectedLocations`；实际请求以 applyFilters 确认并持久化到 `currentFilterParams` 为准。
-- 溯源：activeContext 2025-09-06｜SEARCHBAR-INLINE-CHIPS｜commit 23f186f
-
-## Netlify 部署与发布模式（新增）
-- 原则：Monorepo 子目录构建；生产为 SPA 应用需启用 200 重写。
-- 配置：
-  - netlify.toml:
-    - [build] base="vue-frontend"、command="npm run build"、publish="dist"
-    - [[redirects]] from="/*" to="/index.html" status=200（SPA 重写）
-  - Functions：未使用时保持为空，避免误判为函数项目。
-  - Node 版本：遵循 package.json engines（20.19.x 或 22.x），必要时在 Netlify 环境变量中声明 NODE_VERSION。
-- 触发策略：
-  - 生产分支 push 自动构建与发布；若未触发，优先检查 Repository 绑定/Branch to deploy/Auto publish/Lock/Ignore/GitHub App 权限；必要时以 Build Hook 兜底。
-- 溯源：activeContext 2025-09-06｜DEPLOY-NETLIFY-CONFIG｜commit f375181..b227da3
-
-## 构建红线：Vue SFC 单模板（新增）
-- 原则：单文件组件（SFC）仅允许一个 <template> 块。
-- 违例后果：Vite 在解析阶段报错，中断 Rollup，CI/CD 失败。
-- 检查建议：提交前本地执行 vite build 验证；若需附加模板片段，请合并到主模板或拆分为子组件。
-- 溯源：activeContext 2025-09-06｜BUILD-FIX-SFC｜commit f375181..b227da3
-
-## URL 状态同步（新增）
-
-- 原则：筛选应用后将状态写入 URL；进入页面时从 URL 恢复（刷新/直链可复现）。
-- 为什么：便于分享筛选结果与回溯问题；保证可观测与可复现。
-- 实施建议：
-  - 仅持久化“非空参数”，避免污染 URL；
-  - 写入前做“幂等比对”，避免无穷 replace 循环；
-  - 解析时对异常/空值做兜底（try/catch + 判空）。
-- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
-
-## 错误处理与降级策略（新增）
-
-- 原则：快速失败 + 就近 Toast 提示，禁止静默失败与本地估算。
-- 为什么：静默/伪数据会掩盖真实错误源，降低可观测性与用户信任。
-- 实施：
-  - 计数/列表失败时弹出 ElMessage；不将计数强行置 0；
-  - 去除本地估算逻辑，所有数据以后端真实值为准。
-- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
-
-## 地域筛选契约（新增）
-
-- 原则：suburbs 与 postcodes 分离为两类 CSV 参数，分别表达“区域名”与“邮编”。
-- 为什么：避免语义混淆；便于后端针对性索引与过滤。
-- 实施：
-  - URL 与筛选透传区分 suburb/suburbs 与 postcodes；
-  - V2 映射开启后输出 postcodes=CSV；未开启时可忽略不传，保持兼容。
-- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
-
-## 轻量 i18n 策略（新增）
-
-- 原则：默认 zh-CN，以轻量 $t 访问（可平滑切换至 vue-i18n）。
-- 为什么：在不引入新依赖前提下消除硬编码文案，便于未来多语言。
-- 实施：
-  - 提供 src/i18n/index.js 轻量插件，暴露 $t 与 inject('t')；
-  - 新增文案以命名空间组织（如 filter.*），组件使用 $t('ns.key')。
-- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
-
-## 性能观测（新增）
-
-- 原则：以简易埋点监控关键接口耗时阈值（如 p95 800ms）。
-- 为什么：在无后端 APM 的情况下，前端仍需具备“足够的现场证据”进行优化闭环。
-- 实施：
-  - 在 fetchProperties/applyFilters/getFilteredCount 处打印超过阈值的警告日志 [FILTER-PERF]；
-  - 若持续超阈，考虑后端提供轻量 count 端点或索引优化。
-- 溯源：activeContext 2025-09-05｜FILTER-EXPERIENCE-STACK
-
-## 页面级令牌与骨架（新增）
-
-- 页面级令牌（:root）：统一页面“前端表现”的节奏与防遮挡
-  - 尺寸与间距：`--header-height: 56px; --bottom-nav-height: 56px;`
-  - 左右留白：`--page-x-padding-mob: 16px; --page-x-padding-desktop: 32px;`
-  - 区块节奏：`--page-section-gap: 24px; --page-section-gap-lg: 32px;`
-  - 动效基线：`--motion-fast: 120ms; --motion-base: 180ms; --easing-standard: cubic-bezier(0.2, 0, 0, 1)`
-- 标准页面骨架类名（可选帮助类）
-  - `.page` 作为根容器；`.page__header / .page__toolbar / .page__content / .page__footer` 作为主区块
-  - 移动端根容器默认 `padding-bottom: var(--bottom-nav-height)`，避免底部导航遮挡列表尾项
-- 目的：新增页面无需重新摸索留白/间距/动效，复制样板即可统一“前端表现”
-- 溯源：commit 5164a36..fe8f012（引入 page-tokens.css 与 _PageScaffoldExample.vue）
-
-## 设计护栏（Stylelint）（补充）
-
-- 规则范围：对 `color / background / background-color / border / border-color / box-shadow / outline / outline-color / fill / stroke` 强制使用 `var(--*)`
-- 白名单：`transparent / currentColor / currentcolor / inherit / none`
-- 豁免：设计令牌定义入口（如 `src/styles/design-tokens.css`、`src/style.css`）可出现颜色常量与变量定义
-- 作用域：`vue-frontend/src/**/*.vue`；用于阻断新增页面/组件的硬编码色回归
-- 溯源：commit 5164a36..fe8f012（扩展 .stylelintrc.json）
-
-## 设计令牌合规长期规则（新增）
-
-- 非 CTA 交互中性化  
-  - 原则：hover/focus 默认使用中性灰弱底/边框（如 `var(--bg-hover)`, `var(--color-border-default)`），品牌色仅用于 CTA 按钮/文本链接/强调操作。  
-  - 关系：导航 hover 已在“导航交互统一”中规范，其他普通组件遵循相同约束；页面整体的焦点可见性仍保留中性可见焦点。
-- 容器/分隔/弱底令牌化  
-  - 容器背景：`var(--color-bg-card)`；页面背景：`var(--color-bg-page)`  
-  - 分隔线/边框：`var(--color-border-default)`；强分隔：`var(--color-border-strong)`  
-  - 弱底/占位：`var(--bg-hover)`, `var(--surface-2/4)`（按需选择）  
-  - 文案色：`var(--color-text-primary/secondary)`, `var(--text-muted)`  
-  - 示例（局部作用域，少量 !important 仅作兜底）：  
-    ```css
-    /* 中文注释：使用设计令牌统一容器/分隔/弱底 */
-    .card { background: var(--color-bg-card); border: 1px solid var(--color-border-default); }
-    .divider { background: var(--color-border-default); height: 1px; }
-    .muted { color: var(--color-text-secondary); }
-    .hoverable:hover { background: var(--bg-hover); }
-    ```
-- 提交前 Stylelint 条件执行  
-  - Git 钩子：`scripts/git-hooks/pre-commit` 中若检测到 `vue-frontend/node_modules/.bin/stylelint` 存在，则执行 `cd vue-frontend && npm run -s lint:style`，否则跳过以避免阻断本地未安装环境。  
-  - 规则：`.stylelintrc.json` 禁止 hex/rgb/hsl(a)/命名色，启用 `plugin/declaration-use-variable` 强制 `var(--*)`；`design-tokens.css` 与 `style.css` 作为定义入口豁免。  
-  - 回滚：移除或跳过该钩子即可，不影响生产构建流程。
-- 回滚与例外处理  
-  - 单点问题按“最小 diff”快速回退；临时 fallback（如 `var(--token, #xxx)`）仅作短期兜底，应在下一轮清理。  
-  - 深/浅主题或特殊底色对比问题，先以组件局部覆盖验证，再沉淀到 `:root` 令牌，避免全局抖动。
-- 溯源：progress 2025-09-10｜DESIGN-TOKENS-COMPLIANCE-SPRINT & GUARDRAIL-STYLELINT+HOOK（commit 9984dff..0b6e146）
-
-## 变量兜底禁用规则（新增）
-
-- 原则：运行代码（.vue/.css 等）中禁止使用 `var(--token, #hex)` 或 `var(--token, rgb/rgba/命名色)` 形式的兜底；仅限“令牌定义入口文件”（如 src/styles/design-tokens.css 与 src/style.css）可出现颜色常量。
-- 目的：杜绝主题/深浅底或品牌主题切换下出现“与設計令牌不一致”的硬编码色，确保全站风格一致、可回滚。
-- 适用范围：组件样式、页面样式、局部覆盖块、:deep 覆盖、内联 style。
-- 允许例外（受控）：极端紧急场景可临时引入兜底，但必须在下一轮清理；PR 描述需注明“临时兜底原因与清理计划”。
-- 代码示例
-  - 禁止：
-    ```css
-    .chip { background: var(--chip-bg, #f7f8fa); }
-    .btn:hover { background: var(--bg-hover, #f5f5f5); }
-    .pill.selected { background: var(--juwo-primary, #ff5824); }
-    ```
-  - 推荐：
-    ```css
-    .chip { background: var(--chip-bg); }
-    .btn:hover { background: var(--bg-hover); }
-    .pill.selected { background: var(--juwo-primary); }
-    ```
-- PR 审查要点：
-  - 若发现 `var(--*, #xxx)`/`var(--*, rgb/rgba/命名色)`，一律要求改为“纯令牌”；如对应 token 尚未存在，应先在根 tokens 定义入口补齐后再使用。
-- 溯源：progress 2025-09-10｜FILTER-PANELS-HOVER-NEUTRAL & ENTRY-CHIPS-TOKENIZED（commit 0b6e146..806d3a3）
-
-## 信息架构与导航策略（新增 2025-09-12）
-
-- 收藏与我的的边界
-  - 原则：收藏（/favorites）是“收藏管理”的唯一真源；“我的”（/profile）只承载“收藏概览 + 入口”，不复制完整管理能力（排序/批量/对比/备注/标签）。
-  - 前端表现：在“我的”页仅展示最近 3 条收藏与“查看全部收藏”按钮，点击进入 /favorites。避免两处页面功能重叠。
-- 导航策略
-  - 默认采用方案 A：主导航仅保“搜索/收藏”，右侧为“AI 助手/我的”。业务工具页（如 地图/对比/通勤）不进入顶栏，由业务场景页提供入口。
-  - 地图入口（如需）在首页/列表页“操作区”提供按钮，而非顶栏。
-- 路由命名一致性
-  - 组件文件名与路由引用保持一致（如 ChatView.vue → import('../views/ChatView.vue')）。
-  - 移除未使用的路由配置与冗余视图，确保热更新与构建稳定。
-- 回滚与兼容
-  - 导航策略可通过修改 Navigation.vue 中数据数组快速回滚；“我的”页移除概览模块即可回退到纯设置页。
-- 溯源：47cab8b..125e590（NAV-CLEANUP-A / ROUTER-CHAT-FIX / HOME-MAP-ENTRY-REMOVED / DOCS-VISUAL-STANDARD-V1）
