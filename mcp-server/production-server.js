@@ -107,31 +107,10 @@ app.post('/api/properties/search', async (req, res) => {
 
     const walkOptions = response.data?.data?.get_university_commute_profile?.directWalkOptions;
     const items = walkOptions?.items || [];
-    let properties = items;
-
-    // 可选回滚：默认关闭 Node 二次筛选；如需临时回退，设置 ENABLE_NODE_POST_FILTER=true
-    if (process.env.ENABLE_NODE_POST_FILTER === 'true') {
-      if (bedrooms !== undefined) {
-        properties = properties.filter(item => item.property.bedrooms === bedrooms);
-      }
-      if (max_rent_pw !== undefined) {
-        properties = properties.filter(item => item.property.rent_pw <= max_rent_pw);
-      }
-      if (min_rent_pw !== undefined) {
-        properties = properties.filter(item => item.property.rent_pw >= min_rent_pw);
-      }
-      if (max_commute_minutes !== undefined) {
-        properties = properties.filter(item => 
-          item.walkTimeToUniversityMinutes <= max_commute_minutes
-        );
-      }
-    }
+    const properties = items; // 信任后端口径：不在 Node 层做二次筛选
 
     // 计算统计信息
-    let totalFound = walkOptions?.totalCount ?? properties.length;
-    if (process.env.ENABLE_NODE_POST_FILTER === 'true') {
-      totalFound = properties.length;
-    }
+    const totalFound = walkOptions?.totalCount ?? properties.length;
     const rents = properties.map(p => p.property.rent_pw).filter(r => r > 0);
     const avgRent = rents.length > 0 ? Math.round(rents.reduce((a, b) => a + b, 0) / rents.length) : 0;
     const walkTimes = properties.map(p => p.walkTimeToUniversityMinutes).filter(t => t !== undefined);
