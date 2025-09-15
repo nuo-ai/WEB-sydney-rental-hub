@@ -67,14 +67,12 @@
         </div>
       </section>
 
-      <!-- 5. 第三个区块：我的筛选 (占位) -->
+      <!-- 5. 第三个区块：我的筛选 -->
       <section class="page-section">
         <div class="section-header">
-          <h2 class="typo-h2">我的筛选</h2>
+          <h2 class="typo-h2">我的筛选（共 {{ savedSearchesCount }}）</h2>
         </div>
-        <div class="placeholder-state">
-          <p class="typo-body text-secondary">此功能即将推出，敬请期待。</p>
-        </div>
+        <SavedSearchesManager />
       </section>
 
     </main>
@@ -91,6 +89,8 @@ import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
 import BaseButton from '@/components/base/BaseButton.vue' // 确保路径正确
 import BaseIconButton from '@/components/base/BaseIconButton.vue'
+import SavedSearchesManager from '@/components/SavedSearchesManager.vue'
+import { useFilterWizard } from '@/composables/useFilterWizard'
 
 defineOptions({ name: 'ProfileView' })
 
@@ -98,6 +98,7 @@ const pageTitle = ref('我的中心')
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { getSavedSearches } = useFilterWizard()
 
 // 返回上一页（无历史则回首页）
 const goBack = () => {
@@ -124,10 +125,20 @@ const favoriteProperties = computed(() => propertiesStore.favoriteProperties || 
 const historyProperties = computed(() => propertiesStore.historyProperties || [])
 
 // 中文注释：概览页只回显总数（避免越权到管理页）
-// 为什么：Profile 仅承担“收藏概览 + 入口”，完整管理在 /favorites。
-// 前端表现：标题显示“（共 N）/（共 M）”，下方仅渲染最近 3 条。
+// 为什么：Profile 仅承担"收藏概览 + 入口"，完整管理在 /favorites。
+// 前端表现：标题显示"（共 N）/（共 M）"，下方仅渲染最近 3 条。
 const favoritesCount = computed(() => favoriteProperties.value.length)
 const historyCount = computed(() => historyProperties.value.length)
+
+// 已保存搜索计数
+const savedSearchesCount = computed(() => {
+  try {
+    return getSavedSearches().length
+  } catch (error) {
+    console.error('获取已保存搜索计数失败:', error)
+    return 0
+  }
+})
 
 // 7. 实现业务逻辑：只取最近的3条记录
 const recentFavorites = computed(() => favoriteProperties.value.slice(0, 3))
