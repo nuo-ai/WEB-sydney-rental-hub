@@ -562,10 +562,10 @@ onUnmounted(() => {
   gap: 6px;
   padding: 10px 16px;
   background: var(--chip-bg);
-  border: none;
+  border: 1px solid transparent; /* 透明边框避免选中态出现1px抖动 */
   border-radius: 0;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-secondary);
   cursor: pointer;
   transition:
@@ -582,8 +582,18 @@ onUnmounted(() => {
 
 /* 激活状态样式 */
 .filter-tab.active {
-  background: var(--chip-bg-selected); /* 中文注释：激活态统一为中性 chips 选中底色 */
+  background: var(--brand-selected-bg);
+  color: var(--juwo-primary);
+  font-weight: var(--font-weight-bold);
+  border: 1px solid var(--juwo-primary);
+}
+
+/* 选中态的悬停：与未选中 hover 完全一致（灰底 + 主文案色 + 透明边框） */
+.filter-tab.active:hover,
+.filter-tab.applied:hover {
+  background: var(--chip-bg-hover);
   color: var(--color-text-primary);
+  border-color: transparent;
 }
 
 /* 箭头图标 */
@@ -628,8 +638,10 @@ onUnmounted(() => {
 
 /* 已应用高亮（严格使用 design token，与 active 保持一致风格） */
 .filter-tab.applied {
-  background: var(--chip-bg-selected);
-  color: var(--color-text-primary);
+  background: var(--brand-selected-bg);
+  color: var(--juwo-primary);
+  font-weight: var(--font-weight-bold);
+  border: 1px solid var(--juwo-primary);
 }
 
 /* 移除小蓝点样式 */

@@ -48,12 +48,11 @@
 </template>
 
 <script setup>
-import { ref, inject, computed, watch, onMounted } from 'vue'
+import { ref, inject, computed } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import BaseButton from '@/components/base/BaseButton.vue'
-import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：价格筛选专用面板，拆分自原 FilterPanel
 
@@ -95,26 +94,11 @@ const STEP = 25
 const minDisplay = computed(() => `$${Number(localPriceRange.value[0]).toLocaleString()}`)
 const maxDisplay = computed(() => `$${Number(localPriceRange.value[1]).toLocaleString()}`)
 
-/* 实时计数：应用（N） - 使用通用 composable 统一管理（防抖 + 并发守卫 + 卸载清理） */
-const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
-  'price',
-  () => buildFilterParams(),
-  { debounceMs: 300 },
-)
-const applyText = computed(() =>
-  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
-)
+/* PC：关闭面板级计数，按钮文案固定 */
+const applyText = computed(() => '应用')
 
 
-/* 监听滑轨，防抖触发计数（统一经由 composable） */
-watch(localPriceRange, () => {
-  scheduleCompute()
-})
 
-onMounted(() => {
-  // 初次打开计算一次预估数
-  void computeNow()
-})
 
 // 价格范围文本显示
 const priceRangeText = computed(() => {
@@ -134,8 +118,6 @@ const handlePriceChange = () => {
 
 const clearAll = () => {
   localPriceRange.value = [MIN_PRICE, MAX_PRICE]
-  // 交由 composable 清理/标记与触发（空草稿会自动从 base 中剔除旧键）
-  scheduleCompute()
 }
 
 // 构建筛选参数
