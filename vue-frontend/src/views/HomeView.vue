@@ -31,7 +31,11 @@
               @openFilterPanel="handleOpenFilterPanel"
             />
             <!-- 桌面端使用分离式筛选面板，完全在 FilterTabs 组件内部处理 -->
-            <FilterTabs class="filter-tabs-right" @requestOpenFullPanel="handleOpenFilterPanel" />
+            <FilterTabs
+              class="filter-tabs-right"
+              @requestOpenFullPanel="handleOpenFilterPanel"
+              @searchSaved="handleSearchSaved"
+            />
           </div>
 
           <!-- 结果统计移至搜索容器下方的新容器中；此处移除以避免双处回显 -->
@@ -314,6 +318,24 @@ const handleOpenFilterPanel = () => {
 
 const handleFiltersChanged = () => {
   // 筛选逻辑已在FilterPanel组件中处理
+}
+
+// 处理保存搜索成功事件
+const handleSearchSaved = (savedSearch) => {
+  try {
+    // 显示成功提示
+    ElMessage.success(`搜索"${savedSearch.name}"已保存成功！`)
+
+    // 可以在这里添加其他逻辑，比如：
+    // - 更新用户界面状态
+    // - 发送分析事件
+    // - 刷新已保存搜索列表等
+
+    console.log('搜索保存成功:', savedSearch)
+  } catch (error) {
+    console.error('处理保存搜索事件失败:', error)
+    ElMessage.error('保存搜索时出现问题，请重试')
+  }
 }
 
 const handlePageChange = async (page) => {

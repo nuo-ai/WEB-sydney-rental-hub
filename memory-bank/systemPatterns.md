@@ -21,6 +21,25 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 
 ---
 
+## 保存搜索功能模式
+
+### 事件驱动架构
+- **模式**: 组件间事件发射链路 `SaveSearchModal` → `FilterTabs` → `HomeView`
+- **实现**: Vue `emit()` 系统，确保事件正确传递和处理
+- **用户反馈**: 保存成功后立即显示 `ElMessage.success()` 提示
+
+### 智能命名策略
+- **算法**: 基于筛选条件自动生成有意义的搜索名称
+- **格式**: "区域名称 + 房型 + 价格范围 + 特殊条件"
+- **示例**: "Ashfield 等 3 个区域 2房 $400-800" 或 "Burwood 有家具房源"
+
+### 本地存储管理
+- **存储**: localStorage 作为第一阶段实现
+- **结构**: JSON 数组，包含 id/name/conditions/locations/createdAt 等字段
+- **扩展性**: 为后续云端同步预留接口设计
+
+---
+
 ## 筛选系统核心模式
 
 ### URL 幂等与状态同步

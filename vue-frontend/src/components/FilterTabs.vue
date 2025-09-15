@@ -276,6 +276,34 @@
           <MoreFilterPanel @close="activePanel = null" />
         </FilterDropdown>
       </div>
+
+      <!-- 保存搜索按钮 -->
+      <div class="save-search-section">
+        <button
+          class="save-search-btn"
+          :class="{ disabled: !hasActiveFilters }"
+          :disabled="!hasActiveFilters"
+          @click="handleSaveSearch"
+        >
+          <svg
+            class="save-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>保存搜索</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -299,7 +327,40 @@
       </svg>
       <span>筛选</span>
     </button>
+
+    <!-- 移动端保存搜索按钮 -->
+    <button
+      class="save-search-btn-mobile"
+      :class="{ disabled: !hasActiveFilters }"
+      :disabled="!hasActiveFilters"
+      @click="handleSaveSearch"
+    >
+      <svg
+        class="save-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span>保存</span>
+    </button>
   </div>
+
+  <!-- 保存搜索弹窗 -->
+  <SaveSearchModal
+    v-model="showSaveModal"
+    :filter-conditions="currentFilterConditions"
+    @saved="handleSearchSaved"
+  />
 </template>
 
 <script setup>
@@ -310,6 +371,7 @@ import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
 import PriceFilterPanel from './filter-panels/PriceFilterPanel.vue'
 import AvailabilityFilterPanel from './filter-panels/AvailabilityFilterPanel.vue'
 import MoreFilterPanel from './filter-panels/MoreFilterPanel.vue'
+import SaveSearchModal from './SaveSearchModal.vue'
 import { usePropertiesStore } from '@/stores/properties'
 
 // 中文注释：PC端改为分离式下拉面板，移动端保持统一大面板
@@ -317,7 +379,7 @@ import { usePropertiesStore } from '@/stores/properties'
 
 // 定义事件（在模板中通过 $emit 使用）
 // eslint-disable-next-line no-unused-vars
-const emit = defineEmits(['requestOpenFullPanel'])
+const emit = defineEmits(['requestOpenFullPanel', 'searchSaved'])
 
 // 响应式状态
 const activePanel = ref(null) // 'area', 'bedrooms', 'price', 'availability', 'more' 或 null
@@ -498,6 +560,88 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
+
+// 保存搜索相关状态
+const showSaveModal = ref(false)
+
+// 检查是否有活跃的筛选条件
+const hasActiveFilters = computed(() => {
+  return areaApplied.value ||
+         bedroomsApplied.value ||
+         priceApplied.value ||
+         availabilityApplied.value ||
+         moreApplied.value
+})
+
+// 构建当前筛选条件对象
+const currentFilterConditions = computed(() => {
+  const conditions = {}
+
+  // 从 appliedParams 获取当前筛选条件
+  const params = appliedParams.value || {}
+
+  // 房型
+  if (params.bedrooms) {
+    conditions.bedrooms = params.bedrooms
+  }
+
+  // 价格范围
+  const minPrice = params.minPrice ?? params.price_min
+  const maxPrice = params.maxPrice ?? params.price_max
+  if (minPrice != null || maxPrice != null) {
+    conditions.priceRange = [
+      minPrice != null ? Number(minPrice) : 0,
+      maxPrice != null ? Number(maxPrice) : 5000
+    ]
+  }
+
+  // 浴室
+  if (params.bathrooms) {
+    conditions.bathrooms = params.bathrooms
+  }
+
+  // 车位
+  if (params.parking) {
+    conditions.parking = params.parking
+  }
+
+  // 家具
+  if (params.isFurnished === true || params.furnished === true) {
+    conditions.furnished = true
+  }
+
+  // 日期
+  if (params.date_from) {
+    conditions.dateFrom = new Date(params.date_from)
+  }
+  if (params.date_to) {
+    conditions.dateTo = new Date(params.date_to)
+  }
+
+  return conditions
+})
+
+// 处理保存搜索按钮点击
+const handleSaveSearch = () => {
+  if (!hasActiveFilters.value) return
+  showSaveModal.value = true
+}
+
+// 处理搜索保存成功
+const handleSearchSaved = async (savedSearch) => {
+  try {
+    // 保存成功后，应用筛选并刷新页面
+    await propertiesStore.applyFilters(appliedParams.value)
+
+    // 向父组件发射事件
+    emit('searchSaved', savedSearch)
+
+    console.log('搜索已保存并应用！', savedSearch)
+
+  } catch (error) {
+    console.error('应用筛选失败:', error)
+  }
+}
 </script>
 
 <style scoped>
@@ -634,11 +778,123 @@ onUnmounted(() => {
 
 /* 移除小蓝点样式 */
 
+/* 保存搜索按钮样式 */
+.save-search-section {
+  margin-left: 16px;
+}
+
+.save-search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 16px;
+  gap: 8px;
+  border: none;
+  border-radius: 8px;
+  background: var(--juwo-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.save-search-btn:hover:not(:disabled) {
+  background: var(--juwo-primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.save-search-btn:disabled,
+.save-search-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
+.save-search-btn:disabled:hover,
+.save-search-btn.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.save-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* 移动端保存搜索按钮 */
+.filter-tabs-mobile {
+  gap: 8px;
+}
+
+.save-search-btn-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 12px;
+  gap: 6px;
+  border: 1px solid var(--juwo-primary);
+  border-radius: var(--filter-radius-lg);
+  background: var(--juwo-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.save-search-btn-mobile:hover:not(:disabled) {
+  background: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
+}
+
+.save-search-btn-mobile:disabled,
+.save-search-btn-mobile.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-border-default);
+  border-color: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
 /* 更多筛选面板占位 */
 .more-filter-placeholder {
   width: 280px;
   padding: 20px;
   text-align: center;
   color: var(--color-text-secondary);
+}
+
+/* PC端保存搜索按钮在筛选按钮右侧的布局调整 */
+@media (width >= 769px) {
+  .filter-tabs {
+    align-items: center;
+  }
+
+  .save-search-section {
+    margin-left: auto;
+    padding-left: 16px;
+  }
+}
+
+/* 移动端布局调整 */
+@media (width <= 768px) {
+  .filter-tabs-mobile {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .save-search-btn-mobile {
+    flex-shrink: 0;
+  }
 }
 </style>

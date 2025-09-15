@@ -294,6 +294,140 @@ export function useFilterWizard() {
     updatePreviewCount()
   }, { deep: true })
 
+  // 保存搜索功能
+  const saveSearch = async (searchName, emailFrequency = 'daily') => {
+    try {
+      const savedSearch = {
+        id: Date.now().toString(),
+        name: searchName.trim(),
+        emailFrequency,
+        conditions: {
+          areas: filterState.value.areas,
+          bedrooms: filterState.value.bedrooms,
+          priceRange: filterState.value.priceRange,
+          bathrooms: filterState.value.bathrooms,
+          parking: filterState.value.parking,
+          furnished: filterState.value.furnished,
+          dateFrom: filterState.value.dateFrom,
+          dateTo: filterState.value.dateTo
+        },
+        filterParams: buildFilterParams(),
+        createdAt: new Date().toISOString(),
+        lastNotified: null
+      }
+
+      // 保存到本地存储
+      const existingSaves = JSON.parse(localStorage.getItem('savedSearches') || '[]')
+      existingSaves.push(savedSearch)
+      localStorage.setItem('savedSearches', JSON.stringify(existingSaves))
+
+      return savedSearch
+    } catch (error) {
+      console.error('保存搜索失败:', error)
+      throw error
+    }
+  }
+
+  // 获取已保存的搜索
+  const getSavedSearches = () => {
+    try {
+      return JSON.parse(localStorage.getItem('savedSearches') || '[]')
+    } catch (error) {
+      console.error('获取已保存搜索失败:', error)
+      return []
+    }
+  }
+
+  // 删除已保存的搜索
+  const deleteSavedSearch = (searchId) => {
+    try {
+      const existingSaves = getSavedSearches()
+      const filtered = existingSaves.filter(search => search.id !== searchId)
+      localStorage.setItem('savedSearches', JSON.stringify(filtered))
+      return true
+    } catch (error) {
+      console.error('删除已保存搜索失败:', error)
+      return false
+    }
+  }
+
+  // 应用已保存的搜索
+  const applySavedSearch = async (savedSearch) => {
+    try {
+      // 恢复筛选状态
+      if (savedSearch.conditions) {
+        filterState.value = { ...savedSearch.conditions }
+      }
+
+      // 设置选中区域到store
+      if (savedSearch.conditions.areas) {
+        propertiesStore.setSelectedLocations(savedSearch.conditions.areas)
+      }
+
+      // 应用筛选
+      const params = savedSearch.filterParams || buildFilterParams()
+      await propertiesStore.applyFilters(params)
+
+      // 更新URL
+      const query = { ...params }
+      Object.keys(query).forEach(key => {
+        if (query[key] === null || query[key] === undefined || query[key] === '') {
+          delete query[key]
+        }
+      })
+
+      await router.replace({ query })
+
+      return true
+    } catch (error) {
+      console.error('应用已保存搜索失败:', error)
+      return false
+    }
+  }
+
+  // 生成搜索名称建议
+  const generateSearchNameSuggestion = () => {
+    const { areas, bedrooms, priceRange, furnished } = filterState.value
+
+    let name = ''
+
+    // 区域部分
+    if (areas.length > 0) {
+      const areaNames = areas.map(area => area.name || area.suburb).filter(Boolean)
+      if (areaNames.length === 1) {
+        name += areaNames[0]
+      } else if (areaNames.length > 1) {
+        name += `${areaNames[0]} 等 ${areaNames.length} 个区域`
+      }
+    }
+
+    // 房型部分
+    if (bedrooms) {
+      const bedroomText = bedrooms === '0' ? 'Studio'
+        : bedrooms === '4+' ? '4房及以上'
+        : `${bedrooms}房`
+      name += name ? ` ${bedroomText}` : bedroomText
+    }
+
+    // 价格部分
+    if (priceRange && Array.isArray(priceRange)) {
+      const [min, max] = priceRange
+      if (min > 0 || max < 5000) {
+        const priceText = min > 0 && max < 5000
+          ? `$${min}-${max}`
+          : min > 0 ? `≥$${min}` : `≤$${max}`
+        name += name ? ` ${priceText}` : priceText
+      }
+    }
+
+    // 家具要求
+    if (furnished) {
+      name += name ? ' 有家具' : '有家具房源'
+    }
+
+    return name || '我的搜索'
+  }
+
   // 初始化时从URL恢复
   if (route.query && Object.keys(route.query).length > 0) {
     restoreFromQuery(route.query)
@@ -322,6 +456,13 @@ export function useFilterWizard() {
     resetFilters,
     restoreFromQuery,
     generateResultDescription,
-    buildFilterParams
+    buildFilterParams,
+
+    // 保存搜索功能
+    saveSearch,
+    getSavedSearches,
+    deleteSavedSearch,
+    applySavedSearch,
+    generateSearchNameSuggestion
   }
 }
