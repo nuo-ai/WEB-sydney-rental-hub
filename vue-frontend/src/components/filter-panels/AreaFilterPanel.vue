@@ -53,7 +53,6 @@
       <AreasSelector
         :selected="selectedLocations"
         @update:selected="onUpdateSelectedAreas"
-        @requestCount="debouncedRequestCount"
       />
 
       <!-- 包含周边选项（特性开关控制） -->
@@ -82,13 +81,12 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import AreasSelector from '@/components/AreasSelector.vue'
 import BaseChip from '@/components/base/BaseChip.vue'
-import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
  // 中文注释：区域筛选专用面板，拆分自原 FilterPanel
 // 中文注释：特性开关——控制“包含周边区域”UI 与透传是否启用（隐藏但保留代码，便于以后启用）
@@ -111,20 +109,9 @@ const localIncludeNearby = ref(propertiesStore.includeNearby ?? true) // 包含�
 // 计算属性
 const selectedLocations = computed(() => propertiesStore.draftSelectedLocations || [])
 
-/* 预览计数（应用（N））- 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
-const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
-  'area',
-  () => buildFilterParams(),
-  { debounceMs: 300 },
-)
-const applyText = computed(() =>
-  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
-)
+/* PC：关闭面板级计数，按钮文案固定 */
+const applyText = computed(() => '应用')
 
-/* 兼容占位：统一通过 composable 计算 */
-const computePreviewCount = async () => {
-  await computeNow()
-}
 
 // 中文注释：显示层去重（相同 suburb 只显示一个 chip；postcode 原样保留）并统一仅显示 suburb 名称
 const displaySelectedLocations = computed(() => {
@@ -173,7 +160,6 @@ const removeLocation = (id) => {
     tempLocations.splice(index, 1)
     propertiesStore.setDraftSelectedLocations(tempLocations)
     try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
-    nextTick(() => computePreviewCount())
   }
 }
 
@@ -181,33 +167,20 @@ const removeLocation = (id) => {
 const clearAllLocations = () => {
   propertiesStore.setDraftSelectedLocations([])
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
-  nextTick(() => computePreviewCount())
 }
 
 // 包含周边区域变更
 const handleIncludeNearbyChange = () => {
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
-  nextTick(() => debouncedRequestCount())
 }
 
 // 更新区域列表
 const onUpdateSelectedAreas = (newList) => {
   propertiesStore.setDraftSelectedLocations(Array.isArray(newList) ? newList : [])
   try { propertiesStore.markPreviewSection('area') } catch (e) { void e /* ignore non-critical */ }
-  nextTick(() => computePreviewCount())
 }
 
-// 延迟请求筛选计数
-const debouncedRequestCount = (() => {
-  let tid = null
-  return () => {
-    if (tid) clearTimeout(tid)
-    tid = setTimeout(() => {
-      scheduleCompute()
-      tid = null
-    }, 200)
-  }
-})()
+/* PC：关闭预估计数，不再需要延迟请求计数 */
 
 // 首次打开时初始化草稿并计算一次
 onMounted(() => {
@@ -216,7 +189,7 @@ onMounted(() => {
   } catch {
     /* 忽略非关键错误 */
   }
-  void computeNow()
+  /* PC：关闭预估计数，不在挂载时计算 */
 })
 
 // 组件卸载时清理“区域”分组草稿，避免小蓝点残留

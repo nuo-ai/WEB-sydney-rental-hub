@@ -88,22 +88,17 @@
         >
           {{ applyText }}
         </el-button>
-        <!-- a11y：数量变化通过 aria-live 播报 -->
-        <span class="sr-only" aria-live="polite">
-          {{ previewCount !== null ? '可用结果 ' + previewCount + ' 条' : '' }}
-        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, inject, computed, watch, onMounted } from 'vue'
+import { ref, inject, computed } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import BaseButton from '@/components/base/BaseButton.vue'
-import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：卧室筛选专用面板，拆分自原 FilterPanel
 
@@ -197,36 +192,22 @@ const localBedrooms = ref([...initialBedrooms.value])
 const localBathrooms = ref([...initialBathrooms.value])
 const localParking = ref([...initialParking.value])
 
-/* 结果数量预估（用于“应用（N）”）- 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
-const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
-  'bedrooms',
-  () => buildFilterParamsBedroomsOnly(),
-  { debounceMs: 300 },
-)
-const applyText = computed(() =>
-  typeof previewCount.value === 'number' ? `${applyLabel.value}（${previewCount.value}）` : applyLabel.value,
-)
+/* PC：关闭面板级计数，按钮文案固定 */
+const applyText = computed(() => applyLabel.value)
 
 // 清空选择（不限）
 const clearAll = () => {
-  // 中文注释：清空“卧室”面板所管理的全部键（卧室/浴室/车位），符合“清空仅影响当前分组”
+  // 中文注释：清空“卧室/浴室/车位”，不触发预估计数
   localBedrooms.value = []
   localBathrooms.value = []
   localParking.value = []
-  propertiesStore.clearPreviewDraft('bedrooms')
-  propertiesStore.markPreviewSection('bedrooms')
-  scheduleCompute()
+  // 可选：清理旧草稿，避免残留状态
+  if (propertiesStore?.clearPreviewDraft) {
+    propertiesStore.clearPreviewDraft('bedrooms')
+  }
 }
 
-// 触发计数（统一经由 composable）
-watch(localBedrooms, () => scheduleCompute())
-watch(localBathrooms, () => scheduleCompute())
-watch(localParking, () => scheduleCompute())
 
-// 初次打开时计算一次
-onMounted(() => {
-  void computeNow()
-})
 
 // 判断卧室选项是否被选中
 const isBedroomSelected = (value) => {

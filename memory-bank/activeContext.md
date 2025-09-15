@@ -103,7 +103,7 @@
   - 已有后端“筛选=计数”单一真源与 Node 透传，无需改接口，仅变更触发时机
 
 - 原子任务清单（逐步执行）
-  - [ ] A1 禁用 PC 面板级计数（useFilterPreviewCount）
+  - [x] A1 禁用 PC 面板级计数（useFilterPreviewCount）
   - [ ] A2 清理 PC 预估计数相关逻辑（定时器/并发/防抖）
   - [ ] B1 store 引入 draft/applied 与 applyDraft()/resetDraft()
   - [ ] B2 AreaFilterPanel 绑定 draftFilters（样例）

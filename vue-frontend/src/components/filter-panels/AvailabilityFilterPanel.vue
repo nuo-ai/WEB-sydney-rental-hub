@@ -50,11 +50,10 @@
 </template>
 
 <script setup>
-import { ref, inject, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, inject, computed, nextTick } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
-import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 import BaseButton from '@/components/base/BaseButton.vue'
 
 // 中文注释：空出时间筛选专用面板，拆分自原 FilterPanel
@@ -135,15 +134,8 @@ const localRange = ref(
 const localStartDate = computed(() => (localRange.value?.[0] ? localRange.value[0] : null))
 const localEndDate = computed(() => (localRange.value?.[1] ? localRange.value[1] : null))
 
-/* 实时计数：应用（N） - 使用通用 composable（并发守卫 + 防抖 + 卸载清理） */
-const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
-  'availability',
-  () => buildFilterParams(),
-  { debounceMs: 300 },
-)
-const applyText = computed(() =>
-  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
-)
+/* PC：关闭面板级计数，按钮文案固定 */
+const applyText = computed(() => '应用')
 
 // 检查日期范围是否有效
 const isDateRangeValid = computed(() => {
@@ -169,9 +161,8 @@ const handleRangeChange = (range) => {
 }
 
 const clearAll = () => {
-  // 中文注释：清空本地日期范围；交由预览计数统一流程处理（仅写非空键保持不变）
+  // 中文注释：清空本地日期范围；PC 关闭面板级计数，不触发预估
   localRange.value = null
-  scheduleCompute()
 }
 
 /* daterange 模式不再需要独立结束日期处理函数 */
@@ -214,17 +205,6 @@ const buildFilterParams = () => {
 }
 
 
-/* 监听日期变化：仅在日期合法时触发计算；挂载后也计算一次 */
-watch(localRange, () => {
-  if (isDateRangeValid.value) {
-    scheduleCompute()
-  }
-})
-onMounted(() => {
-  if (isDateRangeValid.value) {
-    void computeNow()
-  }
-})
 
 /* 面板打开时对日历单元格做轻量级标注：今天之前/之后
    说明（中文注释，解释“为什么”）：

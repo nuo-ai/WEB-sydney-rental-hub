@@ -47,19 +47,17 @@
         >
           {{ applyText }}
         </el-button>
-        <span class="sr-only" aria-live="polite">{{ srLiveText }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject, onMounted, watch } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import { usePropertiesStore } from '@/stores/properties'
 import BaseButton from '@/components/base/BaseButton.vue'
-import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：更多（高级）筛选面板。仅在“应用”时提交到 store；与其它分离式面板一致。
 
@@ -70,18 +68,8 @@ const t = inject('t') || ((k) => k)
 /* 本地状态（默认值：未勾选）仅保留“带家具” */
 const furnished = ref(false)
 
-/* 计数相关（应用（N）） - 使用通用 composable 统一并发/防抖/清理 */
-const { previewCount, scheduleCompute, computeNow } = useFilterPreviewCount(
-  'more',
-  () => buildFilterParams(),
-  { debounceMs: 300 },
-)
-const applyText = computed(() =>
-  typeof previewCount.value === 'number' ? `应用（${previewCount.value}）` : '应用',
-)
-const srLiveText = computed(() =>
-  typeof previewCount.value === 'number' ? `可用结果 ${previewCount.value} 条` : '',
-)
+/* PC：关闭面板级计数，按钮文案固定 */
+const applyText = computed(() => '应用')
 
 /* 构建参数（仅 isFurnished） */
 const buildFilterParams = () => {
@@ -92,20 +80,14 @@ const buildFilterParams = () => {
 }
 
 /* 监听与首算（通过 composable 防抖） */
-watch(furnished, () => {
-  scheduleCompute()
-})
-onMounted(() => {
-  void computeNow()
-})
 
 /* 清除：重置并触发计数 */
 const clearAll = () => {
   furnished.value = false
-  // 中文注释：清理并标记该分组参与预览（即便草稿为空也删除 base 中旧键）
-  propertiesStore.clearPreviewDraft('more')
-  propertiesStore.markPreviewSection('more')
-  scheduleCompute()
+  // 中文注释：清理旧草稿；PC 关闭面板级计数，不触发预估
+  if (propertiesStore?.clearPreviewDraft) {
+    propertiesStore.clearPreviewDraft('more')
+  }
 }
 
 // i18n 文案（带回退）
