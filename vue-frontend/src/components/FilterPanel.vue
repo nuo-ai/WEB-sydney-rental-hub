@@ -193,9 +193,14 @@
           size="default"
           @click="applyFilters"
           :disabled="!isDateRangeValid"
-          :aria-label="`确定（${filteredCount} 条结果）`"
+          :aria-label="applyButtonAriaLabel"
         >
-          确定（{{ filteredCount }} 条结果）
+          <template v-if="filteredCountDisplay !== null">
+            确定（{{ filteredCountDisplay }} 条结果）
+          </template>
+          <template v-else>
+            确定
+          </template>
         </el-button>
       </div>
     </div>
@@ -338,6 +343,7 @@ const onUpdateSelectedAreas = (newList) => {
 const localFilteredCount = ref(0)
 const _countReqSeq = ref(0) // 中文注释：计数请求序号；防并发乱序响应覆盖新结果（前端表现：防止计数“跳回老数”）
 const _counting = ref(false) // 中文注释：计数中标记（可用于淡化/骨架态；当前未使用）
+const countUnavailable = ref(false) // 中文注释：计数失败/不可用标记，驱动按钮退回“确定”
 
 /* 将筛选参数写入 URL 的 Query（只写非空参数；保持 V1 键名，最小改动） */
 const buildQueryFromFilters = (filterParams) => {
@@ -501,11 +507,24 @@ const priceRangeText = computed(() => {
 })
 
 const filteredCount = computed(() => {
-  // 如果还没有进行过筛选，返回总数
   if (localFilteredCount.value === 0 && !hasAppliedFilters.value) {
     return propertiesStore.totalCount || propertiesStore.allProperties.length
   }
-  return localFilteredCount.value
+  return typeof localFilteredCount.value === 'number'
+    ? localFilteredCount.value
+    : propertiesStore.totalCount || 0
+})
+
+const filteredCountDisplay = computed(() => {
+  if (countUnavailable.value) return null
+  return filteredCount.value
+})
+
+const applyButtonAriaLabel = computed(() => {
+  if (countUnavailable.value) {
+    return '确定（结果数量暂不可用）'
+  }
+  return `确定（${filteredCountDisplay.value} 条结果）`
 })
 
 // 检查是否应用了筛选
@@ -601,6 +620,7 @@ const updateFilteredCount = async () => {
     const e = new Date(filters.value.endDate).getTime()
     if (s > e) {
       localFilteredCount.value = 0
+      countUnavailable.value = false
       return
     }
   }
@@ -646,26 +666,32 @@ const updateFilteredCount = async () => {
   if (Object.keys(filterParams).length === 0) {
     localFilteredCount.value =
       propertiesStore.totalCount || propertiesStore.allProperties.length || 0
+    countUnavailable.value = false
     return
   }
 
+  const seq = ++_countReqSeq.value // 生成本次请求序号
+  _counting.value = true
+  countUnavailable.value = false
+
   try {
     // 统一通过 store 入口获取计数，避免双通道不一致
-    const seq = ++_countReqSeq.value // 生成本次请求序号
-    _counting.value = true
     const total = await propertiesStore.getFilteredCount(filterParams)
-    // 仅当返回的结果仍对应“最新一次请求”时才落地，防止旧响应覆盖新状态
     if (seq === _countReqSeq.value) {
-      localFilteredCount.value = total
+      if (typeof total === 'number' && !Number.isNaN(total)) {
+        localFilteredCount.value = total
+        countUnavailable.value = false
+      } else {
+        countUnavailable.value = true
+      }
       _counting.value = false
-    } else {
-      // 丢弃过期响应（不改动 UI）
     }
   } catch (error) {
     console.error('获取筛选计数失败:', error)
-    // 快速失败：不做本地估算，不篡改现有计数，并就近提示错误
-    // 失败时统一恢复为 false，若下一次请求已开始会再次置为 true，不影响表现
-    _counting.value = false
+    if (seq === _countReqSeq.value) {
+      countUnavailable.value = true
+      _counting.value = false
+    }
     ElMessage.error('筛选计数失败，请稍后重试')
   }
 }
@@ -818,6 +844,7 @@ const applyFilters = async () => {
   await applyFiltersToStore()
   // 应用后更新计数为实际结果
   localFilteredCount.value = propertiesStore.totalCount
+  countUnavailable.value = false
   closePanel()
 }
 
@@ -838,6 +865,7 @@ const resetFilters = () => {
   } else {
     localFilteredCount.value =
       propertiesStore.totalCount || propertiesStore.allProperties.length || 0
+    countUnavailable.value = false
   }
 }
 

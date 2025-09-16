@@ -305,7 +305,8 @@ const {
   nextStep,
   prevStep,
   applyFilters,
-  generateResultDescription
+  generateResultDescription,
+  restoreFromQuery
 } = useFilterWizard()
 
 // 面板引用
@@ -460,6 +461,7 @@ const handleKeyDown = (event) => {
 // 生命周期
 watch(visible, (newValue) => {
   if (newValue) {
+    restoreFromQuery()
     // 打开时聚焦到面板
     nextTick(() => {
       wizardRef.value?.focus()
