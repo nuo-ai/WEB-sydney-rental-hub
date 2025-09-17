@@ -6,7 +6,7 @@
 - `mcp-server/`: TypeScript MCP server for AI assistants.
 - `scripts/` and `database/`: Utilities, ETL helpers, SQL and data processors.
 - `crawler/`: Feature extraction and integration examples.
-- Docs: see `README.md`, `AUTHENTICATION_GUIDE.md`, `FRONTEND_STYLE_GUIDE.md`, `SECURITY_CHECKLIST.md`.
+- Docs: see `README.md`, `AUTHENTICATION_GUIDE.md`, `FRONTEND_STYLE_GUIDE.md`, `SECURITY_CHECKLIST.md`, `GOOGLE_MAPS_API_SETUP.md`.
 
 ## Build, Test, Develop
 - Backend
