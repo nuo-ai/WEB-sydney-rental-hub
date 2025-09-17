@@ -33,6 +33,7 @@ from api.graphql_schema import schema as gql_schema # Renamed to avoid conflict 
 from api.auth_routes import router as auth_router # Import auth routes
 import db as db_module # Import the module itself
 from db import init_db_pool, close_db_pool, get_db_conn_dependency # Import specific functions
+from utils import static_data as static_data_utils
 
 # Standardized API Response Models
 T = TypeVar('T')
@@ -1199,20 +1200,38 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
     Get a single property by its ID.
     """
     logger.info(f"====== HIT get_property_by_id with ID: {property_id} ======")
-    # In a real app, you would have a CRUD function to get a single property
-    # For now, we'll fetch all and filter, which is inefficient.
-    # This should be replaced with a direct DB call.
-    # NOTE: This is a placeholder implementation.
-    
-    # Correct implementation:
-    prop = await asyncio.to_thread(get_property_by_id_from_db, property_id)
-    if not prop:
+    def _static_fallback(db_unavailable: bool):
+        fallback = static_data_utils.get_property(property_id)
+        if fallback:
+            return success_response(data=fallback)
+        if db_unavailable and not static_data_utils.dataset_available():
+            return error_response(
+                code=ErrorCodes.INTERNAL_SERVER_ERROR,
+                message="Property data source is temporarily unavailable.",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         return error_response(
             code=ErrorCodes.RESOURCE_NOT_FOUND,
             message=f"Property with ID {property_id} not found.",
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND,
         )
-    
+
+    if db is None:
+        logger.warning("Database connection unavailable for property detail; using fallback data")
+        return _static_fallback(db_unavailable=True)
+
+    try:
+        prop = await asyncio.to_thread(get_property_by_id_from_db, property_id)
+    except RuntimeError as exc:
+        logger.error(f"Database runtime error while fetching property {property_id}: {exc}")
+        return _static_fallback(db_unavailable=True)
+    except Exception as exc:
+        logger.error(f"Unexpected error fetching property {property_id}: {exc}", exc_info=True)
+        return _static_fallback(db_unavailable=True)
+
+    if not prop:
+        return _static_fallback(db_unavailable=False)
+
     # Manually convert the Strawberry object to a dictionary
     prop_dict = {
         "listing_id": prop.listing_id,
@@ -1237,7 +1256,7 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
         "property_headline": prop.property_headline,  # 添加房源标题字段
         "inspection_times": prop.inspection_times  # 补充看房时间字段，修复刷新后消失
     }
-    
+
     return success_response(data=prop_dict)
 
 
@@ -1305,6 +1324,29 @@ async def get_properties(
     except Exception as _be002_e:
         # 容错：白名单校验异常不应阻断正常查询，记录日志后继续
         logger.warning(f"Whitelist validation failed but skipped: {_be002_e}")
+
+    def _static_properties_response():
+        params_copy = dict(request.query_params)
+        params_copy.pop("cursor", None)
+        params_copy.setdefault("page", pagination.page)
+        params_copy.setdefault("page_size", pagination.page_size)
+        fallback = static_data_utils.list_properties(
+            params_copy,
+            page=pagination.page,
+            page_size=pagination.page_size,
+        )
+        if fallback is None:
+            return error_response(
+                code=ErrorCodes.INTERNAL_SERVER_ERROR,
+                message="Property list is temporarily unavailable.",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        pagination_info = PaginationInfo(**fallback["pagination"])
+        return success_response(data=fallback["data"], pagination=pagination_info)
+
+    if db is None:
+        logger.warning("Database unavailable for property list; using static fallback")
+        return _static_properties_response()
 
     # Build the base query with filters - 只选择列表页需要的字段，减少数据传输
     # 排除大字段如 description 和 property_features，提升性能
@@ -1512,8 +1554,12 @@ async def get_properties(
                 columns = [desc[0] for desc in cur.description]
                 return items, columns
         
-        items, columns = await asyncio.to_thread(_db_call_cursor)
-        
+        try:
+            items, columns = await asyncio.to_thread(_db_call_cursor)
+        except Exception as exc:
+            logger.error(f"Cursor pagination query failed: {exc}", exc_info=True)
+            return _static_properties_response()
+
         has_next = len(items) > pagination.page_size
         if has_next:
             items = items[:-1] # remove extra item
@@ -1540,7 +1586,11 @@ async def get_properties(
     else:
         # Page-based pagination
         query = f"{base_query}{order_clause}"
-        items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
+        try:
+            items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
+        except Exception as exc:
+            logger.error(f"Page-based pagination query failed: {exc}", exc_info=True)
+            return _static_properties_response()
         return success_response(data=items, pagination=pagination_info)
 
 
@@ -1559,7 +1609,15 @@ async def get_location_suggestions(
     Get location suggestions for search autocomplete.
     Returns suburbs and postcodes with property counts.
     """
+    def _static_suggestions():
+        suggestions = static_data_utils.suggest_locations(q, limit)
+        return success_response(data=suggestions)
+
     try:
+        if db is None:
+            logger.warning("Database unavailable for location suggestions; using fallback data")
+            return _static_suggestions()
+
         if q and len(q.strip()) > 0:
             # Search with query
             search_term = q.strip().lower()
@@ -1599,7 +1657,11 @@ async def get_location_suggestions(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Location suggestions query failed: {exc}", exc_info=True)
+                return _static_suggestions()
             
             # Format results
             suggestions = []
@@ -1640,7 +1702,11 @@ async def get_location_suggestions(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Location suggestions query failed: {exc}", exc_info=True)
+                return _static_suggestions()
             
             # Format results
             suggestions = []
@@ -1661,8 +1727,8 @@ async def get_location_suggestions(
             return success_response(data=suggestions)
             
     except Exception as e:
-        logger.error(f"Error getting location suggestions: {str(e)}")
-        return error_response(f"Failed to get location suggestions: {str(e)}")
+        logger.error(f"Error getting location suggestions: {str(e)}", exc_info=True)
+        return _static_suggestions()
 
 
 @app.get("/api/locations/all", tags=["Locations"])
@@ -1674,9 +1740,17 @@ async def get_all_locations(
     Get all unique locations with property counts.
     Used for initializing search suggestions.
     """
+    def _static_locations():
+        locations = static_data_utils.list_locations()
+        return success_response(data=locations)
+
+    if db is None:
+        logger.warning("Database unavailable for all locations; using fallback data")
+        return _static_locations()
+
     try:
         query = """
-        SELECT 
+        SELECT
             suburb,
             REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
             COUNT(DISTINCT listing_id) as property_count
@@ -1693,7 +1767,11 @@ async def get_all_locations(
                 results = cur.fetchall()
                 return results
         
-        results = await asyncio.to_thread(_db_call)
+        try:
+            results = await asyncio.to_thread(_db_call)
+        except Exception as exc:
+            logger.error(f"Location list query failed: {exc}", exc_info=True)
+            return _static_locations()
         
         # Format results for both suburb and postcode lookups
         locations = []
@@ -1741,8 +1819,8 @@ async def get_all_locations(
         return success_response(data=locations)
         
     except Exception as e:
-        logger.error(f"Error getting all locations: {str(e)}")
-        return error_response(f"Failed to get locations: {str(e)}")
+        logger.error(f"Error getting all locations: {str(e)}", exc_info=True)
+        return _static_locations()
 
 
 @app.get("/api/locations/nearby", tags=["Locations"])
@@ -1784,11 +1862,19 @@ async def get_nearby_suburbs(
         "Bondi": ["Bondi Beach", "North Bondi", "Tamarama", "Bellevue Hill", "Waverley", "Bondi Junction"],
         "Coogee": ["Randwick", "South Coogee", "Clovelly", "Maroubra", "Kingsford", "Bronte"]
     }
-    
+
+    def _static_nearby():
+        nearby_data = static_data_utils.nearby_suburbs(suburb, limit, mapping=nearby_mapping)
+        return success_response(data=nearby_data)
+
     try:
+        if db is None:
+            logger.warning("Database unavailable for nearby suburbs; using fallback data")
+            return _static_nearby()
+
         # Get nearby suburbs from mapping
         nearby_suburbs = nearby_mapping.get(suburb, [])[:limit]
-        
+
         if not nearby_suburbs:
             # If no mapping found, return popular suburbs as fallback
             query = """
@@ -1810,12 +1896,16 @@ async def get_nearby_suburbs(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Nearby suburb fallback query failed: {exc}", exc_info=True)
+                return _static_nearby()
         else:
             # Get data for nearby suburbs
             placeholders = ','.join(['%s'] * len(nearby_suburbs))
             query = f"""
-            SELECT 
+            SELECT
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
                 COUNT(DISTINCT listing_id) as property_count
@@ -1832,7 +1922,11 @@ async def get_nearby_suburbs(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Nearby suburb query failed: {exc}", exc_info=True)
+                return _static_nearby()
         
         # Format results
         suggestions = []
@@ -1856,5 +1950,5 @@ async def get_nearby_suburbs(
         })
         
     except Exception as e:
-        logger.error(f"Error getting nearby suburbs: {str(e)}")
-        return error_response(f"Failed to get nearby suburbs: {str(e)}")
+        logger.error(f"Error getting nearby suburbs: {str(e)}", exc_info=True)
+        return _static_nearby()
