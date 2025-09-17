@@ -20,6 +20,100 @@ const _fmtDate = (date) => {
 }
 
 /**
+ * 将邮编转换为其下属的 suburb 名称集合。
+ * 为什么：后端 V1 契约并不识别 postcodes 参数，必须在前端请求前展开为合法的 suburb CSV。
+ * 约束：依赖 areasCache（15min TTL），若缓存失效则按需拉取一次区域目录。
+ * @param {string[]} codes - 需要展开的邮编数组
+ * @returns {Promise<string[]>}
+ */
+async function expandPostcodesToSuburbs(codes = []) {
+  if (!Array.isArray(codes) || codes.length === 0) return []
+
+  let areasList = Array.isArray(this.areasCache?.list) ? this.areasCache.list : []
+  if (!areasList || areasList.length === 0) {
+    try {
+      areasList = await this.getAllAreas()
+    } catch {
+      areasList = []
+    }
+  }
+
+  if (!Array.isArray(areasList) || areasList.length === 0) return []
+
+  const suburbs = new Set()
+  const normalizedCodes = codes
+    .map((code) => (code != null ? String(code).trim() : ''))
+    .filter(Boolean)
+
+  for (const code of normalizedCodes) {
+    const node = areasList.find(
+      (item) => item && item.type === 'postcode' && String(item.name) === code,
+    )
+    if (!node || !Array.isArray(node.suburbs)) continue
+    for (const suburb of node.suburbs) {
+      if (typeof suburb === 'string' && suburb.trim()) {
+        suburbs.add(suburb.trim())
+      }
+    }
+  }
+
+  return Array.from(suburbs)
+}
+
+/**
+ * 规范化区域相关参数：展开 postcodes → suburb CSV，并彻底移除 postcodes 键。
+ * @param {Record<string, any>} legacyParams - 映射层输出的 V1 参数对象
+ * @param {string|string[]|null} overrideCsv - 可选的邮编 CSV（优先使用草稿/传参覆盖 cache 中的 postcodes）
+ * @returns {Promise<Record<string, any>>}
+ */
+async function normalizeRegionParams(legacyParams = {}, overrideCsv = null) {
+  const normalized = { ...legacyParams }
+
+  const rawCsv =
+    overrideCsv != null
+      ? overrideCsv
+      : Object.prototype.hasOwnProperty.call(normalized, 'postcodes')
+        ? normalized.postcodes
+        : null
+
+  const codes = Array.isArray(rawCsv)
+    ? rawCsv
+    : typeof rawCsv === 'string'
+      ? rawCsv.split(',')
+      : []
+
+  const trimmedCodes = codes
+    .map((item) => (item != null ? String(item).trim() : ''))
+    .filter(Boolean)
+
+  if (trimmedCodes.length > 0) {
+    try {
+      const expandedSuburbs = await expandPostcodesToSuburbs.call(this, trimmedCodes)
+      if (expandedSuburbs.length > 0) {
+        const existed = typeof normalized.suburb === 'string'
+          ? normalized.suburb
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : []
+        const merged = Array.from(new Set([...existed, ...expandedSuburbs]))
+        if (merged.length > 0) {
+          normalized.suburb = merged.join(',')
+        }
+      }
+    } catch {
+      // 忽略区域展开失败：仍会移除 postcodes，以免触发后端 400
+    }
+  }
+
+  if (Object.prototype.hasOwnProperty.call(normalized, 'postcodes')) {
+    delete normalized.postcodes
+  }
+
+  return normalized
+}
+
+/**
  * 统一的筛选参数映射函数（V1→V2 兼容层）
  * 为什么：抽离参数构造，保持“组件只触发 action，契约在 store 统一管理”，
  * 并为后续切换到契约一致性的 V2 做铺垫（开启开关即可切换）
@@ -659,59 +753,27 @@ export const usePropertiesStore = defineStore('properties', {
         // 目的：维持 V1 行为（默认），并可通过开关无缝切至 V2 契约（suburbs/price_min/...）
         // 中文注释：P0 稳定策略——仅当显式开启开关时才走 V2，禁用“按需切换”以防契约不一致
         const useV2 = enableFilterV2
+        const effectiveLocations =
+          Array.isArray(this.selectedLocations) && this.selectedLocations.length
+            ? this.selectedLocations
+            : []
         let mappedParams = mapFilterStateToApiParams(
           filters,
-          this.selectedLocations,
+          effectiveLocations,
           { page: 1, page_size: this.pageSize, sort: this.sort },
           { enableFilterV2: useV2 },
         )
 
-        // 中文注释（P0 修复）：后端当前仅支持 V1 的 suburb（CSV），不支持 postcodes 参数。
-        // 若用户只选了“邮编”，区域将失效。为保证“区域筛选”对 suburb/postcode 都生效：
-        // 当 V2 关闭时，将选中的 postcode 映射为其下属的多个 suburb 名称并注入到 suburb CSV 中。
         if (!useV2) {
-          try {
-            const selectedPostcodes = (this.selectedLocations || [])
-              .filter((l) => l && l.type === 'postcode')
-              .map((l) => String(l.name))
-              .filter(Boolean)
+          mappedParams = await normalizeRegionParams.call(
+            this,
+            mappedParams,
+            filters?.postcodes ?? this.previewDraftSections?.area?.postcodes ?? null,
+          )
+        }
 
-            if (selectedPostcodes.length > 0) {
-              // 确保区域目录已加载（优先后端返回，包含 postcode → suburbs 映射）
-              let areasList = Array.isArray(this.areasCache?.list) ? this.areasCache.list : []
-              if (!areasList.length) {
-                try {
-                  areasList = await this.getAllAreas()
-                } catch {
-                  /* 忽略非关键错误 */
-                }
-              }
-
-              const postcodeToSuburbs = new Set()
-              if (Array.isArray(areasList) && areasList.length) {
-                for (const code of selectedPostcodes) {
-                  const node = areasList.find(
-                    (n) => n && n.type === 'postcode' && String(n.name) === String(code),
-                  )
-                  const subs = node && Array.isArray(node.suburbs) ? node.suburbs : []
-                  for (const s of subs) {
-                    if (s && typeof s === 'string') postcodeToSuburbs.add(s)
-                  }
-                }
-              }
-
-              // 合并：已存在的 suburb CSV + 由 postcode 展开的 suburbs
-              const existed = (mappedParams.suburb ? String(mappedParams.suburb).split(',') : [])
-                .map((s) => s.trim())
-                .filter(Boolean)
-              const merged = Array.from(new Set([...existed, ...Array.from(postcodeToSuburbs)]))
-              if (merged.length > 0) {
-                mappedParams.suburb = merged.join(',')
-              }
-            }
-          } catch {
-            /* 忽略非关键错误 */
-          }
+        if (Object.prototype.hasOwnProperty.call(mappedParams, 'postcodes')) {
+          delete mappedParams.postcodes
         }
 
         // 移除 null/空串，避免无效参数污染缓存与后端白名单
@@ -1014,56 +1076,36 @@ export const usePropertiesStore = defineStore('properties', {
         }
         // 计数亦走统一映射，确保与列表参数一致
         // 中文注释：P0 稳定策略——仅当显式开启开关时才走 V2，禁用“按需切换”以防契约不一致
+        const draftArea =
+          this.previewDraftSections && typeof this.previewDraftSections.area === 'object'
+            ? this.previewDraftSections.area
+            : {}
+        const mergedParamsInput = { ...(params || {}) }
+        if (draftArea) {
+          Object.assign(mergedParamsInput, draftArea)
+        }
+        const effectiveLocations =
+          Array.isArray(this.draftSelectedLocations) && this.draftSelectedLocations.length
+            ? this.draftSelectedLocations
+            : this.selectedLocations
         const useV2 = enableFilterV2
         let mappedParams = mapFilterStateToApiParams(
-          params,
-          this.selectedLocations,
-          { page: 1, page_size: 1 }, // 仅取总数
+          mergedParamsInput,
+          effectiveLocations,
+          { page: 1, page_size: 1 },
           { enableFilterV2: useV2 },
         )
 
-        // 中文注释（P0 修复，计数口径与列表一致）：当仅选择“邮编”时，将其展开为多个 suburb 并写入 suburb CSV
         if (!useV2) {
-          try {
-            const selectedPostcodes = (this.selectedLocations || [])
-              .filter((l) => l && l.type === 'postcode')
-              .map((l) => String(l.name))
-              .filter(Boolean)
+          mappedParams = await normalizeRegionParams.call(
+            this,
+            mappedParams,
+            mergedParamsInput.postcodes ?? draftArea?.postcodes ?? null,
+          )
+        }
 
-            if (selectedPostcodes.length > 0) {
-              let areasList = Array.isArray(this.areasCache?.list) ? this.areasCache.list : []
-              if (!areasList.length) {
-                try {
-                  areasList = await this.getAllAreas()
-                } catch {
-                  /* 忽略非关键错误 */
-                }
-              }
-
-              const postcodeToSuburbs = new Set()
-              if (Array.isArray(areasList) && areasList.length) {
-                for (const code of selectedPostcodes) {
-                  const node = areasList.find(
-                    (n) => n && n.type === 'postcode' && String(n.name) === String(code),
-                  )
-                  const subs = node && Array.isArray(node.suburbs) ? node.suburbs : []
-                  for (const s of subs) {
-                    if (s && typeof s === 'string') postcodeToSuburbs.add(s)
-                  }
-                }
-              }
-
-              const existed = (mappedParams.suburb ? String(mappedParams.suburb).split(',') : [])
-                .map((s) => s.trim())
-                .filter(Boolean)
-              const merged = Array.from(new Set([...existed, ...Array.from(postcodeToSuburbs)]))
-              if (merged.length > 0) {
-                mappedParams.suburb = merged.join(',')
-              }
-            }
-          } catch {
-            /* 忽略非关键错误 */
-          }
+        if (Object.prototype.hasOwnProperty.call(mappedParams, 'postcodes')) {
+          delete mappedParams.postcodes
         }
 
         // 中文注释：调试输出计数请求参数（仅用于开发定位，生产可注释）
