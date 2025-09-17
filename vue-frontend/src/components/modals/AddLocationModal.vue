@@ -9,57 +9,53 @@
     <template #header>
       <div class="modal-header">
         <button class="close-btn" @click="handleClose">
-          <i class="fas fa-times"></i>
+          <X class="spec-icon" />
         </button>
-        <h2 class="modal-title">Add location</h2>
+        <h2 class="modal-title typo-heading-card">{{ $t('addLocation.title') }}</h2>
       </div>
     </template>
-    
+
     <div class="modal-content">
       <!-- 搜索区域 -->
       <div class="search-section">
         <div class="search-input-wrapper">
-          <i class="fas fa-search search-icon"></i>
+          <Search class="spec-icon search-icon" />
           <input
             ref="searchInput"
             v-model="searchQuery"
             type="text"
             class="search-input"
-            placeholder="Address"
+            :placeholder="$t('addLocation.placeholder')"
             @input="handleInput"
           />
-          <button 
-            v-if="searchQuery"
-            class="clear-btn"
-            @click="clearSearch"
-          >
-            <i class="fas fa-times"></i>
+          <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
+            <X class="spec-icon" />
           </button>
         </div>
-        <p class="search-hint">Search for your location's address</p>
+        <p class="search-hint typo-body-sm">{{ $t('addLocation.searchHint') }}</p>
       </div>
-      
+
       <!-- 搜索结果 -->
       <div class="search-results">
         <!-- 预设地址 -->
         <div v-if="!searchQuery && presetLocations.length > 0" class="preset-section">
-          <h3 class="section-title">Popular locations</h3>
+          <h3 class="section-title typo-body-sm">{{ $t('addLocation.popular') }}</h3>
           <div
             v-for="location in presetLocations"
             :key="location.place_id || location.placeId"
             class="result-item"
             @click="selectLocation(location)"
           >
-            <i class="fas fa-graduation-cap" v-if="location.type === 'university'"></i>
-            <i class="fas fa-train" v-else-if="location.type === 'station'"></i>
-            <i class="fas fa-map-marker-alt" v-else></i>
+            <GraduationCap class="result-icon spec-icon" v-if="location.type === 'university'" />
+            <Train class="result-icon spec-icon" v-else-if="location.type === 'station'" />
+            <MapPin class="result-icon spec-icon" v-else />
             <div class="result-info">
-              <div class="result-name">{{ location.name }}</div>
+              <div class="result-name typo-body">{{ formatUniDisplayName(location) }}</div>
               <div class="result-address">{{ location.address }}</div>
             </div>
           </div>
         </div>
-        
+
         <!-- 搜索建议 -->
         <div v-else-if="searchResults.length > 0" class="results-list">
           <div
@@ -68,24 +64,24 @@
             class="result-item"
             @click="selectResult(result)"
           >
-            <i class="fas fa-map-marker-alt"></i>
+            <MapPin class="result-icon spec-icon" />
             <div class="result-info">
               <div class="result-address">{{ result.description }}</div>
             </div>
           </div>
         </div>
-        
+
         <!-- 搜索中 -->
         <div v-else-if="isSearching" class="searching-state">
-          <i class="fas fa-spinner fa-spin"></i>
-          <span>Searching...</span>
+          <Loader2 class="spec-icon spinner" />
+          <span class="typo-body-sm">{{ $t('addLocation.searching') }}</span>
         </div>
-        
+
         <!-- 无结果 -->
         <div v-else-if="searchQuery && !isSearching" class="no-results">
-          <i class="fas fa-search"></i>
-          <p>No results found</p>
-          <p class="no-results-hint">Try a different search term</p>
+          <Search class="spec-icon" />
+          <p class="typo-body">{{ $t('addLocation.noResults') }}</p>
+          <p class="no-results-hint typo-body-sm">{{ $t('addLocation.tryAnother') }}</p>
         </div>
       </div>
     </div>
@@ -93,18 +89,21 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, nextTick, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import placesService from '@/services/places'
+import universities from '@/data/universities.sydney.json'
+import { X, Search, GraduationCap, Train, MapPin, Loader2 } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'select'])
+const t = inject('t')
 
 // 响应式状态
 const visible = ref(props.modelValue)
@@ -120,16 +119,53 @@ const presetLocations = ref([])
 // Session token for Google Places API billing optimization
 let sessionToken = null
 
-// 监听props变化
-watch(() => props.modelValue, (newVal) => {
-  visible.value = newVal
-  if (newVal) {
-    // 聚焦输入框
-    nextTick(() => {
-      searchInput.value?.focus()
-    })
+// 中文注释：大学中文名映射（名称/别名）—用于展示，地址保持英文
+const UNI_NAME_ZH_MAP = {
+  'University of Sydney': '悉尼大学',
+  'University of New South Wales': '新南威尔士大学',
+  'University of Technology Sydney': '悉尼科技大学',
+  'Macquarie University': '麦考瑞大学',
+  'Western Sydney University': '西悉尼大学',
+  'Australian Catholic University': '澳大利亚天主教大学',
+  'The University of Notre Dame Australia': '澳大利亚圣母大学',
+  'University of Wollongong': '卧龙岗大学',
+}
+const ALIAS_ZH_MAP = {
+  USYD: '悉尼大学',
+  UNSW: '新南威尔士大学',
+  UTS: '悉尼科技大学',
+  MQ: '麦考瑞大学',
+  WSU: '西悉尼大学',
+  ACU: '澳大利亚天主教大学',
+  UNDA: '澳大利亚圣母大学',
+  UOW: '卧龙岗大学',
+}
+const toZhUniversityName = (name, aliasArr = []) => {
+  if (UNI_NAME_ZH_MAP[name]) return UNI_NAME_ZH_MAP[name]
+  for (const a of aliasArr || []) {
+    const key = String(a || '').toUpperCase()
+    if (ALIAS_ZH_MAP[key]) return ALIAS_ZH_MAP[key]
   }
-})
+  return name || ''
+}
+const formatUniDisplayName = (loc) => {
+  const zh = toZhUniversityName(loc?.name, loc?.alias)
+  return loc?.campus ? `${zh} (${loc.campus})` : zh
+}
+
+// 监听props变化
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    visible.value = newVal
+    if (newVal) {
+      // 聚焦输入框
+      nextTick(() => {
+        searchInput.value?.focus()
+      })
+    }
+  },
+)
 
 // 监听visible变化
 watch(visible, (newVal) => {
@@ -143,12 +179,14 @@ const searchPlaces = async (query) => {
     if (!sessionToken) {
       sessionToken = placesService.createSessionToken()
     }
-    
+
     const results = await placesService.searchPlaces(query, sessionToken)
     return results
   } catch (error) {
     console.error('Places search error:', error)
-    ElMessage.error('Failed to search locations. Please try again.')
+    ElMessage.error(
+      t ? t('addLocation.failedSearch') : 'Failed to search locations. Please try again.',
+    )
     return []
   }
 }
@@ -159,20 +197,37 @@ const handleInput = () => {
   if (searchTimeout.value) {
     clearTimeout(searchTimeout.value)
   }
-  
+
   // 如果搜索框为空，显示预设地址
   if (!searchQuery.value.trim()) {
     searchResults.value = []
     isSearching.value = false
     return
   }
-  
+
   // 延迟搜索（防抖）
   isSearching.value = true
   searchTimeout.value = setTimeout(async () => {
     try {
       const results = await searchPlaces(searchQuery.value)
-      searchResults.value = results
+      // 仅保留“大学”类型；若无，则用本地大学清单做模糊匹配降级
+      let filtered = (results || []).filter(
+        (r) => Array.isArray(r.types) && r.types.includes('university'),
+      )
+      if (filtered.length === 0) {
+        const q = searchQuery.value.toLowerCase()
+        filtered = universities
+          .filter((u) =>
+            (u.name + ' ' + (u.campus || '') + ' ' + u.address).toLowerCase().includes(q),
+          )
+          .slice(0, 8)
+          .map((u) => ({
+            place_id: u.placeId || `local-${u.id}`,
+            description: `${u.name}${u.campus ? ' (' + u.campus + ')' : ''}, ${u.address}`,
+            types: ['university'],
+          }))
+      }
+      searchResults.value = filtered
     } catch (error) {
       console.error('Search failed:', error)
       searchResults.value = []
@@ -195,13 +250,13 @@ const selectLocation = (location) => {
   const formattedLocation = {
     place_id: location.place_id,
     formatted_address: location.formatted_address,
-    name: location.name,
+    name: formatUniDisplayName(location),
     geometry: {
       location: {
         lat: () => location.latitude,
-        lng: () => location.longitude
-      }
-    }
+        lng: () => location.longitude,
+      },
+    },
   }
   emit('select', formattedLocation)
   handleClose()
@@ -211,30 +266,62 @@ const selectLocation = (location) => {
 const selectResult = async (result) => {
   try {
     isSearching.value = true
-    
-    // Get full place details including coordinates
-    const placeDetails = await placesService.getPlaceDetails(result.place_id)
-    
+
+    let placeDetails
+    // 本地大学项（无 Google placeId）走离线详情
+    if (String(result.place_id).startsWith('local-')) {
+      const localId = String(result.place_id).replace('local-', '')
+      const u = universities.find((x) => x.id === localId)
+      if (!u) {
+        throw new Error('Local university not found')
+      }
+      placeDetails = {
+        place_id: u.placeId || `local-${u.id}`,
+        name: u.name,
+        campus: u.campus,
+        alias: u.alias,
+        formatted_address: u.address,
+        latitude: u.lat,
+        longitude: u.lng,
+        types: ['university'],
+      }
+    } else {
+      // 在线详情，且仅允许 university
+      placeDetails = await placesService.getPlaceDetails(result.place_id)
+      if (!Array.isArray(placeDetails.types) || !placeDetails.types.includes('university')) {
+        ElMessage.warning(
+          t ? t('addLocation.pleaseSelectUniversity') : 'Please select a university',
+        )
+        isSearching.value = false
+        return
+      }
+    }
+
     const formattedLocation = {
       place_id: placeDetails.place_id,
       formatted_address: placeDetails.formatted_address,
-      name: placeDetails.name || result.main_text || result.description.split(',')[0],
+      name:
+        placeDetails && placeDetails.campus
+          ? `${toZhUniversityName(placeDetails.name)} (${placeDetails.campus})`
+          : toZhUniversityName(placeDetails.name),
       geometry: {
         location: {
           lat: () => placeDetails.latitude,
-          lng: () => placeDetails.longitude
-        }
-      }
+          lng: () => placeDetails.longitude,
+        },
+      },
     }
-    
+
     // Reset session token after selection (Google billing optimization)
     sessionToken = null
-    
+
     emit('select', formattedLocation)
     handleClose()
   } catch (error) {
     console.error('Failed to get place details:', error)
-    ElMessage.error('Failed to get location details. Please try again.')
+    ElMessage.error(
+      t ? t('addLocation.failedDetails') : 'Failed to get location details. Please try again.',
+    )
   } finally {
     isSearching.value = false
   }
@@ -253,19 +340,25 @@ const handleClose = () => {
 
 // 生命周期
 onMounted(async () => {
-  // Load preset locations
-  presetLocations.value = placesService.getPresetLocations().map(loc => ({
-    ...loc,
-    placeId: loc.place_id, // Keep both formats for compatibility
-    address: loc.formatted_address
+  // 加载本地“大学/校区”清单作为热门项（只含大学，去除非大学）
+  presetLocations.value = universities.map((u) => ({
+    place_id: u.placeId || `local-${u.id}`,
+    placeId: u.placeId || `local-${u.id}`,
+    name: u.name,
+    campus: u.campus,
+    alias: u.alias,
+    formatted_address: u.address,
+    address: u.address,
+    latitude: u.lat,
+    longitude: u.lng,
+    type: 'university',
   }))
-  
-  // Pre-load Google Maps API
+
+  // 预加载 Google Maps API（若可用）
   try {
     await placesService.loadGoogleMaps()
-    // Google Places API加载成功
-  } catch (error) {
-    // Google Places API未加载 - 使用开发模式
+  } catch {
+    // Google Places API未加载 - 使用本地热门清单降级
   }
 })
 </script>
@@ -288,9 +381,9 @@ onMounted(async () => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -301,7 +394,7 @@ onMounted(async () => {
   height: 32px;
   border: none;
   background: none;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -312,13 +405,13 @@ onMounted(async () => {
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -331,8 +424,8 @@ onMounted(async () => {
 /* 搜索区域 */
 .search-section {
   padding: 20px;
-  background: white;
-  border-bottom: 1px solid #e3e3e3;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .search-input-wrapper {
@@ -344,28 +437,29 @@ onMounted(async () => {
 .search-icon {
   position: absolute;
   left: 16px;
-  color: #999;
-  font-size: 16px;
+  color: var(--text-muted);
+  width: 16px;
+  height: 16px;
 }
 
 .search-input {
   width: 100%;
   height: 48px;
   padding: 0 40px 0 44px;
-  border: 1px solid #e3e3e3;
+  border: 1px solid var(--color-border-default);
   border-radius: 8px;
   font-size: 16px;
-  color: #333;
+  color: var(--color-text-primary);
   transition: border-color 0.2s;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #999;
+  border-color: var(--color-border-strong);
 }
 
 .search-input::placeholder {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .clear-btn {
@@ -375,7 +469,7 @@ onMounted(async () => {
   height: 28px;
   border: none;
   background: none;
-  color: #999;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -385,19 +479,19 @@ onMounted(async () => {
 }
 
 .clear-btn:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover);
 }
 
 .search-hint {
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
   font-size: 14px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* 搜索结果 */
 .search-results {
   flex: 1;
-  background: #fafafa;
+  background: var(--surface-2);
 }
 
 /* 预设地址 */
@@ -408,14 +502,14 @@ onMounted(async () => {
 .section-title {
   font-size: 14px;
   font-weight: 600;
-  color: #666;
-  margin: 0 0 12px 0;
+  color: var(--color-text-secondary);
+  margin: 0 0 12px;
   text-transform: uppercase;
 }
 
 /* 结果列表 */
 .results-list {
-  background: white;
+  background: var(--color-bg-card);
 }
 
 .result-item {
@@ -423,25 +517,25 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  background: white;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-default);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .result-item:hover {
-  background: #f8f8f8;
+  background: var(--bg-hover);
 }
 
 .result-item:active {
-  background: #f0f0f0;
+  background: var(--surface-3);
 }
 
-.result-item i {
+.result-item .result-icon {
   flex-shrink: 0;
   width: 20px;
-  color: #999;
-  font-size: 16px;
+  height: 20px;
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -453,13 +547,13 @@ onMounted(async () => {
 .result-name {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 4px;
 }
 
 .result-address {
   font-size: 15px;
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.4;
 }
 
@@ -472,12 +566,13 @@ onMounted(async () => {
   justify-content: center;
   padding: 60px 20px;
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
 }
 
-.searching-state i,
-.no-results i {
-  font-size: 32px;
+.searching-state .spec-icon,
+.no-results .spec-icon {
+  width: 32px;
+  height: 32px;
   margin-bottom: 16px;
 }
 
@@ -488,16 +583,21 @@ onMounted(async () => {
 
 .no-results-hint {
   font-size: 14px !important;
-  color: #bbb;
+  color: var(--color-text-secondary);
 }
 
 /* 动画 */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.fa-spin {
+.spinner {
   animation: spin 1s linear infinite;
 }
 </style>

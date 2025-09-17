@@ -1,359 +1,651 @@
 <template>
-  <!-- Domain风格顶部筛选标签栏 -->
-  <div class="filter-tabs-container">
+  <!-- 顶部筛选标签栏 - PC模式分离式面板 -->
+  <div v-if="!isMobile" class="filter-tabs-container">
     <div class="filter-tabs">
-      <!-- 筛选标签 - 打开完整筛选面板 -->
-      <button 
-        class="filter-tab"
-        :class="{ 'active': props.filterPanelOpen }"
-        @click="toggleFullPanel"
-      >
-        <i class="fa-solid fa-sliders"></i>
-        <span class="chinese-text">筛选</span>
-      </button>
-
-      <!-- 区域标签 - 快速区域选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'area' }">
-        <button 
+      <!-- 区域 -->
+      <div class="filter-tab-entry">
+        <button
+          ref="areaTabRef"
           class="filter-tab"
-          @click.stop="toggleDropdown('area')"
+          :class="{ active: activePanel === 'area', applied: areaApplied }"
+          @click.stop="togglePanel('area', $event)"
         >
-          <span class="chinese-text">区域</span>
-          <i class="fa-solid fa-chevron-down"></i>
-          <span v-if="selectedAreas.length > 0" class="filter-badge">{{ selectedAreas.length }}</span>
-        </button>
-        
-        <!-- 区域快速选择下拉 -->
-        <div v-if="activeDropdown === 'area'" class="quick-filter-dropdown">
-          <div class="dropdown-header chinese-text">选择区域</div>
-          <div class="area-options">
-            <label v-for="area in popularAreas" :key="area.value" class="area-option">
-              <input 
-                type="checkbox" 
-                :value="area.value"
-                :checked="selectedAreas.includes(area.value)"
-                @click="toggleArea(area.value)"
-              >
-              <span>{{ area.label }}</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- 卧室标签 - 快速卧室选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'bedrooms' }">
-        <button 
-          class="filter-tab"
-          @click.stop="toggleDropdown('bedrooms')"
-        >
-          <span class="chinese-text">卧室</span>
-          <i class="fa-solid fa-chevron-down"></i>
-          <span v-if="selectedBedrooms.length > 0" class="filter-badge">{{ selectedBedrooms.length }}</span>
-        </button>
-        
-        <!-- 卧室快速选择下拉 -->
-        <div v-if="activeDropdown === 'bedrooms'" class="quick-filter-dropdown">
-          <div class="dropdown-header chinese-text">卧室数量</div>
-          <div class="bedroom-options">
-            <button 
-              v-for="option in bedroomOptions" 
-              :key="option.value"
-              class="option-btn"
-              :class="{ 'selected': selectedBedrooms.includes(option.value) }"
-              @click="toggleBedroom(option.value)"
-            >
-              {{ option.label }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 价格标签 - 快速价格选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'price' }">
-        <button 
-          class="filter-tab"
-          @click.stop="toggleDropdown('price')"
-        >
-          <span class="chinese-text">价格</span>
-          <i class="fa-solid fa-chevron-down"></i>
-          <span v-if="priceRangeText !== 'Any Price'" class="filter-badge">1</span>
-        </button>
-        
-        <!-- 价格快速选择下拉 -->
-        <div v-if="activeDropdown === 'price'" class="quick-filter-dropdown">
-          <div class="dropdown-header chinese-text">价格范围 (周租)</div>
-          <div class="price-options">
-            <button 
-              v-for="range in priceRanges" 
-              :key="range.label"
-              class="option-btn"
-              :class="{ 'selected': isPriceRangeSelected(range) }"
-              @click="selectPriceRange(range)"
-            >
-              {{ range.label }}
-            </button>
-          </div>
-          <!-- 自定义价格范围 -->
-          <div class="custom-price">
-            <el-slider
-              v-model="customPriceRange"
-              range
-              :min="0"
-              :max="5000"
-              :step="50"
-              class="price-slider-mini"
-              @change="updateCustomPrice"
+          <span class="chinese-text">{{ areaTabText }}</span>
+          <svg
+            v-if="activePanel !== 'area'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             />
-            <div class="price-range-display">
-              ${{ customPriceRange[0] }} - ${{ customPriceRange[1] }}
-            </div>
-          </div>
-        </div>
+          </svg>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'area'"
+          @update:modelValue="(val) => !val && (activePanel = null)"
+          :trigger="areaTabRef"
+          :explicit-position="positions.area"
+          @close="activePanel = null"
+        >
+          <AreaFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
       </div>
 
-      <!-- 空出时间标签 - 快速时间选择 -->
-      <div class="filter-tab-dropdown" :class="{ 'active': activeDropdown === 'availability' }">
-        <button 
+      <!-- 卧室 -->
+      <div class="filter-tab-entry">
+        <button
+          ref="bedroomsTabRef"
           class="filter-tab"
-          @click.stop="toggleDropdown('availability')"
+          :class="{ active: activePanel === 'bedrooms', applied: bedroomsApplied }"
+          @click.stop="togglePanel('bedrooms', $event)"
         >
-          <span class="chinese-text">空出时间</span>
-          <i class="fa-solid fa-chevron-down"></i>
-          <span v-if="selectedAvailability !== 'any'" class="filter-badge">1</span>
+          <span class="chinese-text">{{ bedroomsTabText }}</span>
+          <svg
+            v-if="activePanel !== 'bedrooms'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
-        
-        <!-- 空出时间快速选择下拉 -->
-        <div v-if="activeDropdown === 'availability'" class="quick-filter-dropdown">
-          <div class="dropdown-header chinese-text">入住时间</div>
-          <div class="availability-options">
-            <button 
-              v-for="option in availabilityOptions" 
-              :key="option.value"
-              class="option-btn"
-              :class="{ 'selected': selectedAvailability === option.value }"
-              @click="selectAvailability(option.value)"
-            >
-              {{ option.label }}
-            </button>
-          </div>
-        </div>
+        <FilterDropdown
+          :modelValue="activePanel === 'bedrooms'"
+          @update:modelValue="(val) => !val && (activePanel = null)"
+          :trigger="bedroomsTabRef"
+          :explicit-position="positions.bedrooms"
+          @close="activePanel = null"
+        >
+          <BedroomsFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
+      </div>
+
+      <!-- 价格 -->
+      <div class="filter-tab-entry">
+        <button
+          ref="priceTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'price', applied: priceApplied }"
+          @click.stop="togglePanel('price', $event)"
+        >
+          <span class="chinese-text">{{ priceTabText }}</span>
+          <svg
+            v-if="activePanel !== 'price'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'price'"
+          @update:modelValue="(val) => !val && (activePanel = null)"
+          :trigger="priceTabRef"
+          :explicit-position="positions.price"
+          @close="activePanel = null"
+        >
+          <PriceFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
+      </div>
+
+      <!-- 空出时间 -->
+      <div class="filter-tab-entry">
+        <button
+          ref="availabilityTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'availability', applied: availabilityApplied }"
+          @click.stop="togglePanel('availability', $event)"
+        >
+          <span class="chinese-text">{{ availabilityTabText }}</span>
+          <svg
+            v-if="activePanel !== 'availability'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'availability'"
+          @update:modelValue="(val) => !val && (activePanel = null)"
+          :trigger="availabilityTabRef"
+          :explicit-position="positions.availability"
+          @close="activePanel = null"
+        >
+          <AvailabilityFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
+      </div>
+
+      <!-- 更多（高级筛选） -->
+      <div class="filter-tab-entry">
+        <button
+          ref="moreTabRef"
+          class="filter-tab"
+          :class="{ active: activePanel === 'more', applied: moreApplied }"
+          @click.stop="togglePanel('more', $event)"
+        >
+          <span class="chinese-text">{{ moreTabText }}</span>
+          <svg
+            v-if="activePanel !== 'more'"
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg
+            v-else
+            class="chevron-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M18 15l-6-6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <FilterDropdown
+          :modelValue="activePanel === 'more'"
+          @update:modelValue="(val) => !val && (activePanel = null)"
+          :trigger="moreTabRef"
+          :explicit-position="positions.more"
+          @close="activePanel = null"
+        >
+          <MoreFilterPanel @close="activePanel = null" />
+        </FilterDropdown>
+      </div>
+
+      <!-- 保存搜索按钮 -->
+      <div class="save-search-section">
+        <button
+          class="save-search-btn"
+          :class="{ disabled: !hasActiveFilters }"
+          :disabled="!hasActiveFilters"
+          @click="handleSaveSearch"
+        >
+          <svg
+            class="save-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span>保存搜索</span>
+        </button>
       </div>
     </div>
-
-    <!-- 点击其他区域关闭下拉 -->
-    <div v-if="activeDropdown" class="dropdown-overlay" @click="closeDropdown"></div>
   </div>
+
+  <!-- 移动端触发统一面板的按钮 -->
+  <div v-else class="filter-tabs-mobile">
+    <button class="filter-button" @click="$emit('requestOpenFullPanel')">
+      <svg
+        class="filter-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M3 4h18M3 12h18M3 20h18"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+      <span>筛选</span>
+    </button>
+
+    <!-- 移动端保存搜索按钮 -->
+    <button
+      class="save-search-btn-mobile"
+      :class="{ disabled: !hasActiveFilters }"
+      :disabled="!hasActiveFilters"
+      @click="handleSaveSearch"
+    >
+      <svg
+        class="save-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <path
+          d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <span>保存</span>
+    </button>
+  </div>
+
+  <!-- 保存搜索弹窗 -->
+  <SaveSearchModal
+    v-model="showSaveModal"
+    :filter-conditions="currentFilterConditions"
+    @saved="handleSearchSaved"
+  />
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import FilterDropdown from './FilterDropdown.vue'
+import AreaFilterPanel from './filter-panels/AreaFilterPanel.vue'
+import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
+import PriceFilterPanel from './filter-panels/PriceFilterPanel.vue'
+import AvailabilityFilterPanel from './filter-panels/AvailabilityFilterPanel.vue'
+import MoreFilterPanel from './filter-panels/MoreFilterPanel.vue'
+import SaveSearchModal from './SaveSearchModal.vue'
 import { usePropertiesStore } from '@/stores/properties'
 
-// 组件props
-const props = defineProps({
-  filterPanelOpen: {
-    type: Boolean,
-    default: false
-  },
-  currentFilters: {
-    type: Object,
-    default: () => ({})
-  }
-})
+// 中文注释：PC端改为分离式下拉面板，移动端保持统一大面板
+// 使用 requestOpenFullPanel 事件触发移动端的统一面板
 
-// 组件事件
-const emit = defineEmits(['toggleFullPanel', 'filtersChanged'])
+// 定义事件（在模板中通过 $emit 使用）
+ 
+const emit = defineEmits(['requestOpenFullPanel', 'searchSaved'])
 
-// 状态管理
+// 响应式状态
+const activePanel = ref(null) // 'area', 'bedrooms', 'price', 'availability', 'more' 或 null
+
+// 依赖 Store 的“已应用参数 + 草稿”用于顶部标签文案与小蓝点
 const propertiesStore = usePropertiesStore()
+const appliedParams = computed(() => propertiesStore.currentFilterParams || {})
 
-// 响应式数据
-const activeDropdown = ref(null)
-const selectedAreas = ref([])
-const selectedBedrooms = ref(['any'])
-const customPriceRange = ref([0, 5000])
-const selectedAvailability = ref('any')
+/* 移除未应用变更小蓝点相关计算，保留 applied 文案与高亮 */
 
-// 选项数据
-const popularAreas = [
-  { value: 'sydney', label: 'Sydney CBD' },
-  { value: 'bondi', label: 'Bondi' },
-  { value: 'manly', label: 'Manly' },
-  { value: 'parramatta', label: 'Parramatta' },
-  { value: 'chatswood', label: 'Chatswood' },
-  { value: 'newtown', label: 'Newtown' }
-]
-
-const bedroomOptions = [
-  { value: 'any', label: 'Any' },
-  { value: '1', label: '1' },
-  { value: '2', label: '2' },
-  { value: '3', label: '3' },
-  { value: '4+', label: '4+' }
-]
-
-const priceRanges = [
-  { label: 'Any Price', min: 0, max: 5000 },
-  { label: '$0 - $400', min: 0, max: 400 },
-  { label: '$400 - $600', min: 400, max: 600 },
-  { label: '$600 - $800', min: 600, max: 800 },
-  { label: '$800 - $1200', min: 800, max: 1200 },
-  { label: '$1200+', min: 1200, max: 5000 }
-]
-
-const availabilityOptions = [
-  { value: 'any', label: '任何时间' },
-  { value: 'immediate', label: '立即入住' },
-  { value: 'thisWeek', label: '本周' },
-  { value: 'thisMonth', label: '本月' },
-  { value: 'nextMonth', label: '下个月' }
-]
-
-// 计算属性
-const priceRangeText = computed(() => {
-  const [min, max] = customPriceRange.value
-  if (min === 0 && max === 5000) {
-    return 'Any Price'
-  } else if (max === 5000) {
-    return `$${min}+`
-  } else {
-    return `$${min} - $${max}`
-  }
+// 1) 区域
+const areaApplied = computed(() => (propertiesStore.selectedLocations?.length || 0) > 0)
+/* removed: areaHasDraft */
+const areaTabText = computed(() => {
+  const list = propertiesStore.selectedLocations || []
+  if (!list.length) return '区域'
+  const names = list.map((l) => (l?.name ? String(l.name) : '')).filter(Boolean)
+  if (!names.length) return '区域'
+  const first = names[0]
+  const more = Math.max(0, names.length - 1)
+  return more > 0 ? `${first} +${more}` : first
 })
 
-// 方法
-const toggleFullPanel = () => {
-  closeDropdown()
-  emit('toggleFullPanel', !props.filterPanelOpen)
-}
+// 2) 卧室
+const bedroomsApplied = computed(() => {
+  const v = appliedParams.value?.bedrooms
+  return v !== undefined && v !== null && String(v) !== ''
+})
+/* removed: bedroomsHasDraft */
+const bedroomsTabText = computed(() => {
+  if (!bedroomsApplied.value) return '卧室'
+  const v = String(appliedParams.value?.bedrooms)
+  if (v === '0' || v.toLowerCase() === 'studio') return 'Studio'
+  return v.endsWith('+') ? `${v}卧` : `${v}卧`
+})
 
-const toggleDropdown = (dropdown) => {
-  if (activeDropdown.value === dropdown) {
-    closeDropdown()
-  } else {
-    // 确保关闭主筛选面板
-    if (props.filterPanelOpen) {
-      emit('toggleFullPanel', false)
-    }
-    activeDropdown.value = dropdown
+// 3) 价格
+const priceApplied = computed(() => {
+  const p = appliedParams.value || {}
+  const min = p.minPrice ?? p.price_min
+  const max = p.maxPrice ?? p.price_max
+  return (min != null && min !== '') || (max != null && max !== '')
+})
+/* removed: priceHasDraft */
+const priceTabText = computed(() => {
+  const p = appliedParams.value || {}
+  const min = p.minPrice ?? p.price_min
+  const max = p.maxPrice ?? p.price_max
+  const minNum = min != null && min !== '' ? Number(min) : null
+  const maxNum = max != null && max !== '' ? Number(max) : null
+  if (minNum == null && maxNum == null) return '价格'
+  if (minNum != null && maxNum != null) return `$${minNum} - $${maxNum}`
+  if (minNum != null) return `≥$${minNum}`
+  return `≤$${maxNum}`
+})
+
+// 4) 空出时间
+const availabilityApplied = computed(() => {
+  const p = appliedParams.value || {}
+  return (p.date_from && String(p.date_from) !== '') || (p.date_to && String(p.date_to) !== '')
+})
+/* removed: availabilityHasDraft */
+const availabilityTabText = computed(() => {
+  const p = appliedParams.value || {}
+  const from = p.date_from ? String(p.date_from).slice(0, 10) : null
+  const to = p.date_to ? String(p.date_to).slice(0, 10) : null
+  if (from && to) return `${from} - ${to}`
+  if (from) return `From ${from}`
+  if (to) return `Until ${to}`
+  return '空出时间'
+})
+
+// 5) 更多
+const moreApplied = computed(() => {
+  const p = appliedParams.value || {}
+  // 中文注释：与当前 UI 对齐——“更多”仅体现带家具 Furnished，浴室/车位归“卧室”面板管理
+  return p.isFurnished === true || p.furnished === true
+})
+/* removed: moreHasDraft */
+const moreTabText = computed(() => {
+  const p = appliedParams.value || {}
+  // 中文注释：仅在 Furnished 为 true 时显示；否则显示“更多”
+  if (p.isFurnished === true || p.furnished === true) return 'Furnished'
+  return '更多'
+})
+
+// 面板触发元素引用
+const areaTabRef = ref(null)
+const bedroomsTabRef = ref(null)
+const priceTabRef = ref(null)
+const availabilityTabRef = ref(null)
+const moreTabRef = ref(null)
+
+// 中文注释：显式坐标（由触发按钮计算），用于避免 ref/布局时序造成的 0,0 定位
+const positions = reactive({
+  area: null,
+  bedrooms: null,
+  price: null,
+  availability: null,
+  more: null,
+})
+
+const getRef = (panel) => {
+  switch (panel) {
+    case 'area':
+      return areaTabRef
+    case 'bedrooms':
+      return bedroomsTabRef
+    case 'price':
+      return priceTabRef
+    case 'availability':
+      return availabilityTabRef
+    case 'more':
+      return moreTabRef
+    default:
+      return null
   }
 }
 
-const closeDropdown = () => {
-  activeDropdown.value = null
+// 中文注释：从触发元素计算显式定位（fixed 参考视口坐标）
+const computePosition = (el) => {
+  if (!el) return null
+  const rect = el.getBoundingClientRect()
+  const vw = window.innerWidth
+  // 中文注释：PC 下所有面板统一宽度 380；移动端保持至少与触发等宽
+  const desktop = typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  const width = desktop ? 380 : Math.max(rect.width, 280)
+  let left = rect.left
+  // 边缘保护：左右至少 10px 余量
+  if (left + width > vw - 10) left = Math.max(10, vw - width - 10)
+  if (left < 10) left = 10
+  const top = rect.bottom + 8
+  return { top, left, width }
 }
 
-const toggleArea = (areaValue) => {
-  const index = selectedAreas.value.indexOf(areaValue)
-  
-  if (index > -1) {
-    selectedAreas.value.splice(index, 1)
-  } else {
-    selectedAreas.value.push(areaValue)
+// 移动端判断
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const isMobile = computed(() => {
+  return viewportWidth.value < 768
+})
+
+// 切换面板显示状态
+const togglePanel = (panel, evt) => {
+  const wasOpen = activePanel.value === panel
+  activePanel.value = wasOpen ? null : panel
+  // 中文注释：优先使用事件的 currentTarget；退化到已保存的 ref
+  const el = (evt && evt.currentTarget) || getRef(panel)?.value
+  positions[panel] = computePosition(el)
+}
+
+// 全局事件处理
+const handleResize = () => {
+  // 同步视口宽度为响应式依赖，驱动 isMobile 重新计算
+  if (typeof window !== 'undefined') {
+    viewportWidth.value = window.innerWidth
   }
-  applyFilters()
-}
-
-const toggleBedroom = (value) => {
-  if (value === 'any') {
-    selectedBedrooms.value = ['any']
-  } else {
-    const index = selectedBedrooms.value.indexOf(value)
-    if (index > -1) {
-      selectedBedrooms.value.splice(index, 1)
-      // 如果没有选中任何项，设置为'any'
-      if (selectedBedrooms.value.length === 0) {
-        selectedBedrooms.value = ['any']
-      }
-    } else {
-      // 移除'any'选项，添加具体选项
-      selectedBedrooms.value = selectedBedrooms.value.filter(v => v !== 'any')
-      selectedBedrooms.value.push(value)
-    }
+  // 当切换到移动端视图时，自动关闭任何打开的面板
+  if (isMobile.value && activePanel.value) {
+    activePanel.value = null
+    return
   }
-  applyFilters()
-}
-
-const isPriceRangeSelected = (range) => {
-  return customPriceRange.value[0] === range.min && customPriceRange.value[1] === range.max
-}
-
-const selectPriceRange = (range) => {
-  customPriceRange.value = [range.min, range.max]
-  applyFilters()
-}
-
-const updateCustomPrice = () => {
-  applyFilters()
-}
-
-const selectAvailability = (value) => {
-  selectedAvailability.value = value
-  applyFilters()
-  closeDropdown()
-}
-
-const applyFilters = () => {
-  const filterParams = {
-    areas: selectedAreas.value,
-    bedrooms: selectedBedrooms.value.includes('any') ? 'any' : selectedBedrooms.value.join(','),
-    minPrice: customPriceRange.value[0] > 0 ? customPriceRange.value[0] : null,
-    maxPrice: customPriceRange.value[1] < 5000 ? customPriceRange.value[1] : null,
-    availability: selectedAvailability.value
+  // PC 场景：若有面板打开，随窗口变化重新计算显式定位
+  if (activePanel.value) {
+    const el = getRef(activePanel.value)?.value
+    positions[activePanel.value] = computePosition(el)
   }
-  
-  propertiesStore.applyFilters(filterParams)
-  emit('filtersChanged', filterParams)
 }
 
-// 生命周期
+// 生命周期钩子
 onMounted(() => {
-  // 点击外部关闭下拉
-  document.addEventListener('click', handleClickOutside)
-  
-  // 同步初始筛选状态
-  if (props.currentFilters) {
-    syncFiltersFromPanel(props.currentFilters)
+  // 中文注释：组件挂载时即同步一次视口宽度，避免 SSR/初始值造成的断点误判
+  if (typeof window !== 'undefined') {
+    viewportWidth.value = window.innerWidth
   }
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('resize', handleResize)
 })
 
-const handleClickOutside = (event) => {
-  if (!event.target.closest('.filter-tabs-container')) {
-    closeDropdown()
-  }
-}
+// 保存搜索相关状态
+const showSaveModal = ref(false)
 
-// 同步来自FilterPanel的筛选状态
-const syncFiltersFromPanel = (filters) => {
-  if (filters.areas) {
-    selectedAreas.value = Array.isArray(filters.areas) ? filters.areas : []
+// 检查是否有活跃的筛选条件
+const hasActiveFilters = computed(() => {
+  return areaApplied.value ||
+         bedroomsApplied.value ||
+         priceApplied.value ||
+         availabilityApplied.value ||
+         moreApplied.value
+})
+
+// 构建当前筛选条件对象
+const currentFilterConditions = computed(() => {
+  const conditions = {}
+
+  // 从 appliedParams 获取当前筛选条件
+  const params = appliedParams.value || {}
+
+  // 房型
+  if (params.bedrooms) {
+    conditions.bedrooms = params.bedrooms
   }
-  if (filters.bedrooms) {
-    selectedBedrooms.value = filters.bedrooms === 'any' ? ['any'] : filters.bedrooms.split(',')
-  }
-  if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-    customPriceRange.value = [
-      filters.minPrice || 0,
-      filters.maxPrice || 5000
+
+  // 价格范围
+  const minPrice = params.minPrice ?? params.price_min
+  const maxPrice = params.maxPrice ?? params.price_max
+  if (minPrice != null || maxPrice != null) {
+    conditions.priceRange = [
+      minPrice != null ? Number(minPrice) : 0,
+      maxPrice != null ? Number(maxPrice) : 5000
     ]
   }
-  if (filters.availability) {
-    selectedAvailability.value = filters.availability
+
+  // 浴室
+  if (params.bathrooms) {
+    conditions.bathrooms = params.bathrooms
   }
+
+  // 车位
+  if (params.parking) {
+    conditions.parking = params.parking
+  }
+
+  // 家具
+  if (params.isFurnished === true || params.furnished === true) {
+    conditions.furnished = true
+  }
+
+  // 日期
+  if (params.date_from) {
+    conditions.dateFrom = new Date(params.date_from)
+  }
+  if (params.date_to) {
+    conditions.dateTo = new Date(params.date_to)
+  }
+
+  return conditions
+})
+
+// 处理保存搜索按钮点击
+const handleSaveSearch = () => {
+  if (!hasActiveFilters.value) return
+  showSaveModal.value = true
 }
 
-// 暴露方法给父组件
-defineExpose({
-  syncFiltersFromPanel
-})
+// 处理搜索保存成功
+const handleSearchSaved = async (savedSearch) => {
+  try {
+    // 保存成功后，应用筛选并刷新页面
+    await propertiesStore.applyFilters(appliedParams.value)
+
+    // 向父组件发射事件
+    emit('searchSaved', savedSearch)
+
+    console.log('搜索已保存并应用！', savedSearch)
+
+  } catch (error) {
+    console.error('应用筛选失败:', error)
+  }
+}
 </script>
 
 <style scoped>
-/* Domain风格筛选标签栏 */
+/* 顶部筛选标签栏 */
 .filter-tabs-container {
   position: relative;
   width: 100%;
@@ -365,24 +657,24 @@ defineExpose({
   gap: 8px;
   align-items: center;
   flex-wrap: wrap; /* PC端允许换行 */
-  padding: 0; /* 移除padding让对齐更精确 */
+  padding: 0;
   height: 48px; /* 与搜索框高度一致 */
 }
 
 /* PC端右侧布局时的样式调整 */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .filter-tabs-container {
     max-width: none;
   }
-  
+
   .filter-tabs {
-    justify-content: flex-start; /* 紧邻搜索框，不要右对齐 */
+    justify-content: flex-start; /* 紧邻搜索框 */
     flex-wrap: wrap;
   }
 }
 
-/* 移动端保持原有样式 */
-@media (max-width: 768px) {
+/* 移动端保持原有流式排列 */
+@media (width <= 768px) {
   .filter-tabs-container {
     width: 100%;
     max-width: 100%;
@@ -390,20 +682,11 @@ defineExpose({
     padding: 0 16px;
     box-sizing: border-box;
   }
-  
+
   .filter-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
     padding-bottom: 4px; /* 为滚动条留空间 */
-  }
-  
-  /* 移动端下拉框调整 */
-  .quick-filter-dropdown {
-    position: fixed;  /* 移动端使用fixed定位 */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 340px;
   }
 }
 
@@ -411,222 +694,207 @@ defineExpose({
   display: none;
 }
 
-/* 筛选标签按钮 */
+/* 单个入口 */
+.filter-tab-entry {
+  position: relative;
+}
+
+/* 筛选标签按钮（保持与现有 token 一致） */
 .filter-tab {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  border-radius: 20px;
+  background: var(--chip-bg);
+  border: none;
+  border-radius: 0;
   font-size: 14px;
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
   white-space: nowrap;
-  position: relative;
+  position: relative; /* 为小蓝点定位 */
 }
 
 .filter-tab:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
-}
-
-.filter-tab.active,
-.filter-tab-dropdown.active .filter-tab {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-  color: white;
-}
-
-.filter-tab i {
-  font-size: 12px;
-}
-
-/* 筛选状态标识 */
-.filter-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--juwo-primary);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 16px;
-  text-align: center;
-}
-
-.filter-tab.active .filter-badge {
-  background: white;
-  color: var(--juwo-primary);
-}
-
-/* 下拉框容器 */
-.filter-tab-dropdown {
-  position: relative;
-}
-
-/* 快速筛选下拉框 */
-.quick-filter-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid var(--color-border-default);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  z-index: 10001;  /* 提高z-index以确保在FilterPanel之上 */
-  min-width: 220px;
-  max-width: 280px;
-  padding: 16px;
-  margin-top: 4px;
-  pointer-events: auto;  /* 确保可以接收点击事件 */
-}
-
-.dropdown-header {
-  font-size: 14px;
-  font-weight: 600;
+  background: var(--chip-bg-hover);
   color: var(--color-text-primary);
-  margin-bottom: 12px;
 }
 
-/* 区域选项 */
-.area-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* 激活状态样式 */
+.filter-tab.active {
+  background: var(--chip-bg-selected); /* 中文注释：激活态统一为中性 chips 选中底色 */
+  color: var(--color-text-primary);
 }
 
-.area-option {
+/* 箭头图标 */
+.chevron-icon {
+  width: 16px;
+  height: 16px;
+  color: currentcolor;
+}
+
+/* 移动端筛选按钮 */
+.filter-tabs-mobile {
   display: flex;
+  justify-content: flex-end;
+}
+
+.filter-button {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.area-option:hover {
-  background: var(--juwo-primary-50);
-}
-
-.area-option input[type="checkbox"] {
-  margin: 0;
-}
-
-/* 选项按钮 */
-.bedroom-options,
-.availability-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.price-options {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.option-btn {
-  padding: 8px 12px;
+  justify-content: center;
+  height: 34px;
+  padding: 0 12px;
+  gap: 2px;
   border: 1px solid var(--color-border-default);
-  border-radius: 6px;
-  background: white;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--filter-radius-lg);
+  background: var(--color-bg-card);
   color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
 }
 
-.option-btn:hover {
-  border-color: var(--juwo-primary);
-  color: var(--juwo-primary);
-  background: var(--juwo-primary-50);
+.filter-button:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: var(--bg-hover);
 }
 
-.option-btn.selected {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
-  color: white;
-}
-
-/* 自定义价格滑块 */
-.custom-price {
-  border-top: 1px solid var(--color-border-default);
-  padding-top: 16px;
-}
-
-.price-slider-mini {
-  margin: 8px 0;
-}
-
-.price-slider-mini :deep(.el-slider__runway) {
-  background-color: var(--color-border-default);
-}
-
-.price-slider-mini :deep(.el-slider__bar) {
-  background-color: var(--juwo-primary);
-}
-
-.price-slider-mini :deep(.el-slider__button) {
-  border: 2px solid var(--juwo-primary);
-  background-color: white;
+.filter-icon {
   width: 16px;
   height: 16px;
 }
 
-.price-range-display {
-  text-align: center;
-  font-size: 12px;
+/* 已应用高亮（严格使用 design token，与 active 保持一致风格） */
+.filter-tab.applied {
+  background: var(--chip-bg-selected);
+  color: var(--color-text-primary);
+}
+
+/* 移除小蓝点样式 */
+
+/* 保存搜索按钮样式 */
+.save-search-section {
+  margin-left: 16px;
+}
+
+.save-search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 16px;
+  gap: 8px;
+  border: none;
+  border-radius: 8px;
+  background: var(--juwo-primary);
+  color: white;
   font-weight: 600;
-  color: var(--juwo-primary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-/* 遮罩层 */
-.dropdown-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10000;  /* 提高以配合dropdown */
-  background: transparent;
-  pointer-events: auto;
+.save-search-btn:hover:not(:disabled) {
+  background: var(--juwo-primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* 响应式设计 */
-@media (max-width: 767px) {
+.save-search-btn:disabled,
+.save-search-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
+.save-search-btn:disabled:hover,
+.save-search-btn.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.save-icon {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* 移动端保存搜索按钮 */
+.filter-tabs-mobile {
+  gap: 8px;
+}
+
+.save-search-btn-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 12px;
+  gap: 6px;
+  border: 1px solid var(--juwo-primary);
+  border-radius: var(--filter-radius-lg);
+  background: var(--juwo-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.save-search-btn-mobile:hover:not(:disabled) {
+  background: var(--juwo-primary-light);
+  border-color: var(--juwo-primary-light);
+}
+
+.save-search-btn-mobile:disabled,
+.save-search-btn-mobile.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-border-default);
+  border-color: var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+
+/* 更多筛选面板占位 */
+.more-filter-placeholder {
+  width: 280px;
+  padding: 20px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* PC端保存搜索按钮在筛选按钮右侧的布局调整 */
+@media (width >= 769px) {
   .filter-tabs {
-    padding: 8px 4px;
-    gap: 6px;
+    align-items: center;
   }
-  
-  .filter-tab {
-    padding: 8px 12px;
-    font-size: 13px;
+
+  .save-search-section {
+    margin-left: auto;
+    padding-left: 16px;
   }
-  
-  .quick-filter-dropdown {
-    min-width: 200px;
-    max-width: 240px;
-    padding: 12px;
+}
+
+/* 移动端布局调整 */
+@media (width <= 768px) {
+  .filter-tabs-mobile {
+    justify-content: space-between;
+    width: 100%;
   }
-  
-  .filter-badge {
-    top: -2px;
-    right: -2px;
-    font-size: 9px;
-    padding: 1px 4px;
+
+  .save-search-btn-mobile {
+    flex-shrink: 0;
   }
 }
 </style>

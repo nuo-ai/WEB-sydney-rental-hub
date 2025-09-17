@@ -14,38 +14,38 @@
         <h2 class="modal-title">{{ isLogin ? 'Sign in' : 'Create an account' }}</h2>
       </div>
     </template>
-    
+
     <div class="auth-content">
-      <el-form 
+      <el-form
         ref="authFormRef"
-        :model="authForm" 
+        :model="authForm"
         :rules="authRules"
         label-position="top"
         class="auth-form"
       >
         <el-form-item label="Email address" prop="email">
-          <el-input 
-            v-model="authForm.email" 
+          <el-input
+            v-model="authForm.email"
             placeholder="Enter your email"
             size="large"
             @keyup.enter="handleSubmit"
           />
         </el-form-item>
-        
+
         <el-form-item label="Password" prop="password">
-          <el-input 
-            v-model="authForm.password" 
-            type="password" 
+          <el-input
+            v-model="authForm.password"
+            type="password"
             placeholder="Enter password"
             size="large"
             show-password
             @keyup.enter="handleSubmit"
           />
         </el-form-item>
-        
-        <el-button 
-          type="danger" 
-          size="large" 
+
+        <el-button
+          type="danger"
+          size="large"
           :loading="loading"
           @click="handleSubmit"
           class="submit-btn"
@@ -53,18 +53,18 @@
           {{ isLogin ? 'Sign in' : 'Create account' }}
         </el-button>
       </el-form>
-      
+
       <div class="switch-mode">
         <span>{{ isLogin ? "Don't have an account?" : 'Already have an account?' }}</span>
         <a @click="toggleMode" class="switch-link">
           {{ isLogin ? 'Create account' : 'Sign in' }}
         </a>
       </div>
-      
+
       <div class="divider">
         <span>or continue with</span>
       </div>
-      
+
       <div class="social-buttons">
         <button class="social-btn google-btn" @click="handleGoogleAuth">
           <i class="fab fa-google"></i>
@@ -77,9 +77,9 @@
       </div>
     </div>
   </el-dialog>
-  
+
   <!-- Email Verification Modal -->
-  <EmailVerifyModal 
+  <EmailVerifyModal
     v-if="showVerifyModal"
     v-model="showVerifyModal"
     :email="authForm.email"
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 import EmailVerifyModal from './EmailVerifyModal.vue'
@@ -96,8 +96,8 @@ import EmailVerifyModal from './EmailVerifyModal.vue'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'success'])
@@ -113,25 +113,28 @@ const authFormRef = ref()
 
 const authForm = ref({
   email: '',
-  password: ''
+  password: '',
 })
 
 // 表单验证规则
 const authRules = {
   email: [
     { required: true, message: 'Please enter email address', trigger: 'blur' },
-    { type: 'email', message: 'Please enter a valid email address', trigger: 'blur' }
+    { type: 'email', message: 'Please enter a valid email address', trigger: 'blur' },
   ],
   password: [
     { required: true, message: 'Please enter password', trigger: 'blur' },
-    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
-  ]
+    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' },
+  ],
 }
 
 // 监听props变化
-watch(() => props.modelValue, (newVal) => {
-  visible.value = newVal
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    visible.value = newVal
+  },
+)
 
 // 监听visible变化
 watch(visible, (newVal) => {
@@ -143,7 +146,7 @@ const handleClose = () => {
   // 重置表单
   authForm.value = {
     email: '',
-    password: ''
+    password: '',
   }
   if (authFormRef.value) {
     authFormRef.value.clearValidate()
@@ -162,9 +165,9 @@ const handleSubmit = async () => {
   // 验证表单
   const valid = await authFormRef.value.validate().catch(() => false)
   if (!valid) return
-  
+
   loading.value = true
-  
+
   try {
     if (isLogin.value) {
       // 登录逻辑
@@ -381,11 +384,11 @@ const handleFacebookAuth = () => {
 }
 
 /* Mobile optimization */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .auth-content {
     padding: 24px 16px;
   }
-  
+
   .modal-header {
     padding: 16px;
   }

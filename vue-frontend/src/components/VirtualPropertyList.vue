@@ -6,12 +6,12 @@
       :style="{
         height: `${totalHeight}px`,
         width: '100%',
-        position: 'relative'
+        position: 'relative',
       }"
     >
       <!-- 虚拟化的房源卡片 -->
       <div
-        v-for="(item, index) in visibleItems"
+        v-for="item in visibleItems"
         :key="`row-${item.index}`"
         class="virtual-row-wrapper"
         :style="{
@@ -20,7 +20,7 @@
           left: 0,
           width: '100%',
           height: `${item.height}px`,
-          transform: `translateY(${item.offset}px)`
+          transform: `translateY(${item.offset}px)`,
         }"
       >
         <div class="virtual-row">
@@ -38,18 +38,16 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import PropertyCard from './PropertyCard.vue'
 
 const props = defineProps({
   properties: {
     type: Array,
     required: true,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
-
-const emit = defineEmits(['property-click', 'contact-property'])
 
 // 响应式引用
 const containerRef = ref(null)
@@ -65,11 +63,11 @@ const OVERSCAN = 3 // 预渲染的行数
 const getColumns = () => {
   const width = window.innerWidth
   if (width < 768) {
-    return 1  // 移动端单列
+    return 1 // 移动端单列
   } else if (width < 1024) {
-    return 2  // 平板双列
+    return 2 // 平板双列
   } else {
-    return 2  // 桌面端双列
+    return 2 // 桌面端双列
   }
 }
 
@@ -90,10 +88,10 @@ const totalHeight = computed(() => {
 const visibleRange = computed(() => {
   const start = Math.floor(scrollTop.value / rowHeight.value)
   const end = Math.ceil((scrollTop.value + containerHeight.value) / rowHeight.value)
-  
+
   return {
     start: Math.max(0, start - OVERSCAN),
-    end: Math.min(totalRows.value, end + OVERSCAN)
+    end: Math.min(totalRows.value, end + OVERSCAN),
   }
 })
 
@@ -101,22 +99,22 @@ const visibleRange = computed(() => {
 const visibleItems = computed(() => {
   const items = []
   const { start, end } = visibleRange.value
-  
+
   for (let i = start; i < end; i++) {
     const startIdx = i * columns.value
     const endIdx = Math.min(startIdx + columns.value, props.properties.length)
     const rowProperties = props.properties.slice(startIdx, endIdx)
-    
+
     if (rowProperties.length > 0) {
       items.push({
         index: i,
         offset: i * rowHeight.value,
         height: rowHeight.value,
-        properties: rowProperties
+        properties: rowProperties,
       })
     }
   }
-  
+
   return items
 })
 
@@ -142,25 +140,25 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
-
 </script>
 
 <style scoped>
 .virtual-list-container {
   width: 100%;
   height: 600px; /* 固定高度，确保虚拟滚动正常工作 */
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   position: relative;
+  /* 中文注释：稳定预留滚动条轨道，避免出现/消失引发布局跳动并确保对齐 */
+  scrollbar-gutter: stable;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .virtual-list-container {
     height: calc(100vh - 280px); /* 移动端调整高度 */
   }
 }
 
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .virtual-list-container {
     height: calc(100vh - 200px); /* 桌面端动态高度 */
   }
@@ -178,21 +176,21 @@ onUnmounted(() => {
 }
 
 /* 响应式网格布局 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .virtual-row {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (width >= 768px) and (width <= 1023px) {
   .virtual-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .virtual-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
@@ -201,21 +199,23 @@ onUnmounted(() => {
 
 /* 滚动条样式优化 */
 .virtual-list-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: var(--scrollbar-w);
+  height: var(--scrollbar-w);
 }
 
 .virtual-list-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent; /* 中文注释：统一滚动条轨道为透明，由容器底色决定视觉 */
   border-radius: 4px;
 }
 
 .virtual-list-container::-webkit-scrollbar-thumb {
-  background: #888;
+  background-color: var(--neutral-scrollbar-color); /* 中文注释：滚动条滑块统一中性灰令牌 */
   border-radius: 4px;
 }
 
 .virtual-list-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background-color: var(
+    --neutral-scrollbar-hover-color
+  ); /* 中文注释：hover 略加深，保持一致的前端表现 */
 }
 </style>

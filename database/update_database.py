@@ -159,6 +159,13 @@ class PropertyDataProcessor:
             else:
                 df[col] = None
                 
+        # 规范化邮编：统一为4位字符串，移除小数/噪声（例如 "2010.0" -> "2010"）
+        # 原因：CSV 列混型时 pandas 会将整列推断为 float，导致写回 DB 变成 "2010.0"
+        if 'postcode' in df.columns:
+            df['postcode'] = df['postcode'].astype(str).str.extract(r'(\d{4})')[0].fillna('').str.strip()
+        else:
+            df['postcode'] = ''
+                
         # 去重
         if 'listing_id' in df.columns:
             initial_count = len(df)

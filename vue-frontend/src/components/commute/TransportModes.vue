@@ -5,7 +5,7 @@
       :key="mode.value"
       :class="['mode-btn', { active: modelValue === mode.value }]"
       @click="selectMode(mode.value)"
-      :title="mode.label"
+      :title="$t('commute.modes.' + mode.value.toLowerCase())"
     >
       <i :class="mode.icon"></i>
     </button>
@@ -13,33 +13,31 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-const props = defineProps({
+defineProps({
   modelValue: {
     type: String,
-    default: 'DRIVING'
-  }
+    default: 'DRIVING',
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const modes = [
-  { 
-    value: 'DRIVING', 
+  {
+    value: 'DRIVING',
     icon: 'fas fa-car',
-    label: 'Driving'
+    label: 'Driving',
   },
-  { 
-    value: 'TRANSIT', 
+  {
+    value: 'TRANSIT',
     icon: 'fas fa-bus',
-    label: 'Public transport'
+    label: 'Public transport',
   },
-  { 
-    value: 'WALKING', 
+  {
+    value: 'WALKING',
     icon: 'fas fa-walking',
-    label: 'Walking'
-  }
+    label: 'Walking',
+  },
 ]
 
 const selectMode = (value) => {
@@ -80,9 +78,11 @@ const selectMode = (value) => {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s;
+  transition:
+    width 0.3s,
+    height 0.3s;
 }
 
 .mode-btn:hover::before {
@@ -113,11 +113,11 @@ const selectMode = (value) => {
     width: 0;
     height: 0;
   }
-  
+
   .mode-btn:hover {
     background: #f5f5f5;
   }
-  
+
   .mode-btn.active:hover {
     background: #333;
   }

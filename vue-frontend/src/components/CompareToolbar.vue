@@ -3,7 +3,9 @@
     <div class="compare-items">
       <div v-for="item in compareItems" :key="item.listing_id" class="compare-item">
         <span>{{ item.address }}</span>
-        <el-button size="small" circle :icon="Close" @click="removeFromCompare(item.listing_id)" />
+        <el-button size="small" circle @click="removeFromCompare(item.listing_id)">
+          <template #icon><X class="spec-icon" /></template>
+        </el-button>
       </div>
     </div>
     <el-button type="primary" @click="goToCompare" :disabled="compareItems.length < 2">
@@ -16,13 +18,15 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
-import { Close } from '@element-plus/icons-vue'
+import { X } from 'lucide-vue-next'
 
 const propertiesStore = usePropertiesStore()
 const router = useRouter()
 
 const compareItems = computed(() => {
-  return propertiesStore.allProperties.filter(p => propertiesStore.compareIds.includes(p.listing_id))
+  return propertiesStore.allProperties.filter((p) =>
+    propertiesStore.compareIds.includes(p.listing_id),
+  )
 })
 
 const removeFromCompare = (id) => {
@@ -40,22 +44,25 @@ const goToCompare = () => {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
-  color: white;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
   padding: 10px 20px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-xs);
   z-index: 1001;
 }
+
 .compare-items {
   display: flex;
   gap: 10px;
 }
+
 .compare-item {
-  background: #555;
+  background: var(--surface-2);
   padding: 5px 10px;
   border-radius: 4px;
   display: flex;

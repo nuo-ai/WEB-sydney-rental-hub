@@ -17,7 +17,9 @@ import PropertyCard from '@/components/PropertyCard.vue'
 const propertiesStore = usePropertiesStore()
 
 const compareItems = computed(() => {
-  return propertiesStore.allProperties.filter(p => propertiesStore.compareIds.includes(p.listing_id))
+  return propertiesStore.allProperties.filter((p) =>
+    propertiesStore.compareIds.includes(p.listing_id),
+  )
 })
 </script>
 
@@ -27,6 +29,7 @@ const compareItems = computed(() => {
   padding-left: 24px;
   padding-right: 24px;
 }
+
 .compare-grid {
   display: flex;
   gap: 20px;

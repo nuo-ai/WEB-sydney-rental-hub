@@ -18,7 +18,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, date
 # import os # os and load_dotenv are now handled in server.db
 import logging
-from typing import Any, Dict, List, Optional, TypeVar, Generic
+from typing import Any, Dict, List, Optional, TypeVar, Generic, Tuple
 import json
 import asyncio
 import os
@@ -33,6 +33,7 @@ from api.graphql_schema import schema as gql_schema # Renamed to avoid conflict 
 from api.auth_routes import router as auth_router # Import auth routes
 import db as db_module # Import the module itself
 from db import init_db_pool, close_db_pool, get_db_conn_dependency # Import specific functions
+from utils import static_data as static_data_utils
 
 # Standardized API Response Models
 T = TypeVar('T')
@@ -185,7 +186,7 @@ def decode_cursor(cursor: str) -> str:
     return base64.urlsafe_b64decode(cursor.encode('utf-8')).decode('utf-8')
 
 # Asynchronous pagination logic adapted for psycopg2
-async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> (List[Dict], PaginationInfo):
+async def paginate_query(db_conn: Any, query: str, count_query: str, params: tuple, pagination: PaginationParams) -> Tuple[List[Dict], PaginationInfo]:
     def _db_calls():
         with db_conn.cursor() as cursor:
             cursor.execute(count_query, params)
@@ -327,23 +328,43 @@ async def lifespan(app: FastAPI):
     app.state.db_pool_initialized = True
     logger.info("Database pool initialization completed.")
     
-    # 检查并优化数据库索引
-    # 仅在首次启动或每周执行一次，避免每次重启都执行
+    # 检查并优化数据库索引（增加可跳过与超时保护，避免启动卡死）
+    # 仅在生产环境执行，或当未显式跳过时执行
     try:
-        await check_and_optimize_indexes()
+        skip_opt = os.getenv("SKIP_INDEX_OPTIMIZATION", "").lower() in ("1", "true", "yes")
+        optimize_timeout = float(os.getenv("INDEX_OPTIMIZE_TIMEOUT", "8"))
+        if skip_opt or env != "production":
+            logger.info(f"跳过索引优化：SKIP_INDEX_OPTIMIZATION={skip_opt}，env={env}")
+        else:
+            logger.info(f"开始索引优化（超时 {optimize_timeout}s）...")
+            await asyncio.wait_for(check_and_optimize_indexes(), timeout=optimize_timeout)
+    except asyncio.TimeoutError:
+        logger.warning("索引优化超时，跳过并继续启动。")
     except Exception as e:
         logger.warning(f"索引优化检查失败: {e}. 继续启动...")
     
-    # Initialize Redis Cache with fallback to in-memory cache
+    # Initialize Redis Cache with fallback to in-memory cache（增加可配置与超时）
     try:
-        redis = aioredis.from_url("redis://localhost", encoding="utf8", decode_responses=True)
-        # Test Redis connection
-        await redis.ping()
+        redis_url = os.getenv("REDIS_URL", "").strip()
+        if not redis_url:
+            raise RuntimeError("REDIS_URL 未配置，使用内存缓存")
+        connect_timeout = float(os.getenv("REDIS_CONNECT_TIMEOUT", "0.5"))
+        socket_timeout = float(os.getenv("REDIS_SOCKET_TIMEOUT", "0.5"))
+        ping_timeout = float(os.getenv("REDIS_PING_TIMEOUT", "1.0"))
+        redis = aioredis.from_url(
+            redis_url,
+            encoding="utf8",
+            decode_responses=True,
+            socket_connect_timeout=connect_timeout,
+            socket_timeout=socket_timeout
+        )
+        # Test Redis connection with timeout
+        await asyncio.wait_for(redis.ping(), timeout=ping_timeout)
         app.state.redis = redis  # Store redis client in app state for cache invalidation
         FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-        logger.info("FastAPI Cache initialized with Redis backend.")
+        logger.info(f"FastAPI Cache initialized with Redis backend ({redis_url}).")
     except Exception as e:
-        logger.warning(f"Redis not available: {e}. Using in-memory cache as fallback.")
+        logger.warning(f"Redis 不可用或未配置: {e}。使用内存缓存作为降级。")
         # 使用内存缓存作为降级方案
         from fastapi_cache.backends.inmemory import InMemoryBackend
         FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
@@ -359,10 +380,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Rental MCP Server", version="1.0.0", lifespan=lifespan)
 app.state.limiter = limiter
 
+# 自定义缓存键：使用完整URL（含查询参数）作为缓存键，确保分页/筛选（尤其 page/page_size、价格/日期）不会相互污染
+# 为什么：计数请求（page_size=1）与列表请求（page_size=20）参数不同，默认键可能未包含查询，导致命中相同缓存条目
+from fastapi import Request
+def cache_key_by_url(func, namespace, request: Request, response, *args, **kwargs):
+    return f"{namespace}:{str(request.url)}"
+
 # Cache helper functions for selective invalidation
 async def invalidate_property_cache(property_id: str = None):
     """Invalidate cache for a specific property or all properties"""
     redis = app.state.redis
+    if not redis:
+        logger.info("Cache invalidation skipped: Redis backend not configured.")
+        return
     if property_id:
         # Invalidate specific property detail cache
         pattern = f"fastapi-cache:get_property_by_id:property_id={property_id}*"
@@ -378,28 +408,62 @@ async def invalidate_property_cache(property_id: str = None):
 async def invalidate_all_cache():
     """Invalidate all cache entries"""
     redis = app.state.redis
+    if not redis:
+        logger.info("Cache invalidation skipped: Redis backend not configured.")
+        return
     async for key in redis.scan_iter(match="fastapi-cache:*"):
         await redis.delete(key)
     logger.info("All cache entries invalidated")
 
-# CORS Middleware Configuration
-origins = [
-    "http://localhost",
-    "http://localhost:5500",    # Standard Live Server
-    "http://127.0.0.1:5500",
-    "http://localhost:8080",    # Python http.server
-    "http://127.0.0.1:8080",
-    "http://localhost:8888",    # Netlify Dev Server
-    "http://127.0.0.1:8888",
-]
+# CORS 中间件配置（动态化）
+# 说明（为什么这么做）：
+# - 生产环境仅放行明确的前端域名（安全优先）
+# - 开发/非生产环境放宽（使用正则）以便于本地调试与临时域名验证
+# - 允许通过环境变量 FRONTEND_URL 与 ADDITIONAL_CORS 配置额外来源（逗号分隔）
+env = os.getenv("ENVIRONMENT", "development").lower()
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+additional_cors = os.getenv("ADDITIONAL_CORS", "").strip()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 收集允许的来源（生产使用）
+allowed_origins = {
+    # 常见本地来源（用于生产时也可保留以便临时联调）
+    "http://localhost",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://localhost:8888",
+    "http://127.0.0.1:8888",
+}
+
+if frontend_url:
+    allowed_origins.add(frontend_url)
+
+if additional_cors:
+    for origin in [x.strip() for x in additional_cors.split(",") if x.strip()]:
+        allowed_origins.add(origin)
+
+if env == "production" and allowed_origins:
+    # 生产：白名单明确域名；保持 allow_credentials=True
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(allowed_origins),
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # 开发/非生产：使用正则允许任意来源，便于本地与临时公网域调试
+    # 说明：使用 allow_origin_regex 可与 allow_credentials=True 共存，并回显具体 Origin
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=".*",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Exception Handlers
 @app.exception_handler(RateLimitExceeded)
@@ -580,6 +644,15 @@ async def get_cache_stats():
     """Get cache statistics"""
     try:
         redis = app.state.redis
+        if not redis:
+            return {
+                "backend": "memory",
+                "total_keys": 0,
+                "property_list_cached": 0,
+                "property_details_cached": 0,
+                "memory_used": "N/A",
+                "connected_clients": 0
+            }
         info = await redis.info()
         keys_count = await redis.dbsize()
         
@@ -1127,20 +1200,38 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
     Get a single property by its ID.
     """
     logger.info(f"====== HIT get_property_by_id with ID: {property_id} ======")
-    # In a real app, you would have a CRUD function to get a single property
-    # For now, we'll fetch all and filter, which is inefficient.
-    # This should be replaced with a direct DB call.
-    # NOTE: This is a placeholder implementation.
-    
-    # Correct implementation:
-    prop = await asyncio.to_thread(get_property_by_id_from_db, property_id)
-    if not prop:
+    def _static_fallback(db_unavailable: bool):
+        fallback = static_data_utils.get_property(property_id)
+        if fallback:
+            return success_response(data=fallback)
+        if db_unavailable and not static_data_utils.dataset_available():
+            return error_response(
+                code=ErrorCodes.INTERNAL_SERVER_ERROR,
+                message="Property data source is temporarily unavailable.",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         return error_response(
             code=ErrorCodes.RESOURCE_NOT_FOUND,
             message=f"Property with ID {property_id} not found.",
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_404_NOT_FOUND,
         )
-    
+
+    if db is None:
+        logger.warning("Database connection unavailable for property detail; using fallback data")
+        return _static_fallback(db_unavailable=True)
+
+    try:
+        prop = await asyncio.to_thread(get_property_by_id_from_db, property_id)
+    except RuntimeError as exc:
+        logger.error(f"Database runtime error while fetching property {property_id}: {exc}")
+        return _static_fallback(db_unavailable=True)
+    except Exception as exc:
+        logger.error(f"Unexpected error fetching property {property_id}: {exc}", exc_info=True)
+        return _static_fallback(db_unavailable=True)
+
+    if not prop:
+        return _static_fallback(db_unavailable=False)
+
     # Manually convert the Strawberry object to a dictionary
     prop_dict = {
         "listing_id": prop.listing_id,
@@ -1160,16 +1251,19 @@ async def get_property_by_id(property_id: str, db: Any = Depends(get_db_conn_dep
         "latitude": prop.latitude,
         "longitude": prop.longitude,
         "geom_wkt": prop.geom_wkt,
+        "is_furnished": prop.is_furnished,
         "description": prop.description,  # Add description field
-        "property_headline": prop.property_headline  # 添加房源标题字段
+        "property_headline": prop.property_headline,  # 添加房源标题字段
+        "inspection_times": prop.inspection_times  # 补充看房时间字段，修复刷新后消失
     }
-    
+
     return success_response(data=prop_dict)
 
 
 @app.get("/api/properties", tags=["Properties"], response_model=APIResponse[List[Dict]])
-@cache(expire=900) # Cache for 15 minutes
+@cache(expire=900, key_builder=cache_key_by_url)  # Cache for 15 minutes（包含URL查询参数到缓存键）
 async def get_properties(
+    request: Request,
     pagination: PaginationParams = Depends(), 
     db: Any = Depends(get_db_conn_dependency),
     # Filter parameters
@@ -1182,19 +1276,85 @@ async def get_properties(
     maxPrice: Optional[int] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
-    isFurnished: Optional[bool] = None
+    isFurnished: Optional[bool] = None,
+    # 兼容参数（V2/部分入口）：如传入 furnished=true，则等价于 isFurnished=true
+    furnished: Optional[bool] = None,
+    # 点名过滤（便于校验）
+    listing_id: Optional[str] = None,
+    # 排序参数（白名单）：price_asc/available_date_asc/suburb_az/inspection_earliest
+    sort: Optional[str] = None,
 ):
     """
     Get a paginated list of properties with optional filters.
     Supports both page-based and cursor-based pagination.
     """
+    # --- BE-002: 查询参数白名单校验（防注入/契约一致） ---
+    # 中文注释：在不改变现有键语义的前提下拦截未知键，并对白名单排序值做严格校验
+    try:
+        # 允许的查询键（V1 契约，保持与前端现状一致）
+        allowed_keys = {
+            "suburb", "property_type", "bedrooms", "bathrooms", "parking",
+            "minPrice", "maxPrice", "date_from", "date_to",
+            "isFurnished", "furnished",
+            "listing_id",
+            "page", "page_size", "cursor", "sort",
+        }
+        qp_keys = set(request.query_params.keys())
+        unknown_keys = sorted(list(qp_keys - allowed_keys))
+        invalid_values = {}
+
+        # 排序值白名单：其余值一律 400，兜底排序在后续仍为 listing_id ASC
+        allowed_sorts = {"price_asc", "available_date_asc", "suburb_az", "inspection_earliest"}
+        if "sort" in request.query_params:
+            s_raw = (request.query_params.get("sort") or "").strip().lower()
+            if s_raw and s_raw not in allowed_sorts:
+                invalid_values["sort"] = {"got": s_raw, "allowed": sorted(list(allowed_sorts))}
+
+        if unknown_keys or invalid_values:
+            return error_response(
+                code=ErrorCodes.BAD_REQUEST,
+                message="Invalid query parameters",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                details={
+                    "unknown_keys": unknown_keys or None,
+                    "allowed_keys": sorted(list(allowed_keys)),
+                    "invalid_values": invalid_values or None,
+                }
+            )
+    except Exception as _be002_e:
+        # 容错：白名单校验异常不应阻断正常查询，记录日志后继续
+        logger.warning(f"Whitelist validation failed but skipped: {_be002_e}")
+
+    def _static_properties_response():
+        params_copy = dict(request.query_params)
+        params_copy.pop("cursor", None)
+        params_copy.setdefault("page", pagination.page)
+        params_copy.setdefault("page_size", pagination.page_size)
+        fallback = static_data_utils.list_properties(
+            params_copy,
+            page=pagination.page,
+            page_size=pagination.page_size,
+        )
+        if fallback is None:
+            return error_response(
+                code=ErrorCodes.INTERNAL_SERVER_ERROR,
+                message="Property list is temporarily unavailable.",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        pagination_info = PaginationInfo(**fallback["pagination"])
+        return success_response(data=fallback["data"], pagination=pagination_info)
+
+    if db is None:
+        logger.warning("Database unavailable for property list; using static fallback")
+        return _static_properties_response()
+
     # Build the base query with filters - 只选择列表页需要的字段，减少数据传输
     # 排除大字段如 description 和 property_features，提升性能
     base_query = """SELECT 
         listing_id, property_url, address, suburb, state, postcode, 
         property_type, rent_pw, bond, bedrooms, bathrooms, parking_spaces,
         available_date, inspection_times, agency_name, agent_name,
-        property_headline, latitude, longitude, images, cover_image,
+        property_headline, latitude, longitude, images,
         is_active, status, created_at, last_updated,
         has_air_conditioning, is_furnished, has_balcony, has_dishwasher,
         has_laundry, has_parking, has_pool, has_gym
@@ -1208,6 +1368,16 @@ async def get_properties(
     # 始终只返回活跃的房源（关键修复：过滤已下架房源）
     conditions.append("is_active = TRUE")
     
+    # 指定 listing_id 时做点名过滤（便于校验/复现单条）
+    if listing_id:
+        try:
+            lid = int(listing_id)
+            conditions.append("listing_id = %s")
+            params.append(lid)
+        except (ValueError, TypeError):
+            # 忽略非法 id，不影响其他条件
+            pass
+
     # Add suburb filter - support multiple suburbs (comma-separated)
     if suburb:
         # Split by comma and trim whitespace
@@ -1233,40 +1403,52 @@ async def get_properties(
     if bedrooms:
         bedroom_values = bedrooms.split(',')
         bedroom_conditions = []
+        bedroom_params: List[int] = []
         for value in bedroom_values:
             value = value.strip()
             if value == '4+':
-                bedroom_conditions.append("bedrooms >= 4")
+                bedroom_conditions.append("bedrooms >= %s")
+                bedroom_params.append(4)
             elif value.isdigit():
-                bedroom_conditions.append(f"bedrooms = {int(value)}")
+                bedroom_conditions.append("bedrooms = %s")
+                bedroom_params.append(int(value))
         if bedroom_conditions:
             conditions.append(f"({' OR '.join(bedroom_conditions)})")
+            params.extend(bedroom_params)
     
     # Add bathrooms filter (handle comma-separated values)
     if bathrooms:
         bathroom_values = bathrooms.split(',')
         bathroom_conditions = []
+        bathroom_params: List[int] = []
         for value in bathroom_values:
             value = value.strip()
             if value == '3+':
-                bathroom_conditions.append("bathrooms >= 3")
+                bathroom_conditions.append("bathrooms >= %s")
+                bathroom_params.append(3)
             elif value.isdigit():
-                bathroom_conditions.append(f"bathrooms = {int(value)}")
+                bathroom_conditions.append("bathrooms = %s")
+                bathroom_params.append(int(value))
         if bathroom_conditions:
             conditions.append(f"({' OR '.join(bathroom_conditions)})")
+            params.extend(bathroom_params)
     
     # Add parking filter (handle comma-separated values)
     if parking:
         parking_values = parking.split(',')
         parking_conditions = []
+        parking_params: List[int] = []
         for value in parking_values:
             value = value.strip()
             if value == '2+':
-                parking_conditions.append("parking_spaces >= 2")
+                parking_conditions.append("parking_spaces >= %s")
+                parking_params.append(2)
             elif value.isdigit():
-                parking_conditions.append(f"parking_spaces = {int(value)}")
+                parking_conditions.append("parking_spaces = %s")
+                parking_params.append(int(value))
         if parking_conditions:
             conditions.append(f"({' OR '.join(parking_conditions)})")
+            params.extend(parking_params)
     
     # Add price range filters
     if minPrice is not None:
@@ -1315,13 +1497,14 @@ async def get_properties(
         )
         params.append(date_to)
     
-    # Add furnished filter - is_furnished field is a string ("yes"/"no"/"unknown")
-    if isFurnished is not None:
-        if isFurnished:
-            conditions.append("is_furnished = 'yes'")
+    # 家具筛选（兼容 isFurnished 与 furnished 两个键；仅当显式为 true/false 时才筛）
+    # 说明：将 is_furnished 统一转为文本后做集合匹配，避免历史 text/三态导致的 500；不会把 'unknown' 当 true/false
+    effectiveFurnished = isFurnished if isFurnished is not None else furnished
+    if effectiveFurnished is not None:
+        if effectiveFurnished:
+            conditions.append("NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('t','true','yes','1')")
         else:
-            # When not furnished, include both 'no' and 'unknown'
-            conditions.append("(is_furnished = 'no' OR is_furnished = 'unknown')")
+            conditions.append("NULLIF(TRIM(LOWER(is_furnished::text)), '') IN ('f','false','no','0')")
     
     # Build WHERE clause
     where_clause = ""
@@ -1331,6 +1514,21 @@ async def get_properties(
     # Update queries with WHERE clause
     base_query += where_clause
     count_query += where_clause
+
+    # 排序映射（为什么：让前端 Sort 真正生效；仅允许白名单，防注入；并附加 listing_id ASC 作为稳定次序键）
+    order_clause = " ORDER BY listing_id ASC"
+    if sort:
+        s = str(sort).strip().lower()
+        if s == "price_asc":
+            order_clause = " ORDER BY rent_pw ASC NULLS LAST, listing_id ASC"
+        elif s == "available_date_asc":
+            order_clause = " ORDER BY available_date ASC NULLS FIRST, listing_id ASC"
+        elif s == "suburb_az":
+            order_clause = " ORDER BY lower(suburb) ASC NULLS LAST, listing_id ASC"
+        elif s == "inspection_earliest":
+            # TODO：P1 精确解析 inspection_times 的“最早看房时间”进行排序
+            # 当前先与 available_date_asc 等价，满足 P0 真正生效的前端表现
+            order_clause = " ORDER BY available_date ASC NULLS FIRST, listing_id ASC"
     
     
     # Simple cursor implementation based on listing_id
@@ -1356,8 +1554,12 @@ async def get_properties(
                 columns = [desc[0] for desc in cur.description]
                 return items, columns
         
-        items, columns = await asyncio.to_thread(_db_call_cursor)
-        
+        try:
+            items, columns = await asyncio.to_thread(_db_call_cursor)
+        except Exception as exc:
+            logger.error(f"Cursor pagination query failed: {exc}", exc_info=True)
+            return _static_properties_response()
+
         has_next = len(items) > pagination.page_size
         if has_next:
             items = items[:-1] # remove extra item
@@ -1383,8 +1585,12 @@ async def get_properties(
         return success_response(data=items_as_dicts, pagination=pagination_info)
     else:
         # Page-based pagination
-        query = f"{base_query} ORDER BY listing_id ASC"
-        items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
+        query = f"{base_query}{order_clause}"
+        try:
+            items, pagination_info = await paginate_query(db, query, count_query, tuple(params), pagination)
+        except Exception as exc:
+            logger.error(f"Page-based pagination query failed: {exc}", exc_info=True)
+            return _static_properties_response()
         return success_response(data=items, pagination=pagination_info)
 
 
@@ -1393,7 +1599,7 @@ async def get_properties(
 # ========================================
 
 @app.get("/api/locations/suggestions", tags=["Locations"])
-@cache(expire=3600)  # Cache for 1 hour
+@cache(expire=900)  # Cache for 15 minutes
 async def get_location_suggestions(
     q: Optional[str] = Query(None, description="Search query"),
     limit: int = Query(20, ge=1, le=100),
@@ -1403,7 +1609,15 @@ async def get_location_suggestions(
     Get location suggestions for search autocomplete.
     Returns suburbs and postcodes with property counts.
     """
+    def _static_suggestions():
+        suggestions = static_data_utils.suggest_locations(q, limit)
+        return success_response(data=suggestions)
+
     try:
+        if db is None:
+            logger.warning("Database unavailable for location suggestions; using fallback data")
+            return _static_suggestions()
+
         if q and len(q.strip()) > 0:
             # Search with query
             search_term = q.strip().lower()
@@ -1412,9 +1626,10 @@ async def get_location_suggestions(
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as clean_postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IS NOT NULL
+                AND is_active = TRUE
                 AND (
                     LOWER(suburb) LIKE %s
                     OR REPLACE(postcode, '.0', '') LIKE %s
@@ -1442,7 +1657,11 @@ async def get_location_suggestions(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Location suggestions query failed: {exc}", exc_info=True)
+                return _static_suggestions()
             
             # Format results
             suggestions = []
@@ -1468,9 +1687,10 @@ async def get_location_suggestions(
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IS NOT NULL
+              AND is_active = TRUE
             GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
             ORDER BY property_count DESC
             LIMIT %s
@@ -1482,7 +1702,11 @@ async def get_location_suggestions(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Location suggestions query failed: {exc}", exc_info=True)
+                return _static_suggestions()
             
             # Format results
             suggestions = []
@@ -1503,12 +1727,12 @@ async def get_location_suggestions(
             return success_response(data=suggestions)
             
     except Exception as e:
-        logger.error(f"Error getting location suggestions: {str(e)}")
-        return error_response(f"Failed to get location suggestions: {str(e)}")
+        logger.error(f"Error getting location suggestions: {str(e)}", exc_info=True)
+        return _static_suggestions()
 
 
 @app.get("/api/locations/all", tags=["Locations"])
-@cache(expire=3600)  # Cache for 1 hour
+@cache(expire=900)  # Cache for 15 minutes
 async def get_all_locations(
     db: Any = Depends(get_db_conn_dependency)
 ):
@@ -1516,14 +1740,23 @@ async def get_all_locations(
     Get all unique locations with property counts.
     Used for initializing search suggestions.
     """
+    def _static_locations():
+        locations = static_data_utils.list_locations()
+        return success_response(data=locations)
+
+    if db is None:
+        logger.warning("Database unavailable for all locations; using fallback data")
+        return _static_locations()
+
     try:
         query = """
-        SELECT 
+        SELECT
             suburb,
             REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-            COUNT(*) as property_count
+            COUNT(DISTINCT listing_id) as property_count
         FROM properties
         WHERE suburb IS NOT NULL
+          AND is_active = TRUE
         GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
         ORDER BY property_count DESC
         """
@@ -1534,7 +1767,11 @@ async def get_all_locations(
                 results = cur.fetchall()
                 return results
         
-        results = await asyncio.to_thread(_db_call)
+        try:
+            results = await asyncio.to_thread(_db_call)
+        except Exception as exc:
+            logger.error(f"Location list query failed: {exc}", exc_info=True)
+            return _static_locations()
         
         # Format results for both suburb and postcode lookups
         locations = []
@@ -1582,12 +1819,12 @@ async def get_all_locations(
         return success_response(data=locations)
         
     except Exception as e:
-        logger.error(f"Error getting all locations: {str(e)}")
-        return error_response(f"Failed to get locations: {str(e)}")
+        logger.error(f"Error getting all locations: {str(e)}", exc_info=True)
+        return _static_locations()
 
 
 @app.get("/api/locations/nearby", tags=["Locations"])
-@cache(expire=3600)  # Cache for 1 hour
+@cache(expire=900)  # Cache for 15 minutes
 async def get_nearby_suburbs(
     suburb: str = Query(..., description="Suburb name"),
     limit: int = Query(6, ge=1, le=20),
@@ -1625,20 +1862,29 @@ async def get_nearby_suburbs(
         "Bondi": ["Bondi Beach", "North Bondi", "Tamarama", "Bellevue Hill", "Waverley", "Bondi Junction"],
         "Coogee": ["Randwick", "South Coogee", "Clovelly", "Maroubra", "Kingsford", "Bronte"]
     }
-    
+
+    def _static_nearby():
+        nearby_data = static_data_utils.nearby_suburbs(suburb, limit, mapping=nearby_mapping)
+        return success_response(data=nearby_data)
+
     try:
+        if db is None:
+            logger.warning("Database unavailable for nearby suburbs; using fallback data")
+            return _static_nearby()
+
         # Get nearby suburbs from mapping
         nearby_suburbs = nearby_mapping.get(suburb, [])[:limit]
-        
+
         if not nearby_suburbs:
             # If no mapping found, return popular suburbs as fallback
             query = """
             SELECT 
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IS NOT NULL AND suburb != %s
+              AND is_active = TRUE
             GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
             ORDER BY property_count DESC
             LIMIT %s
@@ -1650,17 +1896,22 @@ async def get_nearby_suburbs(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Nearby suburb fallback query failed: {exc}", exc_info=True)
+                return _static_nearby()
         else:
             # Get data for nearby suburbs
             placeholders = ','.join(['%s'] * len(nearby_suburbs))
             query = f"""
-            SELECT 
+            SELECT
                 suburb,
                 REPLACE(COALESCE(postcode, '0'), '.0', '') as postcode,
-                COUNT(*) as property_count
+                COUNT(DISTINCT listing_id) as property_count
             FROM properties
             WHERE suburb IN ({placeholders})
+              AND is_active = TRUE
             GROUP BY suburb, REPLACE(COALESCE(postcode, '0'), '.0', '')
             ORDER BY property_count DESC
             """
@@ -1671,7 +1922,11 @@ async def get_nearby_suburbs(
                     results = cur.fetchall()
                     return results
             
-            results = await asyncio.to_thread(_db_call)
+            try:
+                results = await asyncio.to_thread(_db_call)
+            except Exception as exc:
+                logger.error(f"Nearby suburb query failed: {exc}", exc_info=True)
+                return _static_nearby()
         
         # Format results
         suggestions = []
@@ -1695,5 +1950,5 @@ async def get_nearby_suburbs(
         })
         
     except Exception as e:
-        logger.error(f"Error getting nearby suburbs: {str(e)}")
-        return error_response(f"Failed to get nearby suburbs: {str(e)}")
+        logger.error(f"Error getting nearby suburbs: {str(e)}", exc_info=True)
+        return _static_nearby()

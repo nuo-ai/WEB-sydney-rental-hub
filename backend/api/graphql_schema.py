@@ -17,7 +17,8 @@ from crud.properties_crud import (
     get_all_properties_from_db,
     get_property_by_id_from_db,
     get_properties_near_location_from_db,
-    fetch_university_commute_profile_data # Placeholder for the new CRUD function
+    fetch_university_commute_profile_data, # Placeholder for the new CRUD function
+    get_median_rent_by_suburb
 )
 
 @strawberry.enum
@@ -57,6 +58,12 @@ class UniversityCommuteProfile:
     lightRailConnectedOptions: PaginatedCommuteProperties
     trainConnectedOptions: PaginatedCommuteProperties
     busConnectedOptions: PaginatedCommuteProperties
+
+@strawberry.type
+class MedianRentBySuburb:
+    suburb: str
+    bedrooms: int
+    median_rent_pw: int
 
 @strawberry.type
 class Query:
@@ -274,6 +281,28 @@ class Query:
 
         return result
 
+    @strawberry.field(name="medianRentBySuburb")
+    def median_rent_by_suburb(
+        self,
+        monthsWindow: Optional[int] = None
+    ) -> List[MedianRentBySuburb]:
+        """
+        业务说明（为什么）：
+        - 面向前端提供“按 suburb × 1/2/3 房的中位周租金”聚合数据，口径为在租（is_active=TRUE）。
+        - 可选 monthsWindow（最近 N 个月）控制时间窗，便于对近期市场的中位价进行观察。
+        技术实现：
+        - 复用 CRUD 层的 get_median_rent_by_suburb(months_window)，其内部使用 PostgreSQL percentile_cont(0.5)。
+        """
+        data = get_median_rent_by_suburb(months_window=monthsWindow)
+        # 将 CRUD 返回的 dict 映射为 GraphQL 类型，保持最小转换与清晰字段名
+        return [
+            MedianRentBySuburb(
+                suburb=item["suburb"],
+                bedrooms=item["bedrooms"],
+                median_rent_pw=item["median_rent_pw"]
+            )
+            for item in data
+        ]
 
     # Future: Add more queries here
     # e.g., properties_by_suburb etc.

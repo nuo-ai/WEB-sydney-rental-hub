@@ -2,51 +2,53 @@
   <div class="location-card">
     <div class="location-info">
       <span class="location-label" :class="labelClass">{{ location.label }}</span>
-      <span class="location-address">{{ truncatedAddress }}</span>
+      <span class="location-address typo-body-sm">{{ truncatedAddress }}</span>
     </div>
-    
+
     <div class="commute-info">
       <div v-if="isLoading" class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
+        <Loader2 class="spec-icon spinner" />
       </div>
       <div v-else-if="commuteData">
         <div class="time">{{ commuteData.duration }}</div>
-        <div class="distance">{{ commuteData.distance }}</div>
+        <div class="distance typo-body-sm">{{ commuteData.distance }}</div>
       </div>
       <div v-else class="no-data">
         <div class="time">--</div>
       </div>
     </div>
-    
-    <button class="remove-btn" @click="handleRemove" title="Remove location">
-      <i class="fas fa-times"></i>
+
+    <button class="remove-btn" @click="handleRemove" :title="$t('locationCard.remove')">
+      <X class="spec-icon" />
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import { useCommuteStore } from '@/stores/commute'
 import { transportAPI } from '@/services/api'
+import { Loader2, X } from 'lucide-vue-next'
 
 const props = defineProps({
   location: {
     type: Object,
-    required: true
+    required: true,
   },
   mode: {
     type: String,
-    default: 'DRIVING'
+    default: 'DRIVING',
   },
   from: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const emit = defineEmits(['remove'])
 
 const commuteStore = useCommuteStore()
+const t = inject('t')
 
 // 响应式状态
 const isLoading = ref(false)
@@ -70,38 +72,38 @@ const labelClass = computed(() => {
 // 计算通勤时间
 const calculateCommute = async () => {
   if (!props.from || !props.location) return
-  
+
   isLoading.value = true
   error.value = null
-  
+
   try {
     // 检查缓存
     const cacheKey = `${props.from.lat},${props.from.lng}-${props.location.id}-${props.mode}`
     const cached = commuteStore.getFromCache(cacheKey)
-    
+
     if (cached) {
       commuteData.value = cached
     } else {
       // 准备API调用参数
       const origin = `${props.from.lat},${props.from.lng}`
       const destination = props.location.address
-      
+
       // 确保location有坐标信息（用于本地估算）
       if (!props.location.latitude || !props.location.longitude) {
         console.warn('Location missing coordinates:', props.location)
       }
-      
+
       const result = await transportAPI.getDirections(origin, destination, props.mode)
-      
+
       if (result.error) {
         throw new Error(result.error)
       }
-      
+
       commuteData.value = {
-        duration: result.duration || 'N/A',
-        distance: result.distance || ''
+        duration: result.duration || (t ? t('locationCard.na') : 'N/A'),
+        distance: result.distance || '',
       }
-      
+
       // 缓存结果
       commuteStore.setCache(cacheKey, commuteData.value)
     }
@@ -109,8 +111,8 @@ const calculateCommute = async () => {
     console.error('Failed to calculate commute:', err)
     error.value = err.message
     commuteData.value = {
-      duration: 'N/A',
-      distance: ''
+      duration: t ? t('locationCard.na') : 'N/A',
+      distance: '',
     }
   } finally {
     isLoading.value = false
@@ -118,14 +120,21 @@ const calculateCommute = async () => {
 }
 
 // 监听交通方式变化
-watch(() => props.mode, () => {
-  calculateCommute()
-})
+watch(
+  () => props.mode,
+  () => {
+    calculateCommute()
+  },
+)
 
 // 监听起点变化
-watch(() => props.from, () => {
-  calculateCommute()
-}, { deep: true })
+watch(
+  () => props.from,
+  () => {
+    calculateCommute()
+  },
+  { deep: true },
+)
 
 const handleRemove = () => {
   emit('remove', props.location.id)
@@ -142,14 +151,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding: 12px;
-  background: #f8f8f8;
+  background: var(--surface-2);
   border-radius: 8px;
   margin-bottom: 12px;
   transition: all 0.2s;
 }
 
 .location-card:hover {
-  background: #f0f0f0;
+  background: var(--bg-hover);
 }
 
 /* 地址信息 */
@@ -171,28 +180,32 @@ onMounted(() => {
 }
 
 .label-work {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .label-school {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .label-home {
-  background: #fce7f3;
-  color: #be185d;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .label-other {
-  background: #e5e7eb;
-  color: #6b7280;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
 }
 
 .location-address {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -207,24 +220,24 @@ onMounted(() => {
 }
 
 .loading {
-  color: #999;
+  color: var(--text-muted);
 }
 
 .time {
   font-size: 16px;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.2;
 }
 
 .distance {
   font-size: 12px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-top: 2px;
 }
 
 .no-data .time {
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* 删除按钮 */
@@ -234,7 +247,7 @@ onMounted(() => {
   height: 24px;
   border: none;
   background: none;
-  color: #999;
+  color: var(--text-muted);
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -245,8 +258,8 @@ onMounted(() => {
 }
 
 .remove-btn:hover {
-  background: #fff;
-  color: #dc2626;
+  background: var(--color-bg-card);
+  color: var(--color-danger);
 }
 
 /* 加载动画 */
@@ -254,21 +267,22 @@ onMounted(() => {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-.fa-spin {
+.spinner {
   animation: spin 1s linear infinite;
 }
 
 /* 移动端优化 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .location-card {
     padding: 10px;
   }
-  
+
   .commute-info {
     min-width: 70px;
     margin: 0 8px;

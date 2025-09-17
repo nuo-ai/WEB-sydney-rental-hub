@@ -2,7 +2,7 @@
   <div id="app" class="app-container">
     <!-- 导航组件 -->
     <Navigation :isHidden="isNavHidden" />
-    
+
     <!-- 主要内容区域 -->
     <router-view class="main-view" @updateNavVisibility="handleNavVisibility" />
 
@@ -48,14 +48,14 @@ const handleNavVisibility = (hidden) => {
 }
 
 /* 移动端适配 - 为底部导航留空间 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .main-view {
     padding-bottom: 80px;
   }
 }
 
 /* 桌面端适配 - 为固定导航栏留出空间 */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .main-view {
     padding-top: 64px; /* 为固定导航栏预留空间 */
   }
@@ -71,18 +71,12 @@ const handleNavVisibility = (hidden) => {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--juwo-primary);
+  background: var(--neutral-scrollbar-color);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--juwo-primary-dark);
-}
-
-/* 全局焦点样式 */
-*:focus {
-  outline: 2px solid var(--juwo-primary);
-  outline-offset: 2px;
+  background: var(--neutral-scrollbar-hover-color);
 }
 
 /* 全局选择样式 */
@@ -93,13 +87,13 @@ const handleNavVisibility = (hidden) => {
 
 /* 全局链接样式 */
 a {
-  color: var(--juwo-primary);
+  color: var(--link-color);
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 a:hover {
-  color: var(--juwo-primary-dark);
+  color: var(--link-hover-color);
 }
 
 /* 全局按钮样式增强 */
@@ -122,7 +116,7 @@ a:hover {
 }
 
 .el-input__wrapper:hover {
-  border-color: var(--juwo-primary);
+  border-color: var(--color-border-strong);
 }
 
 /* 全局加载动画 */
@@ -130,6 +124,7 @@ a:hover {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -140,13 +135,13 @@ a:hover {
 }
 
 /* 响应式字体大小 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   html {
     font-size: 14px;
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   html {
     font-size: 16px;
   }
@@ -180,11 +175,11 @@ img {
   .app-container {
     background: white;
   }
-  
+
   .main-view {
     padding: 0;
   }
-  
+
   nav {
     display: none;
   }

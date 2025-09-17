@@ -7,19 +7,19 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../views/HomeView.vue')
+      component: () => import('../views/HomeView.vue'),
     },
     {
       path: '/details/:id',
       name: 'PropertyDetail',
       component: () => import('../views/PropertyDetail.vue'),
-      props: true
+      props: true,
     },
     {
       path: '/details-new/:id',
       name: 'PropertyDetailNew',
       component: () => import('../views/PropertyDetailNew.vue'),
-      props: true
+      props: true,
     },
     {
       path: '/favorites',
@@ -27,14 +27,9 @@ const router = createRouter({
       component: () => import('../views/Favorites.vue'),
     },
     {
-      path: '/map',
-      name: 'map',
-      component: () => import('../views/Map.vue'),
-    },
-    {
       path: '/chat',
       name: 'chat',
-      component: () => import('../views/Chat.vue'),
+      component: () => import('../views/ChatView.vue'),
     },
     {
       path: '/profile',
@@ -55,7 +50,7 @@ const router = createRouter({
       path: '/commute',
       name: 'CommuteTimes',
       component: () => import('../views/CommuteTimes.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
   ],
 })

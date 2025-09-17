@@ -10,7 +10,7 @@
           class="main-image"
           fit="cover"
         />
-        
+
         <!-- 返回按钮 -->
         <button @click="goBack" class="back-btn">
           <el-icon :size="20"><ArrowLeft /></el-icon>
@@ -20,7 +20,6 @@
       <!-- 主内容区 1683x1909 位于 left:117px top:687px -->
       <div class="main-content-wrapper">
         <div class="main-content">
-          
           <!-- 第一部分：基本信息 -->
           <div class="info-section">
             <!-- 价格和可用日期 -->
@@ -29,16 +28,16 @@
               <span class="divider">|</span>
               <span>Bond ${{ getBondAmount() }}</span>
             </div>
-            
+
             <!-- 价格 -->
             <div class="price">${{ property?.rent_pw || 0 }} per week</div>
-            
+
             <!-- 地址 -->
             <div class="address">
               <h1>{{ property?.address }}</h1>
               <p>{{ property?.suburb }}, NSW {{ property?.postcode }}</p>
             </div>
-            
+
             <!-- 房屋特征 -->
             <div class="features">
               <div class="feature">
@@ -61,16 +60,17 @@
           <div class="map-section">
             <h2>Location</h2>
             <div class="map-container">
-              <SimpleMap 
+              <GoogleMap
                 v-if="property?.latitude && property?.longitude"
                 :latitude="property.latitude"
                 :longitude="property.longitude"
                 :zoom="15"
-                height="360px"
+                :height="'360px'"
                 :marker-title="property.address"
+                :lock-center="true"
               />
             </div>
-            
+
             <!-- See travel times 按钮 - 保留原功能 -->
             <button class="see-travel-times-btn" @click="handleSeeTravelTimes">
               <div class="travel-icon-wrapper">
@@ -78,7 +78,9 @@
               </div>
               <div class="travel-btn-content">
                 <span class="travel-btn-title">See travel times</span>
-                <span class="travel-btn-subtitle">Find out travel times from this property to your destinations</span>
+                <span class="travel-btn-subtitle"
+                  >Find out travel times from this property to your destinations</span
+                >
               </div>
             </button>
           </div>
@@ -87,8 +89,13 @@
           <div class="description-section">
             <h2 class="section-title">Property Description</h2>
             <div class="description-content">
-              <p class="headline">Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104</p>
-              <p>?? Fully Furnished 2 Bed 2 Bath in Maroubra |Big Balcony I Quiet Location | Direct Bus to UNSW</p>
+              <p class="headline">
+                Fully Furnished-2B2B! WeChat: KRL103,BoeyANTmover,KRL106,ATR102,KRL_111,KRL104
+              </p>
+              <p>
+                ?? Fully Furnished 2 Bed 2 Bath in Maroubra |Big Balcony I Quiet Location | Direct
+                Bus to UNSW
+              </p>
               <p>??Address: 7/264 Maroubra Road, Maroubra</p>
             </div>
             <button class="read-more-btn" @click="isDescriptionExpanded = !isDescriptionExpanded">
@@ -128,7 +135,7 @@
           <div class="inspection-section">
             <h2 class="inspection-title">Inspection times</h2>
             <span class="inspection-label">INSPECTIONS</span>
-            
+
             <div class="inspection-grid">
               <!-- 左列 -->
               <div class="inspection-column">
@@ -169,7 +176,7 @@
                   </button>
                 </div>
               </div>
-              
+
               <!-- 右列 -->
               <div class="inspection-column">
                 <div class="inspection-item">
@@ -199,7 +206,7 @@
                     <el-icon><Calendar /></el-icon>
                   </button>
                 </div>
-                
+
                 <!-- Add all to planner 按钮 -->
                 <div class="planner-btn-wrapper">
                   <button class="add-to-planner">
@@ -210,17 +217,12 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
-    
+
     <!-- Auth Modal -->
-    <AuthModal 
-      v-if="showAuthModal"
-      v-model="showAuthModal"
-      @success="handleAuthSuccess"
-    />
+    <AuthModal v-if="showAuthModal" v-model="showAuthModal" @success="handleAuthSuccess" />
   </div>
 </template>
 
@@ -229,10 +231,8 @@ import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePropertiesStore } from '@/stores/properties'
 import { useAuthStore } from '@/stores/auth'
-import { 
-  ArrowLeft, House, Ticket, Van, Calendar, Plus
-} from '@element-plus/icons-vue'
-import SimpleMap from '@/components/SimpleMap.vue'
+import { ArrowLeft, House, Ticket, Van, Calendar, Plus } from '@element-plus/icons-vue'
+import GoogleMap from '@/components/GoogleMap.vue'
 import AuthModal from '@/components/modals/AuthModal.vue'
 
 const route = useRoute()
@@ -248,7 +248,7 @@ const showAuthModal = ref(false)
 const property = computed(() => propertiesStore.currentProperty)
 const images = computed(() => {
   if (!property.value?.images) return []
-  return property.value.images.filter(url => url && url.trim())
+  return property.value.images.filter((url) => url && url.trim())
 })
 
 const goBack = () => router.go(-1)
@@ -260,9 +260,9 @@ const getBondAmount = () => {
 
 // 保留原有的 handleSeeTravelTimes 功能
 const handleSeeTravelTimes = () => {
-  const testMode = true
-  
-  if (testMode || authStore.isAuthenticated) {
+  const isTest = authStore.testMode
+
+  if (isTest || authStore.isAuthenticated) {
     router.push({
       name: 'CommuteTimes',
       query: {
@@ -270,8 +270,8 @@ const handleSeeTravelTimes = () => {
         address: property.value.address,
         suburb: property.value.suburb,
         lat: property.value.latitude,
-        lng: property.value.longitude
-      }
+        lng: property.value.longitude,
+      },
     })
   } else {
     showAuthModal.value = true
@@ -325,7 +325,7 @@ onMounted(async () => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgb(255 255 255 / 90%);
   border: none;
   display: flex;
   align-items: center;
@@ -339,7 +339,7 @@ onMounted(async () => {
   left: 117px;
   top: 687px;
   width: 1683px;
-  background: rgba(254, 254, 254, 1);
+  background: rgb(254 254 254 / 100%);
 }
 
 .main-content {
@@ -378,7 +378,7 @@ onMounted(async () => {
   font-size: 22px;
   font-weight: 600;
   color: #2e3a4b;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-family: Inter, sans-serif;
 }
 
@@ -432,7 +432,7 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 700;
   color: #2e3a4b;
-  margin: 0 0 24px 0;
+  margin: 0 0 24px;
   font-family: Inter, sans-serif;
 }
 
@@ -453,7 +453,7 @@ onMounted(async () => {
   background: white;
   border: 1px solid #d0d3d9;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
   display: flex;
   align-items: center;
   gap: 14px;
@@ -463,7 +463,7 @@ onMounted(async () => {
 }
 
 .see-travel-times-btn:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 12%);
   background: #f8f9fa;
 }
 
@@ -517,8 +517,8 @@ onMounted(async () => {
 .section-title {
   font-size: 23px;
   font-weight: 700;
-  color: #60606D;
-  margin: 0 0 24px 0;
+  color: #60606d;
+  margin: 0 0 24px;
   font-family: Inter, sans-serif;
 }
 
@@ -529,14 +529,14 @@ onMounted(async () => {
 .headline {
   font-size: 15px;
   font-weight: 700;
-  color: #757D8B;
+  color: #757d8b;
   margin-bottom: 12px;
   font-family: Inter, sans-serif;
 }
 
 .description-content p {
   font-size: 14px;
-  color: #757D8B;
+  color: #757d8b;
   line-height: 1.6;
   margin-bottom: 8px;
   font-family: Inter, sans-serif;
@@ -544,12 +544,12 @@ onMounted(async () => {
 
 .read-more-btn {
   padding: 6px 14px;
-  border: 1px solid #6F6997;
+  border: 1px solid #6f6997;
   border-radius: 4px;
   background: white;
   font-size: 13px;
   font-weight: 700;
-  color: #4F6181;
+  color: #4f6181;
   cursor: pointer;
   font-family: Inter, sans-serif;
 }
@@ -573,14 +573,14 @@ onMounted(async () => {
 
 .feature-item {
   font-size: 15px;
-  color: #7F8194;
+  color: #7f8194;
   padding: 10px 0;
   font-family: Inter, sans-serif;
 }
 
 .view-less-btn {
   font-size: 15px;
-  color: #6FC168;
+  color: #6fc168;
   background: none;
   border: none;
   cursor: pointer;
@@ -601,15 +601,15 @@ onMounted(async () => {
 .inspection-title {
   font-size: 23px;
   font-weight: 700;
-  color: #4C5267;
-  margin: 0 0 8px 0;
+  color: #4c5267;
+  margin: 0 0 8px;
   font-family: Inter, sans-serif;
 }
 
 .inspection-label {
   font-size: 14px;
   font-weight: 700;
-  color: #6F7386;
+  color: #6f7386;
   text-transform: uppercase;
   font-family: Inter, sans-serif;
 }
@@ -624,7 +624,7 @@ onMounted(async () => {
 .inspection-item {
   width: 305px;
   height: 72px;
-  border: 1px solid #D0D3D9;
+  border: 1px solid #d0d3d9;
   background: white;
   padding: 16px 20px;
   display: flex;
@@ -636,14 +636,14 @@ onMounted(async () => {
 .inspection-date .day {
   font-size: 15px;
   font-weight: 700;
-  color: #6E7385;
+  color: #6e7385;
   margin-bottom: 4px;
   font-family: Inter, sans-serif;
 }
 
 .inspection-date .time {
   font-size: 15px;
-  color: #7F8194;
+  color: #7f8194;
   font-family: Inter, sans-serif;
 }
 
@@ -666,7 +666,7 @@ onMounted(async () => {
 .add-to-planner {
   width: 305px;
   height: 72px;
-  border: 1px solid #D0D3D9;
+  border: 1px solid #d0d3d9;
   background: white;
   display: flex;
   align-items: center;
@@ -674,23 +674,23 @@ onMounted(async () => {
   gap: 8px;
   font-size: 15px;
   font-weight: 700;
-  color: #6E7285;
+  color: #6e7285;
   cursor: pointer;
   border-radius: 4px;
   font-family: Inter, sans-serif;
 }
 
 /* 响应式 - 移动端降级 */
-@media (max-width: 1920px) {
+@media (width <= 1920px) {
   .root-container {
     width: 100%;
     max-width: 1920px;
   }
-  
+
   .image-section {
     width: 100%;
   }
-  
+
   .main-content-wrapper {
     position: relative;
     left: 0;
@@ -700,7 +700,7 @@ onMounted(async () => {
     margin: 0 auto;
     padding: 20px;
   }
-  
+
   .map-section,
   .description-section,
   .features-section,
@@ -710,15 +710,15 @@ onMounted(async () => {
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .image-section {
     height: 300px;
   }
-  
+
   .inspection-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
     gap: 20px;

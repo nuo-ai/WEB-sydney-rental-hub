@@ -1,127 +1,126 @@
 # 系统设计模式与最佳实践
 
-## 数据流架构 (Data Flow Architecture)
+---
 
-此为项目最高级别的架构模式，必须严格遵守。
+## 核心架构原则
 
--   **核心Web应用数据流 (MANDATORY)**: 所有与房源核心业务相关的数据请求，必须遵循以下链路：
-    ```
-    Browser (Vue @ :5173) -> Vite Proxy -> Python Backend (@ :8000)
-    ```
-    -   **描述**: `vue-frontend` 应用通过 Vite 的开发服务器代理 (`/api`)，将其所有数据请求以 **RESTful** 方式发送到 `http://localhost:8000/api/...`。这是前端获取房源数据的**唯一**路径。
-    -   **GraphQL说明**: Python后端在`/graphql`路径下还提供了一个独立的GraphQL服务。此服务**不由前端直接调用**，而是为AI助手或内部工具提供更灵活的数据查询能力。
-    -   **原则**: 这是获取房源列表、详情等核心数据的**唯一**且**正确**的路径。
+### 数据流架构
+```bash
+# 核心数据流路径 (必须遵守)
+Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
+```
 
--   **AI 助手服务数据流 (Standalone)**: 为 AI 助手提供的服务是完全独立的。
-    ```
-    AI Agent -> MCP Server (Express @ :3001) -> External/DB Services
-    ```
-    -   **描述**: `mcp-server` 是一个独立的 Express 应用，它为 AI Agent (Cline) 提供特殊工具或数据接口，其内部实现可能涉及连接数据库或调用外部API。
-    -   **原则**: 此服务**决不能**被核心 Web 应用 (`vue-frontend`) 所依赖或调用。
+**禁止** ❌: AI Agent直接调用前端或其他反向依赖
+**原因**: 引入脆弱中间层，增加延迟，隐藏真正的错误源
 
--   **反模式 (Anti-Pattern) 🚨**: **严禁**将前端的 `vite.config.js` 代理指向 `mcp-server` (`localhost:3001`)。
-    -   **后果**: 这种错误配置会引入一个不必要的、脆弱的中间层，导致数据加载失败、增加延迟和隐藏真正的错误源，对整个系统的稳定性造成严重破坏。我们在 2025-08-25 的故障排查中已证实了这一点。
+### 前端架构
+- **组件框架**: Vue 3 (Composition API)
+- **状态管理**: Pinia (单一数据源原则)
+- **路由系统**: Vue Router (SPA架构)
+- **UI库**: Element Plus (JUWO主题定制)
 
-## 核心架构
+---
 
--   **前端**: Vue 3 (Composition API) + Vite
--   **状态管理**: Pinia
--   **路由**: Vue Router
--   **UI库**: Element Plus
+## 保存搜索功能模式
+
+### 事件驱动架构
+- **模式**: 组件间事件发射链路 `SaveSearchModal` → `FilterTabs` → `HomeView`
+- **实现**: Vue `emit()` 系统，确保事件正确传递和处理
+- **用户反馈**: 保存成功后立即显示 `ElMessage.success()` 提示
+
+### 智能命名策略
+- **算法**: 基于筛选条件自动生成有意义的搜索名称
+- **格式**: "区域名称 + 房型 + 价格范围 + 特殊条件"
+- **示例**: "Ashfield 等 3 个区域 2房 $400-800" 或 "Burwood 有家具房源"
+
+### 本地存储管理
+- **存储**: localStorage 作为第一阶段实现
+- **结构**: JSON 数组，包含 id/name/conditions/locations/createdAt 等字段
+- **扩展性**: 为后续云端同步预留接口设计
+
+---
+
+## 筛选系统核心模式
+
+### URL 幂等与状态同步
+- **模式**: 最终写入点清洗 + 幂等对比
+- **实现**: `sanitizeQueryParams` 过滤空值键，`isSameQuery` 比较新旧查询
+- **效果**: 应用后 URL 可直链/刷新恢复，不写空键，地址栏不抖动
+
+### 预估计数统一
+- **composable**: useFilterPreviewCount 统一"应用（N）"口径
+- **特性**: 并发序号守卫、300ms 防抖、组件卸载清理
+- **降级**: 计数失败返回 null，按钮退回"应用/确定"
+
+### 分组边界隔离
+- **API**: `applyFilters(filters, { sections })`
+- **原则**: 仅删除指定分组旧键再合并，避免跨面板覆盖
+- **分组**: area/price/bedrooms/availability/more
+
+---
 
 ## CSS与布局模式
 
-### 1. 全局样式 vs. 局部样式
+### 布局对齐策略
+- **统一容器**: `max-width: 1200px` 和 `padding: 0 32px`
+- **双层结构**: 外层容器全宽背景 + 内层居中内容区
+- **响应式断点**: 768px（平板）、1200px（桌面）、1920px（超宽）
 
--   **模式**: 审慎使用全局样式。应将影响布局和定位的规则（如 `overflow`, `position`, `display`）限定在组件作用域内，以避免意料之外的副作用。
--   **反模式 (应避免)**: 对 `html` 或 `body` 等顶级元素应用强制性的 `overflow` 规则（例如 `overflow-x: hidden`）。
--   **经验教训**: 在UI修复任务中，我们再次确认了全局`overflow-x: hidden`是导致`position: sticky`失效的根本原因。我们已将此规则从`html, body`移至根组件`.app-container`，从而在解决`sticky`定位问题的同时，避免了全局副作用。
+### 设计令牌约束
+- **强制使用**: `var(--*)` 形式的 CSS 自定义属性
+- **禁止**: 硬编码颜色、`var(--token, #hex)` 兜底形式
+- **护栏**: Stylelint 规则拦截新增硬编码色
 
-### 2. 布局对齐策略
+### 分段控件（Segmented）模式
+- **目的**: 数字/枚举按钮视觉连体，仅改几何关系
+- **实现**: 相邻无缝、端部圆角 2px、边框折叠
+- **约束**: 不覆写颜色/状态逻辑，沿用既有设计令牌
 
--   **模式**: 在整个应用中，对主要的布局容器使用**统一的 `max-width` 和水平 `padding`**，以确保从上到下所有内容块的垂直对齐。
--   **示例**:
-    -   导航栏内容容器 (`.top-nav-content`)
-    -   搜索/筛选内容容器 (`.search-content-container`)
-    -   主内容区容器 (`.container`)
-    -   以上所有容器都应共享相同的 `max-width` (例如 `1200px`) 和 `padding` (例如 `0 32px`)。
--   **反模式 (应避免)**: 对不同的主内容容器使用不同的`max-width`，这会导致视觉上的错位。
--   **经验教训**: 我们通过将所有核心容器的`max-width`统一为`1200px`，成功解决了导航栏Logo、搜索栏和房源列表之间的对齐问题。
+---
 
-### 3. 全宽背景与内容居中
+## 状态管理原则
 
--   **模式**: 要实现一个背景全宽、但内容居中对齐的UI元素（如粘性搜索栏），应采用两层结构：
-    1.  **外层容器 (`.full-bleed`)**: 设为 `width: 100%`，负责背景颜色和阴影。
-    2.  **内层容器**: 设为与主内容区统一的 `max-width` 和水平`margin: auto`，负责将内容约束在布局内。
--   **在Home.vue中的应用**: `.search-filter-section` 作为全宽背景层，而 `.search-content-container` 作为居中的内容层。
+### 单一数据源
+- **原则**: 组件负责触发action，业务逻辑在store actions中处理
+- **反模式** ❌: 在action中混合传入参数和未同步的旧state
 
-## 状态管理 (Pinia)
+### 特性开关模式
+- **V1→V2演进**: 映射函数 + 特性开关，默认关闭新契约
+- **回滚保障**: enableFilterV2=false，任何异常可一键回退
 
--   **模式**: 遵循单一数据源（Single Source of Truth）原则。组件负责触发action并传递用户输入，而所有的业务逻辑和状态变更都应在Pinia store的 `actions` 中处理。
--   **示例**: `FilterTabs.vue` 在用户选择筛选条件后，调用 `propertiesStore.applyFilters(filters)`。`applyFilters` action 负责接收参数，更新store自身的`state`，然后基于更新后的`state`计算出新的`filteredProperties`。
--   **反模式 (应避免)**: 在action中混合使用传入的参数和未同步的旧`state`，这会导致数据不一致。
--   **经验教训**: 我们修复了`applyFilters` action，使其在执行筛选前，首先用传入的参数更新相关的store state，从而解决了筛选功能不正常的问题。
+---
 
-## 移动端响应式设计模式
+## API 设计与契约一致性
 
-### 4. 渐进式间距系统
+### 端点字段一致性
+- **原则**: 详情端点应为列表端点的"超集"（superset）
+- **避免**: 刷新或直链访问出现字段缺失导致的 UI 回退
+- **缓存策略**: 提供选择性失效端点，避免旧缓存污染
 
--   **模式**: 在移动端界面中采用渐进式间距设计，从视觉层次上由紧到松：`核心元素间距 < 区域间距 < 容器间距`。
--   **示例实现**:
-    ```css
-    /* 渐进式间距：8px → 12px → 16px */
-    .mobile-logo-section {
-      padding: 8px 0 12px 0;  /* logo核心间距 */
-    }
-    .search-filter-section {
-      margin-bottom: 12px;     /* 区域间距 */
-    }
-    .container {
-      padding: 16px 32px;      /* 容器间距 */
-    }
-    ```
--   **反模式 (应避免)**: 使用统一的大间距值（如24px），会造成移动端界面过于松散。
--   **经验教训**: 通过将logo区域padding从`16px 0`优化为`8px 0 12px 0`，显著改善了移动端界面的紧凑性。
+### 统一响应格式
+- **结构**: `{status, data, pagination, error}`
+- **建议**: 契约单元测试校验字段一致性
 
-### 5. 移动端滚动逻辑隔离
+---
 
--   **模式**: 移动端和桌面端应使用不同的滚动处理逻辑，避免跨平台状态污染。
--   **核心实现**:
-    ```javascript
-    const handleScroll = () => {
-      const isMobileView = windowWidth.value <= 768
-      
-      if (isMobileView) {
-        // 移动端：基于实际DOM高度判断
-        const logoSection = document.querySelector('.mobile-logo-section')
-        const logoHeight = logoSection ? logoSection.offsetHeight : 32
-        const shouldBeFixed = currentScrollY > logoHeight
-        
-        // 移动端状态清洁：避免污染全局导航状态
-        if (isNavHidden.value) {
-          isNavHidden.value = false
-        }
-      } else {
-        // 桌面端：使用getBoundingClientRect判断
-        const shouldBeFixed = searchBarRect.top <= 0
-      }
-    }
-    ```
--   **反模式 (应避免)**: 移动端和桌面端使用相同的`getBoundingClientRect()`判断逻辑，会导致移动端回滚到顶部时的判断错误。
--   **经验教训**: 通过将移动端滚动判断改为基于`offsetHeight`的精确计算，解决了回滚到顶部时logo消失的问题。
+## 图标系统与组件化
 
-### 6. 精确高度计算策略
+### 统一图标库
+- **标准**: 全站使用 `lucide-vue-next` SVG 图标库
+- **导入**: `import { IconName } from 'lucide-vue-next'`
+- **使用**: `<IconName class="spec-icon" />`
+- **颜色**: `stroke: currentColor`，由外层控制
 
--   **模式**: 对于需要精确定位的移动端组件，应使用实际DOM高度（`offsetHeight`）而非实时计算的边界信息（`getBoundingClientRect()`）。
--   **技术对比**:
-    ```javascript
-    // ❌ 错误方式：频繁的getBoundingClientRect调用
-    const searchBarRect = searchBarElement.value.getBoundingClientRect()
-    const shouldBeFixed = searchBarRect.top <= 0
-    
-    // ✅ 正确方式：基于实际DOM高度的一次性计算
-    const logoHeight = logoSection ? logoSection.offsetHeight : 32
-    const shouldBeFixed = currentScrollY > logoHeight
-    ```
--   **性能优势**: `offsetHeight`获取的是缓存的布局信息，避免了`getBoundingClientRect()`引起的强制布局重计算。
--   **经验教训**: 移动端场景下，基于滚动距离的判断比基于视窗位置的判断更加可靠和高效。
+### 规格行变量驱动
+- **全局变量**: --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap
+- **结构类**: .spec-row/.spec-item/.spec-text
+- **原则**: 统一"图标 + 数字"信息行的尺寸与间距
+
+---
+
+## 经验教训总结
+
+- **CSS全局影响**: 全局 `overflow-x: hidden` 会破坏 `position: sticky`
+- **滚动判断差异**: 移动端和桌面端需要隔离的滚动处理逻辑
+- **布局统一**: 容器对齐不一致会导致视觉错位
+- **状态同步**: 异步action中参数与state的不一致会导致数据错误

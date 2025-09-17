@@ -11,7 +11,7 @@
       marginwidth="0"
       :title="markerTitle"
     ></iframe>
-    
+
     <!-- 备用：显示静态地址信息 -->
     <div v-else class="map-static">
       <div class="map-icon">
@@ -32,24 +32,24 @@ import { Location } from '@element-plus/icons-vue'
 const props = defineProps({
   latitude: {
     type: Number,
-    required: true
+    required: true,
   },
   longitude: {
     type: Number,
-    required: true
+    required: true,
   },
   zoom: {
     type: Number,
-    default: 14
+    default: 14,
   },
   height: {
     type: String,
-    default: '200px'
+    default: '200px',
   },
   markerTitle: {
     type: String,
-    default: 'Property Location'
-  }
+    default: 'Property Location',
+  },
 })
 
 // 是否使用静态图片模式
@@ -63,16 +63,15 @@ const openStreetMapUrl = computed(() => {
 
 // 计算边界框
 function calculateBoundingBox(lat, lng, zoom) {
-  const latRad = lat * Math.PI / 180
   const n = Math.pow(2, zoom)
   const latDelta = 180 / n
   const lngDelta = 360 / n
-  
+
   const minLat = lat - latDelta / 2
   const maxLat = lat + latDelta / 2
   const minLng = lng - lngDelta / 2
   const maxLng = lng + lngDelta / 2
-  
+
   return `${minLng},${minLat},${maxLng},${maxLat}`
 }
 
@@ -82,12 +81,6 @@ const formattedCoordinates = computed(() => {
   const lng = props.longitude.toFixed(6)
   return `纬度: ${lat}, 经度: ${lng}`
 })
-
-// 处理iframe加载错误
-const handleIframeError = () => {
-  // OpenStreetMap加载失败，切换到静态模式
-  useStaticImage.value = true
-}
 </script>
 
 <style scoped>
@@ -122,7 +115,7 @@ const handleIframeError = () => {
 }
 
 .map-info h4 {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   font-size: 16px;
   color: #333;
 }

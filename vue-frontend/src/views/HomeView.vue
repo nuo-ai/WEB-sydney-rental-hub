@@ -6,52 +6,97 @@
       <div class="mobile-logo-section">
         <div class="container">
           <div class="mobile-logo">
-            <i class="fa-solid fa-house logo-icon"></i>
-            <span class="logo-text">JUWO 桔屋找房</span>
+            <span class="brand-text">Juwo</span>
           </div>
         </div>
       </div>
 
       <!-- 搜索和筛选区域 - Domain风格全屏容器 -->
-      <div 
+      <div
         ref="searchBarElement"
         class="search-filter-section"
-        :class="{ 
+        :class="{
           'is-fixed': isSearchBarFixed,
-          'nav-hidden': isNavHidden && windowWidth > 768
+          'nav-hidden': isNavHidden && windowWidth > 768,
         }"
       >
         <div class="search-content-container">
           <!-- PC端：搜索框和筛选标签在同一行 -->
           <div class="search-filter-row">
-            <SearchBar 
+            <SearchBar
+              v-if="windowWidth <= 768"
               class="search-bar"
               @search="handleSearch"
               @locationSelected="handleLocationSelected"
+              @openFilterPanel="handleOpenFilterPanel"
             />
-            <FilterTabs 
+            <!-- 桌面端使用分离式筛选面板，完全在 FilterTabs 组件内部处理 -->
+            <FilterTabs
               class="filter-tabs-right"
-              :filter-panel-open="showFilterPanel"
-              @toggleFullPanel="handleToggleFullPanel"
-              @filtersChanged="handleQuickFiltersChanged"
+              @requestOpenFullPanel="handleOpenFilterPanel"
+              @searchSaved="handleSearchSaved"
             />
           </div>
-          
-          <!-- 结果统计 -->
-          <div class="results-summary chinese-text">
-            <p class="results-count">
-              找到 <strong>{{ propertiesStore.totalCount }}</strong> 套房源
-            </p>
-          </div>
+
+          <!-- 结果统计移至搜索容器下方的新容器中；此处移除以避免双处回显 -->
         </div>
       </div>
 
       <!-- 布局偏移补偿 -->
-      <div 
-        v-if="isSearchBarFixed" 
-        class="search-bar-spacer" 
+      <div
+        v-if="isSearchBarFixed"
+        class="search-bar-spacer"
         :style="{ height: searchBarHeight + 'px' }"
       ></div>
+
+      <!-- 标题区：面包屑 / H1 / 操作行（390 视口对齐参考站） -->
+      <div class="container title-block" :class="{ 'align-to-card': !useVirtualScroll }">
+        <nav class="breadcrumbs">
+          <template v-if="isMultiSelect">
+            首页/ NSW
+          </template>
+          <template v-else>
+            首页 › NSW › {{ suburb || '—' }}
+          </template>
+        </nav>
+
+        <h1 class="page-h1">
+          <template v-if="isMultiSelect">
+            {{ propertiesStore.totalCount }} 套房源，覆盖及周边 {{ selectedLocationsCount }} 个郊区
+          </template>
+          <template v-else-if="hasSingleSelection">
+            {{ propertiesStore.totalCount }} 套房源在 {{ suburb || 'Sydney' }}, NSW
+          </template>
+          <template v-else>
+            {{ propertiesStore.totalCount }} 套待租房源在 {{ suburb || 'Sydney' }}, NSW<span v-if="postcode">, {{ postcode }}</span>
+          </template>
+        </h1>
+
+        <div class="actions-row">
+          <div class="alert-left">
+            <Bell :size="20" />
+            <span class="label">Property alert</span>
+            <BaseToggle v-model="alertOn" size="sm" aria-label="Property alert" />
+          </div>
+
+          <div class="actions-right">
+            <el-dropdown @command="onSortCommand" placement="bottom-end" :teleported="false">
+              <button class="sort-btn" type="button">
+                <ArrowUpDown :size="20" />
+                <span class="label">Sort</span>
+              </button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="price_asc">按最小价格</el-dropdown-item>
+                  <el-dropdown-item command="available_date_asc">按空出时间</el-dropdown-item>
+                  <el-dropdown-item command="inspection_earliest">按最早看房时间</el-dropdown-item>
+                  <el-dropdown-item command="suburb_az">按区域（首字母）</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
+      </div>
 
       <!-- 房源列表 -->
       <div class="container">
@@ -66,25 +111,21 @@
 
           <!-- 错误状态 -->
           <div v-else-if="propertiesStore.error" class="error-message">
-            <el-icon :size="48" color="#f56c6c">
+            <el-icon :size="48" class="error-icon">
               <Warning />
             </el-icon>
             <p class="chinese-text">{{ propertiesStore.error }}</p>
-            <el-button type="primary" @click="retryLoadProperties">
-              重新加载
-            </el-button>
+            <el-button type="primary" @click="retryLoadProperties"> 重新加载 </el-button>
           </div>
 
           <!-- 空状态 -->
           <div v-else-if="propertiesStore.filteredProperties.length === 0" class="empty-state">
-            <el-icon :size="64" color="#d9d9d9">
+            <el-icon :size="64" class="empty-icon">
               <House />
             </el-icon>
             <h3 class="chinese-text">没有找到匹配的房源</h3>
             <p class="chinese-text">请尝试调整搜索条件或筛选器</p>
-            <el-button type="primary" @click="clearFilters">
-              清除筛选条件
-            </el-button>
+            <el-button type="primary" @click="clearFilters"> 清除筛选条件 </el-button>
           </div>
 
           <!-- 房源列表容器 -->
@@ -96,7 +137,7 @@
               @property-click="goToPropertyDetail"
               @contact-property="handleContactProperty"
             />
-            
+
             <!-- 普通网格：小数据量保持原有交互体验，避免滚动条跳动 -->
             <div v-else class="properties-grid">
               <PropertyCard
@@ -110,7 +151,10 @@
           </div>
 
           <!-- 分页组件：虚拟滚动启用时隐藏，两种导航方式互斥避免用户困惑 -->
-          <div v-if="!useVirtualScroll && propertiesStore.totalPages > 1" class="pagination-container">
+          <div
+            v-if="!useVirtualScroll && propertiesStore.totalPages > 1"
+            class="pagination-container"
+          >
             <el-pagination
               :current-page="propertiesStore.currentPage"
               :page-size="propertiesStore.pageSize"
@@ -126,9 +170,10 @@
     </main>
 
     <!-- 筛选面板 -->
-    <FilterPanel 
+    <FilterPanel
       ref="filterPanelRef"
       v-model="showFilterPanel"
+      :focusSection="focusSection"
       @filtersChanged="handleFiltersChanged"
     />
   </div>
@@ -136,20 +181,24 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
 import VirtualPropertyList from '@/components/VirtualPropertyList.vue'
 import SearchBar from '@/components/SearchBar.vue'
-import FilterTabs from '@/components/FilterTabs.vue'
 import FilterPanel from '@/components/FilterPanel.vue'
+import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
+import { Bell, ArrowUpDown } from 'lucide-vue-next'
+import BaseToggle from '@/components/base/BaseToggle.vue'
+import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 
-// 路由
+/* 路由 */
 const router = useRouter()
+const route = useRoute()
 
-// 状态管理
+/* 状态管理 */
 const propertiesStore = usePropertiesStore()
 
 // 响应式数据
@@ -160,7 +209,65 @@ const searchBarElement = ref(null)
 const lastScrollY = ref(0)
 const isNavHidden = ref(false)
 const windowWidth = ref(window.innerWidth)
-const filterPanelRef = ref(null)  // 添加FilterPanel组件的引用
+const filterPanelRef = ref(null) // 添加FilterPanel组件的引用
+const focusSection = ref(null) // 指定面板打开时的聚焦分组
+
+/* 排序入口：仅透传到后端；URL 状态同步，不做前端本地排序 */
+const sortValue = ref('')
+const handleSortChange = async (val) => {
+  try {
+    const currentQuery = { ...(route.query || {}) }
+    const merged = { ...currentQuery }
+    if (val) merged.sort = val
+    else delete merged.sort
+
+    // URL 幂等：仅当变更后与当前不同才写入；并清理空值，稳定键顺序
+    const nextQuery = sanitizeQueryParams(merged)
+    const currQuery = sanitizeQueryParams(currentQuery)
+    if (!isSameQuery(currQuery, nextQuery)) {
+      await router.replace({ query: nextQuery })
+    }
+
+    await propertiesStore.setSort(val)
+  } catch (e) {
+    console.error('排序切换失败:', e)
+  }
+}
+/* 下拉命令转发至排序处理 */
+const onSortCommand = (val) => handleSortChange(val)
+
+/* 左侧通知开关占位（未来接入真实通知） */
+const alertOn = ref(false)
+
+/* 计算 suburb/postcode：从首个已选区域回显；无则优雅回退 */
+const suburb = computed(() => {
+  const list = propertiesStore.selectedLocations
+  if (Array.isArray(list) && list.length) {
+    const first = list[0]
+    // 优先使用 suburb 名称；若是 postcode 类型且带 suburb 字段则取其 suburb
+    return first?.type === 'suburb' ? first.name : first.suburb || first.name || ''
+  }
+  return ''
+})
+const postcode = computed(() => {
+  const list = propertiesStore.selectedLocations
+  if (Array.isArray(list) && list.length) {
+    const first = list[0]
+    // 常见 4 位邮编；若对象自带 postcode 字段优先
+    const pc = first?.postcode || first?.name
+    return typeof pc === 'string' && /^\d{4}$/.test(pc) ? pc : ''
+  }
+  return ''
+})
+
+// 选择状态：用于标题与面包屑的前端表现
+// 说明：统一在前端用选择数量来判断“单选/多选”，避免依赖 store 内部实现细节
+const selectedLocationsCount = computed(() => {
+  const list = propertiesStore.selectedLocations
+  return Array.isArray(list) ? list.length : 0
+})
+const hasSingleSelection = computed(() => selectedLocationsCount.value === 1)
+const isMultiSelect = computed(() => selectedLocationsCount.value > 1)
 
 // 定义事件发射器
 const emit = defineEmits(['updateNavVisibility'])
@@ -177,62 +284,67 @@ const useVirtualScroll = computed(() => {
   return enableVirtual && displayedProperties.value.length > VIRTUAL_SCROLL_THRESHOLD
 })
 
-// 方法
+/* 方法 */
+// 工具：是否已选择区域（suburb/postcode）
+
 const handleSearch = () => {
   // 搜索逻辑已在SearchBar组件中处理，这里主要是响应搜索事件
 }
 
-const handleLocationSelected = async (location) => {
-  // 当选择或移除区域后，调用API进行服务端筛选
-  const selectedSuburbs = propertiesStore.selectedLocations.map(loc => loc.name)
-  
+const handleLocationSelected = async () => {
   try {
-    if (selectedSuburbs.length > 0) {
-      // 有选中的区域，进行筛选
-      const params = {
-        suburb: selectedSuburbs.join(',')
-      }
-      await propertiesStore.fetchProperties(params)
+    const hasSel =
+      Array.isArray(propertiesStore.selectedLocations) &&
+      propertiesStore.selectedLocations.length > 0
+
+    if (hasSel) {
+      // 统一走 applyFilters：内部会用 selectedLocations 构造并保存 currentFilterParams，保证翻页/改每页大小不丢条件
+      await propertiesStore.applyFilters({})
     } else {
-      // 没有选中的区域，加载所有房源
-      await propertiesStore.fetchProperties()
+      // 无选区：重置筛选并回到无筛选列表（同时清空 currentFilterParams，保持行为一致）
+      await propertiesStore.resetFilters()
     }
   } catch (error) {
     console.error('筛选房源失败:', error)
   }
 }
 
-const handleToggleFullPanel = (show) => {
-  showFilterPanel.value = show
-}
-
-const handleQuickFiltersChanged = (filterParams) => {
-  // 同步快速筛选数据到FilterPanel
-  if (filterPanelRef.value) {
-    // 转换格式以同步到FilterPanel
-    const syncData = {
-      priceRange: filterParams.minPrice !== null || filterParams.maxPrice !== null
-        ? [filterParams.minPrice || 0, filterParams.maxPrice || 5000]
-        : [0, 5000],
-      bedrooms: filterParams.bedrooms === 'any' ? [] : filterParams.bedrooms.split(','),
-      bathrooms: filterParams.bathrooms === 'any' ? [] : filterParams.bathrooms?.split(',') || [],
-      parking: filterParams.parking === 'any' ? [] : filterParams.parking?.split(',') || []
-    }
-    filterPanelRef.value.setFilters(syncData)
-  }
+const handleOpenFilterPanel = () => {
+  // 仅移动端打开统一 FilterPanel；PC 端采用分离式下拉面板（FilterTabs 内部处理）
+  if (windowWidth.value > 768) return
+  focusSection.value = null
+  showFilterPanel.value = true
 }
 
 const handleFiltersChanged = () => {
   // 筛选逻辑已在FilterPanel组件中处理
 }
 
+// 处理保存搜索成功事件
+const handleSearchSaved = (savedSearch) => {
+  try {
+    // 显示成功提示
+    ElMessage.success(`搜索"${savedSearch.name}"已保存成功！`)
+
+    // 可以在这里添加其他逻辑，比如：
+    // - 更新用户界面状态
+    // - 发送分析事件
+    // - 刷新已保存搜索列表等
+
+    console.log('搜索保存成功:', savedSearch)
+  } catch (error) {
+    console.error('处理保存搜索事件失败:', error)
+    ElMessage.error('保存搜索时出现问题，请重试')
+  }
+}
+
 const handlePageChange = async (page) => {
   await propertiesStore.setCurrentPage(page)
-  
+
   // 滚动到顶部
   window.scrollTo({
     top: 0,
-    behavior: 'smooth'
+    behavior: 'smooth',
   })
 }
 
@@ -241,6 +353,7 @@ const goToPropertyDetail = (property) => {
   propertiesStore.currentProperty = property
   router.push({ name: 'PropertyDetail', params: { id: property.listing_id } })
 }
+
 
 const handleContactProperty = (property) => {
   // TODO: 实现联系我们功能
@@ -256,19 +369,6 @@ const retryLoadProperties = () => {
 const clearFilters = () => {
   propertiesStore.resetFilters()
   showFilterPanel.value = false
-}
-
-const applyCurrentFilters = () => {
-  // 应用当前的筛选条件
-  propertiesStore.applyFilters({
-    minPrice: null,
-    maxPrice: null,
-    bedrooms: 'any',
-    bathrooms: 'any',
-    parking: 'any',
-    availableDate: 'any',
-    isFurnished: false
-  })
 }
 
 const loadProperties = async () => {
@@ -287,20 +387,20 @@ const handleResize = () => {
 // 滚动处理逻辑
 const handleScroll = () => {
   if (!searchBarElement.value) return
-  
+
   const currentScrollY = window.scrollY
   const scrollDelta = currentScrollY - lastScrollY.value
   const isMobileView = windowWidth.value <= 768
-  
+
   // 搜索栏固定逻辑 - 改进移动端逻辑
   const searchBarRect = searchBarElement.value.getBoundingClientRect()
-  
+
   if (isMobileView) {
     // 移动端：更精确的固定逻辑，考虑logo区域高度
     const logoSection = document.querySelector('.mobile-logo-section')
     const logoHeight = logoSection ? logoSection.offsetHeight : 32 // fallback高度
     const shouldBeFixed = currentScrollY > logoHeight
-    
+
     if (shouldBeFixed && !isSearchBarFixed.value) {
       searchBarHeight.value = searchBarElement.value.offsetHeight
       isSearchBarFixed.value = true
@@ -311,7 +411,7 @@ const handleScroll = () => {
   } else {
     // 桌面端：保持原有逻辑
     const shouldBeFixed = searchBarRect.top <= 0
-    
+
     if (shouldBeFixed && !isSearchBarFixed.value) {
       searchBarHeight.value = searchBarElement.value.offsetHeight
       isSearchBarFixed.value = true
@@ -320,11 +420,11 @@ const handleScroll = () => {
       searchBarHeight.value = 0
     }
   }
-  
+
   // 导航栏显示/隐藏逻辑（仅在桌面端）
   if (!isMobileView) {
     const scrollThreshold = 5
-    
+
     // 回到顶部附近时强制重置导航栏状态
     if (currentScrollY < 50) {
       if (isNavHidden.value) {
@@ -353,7 +453,7 @@ const handleScroll = () => {
       // 不发送emit事件，避免影响App组件
     }
   }
-  
+
   lastScrollY.value = currentScrollY
 }
 
@@ -367,10 +467,59 @@ const initSearchBarHeight = async () => {
 
 // 生命周期
 onMounted(async () => {
-  // 只在没有数据时才加载，避免覆盖筛选结果
-  if (propertiesStore.filteredProperties.length === 0) {
-    loadProperties()
+  // 从 URL 恢复排序（URL 状态同步）：存在 sort 时恢复并触发服务端排序透传
+  const sortQ = route.query?.sort
+  if (typeof sortQ === 'string' && sortQ) {
+    sortValue.value = sortQ
+    await propertiesStore.setSort(sortQ)
   }
+
+  // 首次加载自动应用：若已存在“已选区域/或URL筛选参数”，自动等效一次“确定”
+  try {
+    const hasApplied =
+      propertiesStore.currentFilterParams &&
+      Object.keys(propertiesStore.currentFilterParams).length > 0
+
+    const hasSelections =
+      Array.isArray(propertiesStore.selectedLocations) &&
+      propertiesStore.selectedLocations.length > 0
+
+    const queryKeys = [
+      'suburbs',
+      'suburb',
+      'postcodes',
+      'date_from',
+      'date_to',
+      'price_min',
+      'price_max',
+      'bedrooms',
+      'isFurnished',
+      'bathrooms',
+      'parking',
+      'include_nearby',
+    ]
+    const queryHasAny = Object.keys(route.query || {}).some(
+      (k) => queryKeys.includes(k) && route.query[k] !== undefined && route.query[k] !== '',
+    )
+
+    if (!hasApplied && (hasSelections || queryHasAny)) {
+      // 将当前路由参数作为原始 filters 传入（store 内部会做契约映射与清洗）
+      const plainFilters = { ...(route.query || {}) }
+      await propertiesStore.applyFilters(plainFilters)
+    } else {
+      // 无可用上下文时才加载“无筛选”列表，避免覆盖筛选结果
+      if (propertiesStore.filteredProperties.length === 0) {
+        loadProperties()
+      }
+    }
+  } catch (e) {
+    // 兜底：若自动应用失败，不阻断页面
+    console.warn('auto-apply on first load failed (ignored):', e)
+    if (propertiesStore.filteredProperties.length === 0) {
+      loadProperties()
+    }
+  }
+
   await initSearchBarHeight()
   lastScrollY.value = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })
@@ -392,7 +541,7 @@ onUnmounted(() => {
   overflow-x: hidden; /* 防止固定宽度元素造成水平滚动，不影响内部粘性定位 */
 }
 
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .home-container {
     padding-bottom: 0;
   }
@@ -401,6 +550,7 @@ onUnmounted(() => {
 /* 主内容区域 */
 .main-content {
   width: 100%;
+
   /* 移除 overflow-x: hidden 以修复粘性定位 */
 }
 
@@ -410,13 +560,13 @@ onUnmounted(() => {
   padding: 16px 32px; /* 减少移动端上下padding */
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .container {
-    padding: 32px 32px;
+    padding: 32px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .container {
     padding: 40px 32px;
   }
@@ -442,23 +592,22 @@ onUnmounted(() => {
   line-height: 1.4;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .page-title {
     font-size: 36px;
   }
-  
+
   .page-subtitle {
     font-size: 20px;
   }
 }
-
 
 /* Domain标准搜索区域 - 全屏容器 */
 .search-filter-section {
   /* 从一开始就横贯整个屏幕，像Domain一样 */
   width: 100%;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   margin-bottom: 16px; /* 减少移动端下边距 */
   z-index: 50;
   transition: all 0.2s ease-out;
@@ -471,19 +620,19 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   margin-bottom: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
   transition: top 0.2s ease-in-out;
 }
 
 /* 当导航栏隐藏时，搜索栏贴顶 */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .search-filter-section.is-fixed.nav-hidden {
     top: 0;
   }
 }
 
 /* 移动端搜索栏始终贴顶 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .search-filter-section.is-fixed {
     top: 0;
   }
@@ -494,11 +643,25 @@ onUnmounted(() => {
   width: 100%;
 }
 
-/* 移动端Logo区域 */
+/* 移动端Logo区域
+   中文注释：用“一层控高 + 一层水平留白”的结构，避免多层 padding 叠加导致总高失控 */
 .mobile-logo-section {
-  padding: 8px 0 12px 0; /* 减少上下间距，上8px下12px */
+  height: var(--nav-h-mob, 54px); /* 目标总高度=54px */
+  padding-block: 0;               /* 垂直高度由容器控制，禁止再叠加上下padding */
   position: relative;
-  /* 移除高z-index，避免与fixed搜索栏产生叠加问题 */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;    /* 水平靠左 */
+  background: var(--color-bg-card);              /* 纯白背景 */
+  border-bottom: 1px solid var(--color-border-default); /* 底部分隔线 */
+}
+
+/* 仅在 LOGO 顶栏内部，移除通用 .container 的上下内边距，保留左右留白 */
+.mobile-logo-section > .container {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-left: 0;   /* 靠左贴齐，保留左右 padding 16px */
+  margin-right: auto;
 }
 
 .mobile-logo {
@@ -506,16 +669,13 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   font-size: 20px;
-  font-weight: 600;
-  color: var(--juwo-primary);
+  font-weight: 700;                    /* 粗体 */
+  color: var(--color-text-primary);    /* 黑色（主文案色） */
 }
 
-.logo-icon {
-  font-size: 24px;
-}
 
 /* 在桌面端隐藏移动端Logo */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .mobile-logo-section {
     display: none;
   }
@@ -525,7 +685,7 @@ onUnmounted(() => {
   /* 搜索内容居中对齐容器 */
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 32px 12px 32px; /* 减少上下padding */
+  padding: 16px 32px 12px; /* 减少上下padding */
 }
 
 /* 搜索行布局 */
@@ -547,6 +707,34 @@ onUnmounted(() => {
   align-items: center;
 }
 
+/* 桌面端筛选按钮（与行内控件间距一致） */
+.filter-trigger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 12px; /* 更紧凑的药丸尺寸 */
+  gap: 2px; /* 图标与文字更紧凑 */
+  border: 1px solid var(--color-border-default);
+  border-radius: 9999px; /* 强制药丸型 */
+  background: #fff;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1; /* 垂直居中更稳 */
+}
+
+.filter-trigger-btn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  background: #f7f8fa;
+}
+
+.filter-trigger-btn:focus {
+  outline: none; /* 去除浏览器默认 focus ring */
+  box-shadow: none;
+}
+
 .results-summary {
   max-width: 1200px;
   margin: 0 auto;
@@ -563,27 +751,109 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
+/* 标题区（面包屑/H1/操作行）——对齐参考站 390 规格 */
+.title-block {
+  padding-top: 8px;
+}
+
+.breadcrumbs {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+}
+
+.page-h1 {
+  font-size: 22px;
+  line-height: 26px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 14px;
+}
+
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+}
+
+.alert-left .label {
+  font-weight: 500;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  padding: 8px 0;
+}
+
+.sort-btn .label {
+  font-weight: 600;
+}
+
+/* 右侧操作容器：并排显示“地图视图”与排序下拉 */
+.actions-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* 移动端下保持点击区可达性 */
+@media (width <= 768px) {
+  .actions-row {
+    gap: 10px;
+  }
+}
+
 /* 移动端布局调整 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
+  .container {
+    padding: 12px 16px;
+  } /* 统一移动端左右 16px，与卡片内容区一致 */
   .search-filter-section {
     margin-bottom: 12px; /* 进一步减少移动端间距 */
   }
-  
+
   .search-content-container {
-    padding: 12px 24px 8px 24px; /* 减少移动端搜索内容padding */
+    padding: 12px 16px 8px; /* 与卡片内容区(16px)左右对齐 */
   }
-  
+
   .search-filter-row {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row; /* 移动端与搜索框同排 */
+    align-items: center;
+    gap: 8px;
   }
-  
+
   .search-bar {
     width: 100%;
+    flex: 1;
   }
-  
+
   .filter-tabs-right {
-    width: 100%;
+    display: inline-flex; /* 移动端显示 FilterTabs 组件（内部会自动切换为“筛选”按钮） */
+  }
+
+  .filter-trigger-btn {
+    display: inline-flex; /* 仅移动端显示按钮 */
+    height: 34px;
+    padding: 0 12px; /* 更紧凑但可点击 */
+    border-radius: 9999px;
+    gap: 2px;
+    font-size: 13px;
+    line-height: 1;
+    margin-right: 3px; /* 对齐卡片“···”右缘（按钮右侧退 3px） */
   }
 }
 
@@ -649,6 +919,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 24px;
   align-items: flex-start;
+
   /* max-width 将由外部容器 .container 控制 */
 }
 
@@ -684,26 +955,49 @@ onUnmounted(() => {
 }
 
 /* 响应式搜索筛选区域 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .search-filter-section {
     max-width: none;
     margin-bottom: 16px;
   }
-  
+
   .search-filter-container {
     flex-direction: column;
     gap: 12px;
     width: 100%;
   }
-  
+
   .search-bar {
     width: 100%;
   }
-  
+
   .filter-trigger-btn {
-    width: 100%;
-    height: 48px;
-    border-radius: 6px;
+    display: inline-flex;
+    width: auto;
+    height: 34px;
+    padding: 0 12px; /* 与上方断点一致 */
+    border-radius: 9999px;
+    gap: 2px;
+    font-size: 13px;
+    line-height: 1;
+  }
+}
+
+/* 统一图标语义色（错误/空状态），改用设计令牌，避免内联硬编码 */
+.error-message .el-icon.error-icon {
+  color: var(--color-danger);
+}
+
+.empty-state .el-icon.empty-icon {
+  color: var(--color-border-default);
+}
+
+/* 标题区与卡片右缘对齐（单列卡片场景）：
+   让 actions-row 使用与卡片一致的内容宽度，并以左侧为锚点 */
+@media (width >= 1024px) {
+  /* 始终让标题区操作行与卡片内容宽度一致（PC 断点） */
+  .title-block .actions-row {
+    width: var(--card-content-w);
   }
 }
 </style>

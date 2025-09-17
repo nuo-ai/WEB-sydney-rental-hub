@@ -17,9 +17,7 @@
             </el-icon>
             <h3 class="chinese-text">还没有收藏的房源</h3>
             <p class="chinese-text">浏览房源时点击收藏按钮，将喜欢的房源保存在这里</p>
-            <el-button type="primary" @click="goToHome">
-              去看房源
-            </el-button>
+            <el-button type="primary" @click="goToHome"> 去看房源 </el-button>
           </div>
 
           <!-- 收藏房源网格 -->
@@ -39,6 +37,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'FavoritesView' })
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -94,13 +93,13 @@ const handleContactProperty = (property) => {
   padding: 24px 16px;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .container {
     padding: 32px 24px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .container {
     padding: 40px 32px;
   }
@@ -163,14 +162,14 @@ const handleContactProperty = (property) => {
 }
 
 /* 移动端 - 单列布局 */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .properties-grid {
     grid-template-columns: 1fr;
   }
 }
 
 /* 平板端 - 双列布局 */
-@media (min-width: 768px) and (max-width: 1199px) {
+@media (width >= 768px) and (width <= 1199px) {
   .properties-grid {
     grid-template-columns: repeat(2, 1fr);
     max-width: 1200px;
@@ -179,7 +178,7 @@ const handleContactProperty = (property) => {
 }
 
 /* 桌面端 - 灵活布局 */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .properties-grid {
     grid-template-columns: repeat(auto-fit, minmax(580px, 1fr));
     max-width: 1800px;

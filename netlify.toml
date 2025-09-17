@@ -1,6 +1,14 @@
-# Netlify build configuration
+# Netlify build configuration (vue-frontend)
 [build]
-  # 这是我们的构建命令
-  command = "npm run build:h5"
-  # 这是构建产物的发布目录
+  # 在子目录 vue-frontend 下执行构建
+  base = "vue-frontend"
+  # 使用 Vite 标准构建脚本（Netlify 会自动安装依赖）
+  command = "npm run build"
+  # 发布目录相对 base，为 dist
   publish = "dist"
+
+# 单页应用（SPA）回退规则：所有路径回退到 index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
