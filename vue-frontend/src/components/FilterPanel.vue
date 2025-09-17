@@ -65,7 +65,7 @@
           <AreasSelector
             :selected="selectedLocations"
             @update:selected="onUpdateSelectedAreas"
-            @requestCount="debouncedRequestCount"
+            @requestCount="triggerFilteredCount"
           />
           <div v-if="SHOW_INCLUDE_NEARBY" class="nearby-toggle">
             <el-checkbox v-model="includeNearby" @change="handleIncludeNearbyChange">
@@ -208,7 +208,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick, inject } from 'vue'
+import { ref, computed, watch, onMounted, nextTick, inject, onUnmounted } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
 import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
@@ -310,33 +311,22 @@ const removeLocation = (id) => {
     (loc) => String(loc?.id ?? '') !== String(id),
   )
   propertiesStore.setDraftSelectedLocations(temp)
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 const clearAllLocations = () => {
   // 清空草稿选区；需“应用”后才真正生效
   propertiesStore.setDraftSelectedLocations([])
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 const handleIncludeNearbyChange = () => {
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 
 /* 区域目录交互：选择时仅刷新计数，不立即应用（分离选择与应用） */
-const debouncedRequestCount = (() => {
-  let tid = null
-  return () => {
-    if (tid) clearTimeout(tid)
-    tid = setTimeout(() => {
-      updateFilteredCount()
-      tid = null
-    }, 250)
-  }
-})()
-
 const onUpdateSelectedAreas = (newList) => {
   // 改为仅更新草稿，不触发 apply；仅刷新底部“显示结果 (N)”
   propertiesStore.setDraftSelectedLocations(Array.isArray(newList) ? newList : [])
-  nextTick(() => debouncedRequestCount())
+  nextTick(() => triggerFilteredCount())
 }
 
 /* 本地计算的筛选结果数量 */
@@ -344,6 +334,18 @@ const localFilteredCount = ref(0)
 const _countReqSeq = ref(0) // 中文注释：计数请求序号；防并发乱序响应覆盖新结果（前端表现：防止计数“跳回老数”）
 const _counting = ref(false) // 中文注释：计数中标记（可用于淡化/骨架态；当前未使用）
 const countUnavailable = ref(false) // 中文注释：计数失败/不可用标记，驱动按钮退回“确定”
+
+const scheduleFilteredCount = useDebounceFn(
+  () => {
+    void updateFilteredCount()
+  },
+  300,
+  { maxWait: 800 },
+)
+
+function triggerFilteredCount() {
+  scheduleFilteredCount()
+}
 
 /* 将筛选参数写入 URL 的 Query（只写非空参数；保持 V1 键名，最小改动） */
 const buildQueryFromFilters = (filterParams) => {
@@ -585,7 +587,7 @@ const toggleBedroom = (value) => {
   } else {
     filters.value.bedrooms = [value]
   }
-  updateFilteredCount()
+  triggerFilteredCount()
 }
 
 const toggleBathroom = (value) => {
@@ -597,7 +599,7 @@ const toggleBathroom = (value) => {
   } else {
     filters.value.bathrooms = [value]
   }
-  updateFilteredCount()
+  triggerFilteredCount()
 }
 
 const toggleParking = (value) => {
@@ -609,11 +611,11 @@ const toggleParking = (value) => {
   } else {
     filters.value.parking = [value]
   }
-  updateFilteredCount()
+  triggerFilteredCount()
 }
 
 // 实时更新筛选数量（不立即应用到store）
-const updateFilteredCount = async () => {
+async function updateFilteredCount() {
   // 中文注释：日期区间校验，非法时不发起计数请求，直接显示 0
   if (filters.value.startDate && filters.value.endDate) {
     const s = new Date(filters.value.startDate).getTime()
@@ -699,7 +701,7 @@ const updateFilteredCount = async () => {
 /* 本地估算已移除：为避免与真实结果不一致，计数统一走后端接口，通过 store.getFilteredCount() 获取 */
 
 const handlePriceChange = () => {
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 
 const handleStartDateChange = (date) => {
@@ -710,7 +712,7 @@ const handleStartDateChange = (date) => {
     filters.value.startDate = currentEnd
     filters.value.endDate = date
   }
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 
 const handleEndDateChange = (date) => {
@@ -721,11 +723,11 @@ const handleEndDateChange = (date) => {
     filters.value.endDate = currentStart
     filters.value.startDate = date
   }
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 
 const handleFurnishedChange = () => {
-  nextTick(() => updateFilteredCount())
+  nextTick(() => triggerFilteredCount())
 }
 
 // 关闭面板方法
@@ -861,7 +863,7 @@ const resetFilters = () => {
 
   // 如果有选中的区域，基于区域更新计数；否则显示总数
   if (propertiesStore.selectedLocations.length > 0) {
-    updateFilteredCount()
+    triggerFilteredCount()
   } else {
     localFilteredCount.value =
       propertiesStore.totalCount || propertiesStore.allProperties.length || 0
@@ -967,7 +969,7 @@ watch(visible, (newValue) => {
     } catch {
       /* 忽略非关键错误 */
     }
-    updateFilteredCount()
+    void updateFilteredCount()
 
     // 添加键盘事件监听
     if (typeof document !== 'undefined') {
@@ -1008,7 +1010,6 @@ watch(visible, (newValue) => {
 })
 
 // 组件卸载时的清理
-import { onUnmounted } from 'vue'
 onUnmounted(() => {
   unlockBodyScroll()
   if (typeof document !== 'undefined') {
@@ -1023,7 +1024,7 @@ onMounted(() => {
 
   // 若存在筛选或已有选区，则刷新计数；否则显示总数
   if (propertiesStore.selectedLocations.length > 0 || hasAppliedFilters.value) {
-    updateFilteredCount()
+    void updateFilteredCount()
   } else {
     localFilteredCount.value =
       propertiesStore.totalCount || propertiesStore.allProperties.length || 0
