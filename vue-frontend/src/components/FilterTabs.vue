@@ -378,7 +378,7 @@ import { usePropertiesStore } from '@/stores/properties'
 // 使用 requestOpenFullPanel 事件触发移动端的统一面板
 
 // 定义事件（在模板中通过 $emit 使用）
-// eslint-disable-next-line no-unused-vars
+ 
 const emit = defineEmits(['requestOpenFullPanel', 'searchSaved'])
 
 // 响应式状态
