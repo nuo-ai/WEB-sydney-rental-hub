@@ -405,7 +405,7 @@ watch(
 }
 
 .area-item:has(.check:checked) .area-name {
-  color: #374151;
+  color: var(--filter-color-text-primary);
   font-weight: 600;
 }
 
@@ -416,7 +416,7 @@ watch(
 }
 
 .area-item.selected .area-name {
-  color: #374151;
+  color: var(--filter-color-text-primary);
   font-weight: 600;
 }
 </style>

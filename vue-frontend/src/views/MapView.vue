@@ -9,7 +9,7 @@
 
         <div class="map-content">
           <div class="placeholder-content">
-            <el-icon :size="64" color="#d9d9d9">
+            <el-icon :size="64" class="placeholder-icon">
               <MapLocation />
             </el-icon>
             <h3 class="chinese-text">地图功能开发中</h3>
@@ -66,7 +66,7 @@ const goToHome = () => {
 }
 
 .map-content {
-  background: white;
+  background: var(--color-bg-card);
   padding: 40px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -79,6 +79,10 @@ const goToHome = () => {
 .placeholder-content {
   text-align: center;
   max-width: 400px;
+}
+
+.placeholder-icon {
+  color: var(--filter-color-neutral-300);
 }
 
 .placeholder-content h3 {

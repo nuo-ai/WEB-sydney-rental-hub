@@ -15,7 +15,7 @@
     <!-- 备用：显示静态地址信息 -->
     <div v-else class="map-static">
       <div class="map-icon">
-        <el-icon :size="48" color="#FF5824"><Location /></el-icon>
+        <el-icon :size="48" class="map-icon-symbol"><Location /></el-icon>
       </div>
       <div class="map-info">
         <h4>{{ markerTitle }}</h4>
@@ -89,7 +89,7 @@ const formattedCoordinates = computed(() => {
   height: v-bind(height);
   border-radius: 8px;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: var(--surface-2);
 }
 
 .map-iframe {
@@ -107,22 +107,27 @@ const formattedCoordinates = computed(() => {
   justify-content: center;
   padding: 20px;
   text-align: center;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-4) 100%);
 }
 
 .map-icon {
   margin-bottom: 16px;
 }
 
+.map-icon :deep(.el-icon),
+.map-icon :deep(svg) {
+  color: var(--juwo-primary);
+}
+
 .map-info h4 {
   margin: 0 0 8px;
   font-size: 16px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .map-info p {
   margin: 0;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 </style>

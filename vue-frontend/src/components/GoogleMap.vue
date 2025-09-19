@@ -28,6 +28,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
 import { Loading, Location } from '@element-plus/icons-vue'
+import { getCssVarValue } from '@/utils/designTokens'
 
 const props = defineProps({
   latitude: {
@@ -73,7 +74,6 @@ const props = defineProps({
   routeOptions: {
     type: Object,
     default: () => ({
-      strokeColor: '#4285F4',
       strokeOpacity: 0.9,
       strokeWeight: 5,
       zIndex: 999,
@@ -116,6 +116,31 @@ let lastRoutePath = null // 记录最近一次路线点列，便于 resize 重�
 let isFitting = false // 正在执行 fitBounds，避免与锁定中心冲突
 let resizeTimer = null // 节流 resize
 let routeLabelInfoWindow = null // 路线标签 InfoWindow 实例
+
+const mergedRouteOptions = computed(() => {
+  const fallbackColor = getCssVarValue('--juwo-primary', '#0057ff')
+  const baseOptions = {
+    strokeColor: fallbackColor,
+    strokeOpacity: 0.9,
+    strokeWeight: 5,
+    zIndex: 999,
+  }
+
+  if (!props.routeOptions) {
+    return baseOptions
+  }
+
+  const providedColor =
+    typeof props.routeOptions.strokeColor === 'string'
+      ? props.routeOptions.strokeColor.trim()
+      : props.routeOptions.strokeColor
+
+  return {
+    ...baseOptions,
+    ...props.routeOptions,
+    strokeColor: providedColor ? providedColor : fallbackColor,
+  }
+})
 
 // 数值校验与经纬度规范化：兼容字符串输入并过滤 NaN/Infinity
 const isFiniteNumber = (n) => typeof n === 'number' && Number.isFinite(n)
@@ -312,7 +337,7 @@ const renderRoute = () => {
   if (!path || path.length < 2) return
   polyline = new google.maps.Polyline({
     path,
-    ...props.routeOptions,
+    ...mergedRouteOptions.value,
     map,
   })
   // 记录并自动自适应视野
@@ -538,7 +563,7 @@ watch(
 )
 
 watch(
-  () => props.routeOptions,
+  mergedRouteOptions,
   () => {
     renderRoute()
   },
@@ -659,7 +684,7 @@ onUnmounted(() => {
 .google-map {
   width: 100%;
   height: v-bind(height);
-  background-color: #f5f5f5;
+  background-color: var(--surface-2);
   position: relative;
 }
 
@@ -672,7 +697,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .map-loading span {
@@ -683,7 +708,7 @@ onUnmounted(() => {
 .map-fallback {
   width: 100%;
   height: v-bind(height);
-  background-color: #f5f5f5;
+  background-color: var(--surface-2);
   position: relative;
   display: flex;
   align-items: center;
@@ -709,7 +734,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 </style>

@@ -198,7 +198,7 @@ const handleClick = (event) => {
 /* 危险按钮 */
 .base-button--danger {
   background: var(--filter-color-danger);
-  color: #fff;
+  color: var(--filter-btn-primary-color);
   border-color: var(--filter-color-danger);
 }
 

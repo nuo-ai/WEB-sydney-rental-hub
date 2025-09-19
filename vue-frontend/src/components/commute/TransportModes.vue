@@ -58,8 +58,8 @@ const selectMode = (value) => {
   height: 48px;
   border-radius: 50%;
   border: none;
-  background: #f5f5f5;
-  color: #666;
+  background: var(--surface-2);
+  color: var(--color-text-secondary);
   font-size: 18px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -91,7 +91,7 @@ const selectMode = (value) => {
 }
 
 .mode-btn:hover {
-  background: #ebebeb;
+  background: var(--surface-3);
 }
 
 .mode-btn:active {
@@ -99,12 +99,12 @@ const selectMode = (value) => {
 }
 
 .mode-btn.active {
-  background: #333;
-  color: white;
+  background: var(--filter-color-neutral-800);
+  color: var(--color-text-inverse);
 }
 
 .mode-btn.active:hover {
-  background: #222;
+  background: var(--filter-color-neutral-900);
 }
 
 /* 触摸设备优化 */
@@ -115,11 +115,11 @@ const selectMode = (value) => {
   }
 
   .mode-btn:hover {
-    background: #f5f5f5;
+    background: var(--surface-2);
   }
 
   .mode-btn.active:hover {
-    background: #333;
+    background: var(--filter-color-neutral-800);
   }
 }
 </style>
