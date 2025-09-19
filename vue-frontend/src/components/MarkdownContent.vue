@@ -82,7 +82,7 @@ const sanitizedHtml = computed(() => {
 .markdown-content {
   font-size: 14px;
   line-height: 1.8;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .markdown-content :deep(p) {
@@ -96,7 +96,7 @@ const sanitizedHtml = computed(() => {
 .markdown-content :deep(strong),
 .markdown-content :deep(b) {
   font-weight: 600;
-  color: #111;
+  color: var(--color-text-primary);
 }
 
 .markdown-content :deep(ul),
@@ -121,7 +121,7 @@ const sanitizedHtml = computed(() => {
 .markdown-content :deep(h5),
 .markdown-content :deep(h6) {
   font-weight: 600;
-  color: #111;
+  color: var(--color-text-primary);
   margin: 16px 0 8px;
   line-height: 1.3;
 }
@@ -153,13 +153,13 @@ const sanitizedHtml = computed(() => {
 .markdown-content :deep(blockquote) {
   margin: 12px 0;
   padding: 8px 16px;
-  border-left: 3px solid #007bff;
-  background-color: #f8f9fa;
-  color: #555;
+  border-left: 3px solid var(--juwo-primary);
+  background-color: var(--filter-color-bg-secondary);
+  color: var(--color-text-secondary);
 }
 
 .markdown-content :deep(pre) {
-  background-color: #f5f5f5;
+  background-color: var(--surface-2);
   padding: 12px;
   border-radius: 4px;
   overflow-x: auto;
@@ -167,7 +167,7 @@ const sanitizedHtml = computed(() => {
 }
 
 .markdown-content :deep(code) {
-  background-color: #f5f5f5;
+  background-color: var(--surface-2);
   padding: 2px 6px;
   border-radius: 3px;
   font-family: Consolas, Monaco, monospace;
@@ -177,15 +177,16 @@ const sanitizedHtml = computed(() => {
 .markdown-content :deep(hr) {
   margin: 16px 0;
   border: none;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--color-border-default);
 }
 
 .markdown-content :deep(a) {
-  color: #007bff;
+  color: var(--link-color);
   text-decoration: none;
 }
 
 .markdown-content :deep(a:hover) {
+  color: var(--link-hover-color);
   text-decoration: underline;
 }
 </style>

@@ -225,9 +225,9 @@ const handleFacebookAuth = () => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -238,7 +238,7 @@ const handleFacebookAuth = () => {
   height: 32px;
   border: none;
   background: none;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -249,13 +249,13 @@ const handleFacebookAuth = () => {
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
+  background: var(--surface-2);
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -275,7 +275,7 @@ const handleFacebookAuth = () => {
 .auth-form :deep(.el-form-item__label) {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 8px;
 }
 
@@ -291,24 +291,24 @@ const handleFacebookAuth = () => {
   font-weight: 600;
   border-radius: 8px;
   margin-top: 24px;
-  background: #dc2626 !important;
-  border-color: #dc2626 !important;
+  background: var(--filter-color-danger) !important;
+  border-color: var(--filter-color-danger) !important;
 }
 
 .submit-btn:hover {
-  background: #b91c1c !important;
-  border-color: #b91c1c !important;
+  background: var(--filter-color-danger-hover) !important;
+  border-color: var(--filter-color-danger-hover) !important;
 }
 
 .switch-mode {
   text-align: center;
   margin: 24px 0;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .switch-link {
-  color: #dc2626;
+  color: var(--filter-color-danger);
   cursor: pointer;
   font-weight: 600;
   margin-left: 4px;
@@ -326,9 +326,9 @@ const handleFacebookAuth = () => {
 }
 
 .divider span {
-  background: white;
+  background: var(--color-bg-card);
   padding: 0 16px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 14px;
   position: relative;
   z-index: 1;
@@ -341,7 +341,7 @@ const handleFacebookAuth = () => {
   top: 50%;
   width: 100%;
   height: 1px;
-  background: #e3e3e3;
+  background: var(--color-border-default);
 }
 
 .social-buttons {
@@ -352,9 +352,9 @@ const handleFacebookAuth = () => {
 .social-btn {
   flex: 1;
   height: 48px;
-  border: 1px solid #e3e3e3;
+  border: 1px solid var(--color-border-default);
   border-radius: 8px;
-  background: white;
+  background: var(--color-bg-card);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -362,13 +362,13 @@ const handleFacebookAuth = () => {
   gap: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   transition: all 0.2s;
 }
 
 .social-btn:hover {
-  background: #f5f5f5;
-  border-color: #d0d0d0;
+  background: var(--surface-2);
+  border-color: var(--filter-color-border-strong);
 }
 
 .social-btn i {
@@ -376,11 +376,11 @@ const handleFacebookAuth = () => {
 }
 
 .google-btn i {
-  color: #ea4335;
+  color: var(--brand-google);
 }
 
 .facebook-btn i {
-  color: #1877f2;
+  color: var(--brand-facebook);
 }
 
 /* Mobile optimization */

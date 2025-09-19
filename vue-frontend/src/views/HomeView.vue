@@ -606,7 +606,7 @@ onUnmounted(() => {
 .search-filter-section {
   /* 从一开始就横贯整个屏幕，像Domain一样 */
   width: 100%;
-  background: white;
+  background: var(--color-bg-card);
   box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
   margin-bottom: 16px; /* 减少移动端下边距 */
   z-index: 50;
@@ -717,7 +717,7 @@ onUnmounted(() => {
   gap: 2px; /* 图标与文字更紧凑 */
   border: 1px solid var(--color-border-default);
   border-radius: 9999px; /* 强制药丸型 */
-  background: #fff;
+  background: var(--color-bg-card);
   color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 13px;
@@ -727,7 +727,7 @@ onUnmounted(() => {
 .filter-trigger-btn:hover {
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
-  background: #f7f8fa;
+  background: var(--el-color-primary-light-9);
 }
 
 .filter-trigger-btn:focus {

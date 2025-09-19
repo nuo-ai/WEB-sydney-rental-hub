@@ -1068,7 +1068,7 @@ onMounted(() => {
   right: 0;
   width: 420px;
   height: 100vh;
-  background: white;
+  background: var(--filter-panel-bg);
   box-shadow: -4px 0 20px rgb(0 0 0 / 15%);
   transform: translateX(100%);
   transition: transform 0.3s ease;
@@ -1202,7 +1202,7 @@ onMounted(() => {
 }
 
 .price-slider :deep(.el-slider__runway) {
-  background-color: #e5e7eb;
+  background-color: var(--filter-color-neutral-200);
   height: 6px;
 }
 
@@ -1213,7 +1213,7 @@ onMounted(() => {
 
 .price-slider :deep(.el-slider__button) {
   border: 3px solid var(--color-border-strong);
-  background-color: white;
+  background-color: var(--filter-color-bg-primary);
   width: 20px;
   height: 20px;
 }
@@ -1362,7 +1362,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--filter-color-bg-muted);
   border: 1px solid var(--color-border-default);
   border-radius: 8px;
 }
@@ -1760,7 +1760,7 @@ onMounted(() => {
 
     /* 为 iOS 底部 Home Bar 预留安全区，确保按钮不被遮挡 */
     padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    background: white;
+    background: var(--color-bg-card);
 
     /* 说明：footer 位于滚动容器(panel-content)之外，天然常驻，无需 sticky；此处仅做安全区留白 */
   }

@@ -516,7 +516,7 @@ watch(
 .pill.selected {
   background: var(--juwo-primary);
   border-color: var(--juwo-primary);
-  color: #fff;
+  color: var(--filter-btn-primary-color);
 }
 
 .pill-icon {
