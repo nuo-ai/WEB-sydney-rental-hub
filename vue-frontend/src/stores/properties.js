@@ -980,26 +980,46 @@ export const usePropertiesStore = defineStore('properties', {
       const id = isObj ? String(propertyOrId.listing_id) : String(propertyOrId)
       if (!id) return
 
-      // id 列表去重追加
       if (!this.favoriteIds.includes(id)) {
         this.favoriteIds.push(id)
-        localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
       }
 
-      // 若传入对象，则维护对象数组与数据缓存
+      let resolvedProperty = null
       if (isObj) {
-        // favoritePropertiesList：用于 Profile 直接渲染最近条目（放到最前）
+        resolvedProperty = propertyOrId
+      } else {
+        resolvedProperty =
+          this.filteredProperties.find((p) => String(p?.listing_id) === id) ||
+          this.favoritePropertiesData.find((p) => String(p?.listing_id) === id) ||
+          this.allProperties.find((p) => String(p?.listing_id) === id) ||
+          this.historyPropertiesList.find((p) => String(p?.listing_id) === id) ||
+          (this.currentProperty && String(this.currentProperty?.listing_id) === id
+            ? this.currentProperty
+            : null)
+      }
+
+      if (resolvedProperty) {
+        const normalized = { ...resolvedProperty }
+        if (!Object.prototype.hasOwnProperty.call(normalized, 'listing_id')) {
+          normalized.listing_id = id
+        }
         this.favoritePropertiesList = Array.isArray(this.favoritePropertiesList)
           ? this.favoritePropertiesList.filter((p) => String(p?.listing_id) !== id)
           : []
-        this.favoritePropertiesList.unshift(propertyOrId)
+        this.favoritePropertiesList.unshift(normalized)
 
-        // favoritePropertiesData：沿用旧结构，若不存在则追加（末尾即可）
-        if (!this.favoritePropertiesData.find((p) => String(p?.listing_id) === id)) {
-          this.favoritePropertiesData.push(propertyOrId)
+        const existingIndex = this.favoritePropertiesData.findIndex(
+          (p) => String(p?.listing_id) === id,
+        )
+        if (existingIndex > -1) {
+          this.favoritePropertiesData.splice(existingIndex, 1, normalized)
+        } else {
+          this.favoritePropertiesData.push(normalized)
         }
+      }
 
-        // 持久化对象数组
+      localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
+      if (resolvedProperty) {
         localStorage.setItem('juwo-favorite-props', JSON.stringify(this.favoritePropertiesList))
       }
     },
@@ -1007,37 +1027,34 @@ export const usePropertiesStore = defineStore('properties', {
     // 移除收藏
     removeFavorite(propertyId) {
       const id = String(propertyId)
+      if (!id) return
       const index = this.favoriteIds.indexOf(id)
       if (index > -1) {
         this.favoriteIds.splice(index, 1)
-        localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
       }
+
+      this.favoritePropertiesData = this.favoritePropertiesData.filter(
+        (p) => String(p?.listing_id) !== id,
+      )
+      this.favoritePropertiesList = Array.isArray(this.favoritePropertiesList)
+        ? this.favoritePropertiesList.filter((p) => String(p?.listing_id) !== id)
+        : []
+
+      localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
+      localStorage.setItem('juwo-favorite-props', JSON.stringify(this.favoritePropertiesList))
     },
 
     // 切换收藏状态
-    toggleFavorite(propertyId) {
-      const id = String(propertyId)
-      const index = this.favoriteIds.indexOf(id)
+    toggleFavorite(propertyOrId) {
+      const isObj = propertyOrId && typeof propertyOrId === 'object'
+      const id = isObj ? String(propertyOrId.listing_id) : String(propertyOrId)
+      if (!id) return
 
-      if (index > -1) {
-        this.favoriteIds.splice(index, 1)
-        // 从收藏数据中移除
-        this.favoritePropertiesData = this.favoritePropertiesData.filter(
-          (p) => String(p.listing_id) !== id,
-        )
+      if (this.favoriteIds.includes(id)) {
+        this.removeFavorite(id)
       } else {
-        this.favoriteIds.push(id)
-        // 如果当前有该房源数据，添加到收藏数据中
-        const property =
-          this.filteredProperties.find((p) => String(p.listing_id) === id) ||
-          this.allProperties.find((p) => String(p.listing_id) === id)
-        if (property && !this.favoritePropertiesData.find((p) => String(p.listing_id) === id)) {
-          this.favoritePropertiesData.push(property)
-        }
+        this.addFavorite(isObj ? propertyOrId : id)
       }
-
-      // 保存到localStorage
-      localStorage.setItem('juwo-favorites', JSON.stringify(this.favoriteIds))
     },
 
     // 获取收藏的房源数据
@@ -1283,9 +1300,15 @@ export const usePropertiesStore = defineStore('properties', {
         const id = property && typeof property === 'object' ? String(property.listing_id) : String(property)
         if (!id) return
         // 先移除已有，再添加到最前
-        this.historyPropertiesList = Array.isArray(this.historyPropertiesList) ? this.historyPropertiesList.filter((p) => String(p?.listing_id) !== id) : []
+        this.historyPropertiesList = Array.isArray(this.historyPropertiesList)
+          ? this.historyPropertiesList.filter((p) => String(p?.listing_id) !== id)
+          : []
         if (property && typeof property === 'object') {
-          this.historyPropertiesList.unshift(property)
+          const normalized = { ...property }
+          if (!Object.prototype.hasOwnProperty.call(normalized, 'listing_id')) {
+            normalized.listing_id = id
+          }
+          this.historyPropertiesList.unshift(normalized)
         }
         // 限制长度
         if (this.historyPropertiesList.length > 50) {

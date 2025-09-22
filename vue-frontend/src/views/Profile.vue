@@ -40,6 +40,7 @@
             v-for="property in recentFavorites"
             :key="property.listing_id"
             :property="property"
+            @click="goToPropertyDetail"
           />
         </div>
         <div v-else class="empty-state">
@@ -55,11 +56,12 @@
 
         <!-- 动态内容：历史记录列表或空状态 -->
         <div v-if="historyProperties.length > 0" class="property-grid">
-           <!-- 复用 PropertyCard 组件，并只显示最近3条 -->
+          <!-- 复用 PropertyCard 组件，并只显示最近3条 -->
           <PropertyCard
             v-for="property in recentHistory"
             :key="property.listing_id"
             :property="property"
+            @click="goToPropertyDetail"
           />
         </div>
         <div v-else class="empty-state">
@@ -72,7 +74,7 @@
         <div class="section-header">
           <h2 class="typo-h2">我的筛选（共 {{ savedSearchesCount }}）</h2>
         </div>
-        <SavedSearchesManager />
+        <SavedSearchesManager @updated="handleSavedSearchesUpdated" />
       </section>
 
     </main>
@@ -80,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ArrowLeft } from 'lucide-vue-next'
@@ -131,18 +133,41 @@ const favoritesCount = computed(() => favoriteProperties.value.length)
 const historyCount = computed(() => historyProperties.value.length)
 
 // 已保存搜索计数
-const savedSearchesCount = computed(() => {
-  try {
-    return getSavedSearches().length
-  } catch (error) {
-    console.error('获取已保存搜索计数失败:', error)
-    return 0
-  }
-})
+const savedSearches = ref([])
+const savedSearchesCount = computed(() => savedSearches.value.length)
 
 // 7. 实现业务逻辑：只取最近的3条记录
 const recentFavorites = computed(() => favoriteProperties.value.slice(0, 3))
 const recentHistory = computed(() => historyProperties.value.slice(0, 3))
+
+const goToPropertyDetail = (property) => {
+  if (!property || !property.listing_id) return
+  router.push({ name: 'PropertyDetail', params: { id: property.listing_id } })
+}
+
+const refreshSavedSearches = () => {
+  try {
+    savedSearches.value = getSavedSearches()
+  } catch (error) {
+    console.error('获取已保存搜索计数失败:', error)
+    savedSearches.value = []
+  }
+}
+
+const handleSavedSearchesUpdated = (list) => {
+  if (Array.isArray(list)) {
+    savedSearches.value = list
+    return
+  }
+  refreshSavedSearches()
+}
+
+onMounted(() => {
+  refreshSavedSearches()
+  propertiesStore.fetchFavoriteProperties().catch((error) => {
+    console.error('获取收藏房源失败:', error)
+  })
+})
 
 </script>
 
