@@ -293,7 +293,7 @@ const handleCardClick = () => {
 }
 
 const toggleFavorite = () => {
-  propertiesStore.toggleFavorite(props.property.listing_id)
+  propertiesStore.toggleFavorite(props.property)
 }
 
 // 处理更多操作菜单
@@ -314,7 +314,8 @@ const handleMoreAction = (command) => {
 <style scoped>
 /* 房源卡片样式 - 复用现有设计 */
 .property-card {
-  width: 580px;
+  width: 100%;
+  max-width: 580px;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
   border-radius: 6px;

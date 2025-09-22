@@ -491,11 +491,16 @@ export function useFilterWizard() {
 
       const params = savedSearch.filterParams ? { ...savedSearch.filterParams } : buildFilterParams()
       await propertiesStore.applyFilters(params)
-      await syncRouterQuery(params)
-      return true
+      const appliedQuery = sanitizeQueryParams(
+        propertiesStore.currentFilterParams && Object.keys(propertiesStore.currentFilterParams).length
+          ? propertiesStore.currentFilterParams
+          : params,
+      )
+      await syncRouterQuery(appliedQuery)
+      return appliedQuery
     } catch (error) {
       console.error('应用已保存搜索失败:', error)
-      return false
+      return null
     }
   }
 

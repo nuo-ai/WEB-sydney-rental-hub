@@ -122,6 +122,8 @@ defineOptions({ name: 'SavedSearchesManager' })
 const router = useRouter()
 const { getSavedSearches, deleteSavedSearch, applySavedSearch } = useFilterWizard()
 
+const emit = defineEmits(['updated'])
+
 // 响应式状态
 const savedSearches = ref([])
 const applyingSearchId = ref(null)
@@ -138,6 +140,7 @@ const renameInput = ref(null)
 const loadSavedSearches = () => {
   try {
     savedSearches.value = getSavedSearches()
+    emit('updated', savedSearches.value.slice())
   } catch (error) {
     console.error('加载已保存搜索失败:', error)
     ElMessage.error('加载搜索列表失败')
@@ -149,11 +152,10 @@ const applySearch = async (search) => {
   applyingSearchId.value = search.id
 
   try {
-    const success = await applySavedSearch(search)
-    if (success) {
+    const appliedQuery = await applySavedSearch(search)
+    if (appliedQuery) {
       ElMessage.success(`已应用搜索"${search.name}"`)
-      // 跳转到首页查看结果
-      router.push('/')
+      await router.push({ name: 'home', query: appliedQuery })
     } else {
       ElMessage.error('应用搜索失败，请重试')
     }
@@ -215,7 +217,7 @@ const confirmRename = async () => {
   try {
     // 更新本地存储中的搜索名称
     const searches = getSavedSearches()
-    const searchIndex = searches.findIndex(s => s.id === renamingSearch.value.id)
+    const searchIndex = searches.findIndex((s) => s.id === renamingSearch.value.id)
 
     if (searchIndex !== -1) {
       searches[searchIndex].name = newSearchName.value.trim()
@@ -276,7 +278,7 @@ const generateConditionsText = (conditions) => {
 
   // 区域
   if (conditions.areas && conditions.areas.length > 0) {
-    const areaNames = conditions.areas.map(area => area.name || area.suburb).filter(Boolean)
+    const areaNames = conditions.areas.map((area) => area.name || area.suburb).filter(Boolean)
     if (areaNames.length > 0) {
       const areaText = areaNames.length > 2
         ? `${areaNames.slice(0, 2).join('、')} 等 ${areaNames.length} 个区域`
