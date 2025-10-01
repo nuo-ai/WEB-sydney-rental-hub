@@ -1,113 +1,99 @@
 # Implementation Plan
 
 [Overview]
-目标：将筛选组件提升到“成熟可用”的一致性标准，支持用户在“区域、卧室、浴室、车位、价格、家具（更多）”六个分组中任意顺序连续设置并“应用”，任何一次“应用”都仅影响本次涉及分组，其他已应用条件保持不变；“清空/取消”仅影响当前分组；顶部标签“颜色+文案”和列表结果仅在“应用”后更新；样式严格遵循 design token；URL 同步与刷新后的状态恢复正常。
+目标：将 MarkItDown MCP 使用“系统/用户级安装 + Cline 全局配置”的标准方式接入，避免在项目仓库内安装或克隆任何 MCP 代码，统一采用 STDIO 传输，保证稳定、可复用与最小耦合。
 
-为此，我们以“Store 分组级合并 + draft/applied 双态 + 顶部标签文案生成规则 + URL 同步”统一口径。PC 分离式和移动端统一面板共享同一数据层策略，确保跨端一致。
+背景与范围：
+- 之前曾在项目目录或临时目录克隆/运行 MCP 服务（不合规，易污染仓库且不可复用）。
+- 本方案改为“命令化”启动：官方 Python 包通过 pipx 安装为全局可执行（markitdown-mcp），或使用 npx 包装器（markitdown-mcp-npx）零维护运行。二者均不依赖项目路径。
+- Cline 层面采用“全局 MCP 设置”（cline_mcp_settings.json，经由 UI 打开编辑），登记 STDIO 启动命令，项目仓库内不再保存 MCP 服务器配置（可清理 add-mcp-server.json 的 markitdown 项）。
+
+高层做法：
+- 官方推荐：pipx install markitdown-mcp → Cline 全局配置中登记 command=markitdown-mcp（STDIO，args=[]）。
+- 备选：npx -y markitdown-mcp-npx → Cline 全局配置中登记 command=npx args=["-y","markitdown-mcp-npx"]（STDIO）。
+- 如需网络访问/共享，可切到 HTTP/SSE，但优先 STDIO（简单、低延迟、无端口暴露）。
 
 [Types]  
-本项变更不引入外部类型系统；在 Pinia Store 中规范内部结构字段与语义。
+不涉及业务类型系统，仅涉及 Cline MCP 配置 JSON 结构。
 
-- State（Pinia / properties.js）
-  - selectedLocations: Location[]（已应用区域）
-  - draftSelectedLocations: Location[]（区域草稿）
-  - currentFilterParams: Record<string, string|number|boolean>（所有分组的“已应用”请求参数合集）
-  - previewDraftSections: Record<sectionKey, PartialParams & { __mark?: true }>
-  - sort: string
-  - page/page_size: number
-
-- 分组键管理（键与分组的映射关系）
-  - SECTION_KEY_MAP（已存在，并作为全局真源）
-    - area: ['suburb','suburbs','postcodes','include_nearby']
-    - price: ['minPrice','maxPrice','price_min','price_max']
-    - bedrooms: ['bedrooms']
-    - availability: ['date_from','date_to']
-    - more: ['isFurnished','furnished','bathrooms','bathrooms_min','parking','parking_min']
-
-- Draft/Applied 语义
-  - draft*：面板内临时编辑与预览计数（getPreviewCount），不影响顶部文案与列表。
-  - applied：selectedLocations + currentFilterParams；顶部文案与列表依赖“已应用”。
-  - URL：仅在“应用”后写入已应用参数，刷新后能复现。
+配置对象结构（STDIO 传输）：
+- mcpServers: object
+  - <serverName>: object
+    - command: string（可执行名或运行时入口，如 "markitdown-mcp" 或 "npx"）
+    - args: string[]（命令参数；无参时为空数组）
+    - env?: object（可选，环境变量键值对）
+    - alwaysAllow?: string[]（可选，默认允许工具列表）
+    - disabled?: boolean（可选，启停开关）
 
 [Files]
-本次工作主要“修复与加固”现有实现，文件清单如下。
-
-- 新增文件
-  - /implementation_plan.md（当前文档）
-
-- 已修改文件（已完成的改动需回归验证）
-  - vue-frontend/src/stores/properties.js
-    - applyFilters：新增“分组级合并”逻辑（推断触达分组→清理 base→合并 mapped→请求→写回 currentFilterParams）
-    - getFilteredCount：与 applyFilters 口径一致（日期/价格/邮编展开/白名单）
-    - draftSelectedLocations 家族 API：setDraft/resetDraft/applySelectedLocations/hasAreaDraftDiff
-    - SECTION_KEY_MAP：集中管理分组键映射
-  - vue-frontend/src/components/FilterPanel.vue（移动端统一面板）
-    - 区域使用 draftSelectedLocations；应用时 applySelectedLocations；预览计数走草稿；关闭时丢弃草稿
-  - vue-frontend/src/components/filter-panels/AreaFilterPanel.vue（PC 分离式“区域”）
-    - 同 FilterPanel 的区域草稿逻辑；应用/取消流程及草稿清理
-  - vue-frontend/src/components/FilterTabs.vue（PC 顶部标签）
-    - 文案基于“已应用”，移除未应用小蓝点；样式走 design token；moreApplied/moreTabText 忽略 'any'，保留 0 的有效值
-
-- 需要核查/加固（若不满足需补丁）
-  - vue-frontend/src/components/filter-panels/PriceFilterPanel.vue
-  - vue-frontend/src/components/filter-panels/BedroomsFilterPanel.vue
-  - vue-frontend/src/components/filter-panels/AvailabilityFilterPanel.vue
-  - vue-frontend/src/components/filter-panels/MoreFilterPanel.vue
-  - 核查点：
-    - 预览计数阶段：updatePreviewDraft(section)、getPreviewCount()
-    - 应用阶段：仅提交本分组参数；区域先 applySelectedLocations() 再 applyFilters()
-    - 取消/关闭：清理草稿 clearPreviewDraft(section) / resetDraftSelectedLocations（区域）
-    - URL 同步与恢复仅针对“已应用”的 currentFilterParams
+本方案不修改业务源码，仅触达配置与文档：
+- 全局设置（由 Cline 托管）：cline_mcp_settings.json
+  - 打开方式：Cline 侧边栏 → MCP Servers → Installed → Configure MCP Servers / Advanced MCP Settings
+  - 写入/更新 “markitdown” 服务器配置（STDIO）
+- 项目仓库（本次新增）：
+  - implementation_plan.md（当前文件，方案说明）
+- 项目仓库（可选清理）：
+  - add-mcp-server.json 中的 “markitdown” 项（建议移除，避免与全局配置重复）
 
 [Functions]
-函数清单与具体要求如下。
-
-- Store（properties.js）
-  - 新增/已存在（需保留）
-    - setDraftSelectedLocations(list: Location[])
-    - resetDraftSelectedLocations(): void
-    - applySelectedLocations(): void
-    - hasAreaDraftDiff(): boolean
-    - updatePreviewDraft(section: string, partial: Record<string,any>): void
-    - clearPreviewDraft(section: string): void
-    - markPreviewSection(section: string): void
-  - 修改（已完成）
-    - applyFilters(filters: PartialParams)
-      - 逻辑：mapFilterStateToApiParams → base = currentFilterParams → 推断触达分组（SECTION_KEY_MAP）→ 从 base 删除该分组键 → merged = { ...base, ...mapped } → 清空空值 → 请求 → currentFilterParams = merged
-      - 补齐 page/page_size/sort；只在“应用”后写入 URL（组件负责）
-    - getFilteredCount(params: PartialParams)
-      - 保持与 applyFilters 同一映射口径，避免预览与实际不一致
-- 组件（各分组面板）
-  - 预览：updatePreviewDraft(section)、getPreviewCount()
-  - 应用：仅提交本分组参数；区域先 applySelectedLocations() 再 applyFilters()
-  - 取消/关闭：resetDraftSelectedLocations()/clearPreviewDraft(section)
+此处“函数”指运维命令与操作步骤：
+- 官方安装（推荐，Python 包 + pipx）：
+  - 安装：pipx install markitdown-mcp
+  - 验证：markitdown-mcp --help
+- 备选安装（npx 包装器，无需 Python 维护）：
+  - 运行/验证：npx -y markitdown-mcp-npx --help
+- Cline 全局 STDIO 配置示例（推荐）：
+  ```
+  {
+    "mcpServers": {
+      "markitdown": {
+        "command": "markitdown-mcp",
+        "args": []
+      }
+    }
+  }
+  ```
+- Cline 全局 STDIO 配置（npx 备选）：
+  ```
+  {
+    "mcpServers": {
+      "markitdown": {
+        "command": "npx",
+        "args": ["-y", "markitdown-mcp-npx"]
+      }
+    }
+  }
+  ```
+- 可选 HTTP/SSE（不推荐作为默认）：
+  - markitdown-mcp --http --host 127.0.0.1 --port 3001
+  - 对应 Cline 可配为 SSE 远程 URL，但本地优先 STDIO。
 
 [Classes]
-本次不涉及 class 的新增/修改/删除（Vue SFC + Pinia 为主）。
+无类/面向对象改动。
 
 [Dependencies]
-不新增第三方依赖；样式严格使用既有 design token；移除“胶囊”样式与自定义 color-mix；维持 Element Plus 等现有依赖。
+- 新增/确认依赖：
+  - pipx（系统/用户级）与 markitdown-mcp（官方 Python 包）
+  - 备选：npx 包装器 markitdown-mcp-npx（第三方）
+- 可选系统依赖：
+  - ffmpeg（当需要音频相关处理时，pydub 会提示；安装：sudo apt install -y ffmpeg）
 
 [Testing]
-采用“矩阵化回归 + 可选组件单测（如已配置）”。
-
-- PC 分离式面板矩阵（任意顺序交叉）
-  1) 区域→价格→更多→卧室→可入住→车位：每次“应用”仅影响本分组，前次分组保持不变
-  2) 在任一分组“清空并应用”：仅清此分组；其它分组保持
-  3) any/0 边界：bathrooms='any' 不触发已应用；parking_min=0 有效（如需特殊展示另议）
-  4) 价格单边：≥min 或 ≤max；跨分组叠加不互斥
-  5) URL 同步：应用后刷新页面，筛选可还原；分页/排序与筛选并用
-- 移动端统一面板：
-  - 一次设置多个分组并“确定”：应全部生效；下一次设置其它分组不覆盖已应用
-- 样式/文案：
-  - 顶部标签文案“首项 +N”；严格 design token；仅应用后更新
+- 本地命令验证：
+  - markitdown-mcp --help 输出正常，说明可执行已安装（pipx 路径通常位于 ~/.local/bin/）
+- Cline 验证：
+  - 打开 Cline → MCP Servers → Installed → Configure MCP Servers
+  - 在 cline_mcp_settings.json 中确认 “markitdown” 项（STDIO）
+  - 启用并重启该服务器，查看工具列表
+- 工具验证：
+  - 使用 MCP Inspector 或直接通过对话调用 markitdown 的文档转 Markdown 能力（PDF/DOCX/图片/Excel 等）
 
 [Implementation Order]
-实施顺序与回归路径如下（最小风险顺序）。
-
-1) Store 合并逻辑（已完成）→ 确认 SECTION_KEY_MAP 全覆盖键  
-2) 各面板预览/应用/取消流程一致性复核（Price/Bedrooms/Availability/More）  
-3) 顶部标签文案与高亮规则核查（忽略 'any'，保留 0；中英混排；仅应用后更新）  
-4) URL 同步与恢复：仅写入已应用；刷新后能还原  
-5) 手工矩阵回归（PC/移动端）  
-6) 记录调试日志与重要断言（仅开发环境可见）；清理后保留必要 Debug 开关
+1) 确认 pipx 已安装（若无则安装）；确认 markitdown-mcp 已通过 pipx 安装（或执行安装）
+2) 在 Cline UI 打开全局 cline_mcp_settings.json
+3) 写入/确认 STDIO 配置：
+   - "markitdown": { "command": "markitdown-mcp", "args": [] }
+4) 在 Cline “Installed” 列表启用 markitdown 并重启服务器，验证工具可用
+5) 清理项目内重复配置（建议删除 add-mcp-server.json 中 “markitdown” 节点，避免歧义）
+6) 可选：安装 ffmpeg 以启用音频处理
+7) 回归测试：转多种文档到 Markdown，观察日志与输出质量

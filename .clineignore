@@ -34,6 +34,8 @@ mcp-server/build/
 backend/.venv/
 backend/venv/
 
+database/sydney-suburbs-name.json
+
 # ===================================================================
 # By default, all other files are INCLUDED.
 # This ensures that memory-bank/, vue-frontend/, backend/ source,

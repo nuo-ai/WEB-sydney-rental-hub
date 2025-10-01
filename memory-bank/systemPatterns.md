@@ -106,7 +106,7 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 ## 图标系统与组件化
 
 ### 统一图标库
-- **标准**: 全站使用 `lucide-vue-next` SVG 图标库
+- **标准**: 迁移进行中——以 `lucide-vue-next` 为标准，允许少量 Font Awesome 遗留（待清理）
 - **导入**: `import { IconName } from 'lucide-vue-next'`
 - **使用**: `<IconName class="spec-icon" />`
 - **颜色**: `stroke: currentColor`，由外层控制
