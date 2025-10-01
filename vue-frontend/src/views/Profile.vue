@@ -210,8 +210,9 @@ onMounted(() => {
   }
 }
 
-.empty-state, .placeholder-state {
-  padding: var(--space-8) var(--space-4);
+.empty-state,
+.placeholder-state {
+  padding: var(--space-xl) var(--space-4);
   background-color: var(--color-bg-card);
   border: 1px dashed var(--color-border-default);
   border-radius: var(--radius-md);
@@ -226,7 +227,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .header-with-actions .page-title {
@@ -235,49 +236,10 @@ onMounted(() => {
   margin: 0;
 }
 
-/* 统一图标按钮样式（令牌化） */
-.icon-btn {
-  background: transparent;
-  border: 1px solid var(--color-border-default);
-  color: var(--color-text-secondary);
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-  transition: background-color .2s ease, color .2s ease, transform .1s ease;
-}
-
-.icon-btn:hover {
-  background: var(--bg-hover);
-  color: var(--color-text-primary);
-}
-
-.icon-btn:active {
-  transform: translateY(1px);
-}
-
-.icon-btn .icon {
-  width: 18px;
-  height: 18px;
-}
-
 /* 账号操作区与标题之间的节奏 */
 .account-actions {
   padding-top: 0;
-  margin-top: 8px;
+  margin-top: var(--space-sm);
   margin-bottom: var(--page-section-gap, 24px);
-}
-
-/* 适配移动端：保证左右控件可点区域充足 */
-@media (width <= 767px) {
-  .icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-  }
 }
 </style>
