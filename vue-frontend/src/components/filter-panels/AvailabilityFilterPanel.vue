@@ -276,21 +276,21 @@ const applyFilters = async () => {
 <style scoped>
 .availability-filter-panel {
   width: 100%;
-  background: var(--filter-panel-bg);
-  border-radius: var(--filter-panel-radius);
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
 }
 
 /* 面板内容 */
 .panel-content {
-  padding: var(--filter-panel-padding);
+  padding: var(--panel-padding);
 }
 
 /* 日期选择器 */
 .date-picker-group {
   display: flex;
   align-items: center;
-  gap: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .date-picker-start,
@@ -299,9 +299,9 @@ const applyFilters = async () => {
 }
 
 .date-separator {
-  color: var(--filter-color-text-secondary);
-  margin: 0 var(--filter-space-xs);
-  font-weight: var(--filter-font-weight-medium);
+  color: var(--color-text-secondary);
+  margin: 0 var(--space-2xs);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 焦点态：中性灰细边框，移除黑色外框 */
@@ -313,8 +313,8 @@ const applyFilters = async () => {
 /* 收紧日期输入右侧内边距，避免右侧空白过大（改用 Filter Field 令牌，PC 作用域可被局部变量覆盖） */
 :deep(.el-date-editor .el-input__wrapper) {
   padding-right: calc(
-    var(--filter-suffix-right, var(--search-suffix-right, 12px)) +
-      var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
+    var(--search-suffix-right, var(--search-suffix-right, 12px)) +
+      var(--search-suffix-hit, var(--search-suffix-hit, 28px))
   ) !important;
 }
 
@@ -332,11 +332,11 @@ const applyFilters = async () => {
 
 /* 日期错误提示 */
 .date-error {
-  color: var(--filter-color-danger);
-  font-size: var(--filter-font-size-md);
-  margin-top: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
-  font-weight: var(--filter-font-weight-medium);
+  color: var(--color-danger);
+  font-size: var(--font-size-md);
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 底部操作按钮 */

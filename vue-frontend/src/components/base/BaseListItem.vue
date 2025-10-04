@@ -123,18 +123,18 @@ const handleKeydown = (event) => {
   /* 使用设计令牌 */
   display: flex;
   align-items: center;
-  padding: var(--filter-list-item-padding-y) var(--filter-list-item-padding-x);
-  min-height: var(--filter-list-item-min-height);
-  background: var(--filter-color-bg-primary);
-  color: var(--filter-color-text-primary);
-  transition: var(--filter-transition-fast);
+  padding: var(--list-item-padding-y) var(--list-item-padding-x);
+  min-height: var(--list-item-min-height);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: var(--transition-fast);
   position: relative;
 }
 
 .base-list-item__prefix {
   display: flex;
   align-items: center;
-  margin-right: var(--filter-space-lg);
+  margin-right: var(--space-md);
   flex-shrink: 0;
 }
 
@@ -144,10 +144,10 @@ const handleKeydown = (event) => {
 }
 
 .base-list-item__title {
-  font-size: var(--filter-font-size-md);
-  font-weight: var(--filter-font-weight-normal);
-  line-height: var(--filter-line-height-normal);
-  color: var(--filter-color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
 
   /* 文本截断 */
   overflow: hidden;
@@ -156,11 +156,11 @@ const handleKeydown = (event) => {
 }
 
 .base-list-item__description {
-  font-size: var(--filter-font-size-sm);
-  font-weight: var(--filter-font-weight-normal);
-  line-height: var(--filter-line-height-normal);
-  color: var(--filter-color-text-secondary);
-  margin-top: var(--filter-space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2xs);
 
   /* 文本截断 */
   overflow: hidden;
@@ -171,13 +171,13 @@ const handleKeydown = (event) => {
 .base-list-item__suffix {
   display: flex;
   align-items: center;
-  margin-left: var(--filter-space-lg);
+  margin-left: var(--space-md);
   flex-shrink: 0;
 }
 
 /* 边框样式 */
 .base-list-item--bordered {
-  border-bottom: 1px solid var(--filter-list-item-border);
+  border-bottom: 1px solid var(--list-item-border);
 }
 
 .base-list-item--bordered:last-child {
@@ -190,22 +190,22 @@ const handleKeydown = (event) => {
 }
 
 .base-list-item--clickable:hover:not(.base-list-item--disabled) {
-  background: var(--filter-list-item-hover-bg);
+  background: var(--list-item-hover-bg);
 }
 
 .base-list-item--clickable:active:not(.base-list-item--disabled) {
-  background: var(--filter-color-bg-muted);
+  background: var(--color-bg-muted);
 }
 
 /* 选中状态 */
 .base-list-item--selected {
-  background: var(--filter-list-item-selected-bg);
-  border-color: var(--filter-list-item-selected-border);
+  background: var(--list-item-selected-bg);
+  border-color: var(--list-item-selected-border);
 }
 
 .base-list-item--selected .base-list-item__title {
-  color: var(--filter-color-text-primary);
-  font-weight: var(--filter-font-weight-semibold);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* 禁用状态 */
@@ -217,18 +217,18 @@ const handleKeydown = (event) => {
 
 /* 焦点样式 */
 .base-list-item--clickable:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: -2px;
 }
 
 /* 分组标题样式（特殊变体） */
 .base-list-item--group-title {
-  background: var(--filter-group-title-bg);
-  padding: var(--filter-group-title-padding-y) var(--filter-group-title-padding-x);
-  font-size: var(--filter-group-title-font-size);
-  font-weight: var(--filter-group-title-font-weight);
-  color: var(--filter-group-title-color);
-  border-bottom: 1px solid var(--filter-group-title-border);
+  background: var(--panel-group-bg);
+  padding: var(--panel-group-padding-y) var(--panel-group-padding-x);
+  font-size: var(--panel-group-font-size);
+  font-weight: var(--panel-group-font-weight);
+  color: var(--panel-group-color);
+  border-bottom: 1px solid var(--panel-group-border);
   position: sticky;
   top: 0;
   z-index: 2;
@@ -246,24 +246,24 @@ const handleKeydown = (event) => {
 /* 响应式调整 */
 @media (width <= 767px) {
   .base-list-item {
-    padding: calc(var(--filter-list-item-padding-y) + 2px) var(--filter-list-item-padding-x);
-    min-height: calc(var(--filter-list-item-min-height) + 4px);
+    padding: calc(var(--list-item-padding-y) + 2px) var(--list-item-padding-x);
+    min-height: calc(var(--list-item-min-height) + 4px);
   }
 
   .base-list-item__title {
-    font-size: var(--filter-font-size-md);
+    font-size: var(--font-size-md);
   }
 
   .base-list-item__description {
-    font-size: var(--filter-font-size-sm);
+    font-size: var(--font-size-sm);
   }
 
   .base-list-item__prefix {
-    margin-right: var(--filter-space-md);
+    margin-right: var(--space-sm);
   }
 
   .base-list-item__suffix {
-    margin-left: var(--filter-space-md);
+    margin-left: var(--space-sm);
   }
 }
 
@@ -296,17 +296,17 @@ const handleKeydown = (event) => {
 
 /* 紧凑模式 */
 .base-list-item--compact {
-  padding: var(--filter-space-sm) var(--filter-list-item-padding-x);
+  padding: var(--space-xs) var(--list-item-padding-x);
   min-height: auto;
 }
 
 .base-list-item--compact .base-list-item__title {
-  font-size: var(--filter-font-size-sm);
+  font-size: var(--font-size-sm);
 }
 
 .base-list-item--compact .base-list-item__description {
-  font-size: var(--filter-font-size-xs);
-  margin-top: var(--filter-space-xs);
+  font-size: var(--font-size-2xs);
+  margin-top: var(--space-2xs);
 }
 
 /* 多行文本支持 */

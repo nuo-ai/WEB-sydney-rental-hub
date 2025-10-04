@@ -114,15 +114,15 @@ const handleClick = (event) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--filter-btn-gap);
-  padding: var(--filter-btn-padding-y) var(--filter-btn-padding-x);
-  font-size: var(--filter-btn-font-size);
-  font-weight: var(--filter-btn-font-weight);
-  line-height: var(--filter-line-height-normal);
-  border-radius: var(--filter-btn-radius);
+  gap: var(--button-gap);
+  padding: var(--button-padding-y) var(--button-padding-x);
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
+  line-height: var(--line-height-normal);
+  border-radius: var(--button-radius);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--filter-transition-normal);
+  transition: var(--transition-normal);
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
@@ -152,14 +152,14 @@ const handleClick = (event) => {
 
 /* 主要按钮 */
 .base-button--primary {
-  background: var(--filter-btn-primary-bg);
-  color: var(--filter-btn-primary-color);
-  border-color: var(--filter-btn-primary-bg);
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  border-color: var(--button-primary-bg);
 }
 
 .base-button--primary:hover:not(:disabled) {
-  background: var(--filter-btn-primary-hover-bg);
-  border-color: var(--filter-btn-primary-hover-bg);
+  background: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-bg);
 }
 
 .base-button--primary:active:not(:disabled) {
@@ -168,15 +168,15 @@ const handleClick = (event) => {
 
 /* 次要按钮 */
 .base-button--secondary {
-  background: var(--filter-btn-secondary-bg);
-  color: var(--filter-btn-secondary-color);
-  border-color: var(--filter-btn-secondary-border);
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border-color: var(--button-secondary-border);
 }
 
 .base-button--secondary:hover:not(:disabled) {
-  border-color: var(--filter-btn-secondary-hover-border);
-  color: var(--filter-btn-secondary-hover-color);
-  background: var(--filter-color-hover-bg);
+  border-color: var(--button-secondary-hover-border);
+  color: var(--button-secondary-hover-color);
+  background: var(--color-surface-hover);
 }
 
 .base-button--secondary:active:not(:disabled) {
@@ -186,33 +186,33 @@ const handleClick = (event) => {
 /* 幽灵按钮 */
 .base-button--ghost {
   background: transparent;
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
   border-color: transparent;
 }
 
 .base-button--ghost:hover:not(:disabled) {
-  background: var(--filter-color-hover-bg);
-  color: var(--filter-color-text-primary);
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
 }
 
 /* 危险按钮 */
 .base-button--danger {
-  background: var(--filter-color-danger);
-  color: var(--filter-btn-primary-color);
-  border-color: var(--filter-color-danger);
+  background: var(--color-danger);
+  color: var(--button-primary-color);
+  border-color: var(--color-danger);
 }
 
 .base-button--danger:hover:not(:disabled) {
-  background: var(--filter-color-danger-hover);
-  border-color: var(--filter-color-danger-hover);
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
 }
 
 /* 按钮尺寸 */
 
 .base-button--small {
-  padding: var(--filter-space-sm) var(--filter-space-lg);
-  font-size: var(--filter-font-size-sm);
-  gap: var(--filter-space-sm);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  gap: var(--space-xs);
 }
 
 .base-button--small .base-button__loading-icon {
@@ -225,9 +225,9 @@ const handleClick = (event) => {
 }
 
 .base-button--large {
-  padding: var(--filter-space-xl) var(--filter-space-2xl);
-  font-size: var(--filter-font-size-lg);
-  gap: var(--filter-space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  font-size: var(--font-size-lg);
+  gap: var(--space-md);
 }
 
 .base-button--large .base-button__loading-icon {
@@ -259,7 +259,7 @@ const handleClick = (event) => {
 
 /* 焦点样式 */
 .base-button:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -277,28 +277,28 @@ const handleClick = (event) => {
 /* 响应式调整 */
 @media (width <= 767px) {
   .base-button {
-    padding: calc(var(--filter-btn-padding-y) + 2px) var(--filter-btn-padding-x);
-    font-size: var(--filter-font-size-md);
+    padding: calc(var(--button-padding-y) + 2px) var(--button-padding-x);
+    font-size: var(--font-size-md);
   }
 
   .base-button--small {
-    padding: var(--filter-space-md) var(--filter-space-lg);
+    padding: var(--space-sm) var(--space-md);
   }
 
   .base-button--large {
-    padding: calc(var(--filter-space-xl) + 2px) var(--filter-space-2xl);
+    padding: calc(var(--space-lg) + 2px) var(--space-xl);
   }
 }
 
 /* 按钮组合样式（当多个按钮相邻时） */
 .base-button + .base-button {
-  margin-left: var(--filter-space-lg);
+  margin-left: var(--space-md);
 }
 
 /* 在 flex 容器中的按钮间距 */
 .base-button-group {
   display: flex;
-  gap: var(--filter-space-lg);
+  gap: var(--space-md);
   align-items: center;
 }
 

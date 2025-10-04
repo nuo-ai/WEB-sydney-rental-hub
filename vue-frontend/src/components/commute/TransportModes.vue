@@ -99,12 +99,12 @@ const selectMode = (value) => {
 }
 
 .mode-btn.active {
-  background: var(--filter-color-neutral-800);
+  background: var(--gray-800);
   color: var(--color-text-inverse);
 }
 
 .mode-btn.active:hover {
-  background: var(--filter-color-neutral-900);
+  background: var(--gray-900);
 }
 
 /* 触摸设备优化 */
@@ -119,7 +119,7 @@ const selectMode = (value) => {
   }
 
   .mode-btn.active:hover {
-    background: var(--filter-color-neutral-800);
+    background: var(--gray-800);
   }
 }
 </style>

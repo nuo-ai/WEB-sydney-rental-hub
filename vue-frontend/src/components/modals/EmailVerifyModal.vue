@@ -316,7 +316,7 @@ onUnmounted(() => {
 .resend-link {
   background: none;
   border: none;
-  color: var(--filter-color-danger);
+  color: var(--color-danger);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
