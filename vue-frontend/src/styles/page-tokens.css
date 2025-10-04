@@ -7,16 +7,15 @@
 :root {
   /* ===== 页面结构尺寸 =====
      中文注释：页面两端留白与区块间距统一，避免每页各写各的 margin/padding */
-  --header-height: 56px;            /* 顶部区域（移动端导航/标题区）统一高度参考 */
-  --bottom-nav-height: 56px;        /* 底部导航高度，用于页面 padding-bottom 防遮挡 */
+  --header-height: var(--size-56);            /* 顶部区域统一高度参考 */
 
   /* 左右内边距（移动/桌面分离），前端表现：页面根容器左右留白一致 */
-  --page-x-padding-mob: 16px;
-  --page-x-padding-desktop: 32px;
+  --page-x-padding-mob: var(--space-lg);
+  --page-x-padding-desktop: var(--space-3xl);
 
   /* 页面主区块纵向间距（大节奏），不与组件内部 spacing 冲突 */
-  --page-section-gap: var(--space-6, 24px);
-  --page-section-gap-lg: var(--space-8, 32px);
+  --page-section-gap: var(--space-6);
+  --page-section-gap-lg: var(--space-8);
 
   /* ===== 响应式断点（语义化，仅作参考，不强制使用） ===== */
   --bp-mob: 767px;
@@ -24,10 +23,9 @@
   --bp-desktop: 1280px;
 
   /* ===== 动效节奏（统一时长与缓动） =====
-     中文注释：引用设计系统语义令牌，保持全站一致的运动语言 */
-  --page-motion-fast: var(--motion-fast);
-  --page-motion-base: var(--motion-base);
-  --page-easing-standard: var(--easing-standard);
+     中文注释：用于 hover/展开/收起等交互，保持全站一致的运动语言 */
+  --motion-fast: var(--duration-120);
+  --motion-base: var(--duration-180);
 
   /* ===== 导航（Navigation）语义令牌 =====
      中文注释：统一导航高度/间距/图标尺寸/安全区，移动端底栏与顶部可共享 */
@@ -35,8 +33,8 @@
   --nav-h-desk: 64px;              /* 桌面端顶部导航目标高度 */
   --nav-px-mob: 16px;              /* 移动端导航左右内边距 */
   --nav-px-desk: 32px;             /* 桌面端导航左右内边距 */
-  --nav-gap: 24px;                 /* 导航项水平间距 */
-  --nav-icon: 16px;                /* 导航图标尺寸（宽高一致） */
+  --nav-gap: var(--space-lg);      /* 导航项水平间距 */
+  --nav-icon: var(--size-16);      /* 导航图标尺寸（宽高一致） */
   --nav-active-underline: 2px;     /* 活动态下划线厚度 */
   --nav-shadow: none;              /* 导航阴影开关（none 或设计系统阴影变量） */
   --nav-safe-area-bottom: env(safe-area-inset-bottom, 0px); /* iOS 安全区 */
@@ -45,13 +43,13 @@
      中文注释：仅样式接线，不改变交互逻辑 */
   --search-h-mob: 44px;            /* 移动/桌面统一 44，移动如需更高可覆盖 */
   --search-h-desk: 44px;
-  --search-radius: 6px;
-  --search-padding-x: 12px;
-  --search-icon: 16px;
-  --search-chip-radius: 16px;
-  --search-chip-gap: 8px;
-  --page-search-suffix-right: var(--search-suffix-right);
-  --page-search-suffix-hit: var(--search-suffix-hit);
+  --search-radius: var(--radius-sm);
+  --search-padding-x: var(--space-md);
+  --search-icon: var(--size-16);
+  --search-chip-radius: var(--radius-xl);
+  --search-chip-gap: var(--space-sm);
+  --search-suffix-right: var(--space-md); /* 输入框右侧图标/点击区右边距 */
+  --search-suffix-hit: var(--space-3xl);   /* 右侧后缀命中区域（可点面积） */
 
   /* 滚动条宽度令牌：统一 PC 端滚动条宽度，便于对齐补偿 */
   --scrollbar-w: 8px;

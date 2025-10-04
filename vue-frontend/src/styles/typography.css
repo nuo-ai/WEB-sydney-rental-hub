@@ -2,6 +2,80 @@
    中文注释：新增“文字系统”基础令牌与语义类。仅新增，不改动现有 tokens/样式，保证向后兼容。
 */
 
+:root {
+  /* 8pt 字号尺度 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+  --font-size-3xl: 40px;
+
+  /* 字重与行高 */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+
+  /* 数字可读性（价格/计数） */
+  --font-numeric-variant: tabular-nums;
+
+  /* 语义令牌（拆分到 size/weight/lineHeight/family，便于复用与定制） */
+  /* 正文 */
+  --typography-body-default-size: var(--font-size-md);
+  --typography-body-default-weight: var(--font-weight-regular);
+  --typography-body-default-line: var(--line-height-relaxed);
+  --typography-body-default-family: var(--font-family-zh-sans);
+
+  /* 小正文/辅助 */
+  --typography-body-small-size: var(--font-size-sm);
+  --typography-body-small-weight: var(--font-weight-regular);
+  --typography-body-small-line: var(--line-height-normal);
+  --typography-body-small-family: var(--font-family-zh-sans);
+
+  /* 页面主标题 */
+  --typography-heading-page-size: var(--font-size-xxl);
+  --typography-heading-page-weight: var(--font-weight-bold);
+  --typography-heading-page-line: var(--line-height-tight);
+  --typography-heading-page-family: var(--font-family-zh-sans);
+
+  /* 卡片标题 */
+  --typography-heading-card-size: var(--font-size-lg);
+  --typography-heading-card-weight: var(--font-weight-semibold);
+  --typography-heading-card-line: var(--line-height-normal);
+  --typography-heading-card-family: var(--font-family-zh-sans);
+
+  /* 价格（沿用现有 22px，数值等宽） */
+  --typography-price-size: 22px;
+  --typography-price-weight: var(--font-weight-bold);
+  --typography-price-line: var(--line-height-tight);
+  --typography-price-family: var(--font-family-en-sans);
+
+  /* 地址（英文主导） */
+  --typography-address-size: 15px;
+  --typography-address-weight: var(--font-weight-medium);
+  --typography-address-line: 1.3;
+  --typography-address-family: var(--font-family-en-sans);
+
+  /* 按钮 */
+  --typography-button-size: var(--font-size-md);
+  --typography-button-weight: var(--font-weight-medium);
+  --typography-button-line: var(--line-height-normal);
+  --typography-button-family: var(--font-family-zh-sans);
+
+  /* 标签/单位（如“每周”） */
+  --typography-label-size: var(--font-size-sm);
+  --typography-label-weight: var(--font-weight-regular);
+  --typography-label-line: var(--line-height-normal);
+  --typography-label-family: var(--font-family-zh-sans);
+}
+
 /* 语义工具类（前端表现：给元素加类名即可获得统一排印风格） */
 .typo-body {
   font-family: var(--typography-body-default-family);

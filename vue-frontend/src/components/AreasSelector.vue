@@ -270,12 +270,12 @@ watch(
 }
 
 .areas-search:focus {
-  border-color: var(--filter-search-focus-border);
-  box-shadow: var(--filter-shadow-focus);
+  border-color: var(--search-focus-border);
+  box-shadow: var(--shadow-focus);
 }
 
 .areas-search:hover:not(:focus) {
-  border-color: var(--filter-search-hover-border);
+  border-color: var(--search-hover-border);
 }
 
 .clear-search-btn {
@@ -294,7 +294,7 @@ watch(
 }
 
 .clear-search-btn:hover {
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
   color: var(--color-text-primary);
 }
 
@@ -325,22 +325,22 @@ watch(
 }
 
 .areas-body {
-  max-height: 280px;
+  max-height: var(--areas-body-max-height);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   border: none; /* 简化：移除外框横线 */
-  border-radius: 6px;
-  background: var(--color-bg-primary);
+  border-radius: var(--areas-body-radius);
+  background: var(--areas-body-bg);
 }
 
 .loading-row,
 .empty-row {
-  padding: 20px 16px;
-  font-size: 14px;
+  padding: var(--areas-state-padding-y) var(--areas-state-padding-x);
+  font-size: var(--areas-state-font-size);
   color: var(--color-text-secondary);
   background: var(--color-bg-secondary);
   text-align: center;
-  border-radius: 6px;
+  border-radius: var(--areas-state-radius);
 }
 
 
@@ -364,24 +364,24 @@ watch(
 }
 
 .area-item:hover {
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .area-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: var(--areas-row-gap);
+  padding: var(--areas-row-padding-y) var(--areas-row-padding-x);
   cursor: pointer;
   transition: all 0.15s ease;
-  min-height: 48px;
+  min-height: var(--areas-row-min-height);
 }
 
 .check {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  accent-color: var(--filter-checkbox-accent);
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border-radius: var(--checkbox-radius);
+  accent-color: var(--checkbox-accent);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -391,10 +391,10 @@ watch(
 }
 
 .area-name {
-  font-size: 14px;
+  font-size: var(--areas-name-font-size);
   color: var(--color-text-primary);
   user-select: none;
-  line-height: 1.4;
+  line-height: var(--areas-name-line-height);
   flex: 1;
 }
 
@@ -406,7 +406,7 @@ watch(
 
 .area-item:has(.check:checked) .area-name {
   color: var(--color-text-primary);
-  font-weight: 600;
+  font-weight: var(--areas-name-font-weight-selected);
 }
 
 /* 如果浏览器不支持 :has，使用 JavaScript 类名回退 */
@@ -417,6 +417,6 @@ watch(
 
 .area-item.selected .area-name {
   color: var(--color-text-primary);
-  font-weight: 600;
+  font-weight: var(--areas-name-font-weight-selected);
 }
 </style>

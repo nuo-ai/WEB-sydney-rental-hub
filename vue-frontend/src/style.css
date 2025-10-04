@@ -5,9 +5,8 @@
 @import './styles/typography.css';
 @import './styles/page-tokens.css';
 
-/* 新增：品牌蓝色与专业中性灰阶（基础层 tokens）
-   中文注释：提供统一的蓝色品牌色族与中性灰阶，作为基础令牌被全站复用。
-   注意：仅新增变量，不改变现有样式的引用，保证向后兼容与可回滚。 */
+/* 设计令牌均在 styles/design-tokens.css 中统一维护。 */
+
 /* ========== 全局重置样式 ========== */
 * {
   box-sizing: border-box;
@@ -1185,14 +1184,21 @@ header nav .el-menu-item:hover,
   box-shadow: 0 0 0 1px var(--color-border-default) !important;
 }
 
+/* ===== Filter Field · Unified Tokens =====
+   说明：统一筛选输入尺寸/间距/字体与后缀命中区，避免逐面板打补丁
+*/
+:root {
+  --date-field-min-ch: 12ch; /* YYYY-MM-DD 10ch 留余量，避免挤压 */
+}
+
 /* 仅在筛选面板作用域统一：PC 分离式 & 移动端全屏 */
 .filter-dropdown-container .filter-field :deep(.el-input__wrapper),
 .domain-filter-panel .filter-field :deep(.el-input__wrapper) {
   height: var(--filter-field-height-pc) !important;
   padding-left: var(--filter-field-padding-x) !important;
   padding-right: calc(
-    var(--filter-suffix-right, var(--search-suffix-right, 12px)) +
-      var(--filter-suffix-hit, var(--search-suffix-hit, 28px))
+    var(--search-suffix-right, var(--search-suffix-right, 12px)) +
+      var(--search-suffix-hit, var(--search-suffix-hit, 28px))
   ) !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
@@ -1209,11 +1215,11 @@ header nav .el-menu-item:hover,
 
 /* PC 分离式下拉：收紧后缀命中区与左右内边距，仅限筛选容器
    说明：不改变容器宽度，仅通过内/外边距与后缀点击区瘦身，释放文本空间
-   风险可回滚：--filter-suffix-right 恢复 12px；--filter-suffix-hit 恢复 28px；删除本段覆盖
+   风险可回滚：--search-suffix-right 恢复 12px；--search-suffix-hit 恢复 28px；删除本段覆盖
 */
 .filter-dropdown-container {
-  --filter-suffix-right: 8px; /* 收紧右侧内距：x到右边界更近 */
-  --filter-suffix-hit: 20px; /* 收紧命中区，仍可点击 */
+  --search-suffix-right: 8px; /* 收紧右侧内距：x到右边界更近 */
+  --search-suffix-hit: 20px; /* 收紧命中区，仍可点击 */
   --date-field-min-ch: 10ch; /* PC面板内日期最小字符宽 */
 }
 
@@ -1225,8 +1231,8 @@ header nav .el-menu-item:hover,
 
 /* 后缀区域尺寸与右内边距（仅 PC Filter 作用域） */
 .filter-dropdown-container .filter-field :deep(.el-input__suffix) {
-  width: var(--filter-suffix-hit);
-  padding-right: var(--filter-suffix-right);
+  width: var(--search-suffix-hit);
+  padding-right: var(--search-suffix-right);
 }
 /* 收紧后缀内部间距（清除 x 与图标组之间的多余空隙） */
 .filter-dropdown-container .filter-field :deep(.el-input__suffix-inner) {
@@ -1278,12 +1284,12 @@ header nav .el-menu-item:hover,
 }
 
 .chinese-text {
-  font-family: var(--font-chinese);
+  font-family: var(--font-family-zh-sans);
   letter-spacing: 0.02em;
 }
 
 .english-text {
-  font-family: var(--font-english);
+  font-family: var(--font-family-en-sans);
   letter-spacing: -0.01em;
 }
 

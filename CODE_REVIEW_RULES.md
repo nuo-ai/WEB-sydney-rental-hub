@@ -19,7 +19,7 @@
   4) 模板/脚本内联颜色样式：
      - `<div :style="{ color: '#2563eb' }">` / `style="border: 1px solid #e5e7eb"`
   5) 使用非规范变量名：
-     - 允许前缀：`--juwo-* | --link-* | --color-* | --text-* | --bg-* | --border-* | --space-* | --radius-* | --shadow-* | --brand-* | --filter-*`
+     - 允许前缀：`--juwo-* | --link-* | --color-* | --text-* | --bg-* | --border-* | --space-* | --radius-* | --shadow-* | --brand-* | --button-* | --chip-* | --panel-* | --list-item-* | --search-* | --clear-* | --checkbox-* | --filter-field-*`
      - 其它自造全局变量名一律拒绝（局部作用域变量例外，但不建议）
 
 ---
@@ -32,7 +32,7 @@
   - 背景：`--color-bg-page | --color-bg-card | --bg-hover`
   - 边框：`--color-border-default | --color-border-strong`
   - 焦点/滚动：`--focus-ring-* | --neutral-scrollbar-*`
-  - 筛选域：`--filter-*`（仅筛选面板域）
+  - 筛选域：`--panel-* / --chip-* / --list-item-* / --search-* / --filter-field-*`（仅筛选面板域）
 - 变更说明：PR 描述必须包含“前端表现”段落（示例见第 5 节模板）
 - 渐进式：修改现有文件时，遵循 **童子军军规**（见第 4 节）；范围内顺手替换 1–3 处硬编码为 Token，小步提交。
 - 向后兼容：若 Token 更名或切换值会影响大范围，采用“旧名 → 新值”的别名过渡，待稳定后再清理。

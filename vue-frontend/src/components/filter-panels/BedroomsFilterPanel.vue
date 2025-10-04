@@ -349,8 +349,8 @@ const applyFilters = async () => {
 <style scoped>
 .bedrooms-filter-panel {
   width: 100%;
-  background: var(--filter-panel-bg);
-  border-radius: var(--filter-panel-radius);
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
 }
 
 /* 面板头部 */
@@ -358,24 +358,24 @@ const applyFilters = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--filter-panel-padding);
-  border-bottom: 1px solid var(--filter-panel-header-border);
+  padding: var(--panel-padding);
+  border-bottom: 1px solid var(--panel-header-border);
 }
 
 .panel-title {
-  font-size: var(--filter-panel-title-font-size);
-  font-weight: var(--filter-panel-title-font-weight);
-  color: var(--filter-panel-title-color);
+  font-size: var(--panel-title-font-size);
+  font-weight: var(--panel-title-font-weight);
+  color: var(--panel-title-color);
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--filter-close-btn-color);
+  color: var(--panel-close-color);
   cursor: pointer;
-  padding: var(--filter-close-btn-padding);
-  border-radius: var(--filter-close-btn-radius);
+  padding: var(--panel-close-padding);
+  border-radius: var(--panel-close-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -383,13 +383,13 @@ const applyFilters = async () => {
 }
 
 .close-btn:hover {
-  background: var(--filter-close-btn-hover-bg);
-  color: var(--filter-close-btn-hover-color);
+  background: var(--panel-close-hover-bg);
+  color: var(--panel-close-hover-color);
 }
 
 .spec-icon {
-  width: var(--filter-close-btn-size);
-  height: var(--filter-close-btn-size);
+  width: var(--panel-close-size);
+  height: var(--panel-close-size);
 }
 
 /* 面板内容 */
@@ -408,9 +408,9 @@ const applyFilters = async () => {
 .filter-btn {
   padding: var(--space-md) var(--space-lg);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-compact-md);
+  border-radius: var(--radius-xs);
   background: var(--color-bg-primary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
   cursor: pointer;
@@ -419,9 +419,9 @@ const applyFilters = async () => {
 }
 
 .filter-btn:hover {
-  border-color: var(--color-hover-border);
+  border-color: var(--color-border-hover);
   color: var(--color-text-primary);
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .filter-btn.active {
@@ -484,7 +484,7 @@ const applyFilters = async () => {
 }
 
 .section-label {
-  font-size: var(--font-size-compact);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   margin-bottom: var(--space-sm);
   font-weight: var(--font-weight-medium);

@@ -1068,7 +1068,7 @@ onMounted(() => {
   right: 0;
   width: 420px;
   height: 100vh;
-  background: var(--filter-panel-bg);
+  background: var(--panel-bg);
   box-shadow: -4px 0 20px rgb(0 0 0 / 15%);
   transform: translateX(100%);
   transition: transform 0.3s ease;
@@ -1087,14 +1087,14 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: var(--space-xl) var(--space-2xl);
-  border-bottom: 1px solid var(--filter-panel-header-border);
-  background: var(--filter-panel-bg);
+  border-bottom: 1px solid var(--panel-header-border);
+  background: var(--panel-bg);
 }
 
 .panel-title {
-  font-size: var(--filter-panel-title-font-size);
-  font-weight: var(--filter-panel-title-font-weight);
-  color: var(--filter-panel-title-color);
+  font-size: var(--panel-title-font-size);
+  font-weight: var(--panel-title-font-weight);
+  color: var(--panel-title-color);
   margin: 0;
   line-height: var(--line-height-tight);
 }
@@ -1108,13 +1108,13 @@ onMounted(() => {
 .reset-link {
   background: none;
   border: none;
-  color: var(--filter-action-link-color);
-  font-size: var(--filter-action-link-font-size);
-  font-weight: var(--filter-action-link-font-weight);
+  color: var(--panel-action-link-color);
+  font-size: var(--panel-action-link-font-size);
+  font-weight: var(--panel-action-link-font-weight);
   cursor: pointer;
   text-decoration: underline;
-  padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
-  border-radius: var(--filter-action-link-radius);
+  padding: var(--panel-action-link-padding-y) var(--panel-action-link-padding-x);
+  border-radius: var(--panel-action-link-radius);
   transition: var(--transition-fast);
 
   /* 移动端触摸目标 */
@@ -1124,21 +1124,21 @@ onMounted(() => {
 }
 
 .reset-link:hover {
-  background: var(--filter-action-link-hover-bg);
-  color: var(--filter-action-link-hover-color);
+  background: var(--panel-action-link-hover-bg);
+  color: var(--panel-action-link-hover-color);
   text-decoration: none;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--filter-close-btn-color);
+  color: var(--panel-close-color);
   cursor: pointer;
-  padding: var(--filter-close-btn-padding);
-  border-radius: var(--filter-close-btn-radius);
+  padding: var(--panel-close-padding);
+  border-radius: var(--panel-close-radius);
   transition: var(--transition-fast);
-  width: var(--filter-close-btn-size);
-  height: var(--filter-close-btn-size);
+  width: var(--panel-close-size);
+  height: var(--panel-close-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1149,8 +1149,8 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: var(--filter-close-btn-hover-bg);
-  color: var(--filter-close-btn-hover-color);
+  background: var(--panel-close-hover-bg);
+  color: var(--panel-close-hover-color);
 }
 
 .close-btn:focus-visible {
@@ -1202,7 +1202,7 @@ onMounted(() => {
 }
 
 .price-slider :deep(.el-slider__runway) {
-  background-color: var(--color-neutral-200);
+  background-color: var(--gray-200);
   height: 6px;
 }
 
@@ -1237,12 +1237,12 @@ onMounted(() => {
 }
 
 .filter-btn {
-  padding: var(--filter-btn-padding-y) var(--filter-btn-padding-x);
+  padding: var(--button-padding-y) var(--button-padding-x);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-compact-lg);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-primary);
-  font-size: var(--filter-btn-font-size);
-  font-weight: var(--filter-btn-font-weight);
+  font-size: var(--button-font-size);
+  font-weight: var(--button-font-weight);
   color: var(--color-text-primary);
   cursor: pointer;
   transition: var(--transition-normal);
@@ -1256,9 +1256,9 @@ onMounted(() => {
 }
 
 .filter-btn:hover {
-  border-color: var(--color-hover-border);
+  border-color: var(--color-border-hover);
   color: var(--color-text-primary);
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .filter-btn.active {
@@ -1305,8 +1305,8 @@ onMounted(() => {
 /* 移动端按钮优化 */
 @media (width <= 767px) {
   .filter-btn {
-    padding: 14px var(--filter-btn-padding-x);
-    font-size: var(--font-size-sm);
+    padding: 14px var(--button-padding-x);
+    font-size: var(--font-size-md);
     min-width: 64px;
     min-height: 48px; /* 更大的触摸目标 */
   }
@@ -1400,7 +1400,7 @@ onMounted(() => {
 .cancel-btn:hover {
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .cancel-btn:focus-visible {
@@ -1412,7 +1412,7 @@ onMounted(() => {
   flex: 2;
   background-color: var(--juwo-primary);
   border-color: var(--juwo-primary);
-  color: var(--filter-btn-primary-color);
+  color: var(--button-primary-color);
   transition: none;
 }
 
@@ -1432,8 +1432,8 @@ onMounted(() => {
 }
 
 .apply-btn:disabled:hover {
-  background-color: var(--filter-btn-primary-bg);
-  border-color: var(--filter-btn-primary-bg);
+  background-color: var(--button-primary-bg);
+  border-color: var(--button-primary-bg);
 }
 
 /* 移动端底部按钮优化 */
@@ -1449,7 +1449,7 @@ onMounted(() => {
   .cancel-btn,
   .apply-btn {
     min-height: 52px; /* 移动端更大的触摸目标 */
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
   }
 }
@@ -1470,15 +1470,15 @@ onMounted(() => {
 .location-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--filter-chip-gap);
+  gap: var(--chip-gap);
   /* 贴近截图：更紧凑的内边距与更小圆角 */
   padding: 6px 10px;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: var(--filter-chip-bg);
-  color: var(--filter-chip-text);
-  font-size: var(--filter-chip-font-size);
-  font-weight: var(--filter-chip-font-weight);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  font-size: var(--chip-font-size);
+  font-weight: var(--chip-font-weight);
   max-width: 160px;
   transition: var(--transition-fast);
 
@@ -1487,8 +1487,8 @@ onMounted(() => {
 }
 
 .location-chip:hover {
-  border-color: var(--filter-chip-hover-border);
-  background: var(--filter-chip-hover-bg);
+  border-color: var(--chip-hover-border);
+  background: var(--chip-hover-bg);
 }
 
 .location-chip .chip-text {
@@ -1508,12 +1508,12 @@ onMounted(() => {
 }
 
 .location-chip .chip-remove {
-  background: var(--filter-chip-remove-bg);
+  background: var(--chip-remove-bg);
   border: none;
-  color: var(--filter-chip-remove-color);
-  width: var(--filter-chip-remove-size);
-  height: var(--filter-chip-remove-size);
-  border-radius: var(--filter-chip-remove-radius);
+  color: var(--chip-remove-color);
+  width: var(--chip-remove-size);
+  height: var(--chip-remove-size);
+  border-radius: var(--chip-remove-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1530,14 +1530,14 @@ onMounted(() => {
 }
 /* 兼容 BaseChip 子元素命名，保持现有样式生效 */
 .location-chip :deep(.base-chip__remove) {
-  background: var(--filter-chip-remove-bg) !important;
-  background-color: var(--filter-chip-remove-bg) !important;
+  background: var(--chip-remove-bg) !important;
+  background-color: var(--chip-remove-bg) !important;
   background-image: none !important;
   border: none !important;
-  color: var(--filter-chip-remove-color) !important;
-  width: var(--filter-chip-remove-size);
-  height: var(--filter-chip-remove-size);
-  border-radius: var(--filter-chip-remove-radius);
+  color: var(--chip-remove-color) !important;
+  width: var(--chip-remove-size);
+  height: var(--chip-remove-size);
+  border-radius: var(--chip-remove-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1558,21 +1558,21 @@ onMounted(() => {
 }
 
 .location-chip .chip-remove:hover {
-  background: var(--filter-chip-remove-hover-bg);
-  color: var(--filter-chip-remove-hover-color);
+  background: var(--chip-remove-hover-bg);
+  color: var(--chip-remove-hover-color);
 }
 /* 兼容 BaseChip 子元素命名，保持现有样式生效 */
 .location-chip :deep(.base-chip__remove:hover) {
-  background: var(--filter-chip-remove-hover-bg);
-  color: var(--filter-chip-remove-hover-color);
+  background: var(--chip-remove-hover-bg);
+  color: var(--chip-remove-hover-color);
 }
 
 /* 彻底移除“位置标签 ×”的浅蓝底：选中/hover/focus 均保持中性 remove 背景 */
 .location-chip :deep(.base-chip--selected .base-chip__remove),
 .location-chip :deep(.base-chip__remove:focus),
 .location-chip :deep(.base-chip__remove:focus-visible) {
-  background: var(--filter-chip-remove-bg) !important;
-  color: var(--filter-chip-remove-color) !important;
+  background: var(--chip-remove-bg) !important;
+  color: var(--chip-remove-color) !important;
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
@@ -1592,13 +1592,13 @@ onMounted(() => {
 .toggle-chips {
   background: none;
   border: none;
-  color: var(--filter-action-link-color);
+  color: var(--panel-action-link-color);
   text-decoration: underline;
-  font-size: var(--filter-action-link-font-size);
-  font-weight: var(--filter-action-link-font-weight);
+  font-size: var(--panel-action-link-font-size);
+  font-weight: var(--panel-action-link-font-weight);
   cursor: pointer;
-  padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
-  border-radius: var(--filter-action-link-radius);
+  padding: var(--panel-action-link-padding-y) var(--panel-action-link-padding-x);
+  border-radius: var(--panel-action-link-radius);
   transition: var(--transition-fast);
 
   /* 移动端触摸目标 */
@@ -1609,8 +1609,8 @@ onMounted(() => {
 
 .clear-all:hover,
 .toggle-chips:hover {
-  background: var(--filter-action-link-hover-bg);
-  color: var(--filter-action-link-hover-color);
+  background: var(--panel-action-link-hover-bg);
+  color: var(--panel-action-link-hover-color);
   text-decoration: none;
 }
 
@@ -1624,17 +1624,17 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  border: 1px solid var(--filter-empty-border);
-  background: var(--filter-empty-bg);
-  border-radius: var(--filter-empty-radius);
-  padding: var(--filter-empty-padding-y) var(--filter-empty-padding-x);
+  border: 1px solid var(--panel-empty-border);
+  background: var(--panel-empty-bg);
+  border-radius: var(--panel-empty-radius);
+  padding: var(--panel-empty-padding-y) var(--panel-empty-padding-x);
   text-align: center;
 }
 
 .location-empty .empty-text {
-  font-size: var(--filter-empty-font-size);
-  font-weight: var(--filter-empty-font-weight);
-  color: var(--filter-empty-text-color);
+  font-size: var(--panel-empty-font-size);
+  font-weight: var(--panel-empty-font-weight);
+  color: var(--panel-empty-text-color);
   line-height: var(--line-height-normal);
 }
 
@@ -1650,21 +1650,21 @@ onMounted(() => {
   }
 
   .location-chip {
-    padding: calc(var(--filter-chip-padding-y) + 2px) var(--filter-chip-padding-x);
+    padding: calc(var(--chip-padding-y) + 2px) var(--chip-padding-x);
     min-height: 36px;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
   }
 
   .location-chip .chip-remove {
-    width: calc(var(--filter-chip-remove-size) + 4px);
-    height: calc(var(--filter-chip-remove-size) + 4px);
+    width: calc(var(--chip-remove-size) + 4px);
+    height: calc(var(--chip-remove-size) + 4px);
     min-width: 24px;
     min-height: 24px;
   }
   /* 兼容 BaseChip 子元素命名，保持现有样式生效（移动端尺寸） */
   .location-chip :deep(.base-chip__remove) {
-    width: calc(var(--filter-chip-remove-size) + 4px);
-    height: calc(var(--filter-chip-remove-size) + 4px);
+    width: calc(var(--chip-remove-size) + 4px);
+    height: calc(var(--chip-remove-size) + 4px);
     min-width: 24px;
     min-height: 24px;
   }

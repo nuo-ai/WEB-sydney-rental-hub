@@ -751,7 +751,7 @@ const handleSearchSaved = async (savedSearch) => {
   padding: 0 12px;
   gap: 2px;
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-compact-lg);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-card);
   color: var(--color-text-secondary);
   font-weight: 500;
@@ -841,7 +841,7 @@ const handleSearchSaved = async (savedSearch) => {
   padding: 0 12px;
   gap: 6px;
   border: 1px solid var(--juwo-primary);
-  border-radius: var(--radius-compact-lg);
+  border-radius: var(--radius-sm);
   background: var(--juwo-primary);
   color: white;
   font-weight: 600;

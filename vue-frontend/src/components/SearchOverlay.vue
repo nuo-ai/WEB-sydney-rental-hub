@@ -355,7 +355,7 @@ watch(
   position: fixed;
   inset: 0;
   z-index: 10050;
-  background: var(--filter-panel-bg, var(--color-bg-primary));
+  background: var(--panel-bg, var(--color-bg-primary));
   display: flex;
   flex-direction: column;
   height: 100dvh; /* 可见视口高度，适配 iOS */
@@ -389,7 +389,7 @@ watch(
 }
 
 .icon-btn:active {
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .spec-icon {
@@ -427,7 +427,7 @@ watch(
 }
 
 .filter-text-btn:active {
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .search-prefix {
@@ -449,7 +449,7 @@ watch(
 /* 已选 chips */
 .chips-row {
   display: flex;
-  gap: var(--filter-chip-gap);
+  gap: var(--chip-gap);
   padding: var(--space-sm) var(--space-md);
   overflow-x: auto;
   border-bottom: 1px solid var(--color-border-default);
@@ -489,8 +489,8 @@ watch(
   font-size: 11px;
   font-weight: 600;
   color: var(--color-text-secondary);
-  background: var(--filter-group-title-bg);
-  border-bottom: 1px solid var(--filter-group-title-border);
+  background: var(--panel-group-bg);
+  border-bottom: 1px solid var(--panel-group-border);
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
@@ -516,7 +516,7 @@ watch(
 .pill.selected {
   background: var(--juwo-primary);
   border-color: var(--juwo-primary);
-  color: var(--filter-btn-primary-color);
+  color: var(--button-primary-color);
 }
 
 .pill-icon {
@@ -558,13 +558,13 @@ watch(
 /* 设计令牌对齐覆盖（追加覆盖而非重写原样式，降低风险）
    为什么这样做：
    - 移动端搜索覆盖层需要与筛选面板共用一套设计语言（中性灰、统一间距/圆角/边框）
-   - 通过后置覆盖使用 design-tokens.css 中的 --filter-* 变量，避免大规模重写，保持向后兼容
+   - 通过后置覆盖使用 design-tokens.css 中的语义令牌（--color-*/--space-*/--panel-*），避免大规模重写
    - 若 design tokens 未来微调，可全局生效；此处仅做映射与对齐 */
 :root {
 }
 
 .search-overlay {
-  background: var(--filter-panel-bg, var(--color-bg-primary));
+  background: var(--panel-bg, var(--color-bg-primary));
 }
 
 /* 头部与输入区 */
@@ -578,17 +578,17 @@ watch(
 
 .icon-btn {
   color: var(--color-text-secondary);
-  border-radius: var(--radius-compact-lg);
+  border-radius: var(--radius-sm);
 }
 
 .icon-btn:active {
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .header-input {
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-compact-xl);
+  border-radius: var(--radius-md);
   padding: 0 var(--space-sm);
 }
 
@@ -602,7 +602,7 @@ watch(
 }
 
 .filter-text-btn:active {
-  background: var(--color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .search-prefix {
@@ -619,12 +619,12 @@ watch(
 }
 
 .section-title {
-  padding: var(--filter-group-title-padding-y) var(--filter-group-title-padding-x);
-  font-size: var(--filter-group-title-font-size);
-  font-weight: var(--filter-group-title-font-weight);
-  color: var(--filter-group-title-color);
-  background: var(--filter-group-title-bg);
-  border-bottom: 1px solid var(--filter-group-title-border);
+  padding: var(--panel-group-padding-y) var(--panel-group-padding-x);
+  font-size: var(--panel-group-font-size);
+  font-weight: var(--panel-group-font-weight);
+  color: var(--panel-group-color);
+  background: var(--panel-group-bg);
+  border-bottom: 1px solid var(--panel-group-border);
 }
 
 .title-icon {
@@ -640,7 +640,7 @@ watch(
 .loading,
 .empty {
   padding: var(--space-lg);
-  font-size: var(--font-size-compact);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
 

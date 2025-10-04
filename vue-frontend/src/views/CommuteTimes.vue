@@ -514,10 +514,10 @@ onMounted(() => {
 .add-location-btn {
   width: 100%;
   height: 48px;
-  border: 1px solid var(--filter-btn-secondary-border); /* 中文注释：统一走次要按钮描边令牌，移除硬编码红色 */
+  border: 1px solid var(--button-secondary-border); /* 中文注释：统一走次要按钮描边令牌，移除硬编码红色 */
   border-radius: 8px;
-  background: var(--filter-btn-secondary-bg); /* 中文注释：次要按钮默认白底，令牌可全局切换 */
-  color: var(--filter-btn-secondary-color); /* 中文注释：文字/图标颜色走次要按钮令牌 */
+  background: var(--button-secondary-bg); /* 中文注释：次要按钮默认白底，令牌可全局切换 */
+  color: var(--button-secondary-color); /* 中文注释：文字/图标颜色走次要按钮令牌 */
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -531,14 +531,14 @@ onMounted(() => {
 
 .add-location-btn:hover {
   /* 中文注释：悬浮态使用统一弱底与加深描边/文字，避免危险色误导 */
-  background: var(--color-hover-bg);
-  border-color: var(--filter-btn-secondary-hover-border);
-  color: var(--filter-btn-secondary-hover-color);
+  background: var(--color-surface-hover);
+  border-color: var(--button-secondary-hover-border);
+  color: var(--button-secondary-hover-color);
 }
 
 .add-location-btn:focus-visible {
   /* 中文注释：键盘可达性——轻微灰色焦点环，使用设计令牌 */
-  box-shadow: var(--filter-shadow-focus);
+  box-shadow: var(--shadow-focus);
 }
 
 .add-location-btn:active {

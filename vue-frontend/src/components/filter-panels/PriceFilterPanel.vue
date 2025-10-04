@@ -275,8 +275,8 @@ const applyFilters = async () => {
 <style scoped>
 .price-filter-panel {
   width: 100%;
-  background: var(--filter-panel-bg);
-  border-radius: var(--filter-panel-radius);
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
 }
 
 /* 面板头部 */
@@ -284,24 +284,24 @@ const applyFilters = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--filter-panel-padding);
-  border-bottom: 1px solid var(--filter-panel-header-border);
+  padding: var(--panel-padding);
+  border-bottom: 1px solid var(--panel-header-border);
 }
 
 .panel-title {
-  font-size: var(--filter-panel-title-font-size);
-  font-weight: var(--filter-panel-title-font-weight);
-  color: var(--filter-panel-title-color);
+  font-size: var(--panel-title-font-size);
+  font-weight: var(--panel-title-font-weight);
+  color: var(--panel-title-color);
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--filter-close-btn-color);
+  color: var(--panel-close-color);
   cursor: pointer;
-  padding: var(--filter-close-btn-padding);
-  border-radius: var(--filter-close-btn-radius);
+  padding: var(--panel-close-padding);
+  border-radius: var(--panel-close-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,18 +309,18 @@ const applyFilters = async () => {
 }
 
 .close-btn:hover {
-  background: var(--filter-close-btn-hover-bg);
-  color: var(--filter-close-btn-hover-color);
+  background: var(--panel-close-hover-bg);
+  color: var(--panel-close-hover-color);
 }
 
 .spec-icon {
-  width: var(--filter-close-btn-size);
-  height: var(--filter-close-btn-size);
+  width: var(--panel-close-size);
+  height: var(--panel-close-size);
 }
 
 /* 面板内容 */
 .panel-content {
-  padding: var(--filter-panel-padding);
+  padding: var(--panel-padding);
 }
 
 /* 价格范围标题 */
@@ -329,7 +329,7 @@ const applyFilters = async () => {
 }
 
 .price-range-title {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   margin: 0;
@@ -351,7 +351,7 @@ const applyFilters = async () => {
 }
 
 .selector-label {
-  font-size: var(--font-size-compact);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   margin-bottom: var(--space-2xs);
@@ -364,7 +364,7 @@ const applyFilters = async () => {
 /* 价格分隔符 */
 .price-separator {
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   padding: 0 var(--space-2xs);
   margin-bottom: var(--space-2xs);
@@ -376,13 +376,13 @@ const applyFilters = async () => {
 /* Element Plus 下拉选择器样式定制 */
 .price-select :deep(.el-input__wrapper) {
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-compact-md);
+  border-radius: var(--radius-xs);
   background: var(--color-bg-primary);
   transition: var(--transition-normal);
 }
 
 .price-select :deep(.el-input__wrapper:hover) {
-  border-color: var(--color-hover-border);
+  border-color: var(--color-border-hover);
 }
 
 .price-select :deep(.el-input__wrapper.is-focus) {
@@ -392,7 +392,7 @@ const applyFilters = async () => {
 
 .price-select :deep(.el-input__inner) {
   color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
 }
 
 .price-select :deep(.el-input__inner::placeholder) {
@@ -404,12 +404,12 @@ const applyFilters = async () => {
   margin: var(--space-sm) 0;
   padding: var(--space-sm);
   background: var(--color-bg-secondary);
-  border-radius: var(--radius-compact-md);
+  border-radius: var(--radius-xs);
   border: 1px solid var(--color-border-default);
 }
 
 .price-range-text {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
 }

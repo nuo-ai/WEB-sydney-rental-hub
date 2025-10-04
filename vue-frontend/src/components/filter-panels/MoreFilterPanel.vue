@@ -162,8 +162,8 @@ const apply = async () => {
 <style scoped>
 .more-filter-panel {
   width: 100%;
-  background: var(--filter-panel-bg);
-  border-radius: var(--filter-panel-radius);
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
 }
 
 /* 头部 */
@@ -171,24 +171,24 @@ const apply = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--filter-panel-padding);
-  border-bottom: 1px solid var(--filter-panel-header-border);
+  padding: var(--panel-padding);
+  border-bottom: 1px solid var(--panel-header-border);
 }
 
 .panel-title {
-  font-size: var(--filter-panel-title-font-size);
-  font-weight: var(--filter-panel-title-font-weight);
-  color: var(--filter-panel-title-color);
+  font-size: var(--panel-title-font-size);
+  font-weight: var(--panel-title-font-weight);
+  color: var(--panel-title-color);
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--filter-close-btn-color);
+  color: var(--panel-close-color);
   cursor: pointer;
-  padding: var(--filter-close-btn-padding);
-  border-radius: var(--filter-close-btn-radius);
+  padding: var(--panel-close-padding);
+  border-radius: var(--panel-close-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -196,18 +196,18 @@ const apply = async () => {
 }
 
 .close-btn:hover {
-  background: var(--filter-close-btn-hover-bg);
-  color: var(--filter-close-btn-hover-color);
+  background: var(--panel-close-hover-bg);
+  color: var(--panel-close-hover-color);
 }
 
 .spec-icon {
-  width: var(--filter-close-btn-size);
-  height: var(--filter-close-btn-size);
+  width: var(--panel-close-size);
+  height: var(--panel-close-size);
 }
 
 /* 内容 */
 .panel-content {
-  padding: var(--filter-panel-padding);
+  padding: var(--panel-padding);
 }
 
 .form-row {
@@ -218,7 +218,7 @@ const apply = async () => {
 }
 
 .form-label {
-  font-size: var(--font-size-compact);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
 }
