@@ -17,32 +17,32 @@
 
 ### 颜色系统
 
-- **中性灰色调**：`--filter-color-neutral-50` 到 `--filter-color-neutral-900`
-- **语义化颜色**：`--filter-color-bg-primary`、`--filter-color-text-primary` 等
-- **交互状态颜色**：`--filter-color-hover-bg`、`--filter-color-focus-ring` 等
+- **中性灰色调**：`--gray-50` 到 `--gray-900`
+- **语义化颜色**：`--color-bg-primary`、`--color-text-primary` 等
+- **交互状态颜色**：`--color-surface-hover`、`--color-focus-ring` 等
 
 ### 间距系统
 
-- `--filter-space-xs`: 4px
-- `--filter-space-sm`: 6px
-- `--filter-space-md`: 8px
-- `--filter-space-lg`: 12px
-- `--filter-space-xl`: 16px
-- `--filter-space-2xl`: 20px
-- `--filter-space-3xl`: 24px
+- `--space-2xs`: 4px
+- `--space-xs`: 6px
+- `--space-sm`: 8px
+- `--space-md`: 12px
+- `--space-lg`: 16px
+- `--space-xl`: 20px
+- `--space-2xl`: 24px
 
 ### 字体系统
 
-- **字号**：`--filter-font-size-xs` (11px) 到 `--filter-font-size-xl` (18px)
-- **字重**：`--filter-font-weight-normal` (400) 到 `--filter-font-weight-bold` (700)
-- **行高**：`--filter-line-height-tight` (1.2) 到 `--filter-line-height-relaxed` (1.6)
+- **字号**：`--font-size-2xs` (11px) 到 `--font-size-xl` (18px)
+- **字重**：`--font-weight-regular` (400) 到 `--font-weight-bold` (700)
+- **行高**：`--line-height-tight` (1.2) 到 `--line-height-relaxed` (1.6)
 
 ### 圆角系统
 
-- `--filter-radius-sm`: 2px
-- `--filter-radius-md`: 4px
-- `--filter-radius-lg`: 6px
-- `--filter-radius-xl`: 8px
+- `--radius-2xs`: 2px
+- `--radius-xs`: 4px
+- `--radius-sm`: 6px
+- `--radius-md`: 8px
 
 ## 基础组件
 
@@ -179,28 +179,24 @@ import BaseListItem from '@/components/base/BaseListItem.vue'
 
 ```css
 .my-component {
-  padding: var(--filter-space-lg);
-  background: var(--filter-color-bg-primary);
-  border: 1px solid var(--filter-color-border-default);
-  border-radius: var(--filter-radius-md);
-  color: var(--filter-color-text-primary);
-  font-size: var(--filter-font-size-md);
-  transition: var(--filter-transition-normal);
+  padding: var(--space-md);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  transition: var(--transition-normal);
 }
 
 .my-component:hover {
-  background: var(--filter-color-hover-bg);
-  border-color: var(--filter-color-hover-border);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
 }
 ```
 
 ### 3. 工具类
 
-可以使用预定义的工具类：
-
-```html
-<div class="filter-text-primary filter-bg-secondary filter-radius-md">使用工具类的内容</div>
-```
+可以直接通过 CSS 变量或项目内的 `.typo-*`、`.page__*` 等工具类组合样式。
 
 ### 4. 响应式设计
 
@@ -214,35 +210,35 @@ import BaseListItem from '@/components/base/BaseListItem.vue'
 
 ### 1. 颜色使用
 
-- **主要文本**：使用 `--filter-color-text-primary`
-- **次要文本**：使用 `--filter-color-text-secondary`
-- **边框**：使用 `--filter-color-border-default`
-- **背景**：使用 `--filter-color-bg-primary` 或 `--filter-color-bg-secondary`
+- **主要文本**：使用 `--color-text-primary`
+- **次要文本**：使用 `--color-text-secondary`
+- **边框**：使用 `--color-border-default`
+- **背景**：使用 `--color-bg-primary` 或 `--color-bg-secondary`
 
 ### 2. 间距使用
 
-- **组件内部间距**：使用 `--filter-space-md` (8px)
-- **组件之间间距**：使用 `--filter-space-lg` (12px) 或 `--filter-space-xl` (16px)
-- **区块间距**：使用 `--filter-space-2xl` (20px) 或 `--filter-space-3xl` (24px)
+- **组件内部间距**：使用 `--space-sm` (8px)
+- **组件之间间距**：使用 `--space-md` (12px) 或 `--space-lg` (16px)
+- **区块间距**：使用 `--space-xl` (20px) 或 `--space-2xl` (24px)
 
 ### 3. 交互状态
 
-- **悬浮状态**：使用 `--filter-color-hover-bg` 和 `--filter-color-hover-border`
-- **选中状态**：使用 `--filter-color-selected-bg` 和 `--filter-color-selected-border`
-- **焦点状态**：使用 `--filter-color-focus-ring`
+- **悬浮状态**：使用 `--color-surface-hover` 和 `--color-border-hover`
+- **选中状态**：使用 `--color-selected-bg` 和 `--color-selected-border`
+- **焦点状态**：使用 `--color-focus-ring`
 
 ### 4. 过渡动画
 
-- **快速交互**：使用 `--filter-transition-fast` (0.15s)
-- **常规交互**：使用 `--filter-transition-normal` (0.2s)
-- **慢速交互**：使用 `--filter-transition-slow` (0.3s)
+- **快速交互**：使用 `--transition-fast` (0.15s)
+- **常规交互**：使用 `--transition-normal` (0.2s)
+- **慢速交互**：使用 `--transition-slow` (0.3s)
 
 ## 扩展指南
 
 ### 添加新的设计令牌
 
 1. 在 `src/styles/design-tokens.css` 中添加新令牌
-2. 遵循命名约定：`--filter-[category]-[property]-[variant]`
+2. 遵循命名约定：优先使用三层结构（`--color-*`、`--space-*`、`--button-*` 等语义名称）
 3. 提供语义化的名称而非具体值
 
 ### 创建新的基础组件

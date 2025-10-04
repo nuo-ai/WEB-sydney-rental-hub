@@ -12,7 +12,7 @@
         <div class="favorites-section">
           <!-- 空状态 -->
           <div v-if="favoriteProperties.length === 0" class="empty-state">
-            <el-icon :size="64" color="#d9d9d9">
+            <el-icon :size="64" class="empty-icon-symbol">
               <Star />
             </el-icon>
             <h3 class="chinese-text">还没有收藏的房源</h3>
@@ -139,6 +139,10 @@ const handleContactProperty = (property) => {
   padding: 80px 20px;
   gap: 16px;
   text-align: center;
+}
+
+.empty-icon-symbol {
+  color: var(--gray-300);
 }
 
 .empty-state h3 {

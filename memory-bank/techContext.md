@@ -10,7 +10,7 @@
 - **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia + lucide-vue-next（图标）
 - **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
 - **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL）
-- **地图**: OpenStreetMap（底图）+ 后端 Google Directions（生产）+ Haversine（测试回退）
+- **地图**: Google Maps JavaScript/Static Map（前端）+ Google Directions（后端，生产）；当前无 Haversine 回退
 
 ---
 
@@ -80,7 +80,7 @@ npx playwright test -g "URL 幂等与仅写非空键"
 - ✅ Python后端: 正常运行 (localhost:8000)
 - ✅ 数据库连接: 正常 (Supabase PostgreSQL)
 - ✅ 认证系统: JWT + 邮箱验证框架
-- ✅ 通勤计算: Google Directions（生产）+ Haversine 回退
+- ✅ 通勤计算: Google Directions（生产）；无 Haversine 回退
 
 ---
 

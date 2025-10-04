@@ -19,6 +19,10 @@
         "@pimzino/spec-workflow-mcp@latest",
         "c:/Users/nuoai/Desktop/WEB-sydney-rental-hub"
       ]
+    },
+    "markitdown": {
+      "command": "markitdown-mcp",
+      "args": []
     }
   }
 }

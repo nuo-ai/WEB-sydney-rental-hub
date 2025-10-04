@@ -3,26 +3,6 @@
 */
 
 :root {
-  /* 基础字体家族（与现有别名互为映射，不破坏旧变量） */
-  --font-family-zh-sans: var(
-    --font-chinese,
-    'PingFang SC',
-    'Noto Sans SC',
-    'Source Han Sans SC',
-    'Microsoft YaHei',
-    system-ui,
-    sans-serif
-  );
-  --font-family-en-sans: var(
-    --font-english,
-    'Inter',
-    'SF Pro Text',
-    'Segoe UI',
-    Roboto,
-    system-ui,
-    sans-serif
-  );
-
   /* 8pt 字号尺度 */
   --font-size-xs: 12px;
   --font-size-sm: 14px;

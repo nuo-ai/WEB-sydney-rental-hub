@@ -13,13 +13,12 @@
   - useFilterWizard 扩展：完整的保存搜索功能支持
   - HomeView 集成：完整的事件处理链路和用户反馈
   - 保存搜索功能：完整实现并测试通过
-- **当前焦点**：保存搜索功能已完整实现，下一步开发已保存搜索管理界面
+- **当前焦点**：FilterWizard 组件已开发但尚未接入主流程（主页仍使用 FilterPanel）；Profile 页已接入 SavedSearchesManager 并提供已保存搜索管理
 
 ## 下一步计划
-- **[P0] Profile 页结构化**：收藏概览（最近3条 + 总数 + 查看全部 → /favorites）、历史浏览入口、已保存筛选占位，严格使用"新页面视觉标准 v1"
-- **[P0] 保存筛选（本地版）**：FilterPanel 顶部"保存/订阅"入口 + Profile"我的筛选"管理占位
+- **[P0] 筛选向导接入评估**：以特性开关接入 FilterWizard（默认关闭），A/B 对比现有 FilterPanel，出现异常可一键回退
+- **[P0] 图标系统余量迁移**：清理 Font Awesome 遗留，统一至 lucide-vue-next + currentColor
 - **[P1] 令牌定义梳理**：assets/design-tokens.css 标注 deprecated（--color-accent/--font-size-base/--spacing-lg）并提供语义映射
-- **[P1] 图标系统统一**：components/icons/* 点扫描，迁移至 lucide-vue-next + currentColor
 - **[P2] 移除 var() 颜色兜底**：渐进清理 var(--token, #xxx) fallback
 
 ## 技术提醒

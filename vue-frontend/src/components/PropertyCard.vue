@@ -130,6 +130,7 @@ import { ref, computed, inject, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { BedDouble, Bath, CarFront, Star, MoreHorizontal, Share2, EyeOff } from 'lucide-vue-next' // 导入 Lucide 图标
 import { usePropertiesStore } from '@/stores/properties'
+import { getCssVarValue } from '@/utils/designTokens'
 
 const t = inject('t')
 
@@ -183,7 +184,9 @@ const validImages = computed(() => {
 })
 
 const placeholderImage = computed(() => {
-  const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="#9ca3af" text-anchor="middle">${t('propertyCard.imageAlt')}</text></svg>`
+  const background = getCssVarValue('--gray-100', '#f3f4f6')
+  const foreground = getCssVarValue('--gray-400', '#9ca3af')
+  const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="${background}"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="${foreground}" text-anchor="middle">${t('propertyCard.imageAlt')}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(placeholderSvg)}`
 })
 
@@ -290,7 +293,7 @@ const handleCardClick = () => {
 }
 
 const toggleFavorite = () => {
-  propertiesStore.toggleFavorite(props.property.listing_id)
+  propertiesStore.toggleFavorite(props.property)
 }
 
 // 处理更多操作菜单
@@ -311,7 +314,8 @@ const handleMoreAction = (command) => {
 <style scoped>
 /* 房源卡片样式 - 复用现有设计 */
 .property-card {
-  width: 580px;
+  width: 100%;
+  max-width: 580px;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
   border-radius: 6px;

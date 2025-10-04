@@ -38,3 +38,7 @@ httpx
 # Task Queue
 celery
 asyncpg
+
+PyYAML==6.0.2
+lxml
+sqlalchemy

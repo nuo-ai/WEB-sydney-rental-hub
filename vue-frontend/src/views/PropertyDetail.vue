@@ -517,7 +517,7 @@ const toggleFavorite = () => {
     propertiesStore.removeFavorite(property.value.listing_id)
     ElMessage.success('已从收藏中移除')
   } else {
-    propertiesStore.addFavorite(property.value.listing_id)
+    propertiesStore.addFavorite(property.value)
     ElMessage.success('已添加到收藏')
   }
 }
@@ -745,8 +745,10 @@ onMounted(async () => {
   // 预加载下一张图片
   if (property.value) {
     preloadNextImage()
+    propertiesStore.addHistory(property.value)
+  } else {
+    propertiesStore.logHistory(propertyId)
   }
-  propertiesStore.logHistory(propertyId)
 })
 
 onBeforeRouteLeave(() => {

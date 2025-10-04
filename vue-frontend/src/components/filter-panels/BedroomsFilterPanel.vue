@@ -349,8 +349,8 @@ const applyFilters = async () => {
 <style scoped>
 .bedrooms-filter-panel {
   width: 100%;
-  background: var(--filter-panel-bg);
-  border-radius: var(--filter-panel-radius);
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
 }
 
 /* 面板头部 */
@@ -358,77 +358,77 @@ const applyFilters = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--filter-panel-padding);
-  border-bottom: 1px solid var(--filter-panel-header-border);
+  padding: var(--panel-padding);
+  border-bottom: 1px solid var(--panel-header-border);
 }
 
 .panel-title {
-  font-size: var(--filter-panel-title-font-size);
-  font-weight: var(--filter-panel-title-font-weight);
-  color: var(--filter-panel-title-color);
+  font-size: var(--panel-title-font-size);
+  font-weight: var(--panel-title-font-weight);
+  color: var(--panel-title-color);
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--filter-close-btn-color);
+  color: var(--panel-close-color);
   cursor: pointer;
-  padding: var(--filter-close-btn-padding);
-  border-radius: var(--filter-close-btn-radius);
+  padding: var(--panel-close-padding);
+  border-radius: var(--panel-close-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
 }
 
 .close-btn:hover {
-  background: var(--filter-close-btn-hover-bg);
-  color: var(--filter-close-btn-hover-color);
+  background: var(--panel-close-hover-bg);
+  color: var(--panel-close-hover-color);
 }
 
 .spec-icon {
-  width: var(--filter-close-btn-size);
-  height: var(--filter-close-btn-size);
+  width: var(--panel-close-size);
+  height: var(--panel-close-size);
 }
 
 /* 面板内容 */
 .panel-content {
-  padding: var(--filter-space-lg); /* 使用设计令牌 */
+  padding: var(--space-md); /* 使用设计令牌 */
 }
 
 /* 筛选按钮组 */
 .filter-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .filter-btn {
-  padding: var(--filter-space-lg) var(--filter-space-xl);
-  border: 1px solid var(--filter-color-border-default);
-  border-radius: var(--filter-radius-md);
-  background: var(--filter-color-bg-primary);
-  font-size: var(--filter-font-size-md);
-  font-weight: var(--filter-font-weight-medium);
-  color: var(--filter-color-text-primary);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xs);
+  background: var(--color-bg-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition: var(--filter-transition-normal);
+  transition: var(--transition-normal);
   min-width: 60px;
 }
 
 .filter-btn:hover {
-  border-color: var(--filter-color-hover-border);
-  color: var(--filter-color-text-primary);
-  background: var(--filter-color-hover-bg);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
 }
 
 .filter-btn.active {
-  background: var(--filter-color-selected-bg);
-  border-color: var(--filter-color-selected-border);
-  color: var(--filter-color-text-primary);
-  font-weight: var(--filter-font-weight-semibold);
+  background: var(--color-selected-bg);
+  border-color: var(--color-selected-border);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* 连体分段样式：保留现有颜色/描边/填充，仅处理连体与圆角 */
@@ -480,14 +480,14 @@ const applyFilters = async () => {
 
 /* 小节标题 */
 .section {
-  margin-top: var(--filter-space-xs);
+  margin-top: var(--space-2xs);
 }
 
 .section-label {
-  font-size: var(--filter-font-size-sm);
-  color: var(--filter-color-text-secondary);
-  margin-bottom: var(--filter-space-md);
-  font-weight: var(--filter-font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 屏幕阅读器可见性辅助 */

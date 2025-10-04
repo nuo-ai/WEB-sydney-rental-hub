@@ -1298,6 +1298,8 @@ async def get_properties(
             "isFurnished", "furnished",
             "listing_id",
             "page", "page_size", "cursor", "sort",
+            # 容错：postcodes 在旧前端中可能出现，统一在映射层移除，这里仅放行以避免 400
+            "postcodes",
         }
         qp_keys = set(request.query_params.keys())
         unknown_keys = sorted(list(qp_keys - allowed_keys))
@@ -1380,20 +1382,14 @@ async def get_properties(
 
     # Add suburb filter - support multiple suburbs (comma-separated)
     if suburb:
-        # Split by comma and trim whitespace
-        suburbs = [s.strip() for s in suburb.split(',')]
-        if len(suburbs) == 1:
-            # Single suburb - use ILIKE for partial matching
-            conditions.append("suburb ILIKE %s")
-            params.append(f"%{suburbs[0]}%")
-        else:
-            # Multiple suburbs - use ILIKE with OR for case-insensitive matching
-            suburb_conditions = []
-            for sub in suburbs:
-                suburb_conditions.append("suburb ILIKE %s")
-                params.append(f"%{sub}%")
-            conditions.append(f"({' OR '.join(suburb_conditions)})")
-    
+        suburbs = [s.strip() for s in suburb.split(',') if s and s.strip()]
+        if suburbs:
+            # 去重以避免重复占位符，并使用 lower(suburb) 命中函数索引
+            unique_suburbs = list(dict.fromkeys(suburbs))
+            placeholders = ','.join(['%s'] * len(unique_suburbs))
+            conditions.append(f"LOWER(suburb) IN ({placeholders})")
+            params.extend([s.lower() for s in unique_suburbs])
+
     # Add property type filter
     if property_type:
         conditions.append("property_type ILIKE %s")
@@ -1435,14 +1431,13 @@ async def get_properties(
     
     # Add parking filter (handle comma-separated values)
     if parking:
-        parking_values = parking.split(',')
-        parking_conditions = []
+        parking_values = [v.strip() for v in parking.split(',') if v and v.strip()]
+        parking_conditions: List[str] = []
         parking_params: List[int] = []
         for value in parking_values:
-            value = value.strip()
-            if value == '2+':
+            if value.endswith('+') and value[:-1].isdigit():
                 parking_conditions.append("parking_spaces >= %s")
-                parking_params.append(2)
+                parking_params.append(int(value[:-1]))
             elif value.isdigit():
                 parking_conditions.append("parking_spaces = %s")
                 parking_params.append(int(value))

@@ -208,9 +208,9 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
-  border-bottom: 1px solid #e3e3e3;
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -221,7 +221,7 @@ onUnmounted(() => {
   height: 32px;
   border: none;
   background: none;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 18px;
   cursor: pointer;
   display: flex;
@@ -232,13 +232,13 @@ onUnmounted(() => {
 }
 
 .back-btn:hover {
-  background: #f5f5f5;
+  background: var(--surface-2);
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -255,7 +255,7 @@ onUnmounted(() => {
 .verify-icon {
   width: 80px;
   height: 80px;
-  background: #fef3c7;
+  background: var(--semantic-warning-weak);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -265,35 +265,35 @@ onUnmounted(() => {
 
 .verify-icon i {
   font-size: 40px;
-  color: #f59e0b;
+  color: var(--semantic-warning);
 }
 
 .verify-title {
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 16px;
 }
 
 .verify-description {
   font-size: 16px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 12px;
 }
 
 .email-display {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   padding: 12px 16px;
-  background: #f5f5f5;
+  background: var(--surface-2);
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
 .verify-instructions {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   line-height: 1.5;
   margin-bottom: 32px;
 }
@@ -316,7 +316,7 @@ onUnmounted(() => {
 .resend-link {
   background: none;
   border: none;
-  color: #dc2626;
+  color: var(--color-danger);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -328,13 +328,13 @@ onUnmounted(() => {
 }
 
 .resend-link:disabled {
-  color: #999;
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .divider {
   height: 1px;
-  background: #e3e3e3;
+  background: var(--color-border-default);
   margin: 32px 0;
 }
 
@@ -345,7 +345,7 @@ onUnmounted(() => {
 .help-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 12px;
 }
 
@@ -357,7 +357,7 @@ onUnmounted(() => {
 
 .help-list li {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   padding: 8px 0;
   padding-left: 20px;
   position: relative;
@@ -367,7 +367,7 @@ onUnmounted(() => {
   content: '•';
   position: absolute;
   left: 0;
-  color: #999;
+  color: var(--text-muted);
 }
 
 /* Mobile optimization */
