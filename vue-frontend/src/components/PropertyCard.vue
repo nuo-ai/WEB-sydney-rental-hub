@@ -184,8 +184,8 @@ const validImages = computed(() => {
 })
 
 const placeholderImage = computed(() => {
-  const background = getCssVarValue('--filter-color-neutral-100', '#f3f4f6')
-  const foreground = getCssVarValue('--filter-color-neutral-400', '#9ca3af')
+  const background = getCssVarValue('--color-neutral-100', '#f3f4f6')
+  const foreground = getCssVarValue('--color-neutral-400', '#9ca3af')
   const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="${background}"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="${foreground}" text-anchor="middle">${t('propertyCard.imageAlt')}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(placeholderSvg)}`
 })

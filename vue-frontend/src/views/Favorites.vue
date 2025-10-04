@@ -142,7 +142,7 @@ const handleContactProperty = (property) => {
 }
 
 .empty-icon-symbol {
-  color: var(--filter-color-neutral-300);
+  color: var(--color-neutral-300);
 }
 
 .empty-state h3 {

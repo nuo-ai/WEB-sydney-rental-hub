@@ -118,11 +118,11 @@ const handleClick = (event) => {
   padding: var(--filter-btn-padding-y) var(--filter-btn-padding-x);
   font-size: var(--filter-btn-font-size);
   font-weight: var(--filter-btn-font-weight);
-  line-height: var(--filter-line-height-normal);
+  line-height: var(--line-height-normal);
   border-radius: var(--filter-btn-radius);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--filter-transition-normal);
+  transition: var(--transition-normal);
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
@@ -176,7 +176,7 @@ const handleClick = (event) => {
 .base-button--secondary:hover:not(:disabled) {
   border-color: var(--filter-btn-secondary-hover-border);
   color: var(--filter-btn-secondary-hover-color);
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
 }
 
 .base-button--secondary:active:not(:disabled) {
@@ -186,33 +186,33 @@ const handleClick = (event) => {
 /* 幽灵按钮 */
 .base-button--ghost {
   background: transparent;
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
   border-color: transparent;
 }
 
 .base-button--ghost:hover:not(:disabled) {
-  background: var(--filter-color-hover-bg);
-  color: var(--filter-color-text-primary);
+  background: var(--color-hover-bg);
+  color: var(--color-text-primary);
 }
 
 /* 危险按钮 */
 .base-button--danger {
-  background: var(--filter-color-danger);
+  background: var(--color-danger);
   color: var(--filter-btn-primary-color);
-  border-color: var(--filter-color-danger);
+  border-color: var(--color-danger);
 }
 
 .base-button--danger:hover:not(:disabled) {
-  background: var(--filter-color-danger-hover);
-  border-color: var(--filter-color-danger-hover);
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
 }
 
 /* 按钮尺寸 */
 
 .base-button--small {
-  padding: var(--filter-space-sm) var(--filter-space-lg);
-  font-size: var(--filter-font-size-sm);
-  gap: var(--filter-space-sm);
+  padding: var(--space-xs) var(--space-lg);
+  font-size: var(--font-size-compact);
+  gap: var(--space-xs);
 }
 
 .base-button--small .base-button__loading-icon {
@@ -225,9 +225,9 @@ const handleClick = (event) => {
 }
 
 .base-button--large {
-  padding: var(--filter-space-xl) var(--filter-space-2xl);
-  font-size: var(--filter-font-size-lg);
-  gap: var(--filter-space-lg);
+  padding: var(--space-2xl) var(--space-3xl);
+  font-size: var(--font-size-md);
+  gap: var(--space-lg);
 }
 
 .base-button--large .base-button__loading-icon {
@@ -259,7 +259,7 @@ const handleClick = (event) => {
 
 /* 焦点样式 */
 .base-button:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -278,27 +278,27 @@ const handleClick = (event) => {
 @media (width <= 767px) {
   .base-button {
     padding: calc(var(--filter-btn-padding-y) + 2px) var(--filter-btn-padding-x);
-    font-size: var(--filter-font-size-md);
+    font-size: var(--font-size-sm);
   }
 
   .base-button--small {
-    padding: var(--filter-space-md) var(--filter-space-lg);
+    padding: var(--space-sm) var(--space-md);
   }
 
   .base-button--large {
-    padding: calc(var(--filter-space-xl) + 2px) var(--filter-space-2xl);
+    padding: calc(var(--space-lg) + 2px) var(--space-xl);
   }
 }
 
 /* 按钮组合样式（当多个按钮相邻时） */
 .base-button + .base-button {
-  margin-left: var(--filter-space-lg);
+  margin-left: var(--space-md);
 }
 
 /* 在 flex 容器中的按钮间距 */
 .base-button-group {
   display: flex;
-  gap: var(--filter-space-lg);
+  gap: var(--space-md);
   align-items: center;
 }
 

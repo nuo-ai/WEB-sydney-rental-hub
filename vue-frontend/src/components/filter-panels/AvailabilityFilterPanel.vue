@@ -289,8 +289,8 @@ const applyFilters = async () => {
 .date-picker-group {
   display: flex;
   align-items: center;
-  gap: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .date-picker-start,
@@ -299,9 +299,9 @@ const applyFilters = async () => {
 }
 
 .date-separator {
-  color: var(--filter-color-text-secondary);
-  margin: 0 var(--filter-space-xs);
-  font-weight: var(--filter-font-weight-medium);
+  color: var(--color-text-secondary);
+  margin: 0 var(--space-2xs);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 焦点态：中性灰细边框，移除黑色外框 */
@@ -332,11 +332,11 @@ const applyFilters = async () => {
 
 /* 日期错误提示 */
 .date-error {
-  color: var(--filter-color-danger);
-  font-size: var(--filter-font-size-md);
-  margin-top: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
-  font-weight: var(--filter-font-weight-medium);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 底部操作按钮 */

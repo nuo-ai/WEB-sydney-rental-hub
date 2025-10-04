@@ -70,9 +70,9 @@ const handleRemove = (event) => {
   color: var(--filter-chip-text);
   font-size: var(--filter-chip-font-size);
   font-weight: var(--filter-chip-font-weight);
-  line-height: var(--filter-line-height-normal);
+  line-height: var(--line-height-normal);
   max-width: 200px;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   cursor: default;
 }
 
@@ -98,7 +98,7 @@ const handleRemove = (event) => {
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   flex-shrink: 0;
 }
 
@@ -135,10 +135,10 @@ const handleRemove = (event) => {
 
 /* 变体样式 */
 .base-chip--selected {
-  background: var(--filter-color-selected-bg);
-  border-color: var(--filter-color-selected-border);
-  color: var(--filter-color-text-primary);
-  font-weight: var(--filter-font-weight-semibold);
+  background: var(--color-selected-bg);
+  border-color: var(--color-selected-border);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .base-chip--hover {
@@ -170,7 +170,7 @@ const handleRemove = (event) => {
 /* 响应式调整 */
 @media (width <= 767px) {
   .base-chip {
-    font-size: var(--filter-font-size-md); /* 移动端稍大字体 */
+    font-size: var(--font-size-sm); /* 移动端稍大字体 */
     padding: calc(var(--filter-chip-padding-y) + 1px) var(--filter-chip-padding-x);
   }
 

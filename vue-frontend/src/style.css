@@ -8,161 +8,6 @@
 /* 新增：品牌蓝色与专业中性灰阶（基础层 tokens）
    中文注释：提供统一的蓝色品牌色族与中性灰阶，作为基础令牌被全站复用。
    注意：仅新增变量，不改变现有样式的引用，保证向后兼容与可回滚。 */
-:root {
-  /* 品牌蓝色族（来源：用户提供） */
-  --blue-50: #e3f2fd;
-  --blue-100: #bbdefb;
-  --blue-200: #90caf9;
-  --blue-300: #64b5f6;
-  --blue-400: #42a5f5;
-  --blue-500: #2196f3;
-  --blue-600: #1e88e5;
-  --blue-700: #1976d2;
-  --blue-800: #1565c0;
-  --blue-900: #0d47a1;
-
-  /* 专业中性灰阶（与筛选面板灰阶保持一致，统一全站风格） */
-  --neutral-50: #f9fafb;
-  --neutral-100: #f3f4f6;
-  --neutral-200: #e5e7eb;
-  --neutral-300: #d1d5db;
-  --neutral-400: #9ca3af;
-  --neutral-500: #6b7280;
-  --neutral-600: #4b5563;
-  --neutral-700: #374151;
-  --neutral-800: #1f2937;
-  --neutral-900: #111827;
-}
-
-/* ========== JUWO品牌色彩系统 ========== */
-:root {
-  /* JUWO主品牌色替换为品牌蓝（语义别名，不改历史变量名，便于向后兼容）
-     中文注释：保持现有 --juwo-* 变量名不变，仅把值映射到新的品牌蓝色。
-     受影响的“前端表现”：主按钮/链接/导航 hover 将切换为蓝色系，其它中性样式不变。 */
-  /* 调整为更深主色：默认 800，hover/active 到 900（中文注释：更沉稳的蓝） */
-  --juwo-primary: #0057ff;
-  --juwo-primary-light: #0047e5;
-  --juwo-primary-dark: #0036b3;
-  --juwo-primary-50: var(--blue-50);
-  --juwo-primary-100: var(--blue-100);
-  --juwo-primary-500: var(--blue-500);
-  --juwo-primary-600: var(--blue-600);
-  --juwo-primary-700: var(--blue-700);
-
-  /* Element Plus主题定制（中性化 primary，保留按钮用 juwo-primary） */
-  --el-color-primary: #5b6472;
-  --el-color-primary-light-1: #6b7583;
-  --el-color-primary-light-3: #8a93a0;
-  --el-color-primary-light-5: #c7ccd3;
-  --el-color-primary-light-7: #e6e9ed;
-  --el-color-primary-light-8: #eff1f4;
-  --el-color-primary-light-9: #f7f8fa;
-  --el-color-primary-dark-2: #3c475b;
-
-  /* 从现有设计系统继承的颜色 */
-  --color-text-primary: #2d2d2d;
-  --color-text-secondary: #595959;
-  --color-text-price: var(--color-text-primary); /* deprecated alias: do not use in business code */
-  --color-border-default: #e3e3e3;
-  --color-bg-page: #f4f7f9;
-  --color-bg-card: #ffffff;
-
-  /* 专业字体系统 */
-  --font-english: 'SF Pro Text', -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-chinese:
-    'PingFang SC', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif;
-  --font-system: -apple-system, 'PingFang SC', 'Inter', sans-serif;
-
-  /* 专业间距系统 */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-
-  /* 专业阴影系统 */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-
-  /* 专业圆角系统 */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-}
-
-/* ========== 统一补充：详情页引用的设计令牌，映射到全局变量（不影响现有页面） ========== */
-:root {
-  /* 间距（对齐 Tailwind 语义，用于详情页按钮/栅格） */
-  --space-1-5: 6px; /* 0.375rem */
-  --space-3: 12px; /* 0.75rem */
-  --space-3-5: 14px; /* 0.875rem */
-  --space-4: 16px; /* 1rem */
-  --space-6: 24px; /* 1.5rem */
-
-  /* 字体与字重（详情页使用到的变量名） */
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --font-semibold: 600;
-
-  /* 背景/边框/品牌（映射到现有JUWO设计系统） */
-  --bg-base: var(--color-bg-card);
-  --bg-hover: #f7f8fa;
-  --bg-secondary: var(--juwo-primary-50);
-  --radius-full: 9999px;
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --brand-primary: var(--juwo-primary);
-
-  /* 文本与链接颜色（与全局一致） */
-  --text-primary: var(--color-text-primary);
-  --text-tertiary: #8b8f97;
-  /* 链接默认更浅一档以保证可读性层级 */
-  --link-color: #0057ff;
-  --link-hover-color: #0047e5;
-
-  /* 输入框后缀定位令牌（统一管理） */
-  --search-suffix-right: 12px; /* 图标距输入框右边界 */
-  --search-suffix-hit: 32px; /* 命中区域尺寸，必要时可收紧为 24–28px */
-
-  /* Chip 中性化令牌（全站复用） */
-  --chip-bg: #f7f8fa;
-  --chip-bg-hover: #eef1f4;
-  --chip-bg-selected: #e9eef2;
-
-  /* 叠加遮罩令牌（统一管理透明度） */
-  --overlay-light-90: rgba(255, 255, 255, 0.9);
-  --overlay-dark-75: rgba(0, 0, 0, 0.75);
-
-  /* 新增：通用弱底与弱文本令牌（中文注释：替代零散 #f5f5f5/#f0f2f5/#e8e8e8/#999；不改旧值，确保向后兼容） */
-  --surface-2: #f5f5f5;
-  --surface-3: #f0f2f5;
-  --surface-4: #e8e8e8;
-  --text-muted: #999999;
-}
-
-:root {
-  /* 语义状态与品牌补充令牌（仅新增，不影响现有样式；用于替换历史硬编码）
-     前端表现：错误/警告/成功/收藏/社交色统一来源，方便全站联动 */
-  --semantic-danger: #dc2626;
-  --semantic-danger-hover: #b91c1c;
-
-  --semantic-warning: #f59e0b;
-  --semantic-warning-weak: #fff3cd;
-
-  --semantic-success: #6fc168;
-
-  --semantic-favorite: #ffd700;
-  --semantic-favorite-hover: #ffed4e;
-
-  --brand-google: #ea4335;
-  --brand-facebook: #1877f2;
-}
-
 /* ========== 全局重置样式 ========== */
 * {
   box-sizing: border-box;
@@ -630,11 +475,6 @@ body {
    范围：nav/header nav/.nav/.navbar/.navigation/.top-nav/.bottom-nav/[class*="nav"] 内的链接，不影响按钮/表单
    说明：使用更高选择器特异性 + !important，安全覆盖 Element Plus 的灰底/描边护栏
 */
-:root {
-  /* 导航 hover 颜色令牌，使用品牌橙 */
-  --nav-hover-color: var(--juwo-primary);
-}
-
 /* 基础链接规范（仅在导航容器中生效） */
 nav a,
 header nav a,
@@ -755,36 +595,6 @@ header nav .el-menu-item:hover,
   font-size: 48px;
   color: var(--color-border-default);
   margin-bottom: 16px;
-}
-
-/* ========== 新增：刻度令牌（声明性，零侵入；后续渐进替换使用） ========== */
-:root {
-  /* 边框宽度刻度（统一 1px/2px 使用语义引用） */
-  --border-width-1: 1px;
-  --border-width-2: 2px;
-
-  /* 层级刻度（避免浮层与导航/下拉抢层级） */
-  --z-search: 50;
-  --z-nav: 60;
-  --z-dropdown: 70;
-  --z-modal: 100;
-  --z-toast: 110;
-
-  /* 图标尺寸刻度（集中管理不同区域图标比例） */
-  --icon-16: 16px;
-  --icon-18: 18px;
-  --icon-20: 20px;
-  --icon-24: 24px;
-}
-
-/* ===== Element Plus 滚动指示器中性化（全局） =====
-   目的：移除非CTA处的品牌色渗透（如滚动条/指示器出现橙色），统一为中性灰
-   原则：仅样式层覆盖，不改动逻辑；全站可复用；必要时可在组件内再做 :deep 兜底
-   溯源：activeContext｜UI-NAV-GLOBAL-RULES（二次中性化）
-*/
-:root {
-  --neutral-scrollbar-color: #c0c4cc;
-  --neutral-scrollbar-hover-color: #909399;
 }
 
 /* 原生 WebKit 滚动条（全站） */
@@ -917,13 +727,6 @@ header nav .el-menu-item:hover,
    - 可选：对极少数按钮允许 .focus-visible-ring 强制启用灰 ring
    溯源：activeContext｜UI-NAV-GLOBAL-RULES & 本次“全站统一焦点策略”
 */
-
-/* 令牌：焦点 ring 风格（可按品牌调整） */
-:root {
-  --focus-ring-color: rgba(0, 0, 0, 0.25);
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px; /* 目前未使用，如需 offset 可改为 box-shadow 双层实现 */
-}
 
 /* 1) 重置 UA outline（所有可聚焦元素） */
 :where(a, button, [role='button'], input, select, textarea, [tabindex]):focus {
@@ -1188,11 +991,6 @@ header nav .el-menu-item:hover,
    3) 改动均为样式层，最小diff，可随时回滚
 */
 
-/* 补充强边框色变量（中性） */
-:root {
-  --color-border-strong: #c7ccd3;
-}
-
 /* Element Plus 输入/选择/日期等控件：圆角收紧 + 聚焦中性化 */
 .el-input__wrapper {
   border-radius: 2px !important;
@@ -1387,20 +1185,6 @@ header nav .el-menu-item:hover,
   box-shadow: 0 0 0 1px var(--color-border-default) !important;
 }
 
-/* ===== Filter Field · Unified Tokens =====
-   说明：统一筛选输入尺寸/间距/字体与后缀命中区，避免逐面板打补丁
-*/
-:root {
-  --filter-field-height-pc: 40px;
-  --filter-field-height-mob: 44px;
-  --filter-field-font-pc: 14px;
-  --filter-field-font-mob: 16px; /* iOS 防缩放阈值 */
-  --filter-field-padding-x: 12px;
-  --filter-suffix-right: 12px; /* 若未定义则回退到 --search-suffix-right */
-  --filter-suffix-hit: 28px; /* 若未定义则回退到 --search-suffix-hit */
-  --date-field-min-ch: 12ch; /* YYYY-MM-DD 10ch 留余量，避免挤压 */
-}
-
 /* 仅在筛选面板作用域统一：PC 分离式 & 移动端全屏 */
 .filter-dropdown-container .filter-field :deep(.el-input__wrapper),
 .domain-filter-panel .filter-field :deep(.el-input__wrapper) {
@@ -1501,14 +1285,6 @@ header nav .el-menu-item:hover,
 .english-text {
   font-family: var(--font-english);
   letter-spacing: -0.01em;
-}
-
-:root {
-  --spec-icon-size: 24px;
-  --spec-text-size: 16px;
-  --spec-line-height: 24px;
-  --spec-icon-gap: 6px;
-  --spec-item-gap: 10px;
 }
 
 /* 房型规格统一样式（bed/bath/car） */

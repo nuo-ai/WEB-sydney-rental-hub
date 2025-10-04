@@ -1086,7 +1086,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--filter-space-2xl) var(--filter-space-3xl);
+  padding: var(--space-xl) var(--space-2xl);
   border-bottom: 1px solid var(--filter-panel-header-border);
   background: var(--filter-panel-bg);
 }
@@ -1096,13 +1096,13 @@ onMounted(() => {
   font-weight: var(--filter-panel-title-font-weight);
   color: var(--filter-panel-title-color);
   margin: 0;
-  line-height: var(--filter-line-height-tight);
+  line-height: var(--line-height-tight);
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--filter-space-xl);
+  gap: var(--space-lg);
 }
 
 .reset-link {
@@ -1115,7 +1115,7 @@ onMounted(() => {
   text-decoration: underline;
   padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
   border-radius: var(--filter-action-link-radius);
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
 
   /* 移动端触摸目标 */
   min-height: 32px;
@@ -1136,7 +1136,7 @@ onMounted(() => {
   cursor: pointer;
   padding: var(--filter-close-btn-padding);
   border-radius: var(--filter-close-btn-radius);
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   width: var(--filter-close-btn-size);
   height: var(--filter-close-btn-size);
   display: inline-flex;
@@ -1154,7 +1154,7 @@ onMounted(() => {
 }
 
 .close-btn:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 
@@ -1202,7 +1202,7 @@ onMounted(() => {
 }
 
 .price-slider :deep(.el-slider__runway) {
-  background-color: var(--filter-color-neutral-200);
+  background-color: var(--color-neutral-200);
   height: 6px;
 }
 
@@ -1213,7 +1213,7 @@ onMounted(() => {
 
 .price-slider :deep(.el-slider__button) {
   border: 3px solid var(--color-border-strong);
-  background-color: var(--filter-color-bg-primary);
+  background-color: var(--color-bg-primary);
   width: 20px;
   height: 20px;
 }
@@ -1226,26 +1226,26 @@ onMounted(() => {
 .filter-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--filter-space-lg);
+  gap: var(--space-md);
 }
 
 /* 移动端按钮组 */
 @media (width <= 767px) {
   .filter-buttons-group {
-    gap: var(--filter-space-md);
+    gap: var(--space-sm);
   }
 }
 
 .filter-btn {
   padding: var(--filter-btn-padding-y) var(--filter-btn-padding-x);
-  border: 1px solid var(--filter-color-border-default);
-  border-radius: var(--filter-radius-lg);
-  background: var(--filter-color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-compact-lg);
+  background: var(--color-bg-primary);
   font-size: var(--filter-btn-font-size);
   font-weight: var(--filter-btn-font-weight);
-  color: var(--filter-color-text-primary);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition: var(--filter-transition-normal);
+  transition: var(--transition-normal);
   min-width: 60px;
 
   /* 移动端触摸目标优化 */
@@ -1256,16 +1256,16 @@ onMounted(() => {
 }
 
 .filter-btn:hover {
-  border-color: var(--filter-color-hover-border);
-  color: var(--filter-color-text-primary);
-  background: var(--filter-color-hover-bg);
+  border-color: var(--color-hover-border);
+  color: var(--color-text-primary);
+  background: var(--color-hover-bg);
 }
 
 .filter-btn.active {
-  background: var(--filter-color-selected-bg);
-  border-color: var(--filter-color-selected-border);
-  color: var(--filter-color-text-primary);
-  font-weight: var(--filter-font-weight-semibold);
+  background: var(--color-selected-bg);
+  border-color: var(--color-selected-border);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* 连体分段样式：保留现有颜色/描边/填充，仅处理连体与圆角 */
@@ -1306,7 +1306,7 @@ onMounted(() => {
 @media (width <= 767px) {
   .filter-btn {
     padding: 14px var(--filter-btn-padding-x);
-    font-size: var(--filter-font-size-md);
+    font-size: var(--font-size-sm);
     min-width: 64px;
     min-height: 48px; /* 更大的触摸目标 */
   }
@@ -1362,7 +1362,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: var(--filter-color-bg-muted);
+  background: var(--color-bg-muted);
   border: 1px solid var(--color-border-default);
   border-radius: 8px;
 }
@@ -1400,11 +1400,11 @@ onMounted(() => {
 .cancel-btn:hover {
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
 }
 
 .cancel-btn:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 
@@ -1422,7 +1422,7 @@ onMounted(() => {
 }
 
 .apply-btn:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 
@@ -1439,18 +1439,18 @@ onMounted(() => {
 /* 移动端底部按钮优化 */
 @media (width <= 767px) {
   .panel-footer {
-    padding: var(--filter-space-2xl);
+    padding: var(--space-xl);
 
     /* 为 iOS 底部 Home Bar 预留安全区，确保按钮不被遮挡 */
-    padding-bottom: calc(var(--filter-space-2xl) + env(safe-area-inset-bottom));
-    gap: var(--filter-space-lg);
+    padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
+    gap: var(--space-md);
   }
 
   .cancel-btn,
   .apply-btn {
     min-height: 52px; /* 移动端更大的触摸目标 */
-    font-size: var(--filter-font-size-lg);
-    font-weight: var(--filter-font-weight-semibold);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
   }
 }
 
@@ -1459,7 +1459,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: var(--filter-space-md);
+  gap: var(--space-sm);
   /* 新增：白底容器外观 */
   background: var(--color-bg-card);
   border: 1px solid var(--color-border-default);
@@ -1480,7 +1480,7 @@ onMounted(() => {
   font-size: var(--filter-chip-font-size);
   font-weight: var(--filter-chip-font-weight);
   max-width: 160px;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
 
   /* 移动端触摸优化 */
   min-height: 32px;
@@ -1521,7 +1521,7 @@ onMounted(() => {
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   flex-shrink: 0;
 
   /* 移动端触摸目标优化 */
@@ -1545,7 +1545,7 @@ onMounted(() => {
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   box-shadow: none !important;
   -webkit-appearance: none;
   appearance: none;
@@ -1582,9 +1582,9 @@ onMounted(() => {
 }
 
 .location-actions {
-  margin-top: var(--filter-space-sm);
+  margin-top: var(--space-xs);
   display: flex;
-  gap: var(--filter-space-lg);
+  gap: var(--space-md);
   align-items: center;
 }
 
@@ -1599,7 +1599,7 @@ onMounted(() => {
   cursor: pointer;
   padding: var(--filter-action-link-padding-y) var(--filter-action-link-padding-x);
   border-radius: var(--filter-action-link-radius);
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
 
   /* 移动端触摸目标 */
   min-height: 32px;
@@ -1615,7 +1615,7 @@ onMounted(() => {
 }
 
 .nearby-toggle {
-  margin-top: var(--filter-space-lg);
+  margin-top: var(--space-md);
 }
 
 /* Location 空态提示 - 使用设计令牌 */
@@ -1623,7 +1623,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--filter-space-md);
+  gap: var(--space-sm);
   border: 1px solid var(--filter-empty-border);
   background: var(--filter-empty-bg);
   border-radius: var(--filter-empty-radius);
@@ -1635,7 +1635,7 @@ onMounted(() => {
   font-size: var(--filter-empty-font-size);
   font-weight: var(--filter-empty-font-weight);
   color: var(--filter-empty-text-color);
-  line-height: var(--filter-line-height-normal);
+  line-height: var(--line-height-normal);
 }
 
 /* 移动端Location区域优化 */
@@ -1643,7 +1643,7 @@ onMounted(() => {
   .location-section .location-list {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--filter-space-sm);
+    gap: var(--space-xs);
     /* 移动端：更紧凑的内边距与圆角 */
     padding: 8px;
     border-radius: 6px;
@@ -1652,7 +1652,7 @@ onMounted(() => {
   .location-chip {
     padding: calc(var(--filter-chip-padding-y) + 2px) var(--filter-chip-padding-x);
     min-height: 36px;
-    font-size: var(--filter-font-size-md);
+    font-size: var(--font-size-sm);
   }
 
   .location-chip .chip-remove {
@@ -1672,13 +1672,13 @@ onMounted(() => {
   .location-actions {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--filter-space-sm);
+    gap: var(--space-xs);
   }
 
   .clear-all,
   .toggle-chips {
     min-height: 36px;
-    padding: var(--filter-space-sm) var(--filter-space-md);
+    padding: var(--space-xs) var(--space-sm);
   }
 }
 

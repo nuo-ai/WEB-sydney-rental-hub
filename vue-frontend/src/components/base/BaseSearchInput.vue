@@ -214,17 +214,17 @@ defineExpose({
   padding: var(--filter-search-padding-y) var(--filter-search-padding-x)
     var(--filter-search-padding-y) var(--filter-search-padding-left);
   font-size: var(--filter-search-font-size);
-  color: var(--filter-color-text-primary);
-  background: var(--filter-color-bg-primary);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
   border: 1px solid var(--filter-search-border);
   border-radius: var(--filter-search-radius);
   outline: none;
-  transition: var(--filter-transition-normal);
-  line-height: var(--filter-line-height-normal);
+  transition: var(--transition-normal);
+  line-height: var(--line-height-normal);
 }
 
 .base-search-input__field::placeholder {
-  color: var(--filter-color-text-muted);
+  color: var(--color-text-muted);
 }
 
 .base-search-input__field:focus {
@@ -237,8 +237,8 @@ defineExpose({
 }
 
 .base-search-input__field:disabled {
-  background: var(--filter-color-bg-muted);
-  color: var(--filter-color-text-muted);
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
@@ -247,14 +247,14 @@ defineExpose({
   right: var(--filter-clear-btn-right);
   background: none;
   border: none;
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
   cursor: pointer;
   padding: var(--filter-clear-btn-padding);
   border-radius: var(--filter-clear-btn-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   width: var(--filter-clear-btn-size);
   height: var(--filter-clear-btn-size);
 }
@@ -266,11 +266,11 @@ defineExpose({
 
 .base-search-input__clear:hover {
   background: var(--filter-clear-btn-hover-bg);
-  color: var(--filter-color-text-primary);
+  color: var(--color-text-primary);
 }
 
 .base-search-input__clear:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 

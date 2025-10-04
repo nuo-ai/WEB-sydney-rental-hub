@@ -291,13 +291,13 @@ const handleFacebookAuth = () => {
   font-weight: 600;
   border-radius: 8px;
   margin-top: 24px;
-  background: var(--filter-color-danger) !important;
-  border-color: var(--filter-color-danger) !important;
+  background: var(--color-danger) !important;
+  border-color: var(--color-danger) !important;
 }
 
 .submit-btn:hover {
-  background: var(--filter-color-danger-hover) !important;
-  border-color: var(--filter-color-danger-hover) !important;
+  background: var(--color-danger-hover) !important;
+  border-color: var(--color-danger-hover) !important;
 }
 
 .switch-mode {
@@ -308,7 +308,7 @@ const handleFacebookAuth = () => {
 }
 
 .switch-link {
-  color: var(--filter-color-danger);
+  color: var(--color-danger);
   cursor: pointer;
   font-weight: 600;
   margin-left: 4px;
@@ -368,7 +368,7 @@ const handleFacebookAuth = () => {
 
 .social-btn:hover {
   background: var(--surface-2);
-  border-color: var(--filter-color-border-strong);
+  border-color: var(--color-border-strong);
 }
 
 .social-btn i {

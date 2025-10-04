@@ -192,7 +192,7 @@ const apply = async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
 }
 
 .close-btn:hover {
@@ -213,14 +213,14 @@ const apply = async () => {
 .form-row {
   display: flex;
   flex-direction: column;
-  gap: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .form-label {
-  font-size: var(--filter-font-size-sm);
-  color: var(--filter-color-text-secondary);
-  font-weight: var(--filter-font-weight-medium);
+  font-size: var(--font-size-compact);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 /* 底部操作 */
