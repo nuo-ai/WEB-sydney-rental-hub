@@ -17,6 +17,11 @@ export default {
     priceTBA: '价格待定',
     availableDateLabel: '空出日期',
     inspectionTimeLabel: '开放时间',
+    availableNow: '立即入住',
+    availableDateFormat: '{year}年{month}月{day}日',
+    shareCopied: '链接已复制到剪贴板',
+    hideSuccess: '已从搜索结果中移除',
+    unknownAddress: '地址未知',
   },
   propertyDetail: {
     photos: '照片',
