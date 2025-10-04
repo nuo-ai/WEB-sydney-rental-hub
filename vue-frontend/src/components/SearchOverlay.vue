@@ -355,7 +355,7 @@ watch(
   position: fixed;
   inset: 0;
   z-index: 10050;
-  background: var(--filter-panel-bg, var(--filter-color-bg-primary));
+  background: var(--filter-panel-bg, var(--color-bg-primary));
   display: flex;
   flex-direction: column;
   height: 100dvh; /* 可见视口高度，适配 iOS */
@@ -371,8 +371,8 @@ watch(
   align-items: center;
   gap: 8px;
   padding: 12px 12px calc(12px + env(safe-area-inset-top, 0px));
-  border-bottom: 1px solid var(--filter-color-border-default);
-  background: var(--filter-color-bg-primary);
+  border-bottom: 1px solid var(--color-border-default);
+  background: var(--color-bg-primary);
   z-index: 1;
 }
 
@@ -389,7 +389,7 @@ watch(
 }
 
 .icon-btn:active {
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
 }
 
 .spec-icon {
@@ -403,8 +403,8 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--filter-color-bg-primary);
-  border: 1px solid var(--filter-color-border-default);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
   border-radius: 8px;
   padding: 0 8px;
 }
@@ -427,7 +427,7 @@ watch(
 }
 
 .filter-text-btn:active {
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
 }
 
 .search-prefix {
@@ -450,10 +450,10 @@ watch(
 .chips-row {
   display: flex;
   gap: var(--filter-chip-gap);
-  padding: var(--filter-space-md) var(--filter-space-lg);
+  padding: var(--space-sm) var(--space-md);
   overflow-x: auto;
-  border-bottom: 1px solid var(--filter-color-border-default);
-  background: var(--filter-color-bg-primary);
+  border-bottom: 1px solid var(--color-border-default);
+  background: var(--color-bg-primary);
 }
 
 /* 活动 chip 的"输入光标"效果 */
@@ -488,7 +488,7 @@ watch(
   padding: 12px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
   background: var(--filter-group-title-bg);
   border-bottom: 1px solid var(--filter-group-title-border);
   letter-spacing: 0.5px;
@@ -498,7 +498,7 @@ watch(
 .title-icon {
   width: 14px;
   height: 14px;
-  color: var(--filter-color-text-muted);
+  color: var(--color-text-muted);
 }
 
 .pill {
@@ -507,10 +507,10 @@ watch(
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid var(--filter-color-border-default);
+  border: 1px solid var(--color-border-default);
   border-radius: 999px;
-  background: var(--filter-color-bg-primary);
-  color: var(--filter-color-text-secondary);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
 }
 
 .pill.selected {
@@ -538,7 +538,7 @@ watch(
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid var(--filter-color-border-subtle);
+  border: 2px solid var(--color-border-subtle);
   border-top-color: var(--juwo-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -564,37 +564,37 @@ watch(
 }
 
 .search-overlay {
-  background: var(--filter-panel-bg, var(--filter-color-bg-primary));
+  background: var(--filter-panel-bg, var(--color-bg-primary));
 }
 
 /* 头部与输入区 */
 .overlay-header {
-  gap: var(--filter-space-md);
-  padding: var(--filter-space-lg) var(--filter-space-lg)
-    calc(var(--filter-space-lg) + env(safe-area-inset-top, 0px));
-  border-bottom: 1px solid var(--filter-color-border-default);
-  background: var(--filter-color-bg-primary);
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md)
+    calc(var(--space-md) + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--color-border-default);
+  background: var(--color-bg-primary);
 }
 
 .icon-btn {
-  color: var(--filter-color-text-secondary);
-  border-radius: var(--filter-radius-lg);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-compact-lg);
 }
 
 .icon-btn:active {
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
 }
 
 .header-input {
-  background: var(--filter-color-bg-primary);
-  border: 1px solid var(--filter-color-border-default);
-  border-radius: var(--filter-radius-xl);
-  padding: 0 var(--filter-space-md);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-compact-xl);
+  padding: 0 var(--space-sm);
 }
 
 .header-actions {
-  margin-left: var(--filter-space-md);
-  gap: var(--filter-space-md);
+  margin-left: var(--space-sm);
+  gap: var(--space-sm);
 }
 
 .filter-text-btn {
@@ -602,20 +602,20 @@ watch(
 }
 
 .filter-text-btn:active {
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
 }
 
 .search-prefix {
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .input {
-  color: var(--filter-color-text-primary);
+  color: var(--color-text-primary);
 }
 
 /* 内容区与分组标题 */
 .overlay-content {
-  padding-bottom: calc(var(--filter-space-lg) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
 }
 
 .section-title {
@@ -628,24 +628,24 @@ watch(
 }
 
 .title-icon {
-  color: var(--filter-color-text-muted);
+  color: var(--color-text-muted);
 }
 
 /* 操作徽标与空/加载态 */
 .pill {
-  border: 1px solid var(--filter-color-border-default);
-  color: var(--filter-color-text-secondary);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
 }
 
 .loading,
 .empty {
-  padding: var(--filter-space-xl);
-  font-size: var(--filter-font-size-sm);
-  color: var(--filter-color-text-secondary);
+  padding: var(--space-lg);
+  font-size: var(--font-size-compact);
+  color: var(--color-text-secondary);
 }
 
 .spinner {
-  border: 2px solid var(--filter-color-border-subtle);
+  border: 2px solid var(--color-border-subtle);
   border-top-color: var(--juwo-primary);
 }
 </style>

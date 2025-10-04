@@ -486,7 +486,7 @@ const applyFilters = async () => {
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
   box-shadow: none !important;
   -webkit-appearance: none;
   appearance: none;

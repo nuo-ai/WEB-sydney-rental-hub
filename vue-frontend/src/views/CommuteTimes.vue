@@ -525,13 +525,13 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all var(--filter-transition-normal); /* 中文注释：统一过渡令牌 */
+  transition: all var(--transition-normal); /* 中文注释：统一过渡令牌 */
   margin-top: auto;
 }
 
 .add-location-btn:hover {
   /* 中文注释：悬浮态使用统一弱底与加深描边/文字，避免危险色误导 */
-  background: var(--filter-color-hover-bg);
+  background: var(--color-hover-bg);
   border-color: var(--filter-btn-secondary-hover-border);
   color: var(--filter-btn-secondary-hover-color);
 }

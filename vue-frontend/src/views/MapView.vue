@@ -82,7 +82,7 @@ const goToHome = () => {
 }
 
 .placeholder-icon {
-  color: var(--filter-color-neutral-300);
+  color: var(--color-neutral-300);
 }
 
 .placeholder-content h3 {

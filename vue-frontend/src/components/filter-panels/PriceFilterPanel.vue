@@ -305,7 +305,7 @@ const applyFilters = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--filter-transition-fast);
+  transition: var(--transition-fast);
 }
 
 .close-btn:hover {
@@ -325,13 +325,13 @@ const applyFilters = async () => {
 
 /* 价格范围标题 */
 .price-range-header {
-  margin-bottom: var(--filter-space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .price-range-title {
-  font-size: var(--filter-font-size-md);
-  font-weight: var(--filter-font-weight-semibold);
-  color: var(--filter-color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -339,22 +339,22 @@ const applyFilters = async () => {
 .price-selectors-horizontal {
   display: flex;
   align-items: flex-end;
-  gap: var(--filter-space-md);
-  margin-bottom: var(--filter-space-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .price-selector-group {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--filter-space-sm);
+  gap: var(--space-xs);
 }
 
 .selector-label {
-  font-size: var(--filter-font-size-sm);
-  font-weight: var(--filter-font-weight-medium);
-  color: var(--filter-color-text-secondary);
-  margin-bottom: var(--filter-space-xs);
+  font-size: var(--font-size-compact);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2xs);
 }
 
 .price-select {
@@ -363,11 +363,11 @@ const applyFilters = async () => {
 
 /* 价格分隔符 */
 .price-separator {
-  color: var(--filter-color-text-secondary);
-  font-size: var(--filter-font-size-md);
-  font-weight: var(--filter-font-weight-medium);
-  padding: 0 var(--filter-space-xs);
-  margin-bottom: var(--filter-space-xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: 0 var(--space-2xs);
+  margin-bottom: var(--space-2xs);
   display: flex;
   align-items: center;
   height: 40px; /* 与下拉框高度对齐 */
@@ -375,14 +375,14 @@ const applyFilters = async () => {
 
 /* Element Plus 下拉选择器样式定制 */
 .price-select :deep(.el-input__wrapper) {
-  border: 1px solid var(--filter-color-border-default);
-  border-radius: var(--filter-radius-md);
-  background: var(--filter-color-bg-primary);
-  transition: var(--filter-transition-normal);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-compact-md);
+  background: var(--color-bg-primary);
+  transition: var(--transition-normal);
 }
 
 .price-select :deep(.el-input__wrapper:hover) {
-  border-color: var(--filter-color-hover-border);
+  border-color: var(--color-hover-border);
 }
 
 .price-select :deep(.el-input__wrapper.is-focus) {
@@ -391,27 +391,27 @@ const applyFilters = async () => {
 }
 
 .price-select :deep(.el-input__inner) {
-  color: var(--filter-color-text-primary);
-  font-size: var(--filter-font-size-md);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .price-select :deep(.el-input__inner::placeholder) {
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 /* 价格显示区域 */
 .price-display {
-  margin: var(--filter-space-md) 0;
-  padding: var(--filter-space-md);
-  background: var(--filter-color-bg-secondary);
-  border-radius: var(--filter-radius-md);
-  border: 1px solid var(--filter-color-border-default);
+  margin: var(--space-sm) 0;
+  padding: var(--space-sm);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-compact-md);
+  border: 1px solid var(--color-border-default);
 }
 
 .price-range-text {
-  font-size: var(--filter-font-size-md);
-  font-weight: var(--filter-font-weight-medium);
-  color: var(--filter-color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
 }
 
 /* sr-only 用于无障碍播报 */

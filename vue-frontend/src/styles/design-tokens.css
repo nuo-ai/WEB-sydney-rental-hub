@@ -1,348 +1,682 @@
 /**
- * 设计令牌系统 - Sydney Rental Hub
- * 基于区域筛选面板现代化设计的成功模式提取
+ * Sydney Rental Hub · Design Tokens
  *
- * 设计原则：
- * - 中性灰色调，避免过度品牌化
- * - 微妙的圆角 (4-6px)，现代但不过分
- * - 一致的间距系统
- * - 清晰的层次结构
+ * 本文件是设计系统的「单一事实来源」。所有令牌按三层结构组织：
+ *  - Tier 1 原始令牌：物理值（色值/尺寸/半径/阴影/动效等），不含业务语义。
+ *  - Tier 2 语义令牌：引用原始令牌，承载品牌与通用语义，供产品/页面直接使用。
+ *  - Tier 3 组件令牌：针对特定组件的样式钩子，仅引用语义令牌或其它组件令牌。
+ *
+ * 规范约定：
+ *  - 不在其它文件重新定义设计令牌；如需新增，请在此文件扩展。
+ *  - 语义层命名采用 `--color-*`、`--space-*`、`--radius-*`、`--shadow-*` 等统一前缀。
+ *  - 组件层保留历史命名（如 --filter-chip-*），便于平滑迁移。
  */
 
 :root {
-  /* ========== 颜色系统 ========== */
+  /* ------------------------------------------------------------------ */
+  /* Tier 1 · Primitive Tokens (原始令牌：物理值)                       */
+  /* ------------------------------------------------------------------ */
 
-  /* 中性灰色调 - 主要用于筛选面板 */
-  --filter-color-neutral-50: #f9fafb;
-  --filter-color-neutral-100: #f3f4f6;
-  --filter-color-neutral-200: #e5e7eb;
-  --filter-color-neutral-300: #d1d5db;
-  --filter-color-neutral-400: #9ca3af;
-  --filter-color-neutral-500: #6b7280;
-  --filter-color-neutral-600: #4b5563;
-  --filter-color-neutral-700: #374151;
-  --filter-color-neutral-800: #1f2937;
-  --filter-color-neutral-900: #111827;
+  /* 灰阶基线 */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-250: #e3e3e3;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-850: #2d2d2d;
+  --gray-900: #111827;
+  --gray-tertiary: #8b8f97;
+  --gray-muted: #999999;
 
-  /* 语义化颜色 */
-  --filter-color-bg-primary: #ffffff;
-  --filter-color-bg-secondary: var(--filter-color-neutral-50);
-  --filter-color-bg-muted: var(--filter-color-neutral-100);
+  /* 品牌蓝色阶 */
+  --blue-50: #e3f2fd;
+  --blue-100: #bbdefb;
+  --blue-200: #90caf9;
+  --blue-300: #64b5f6;
+  --blue-400: #42a5f5;
+  --blue-500: #2196f3;
+  --blue-600: #1e88e5;
+  --blue-700: #1976d2;
+  --blue-800: #1565c0;
+  --blue-900: #0d47a1;
 
-  --filter-color-text-primary: var(--filter-color-neutral-800);
-  --filter-color-text-secondary: var(--filter-color-neutral-500);
-  --filter-color-text-muted: var(--filter-color-neutral-400);
+  /* Element Plus 主题原始值 */
+  --slate-700: #3c475b;
+  --slate-600: #5b6472;
+  --slate-550: #6b7583;
+  --slate-500: #8a93a0;
+  --slate-400: #c7ccd3;
+  --slate-300: #e6e9ed;
+  --slate-250: #eff1f4;
+  --slate-200: #f7f8fa;
 
-  --filter-color-border-default: var(--filter-color-neutral-300);
-  --filter-color-border-strong: var(--filter-color-neutral-400);
-  --filter-color-border-subtle: var(--filter-color-neutral-200);
+  /* Juwo 品牌主色物理值 */
+  --brand-juwo-600: #0057ff;
+  --brand-juwo-500: #0047e5;
+  --brand-juwo-700: #0036b3;
 
-  /* 交互状态颜色 */
-  --filter-color-hover-bg: var(--filter-color-neutral-50);
-  --filter-color-hover-border: var(--filter-color-neutral-400);
-  --filter-color-focus-ring: rgba(107, 114, 128, 0.1);
-  --filter-color-selected-bg: var(--filter-color-neutral-100);
-  --filter-color-selected-border: var(--filter-color-neutral-300);
+  /* 反馈色与附加色值 */
+  --red-500: #dc2626;
+  --red-600: #b91c1c;
+  --amber-500: #f59e0b;
+  --amber-soft-bg: #fffbeb;
+  --amber-soft-border: #fde68a;
+  --green-500: #16a34a;
+  --green-soft-bg: #ecfdf5;
+  --green-soft-border: #bbf7d0;
+  --sky-500: #0ea5e9;
+  --sky-soft-bg: #f0f9ff;
+  --sky-soft-border: #bae6fd;
+  --lime-400: #6fc168;
+  --gold-400: #ffd700;
+  --gold-300: #ffed4e;
+  --google-red: #ea4335;
+  --facebook-blue: #1877f2;
 
-  /* 危险/移除操作颜色 */
-  --filter-color-danger: #dc2626;
-  --filter-color-danger-hover: #b91c1c;
+  /* 表面/覆盖层物理值 */
+  --surface-page: #f4f7f9;
+  --surface-hover: #f7f8fa;
+  --surface-chip-hover: #eef1f4;
+  --surface-chip-selected: #e9eef2;
+  --surface-2: #f5f5f5;
+  --surface-3: #f0f2f5;
+  --surface-4: #e8e8e8;
+  --overlay-white-90: rgba(255, 255, 255, 0.9);
+  --overlay-black-75: rgba(0, 0, 0, 0.75);
 
-  /* ========== 间距系统 ========== */
+  /* 其它原始颜色 */
+  --white: #ffffff;
+  --black: #000000;
+  --focus-ring-soft: rgba(107, 114, 128, 0.1);
 
-  --filter-space-xs: 4px;
-  --filter-space-sm: 6px;
-  --filter-space-md: 8px;
-  --filter-space-lg: 12px;
-  --filter-space-xl: 16px;
-  --filter-space-2xl: 20px;
-  --filter-space-3xl: 24px;
+  /* 尺寸刻度（px） */
+  --size-0: 0px;
+  --size-2: 2px;
+  --size-3: 3px;
+  --size-4: 4px;
+  --size-6: 6px;
+  --size-8: 8px;
+  --size-10: 10px;
+  --size-12: 12px;
+  --size-14: 14px;
+  --size-16: 16px;
+  --size-18: 18px;
+  --size-20: 20px;
+  --size-22: 22px;
+  --size-24: 24px;
+  --size-28: 28px;
+  --size-32: 32px;
+  --size-36: 36px;
+  --size-40: 40px;
+  --size-44: 44px;
+  --size-48: 48px;
+  --size-56: 56px;
 
-  /* ========== 圆角系统 ========== */
+  /* 字体刻度 */
+  --font-size-11: 11px;
+  --font-size-12: 12px;
+  --font-size-13: 13px;
+  --font-size-14: 14px;
+  --font-size-15: 15px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-22: 22px;
+  --font-size-24: 24px;
+  --font-size-32: 32px;
+  --font-size-40: 40px;
 
-  --filter-radius-none: 0;
-  --filter-radius-sm: 2px;
-  --filter-radius-md: 4px;
-  --filter-radius-lg: 6px;
-  --filter-radius-xl: 8px;
+  --font-weight-400: 400;
+  --font-weight-500: 500;
+  --font-weight-600: 600;
+  --font-weight-700: 700;
 
-  /* ========== 字体系统 ========== */
+  --line-height-120: 1.2;
+  --line-height-130: 1.3;
+  --line-height-140: 1.4;
+  --line-height-160: 1.6;
+  --line-height-180: 1.8;
 
-  --filter-font-size-xs: 11px;
-  --filter-font-size-sm: 13px;
-  --filter-font-size-md: 14px;
-  --filter-font-size-lg: 16px;
-  --filter-font-size-xl: 18px;
+  --font-family-zh-base: 'PingFang SC', 'Noto Sans SC', 'Source Han Sans SC',
+    'Microsoft YaHei', system-ui, sans-serif;
+  --font-family-en-base: 'Inter', 'SF Pro Text', 'Segoe UI', Roboto, system-ui,
+    sans-serif;
+  --font-family-system-base: -apple-system, 'PingFang SC', 'Inter', sans-serif;
+  --font-variant-tabular: tabular-nums;
 
-  --filter-font-weight-normal: 400;
-  --filter-font-weight-medium: 500;
-  --filter-font-weight-semibold: 600;
-  --filter-font-weight-bold: 700;
+  /* 圆角刻度 */
+  --radius-0: 0;
+  --radius-2: 2px;
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-10: 10px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-full: 9999px;
 
-  --filter-line-height-tight: 1.2;
-  --filter-line-height-normal: 1.4;
-  --filter-line-height-relaxed: 1.6;
+  /* 阴影原始值 */
+  --shadow-100: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-200: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-300: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-400: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-  /* ========== 阴影系统 ========== */
+  /* 动效与节奏 */
+  --duration-120: 0.12s;
+  --duration-150: 0.15s;
+  --duration-180: 0.18s;
+  --duration-200: 0.2s;
+  --duration-300: 0.3s;
+  --duration-500: 0.5s;
+  --easing-standard: ease;
+  --easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
 
-  --filter-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --filter-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --filter-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --filter-shadow-focus: 0 0 0 3px var(--filter-color-focus-ring);
+  /* 尺寸/层级刻度 */
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --icon-16: 16px;
+  --icon-18: 18px;
+  --icon-20: 20px;
+  --icon-24: 24px;
+  --z-search: 50;
+  --z-nav: 60;
+  --z-dropdown: 70;
+  --z-modal: 100;
+  --z-toast: 110;
 
-  /* ========== 过渡动画 ========== */
-
-  --filter-transition-fast: 0.15s ease;
-  --filter-transition-normal: 0.2s ease;
-  --filter-transition-slow: 0.3s ease;
-
-  /* ========== 组件特定令牌 ========== */
-
-  /* Chip 组件 */
-  --filter-chip-bg: var(--filter-color-bg-secondary);
-  --filter-chip-border: var(--filter-color-border-default);
-  --filter-chip-text: var(--filter-color-text-primary);
-  --filter-chip-hover-bg: var(--filter-color-bg-muted);
-  --filter-chip-hover-border: var(--filter-color-border-strong);
-  --filter-chip-padding-x: 10px;
-  --filter-chip-padding-y: 6px;
-  --filter-chip-gap: var(--filter-space-md);
-  --filter-chip-radius: var(--filter-radius-md);
-  --filter-chip-font-size: var(--filter-font-size-sm);
-  --filter-chip-font-weight: var(--filter-font-weight-medium);
-
-  /* Chip 移除按钮 */
-  --filter-chip-remove-size: 16px;
-  --filter-chip-remove-bg: var(--filter-color-neutral-200);
-  --filter-chip-remove-color: var(--filter-color-text-secondary);
-  --filter-chip-remove-hover-bg: var(--filter-color-danger);
-  --filter-chip-remove-hover-color: #ffffff;
-  --filter-chip-remove-radius: var(--filter-radius-sm);
-
-  /* 搜索输入框 */
-  --filter-search-padding-x: 16px;
-  --filter-search-padding-y: 12px;
-  --filter-search-padding-left: 40px; /* 为搜索图标留空间 */
-  --filter-search-font-size: var(--filter-font-size-md);
-  --filter-search-radius: var(--filter-radius-lg);
-  --filter-search-border: var(--filter-color-border-default);
-  --filter-search-focus-border: var(--filter-color-text-secondary);
-  --filter-search-hover-border: var(--filter-color-border-strong);
-
-  /* 搜索图标 */
-  --filter-search-icon-left: 12px;
-  --filter-search-icon-size: 16px;
-  --filter-search-icon-color: var(--filter-color-text-secondary);
-
-  /* 清除按钮 */
-  --filter-clear-btn-right: 8px;
-  --filter-clear-btn-size: 14px;
-  --filter-clear-btn-padding: 4px;
-  --filter-clear-btn-radius: var(--filter-radius-md);
-  --filter-clear-btn-hover-bg: var(--filter-color-bg-muted);
-
-  /* 按钮系统 */
-  --filter-btn-padding-x: 16px;
-  --filter-btn-padding-y: 12px;
-  --filter-btn-font-size: var(--filter-font-size-md);
-  --filter-btn-font-weight: var(--filter-font-weight-medium);
-  --filter-btn-radius: var(--filter-radius-lg);
-  --filter-btn-gap: var(--filter-space-lg);
-
-  /* 主要按钮 */
-  --filter-btn-primary-bg: var(--juwo-primary);
-  --filter-btn-primary-color: #ffffff;
-  --filter-btn-primary-hover-bg: var(--juwo-primary-light);
-
-  /* 次要按钮 */
-  --filter-btn-secondary-bg: var(--filter-color-bg-primary);
-  --filter-btn-secondary-color: var(--filter-color-text-secondary);
-  --filter-btn-secondary-border: var(--filter-color-border-default);
-  --filter-btn-secondary-hover-border: var(--filter-color-border-strong);
-  --filter-btn-secondary-hover-color: var(--filter-color-text-primary);
-
-  /* 列表项 */
-  --filter-list-item-padding-x: var(--filter-space-xl);
-  --filter-list-item-padding-y: 14px;
-  --filter-list-item-min-height: 48px;
-  --filter-list-item-border: var(--filter-color-border-subtle);
-  --filter-list-item-hover-bg: var(--filter-color-hover-bg);
-  --filter-list-item-selected-bg: var(--filter-color-selected-bg);
-  --filter-list-item-selected-border: var(--filter-color-selected-border);
-
-  /* 复选框 */
-  --filter-checkbox-size: 18px;
-  --filter-checkbox-radius: 3px;
-  --filter-checkbox-accent: var(--filter-color-text-secondary);
-
-  /* 面板系统 */
-  --filter-panel-bg: var(--filter-color-bg-primary);
-  --filter-panel-radius: var(--filter-radius-xl);
-  --filter-panel-padding: var(--filter-space-xl);
-  --filter-panel-header-border: var(--filter-color-border-default);
-  --filter-panel-footer-border: var(--filter-color-border-default);
-
-  /* 面板标题 */
-  --filter-panel-title-font-size: var(--filter-font-size-lg);
-  --filter-panel-title-font-weight: var(--filter-font-weight-semibold);
-  --filter-panel-title-color: var(--filter-color-text-primary);
-
-  /* 关闭按钮 */
-  --filter-close-btn-size: 20px;
-  --filter-close-btn-padding: var(--filter-space-xs);
-  --filter-close-btn-radius: var(--filter-radius-md);
-  --filter-close-btn-color: var(--filter-color-text-secondary);
-  --filter-close-btn-hover-bg: var(--filter-color-hover-bg);
-  --filter-close-btn-hover-color: var(--filter-color-text-primary);
-
-  /* 空状态 */
-  --filter-empty-bg: var(--filter-color-bg-secondary);
-  --filter-empty-border: var(--filter-color-border-subtle);
-  --filter-empty-radius: var(--filter-radius-xl);
-  --filter-empty-padding-x: var(--filter-space-xl);
-  --filter-empty-padding-y: var(--filter-space-2xl);
-  --filter-empty-text-color: var(--filter-color-text-secondary);
-  --filter-empty-font-size: var(--filter-font-size-md);
-  --filter-empty-font-weight: var(--filter-font-weight-medium);
-
-  /* 分组标题 */
-  --filter-group-title-bg: var(--filter-color-bg-secondary);
-  --filter-group-title-padding-x: var(--filter-space-xl);
-  --filter-group-title-padding-y: var(--filter-space-md);
-  --filter-group-title-font-size: var(--filter-font-size-sm);
-  --filter-group-title-font-weight: var(--filter-font-weight-semibold);
-  --filter-group-title-color: var(--filter-color-text-primary);
-  --filter-group-title-border: var(--filter-color-border-subtle);
-
-  /* 操作链接 */
-  --filter-action-link-color: var(--filter-color-text-secondary);
-  --filter-action-link-font-size: var(--filter-font-size-sm);
-  --filter-action-link-font-weight: var(--filter-font-weight-medium);
-  --filter-action-link-padding-x: var(--filter-space-lg);
-  --filter-action-link-padding-y: var(--filter-space-sm);
-  --filter-action-link-radius: var(--filter-radius-lg);
-  --filter-action-link-hover-bg: var(--filter-color-hover-bg);
-  --filter-action-link-hover-color: var(--filter-color-text-primary);
+  /* 滚动条基线 */
+  --scrollbar-thumb: #c0c4cc;
+  --scrollbar-thumb-hover: #909399;
 }
 
-/* ========== 实用工具类 ========== */
-
-/* 中性颜色工具类 */
-.filter-text-primary {
-  color: var(--filter-color-text-primary);
-}
-.filter-text-secondary {
-  color: var(--filter-color-text-secondary);
-}
-.filter-text-muted {
-  color: var(--filter-color-text-muted);
-}
-
-.filter-bg-primary {
-  background-color: var(--filter-color-bg-primary);
-}
-.filter-bg-secondary {
-  background-color: var(--filter-color-bg-secondary);
-}
-.filter-bg-muted {
-  background-color: var(--filter-color-bg-muted);
-}
-
-.filter-border-default {
-  border-color: var(--filter-color-border-default);
-}
-.filter-border-strong {
-  border-color: var(--filter-color-border-strong);
-}
-.filter-border-subtle {
-  border-color: var(--filter-color-border-subtle);
-}
-
-/* 间距工具类 */
-.filter-space-xs {
-  gap: var(--filter-space-xs);
-}
-.filter-space-sm {
-  gap: var(--filter-space-sm);
-}
-.filter-space-md {
-  gap: var(--filter-space-md);
-}
-.filter-space-lg {
-  gap: var(--filter-space-lg);
-}
-.filter-space-xl {
-  gap: var(--filter-space-xl);
-}
-
-/* 圆角工具类 */
-.filter-radius-sm {
-  border-radius: var(--filter-radius-sm);
-}
-.filter-radius-md {
-  border-radius: var(--filter-radius-md);
-}
-.filter-radius-lg {
-  border-radius: var(--filter-radius-lg);
-}
-.filter-radius-xl {
-  border-radius: var(--filter-radius-xl);
-}
-
-/* 过渡工具类 */
-.filter-transition-fast {
-  transition: all var(--filter-transition-fast);
-}
-.filter-transition-normal {
-  transition: all var(--filter-transition-normal);
-}
-.filter-transition-slow {
-  transition: all var(--filter-transition-slow);
-}
-
-/* ====== Global semantic color tokens (added, non-breaking) ======
-   中文注释：全局语义色令牌，仅“新增不改旧值”，为组件与页面提供统一入口；
-   允许继续沿用现有 var(--color-*) / var(--juwo-*)，本区用于补齐 visited/disabled 与反馈语义色等。
-*/
 :root {
-  /* 反色文本与弱底 */
-  --color-text-inverse: #ffffff;
-  --bg-muted: var(--neutral-50);
+  /* ------------------------------------------------------------------ */
+  /* Tier 2 · Semantic Tokens (语义令牌：品牌 / 场景语义)               */
+  /* ------------------------------------------------------------------ */
 
-  /* 链接态（补齐 visited/disabled） */
-  --link-visited: #0036b3; /* 品牌蓝加深一档，保证可访问性 */
-  --link-disabled: var(--color-text-secondary);
+  /* 品牌别名 */
+  --juwo-primary: var(--brand-juwo-600);
+  --juwo-primary-light: var(--brand-juwo-500);
+  --juwo-primary-dark: var(--brand-juwo-700);
+  --juwo-primary-50: var(--blue-50);
+  --juwo-primary-100: var(--blue-100);
+  --juwo-primary-500: var(--blue-500);
+  --juwo-primary-600: var(--blue-600);
+  --juwo-primary-700: var(--blue-700);
+  --brand-primary: var(--juwo-primary);
+  --brand-google: var(--google-red);
+  --brand-facebook: var(--facebook-blue);
 
-  /* 反馈语义（soft 背景 + 边框，避免强色块） */
-  --color-success: #16a34a;
-  --success-soft-bg: #ecfdf5;
-  --success-border: #bbf7d0;
+  /* 中性灰语义 */
+  --color-neutral-50: var(--gray-50);
+  --color-neutral-100: var(--gray-100);
+  --color-neutral-200: var(--gray-200);
+  --color-neutral-300: var(--gray-300);
+  --color-neutral-400: var(--gray-400);
+  --color-neutral-500: var(--gray-500);
+  --color-neutral-600: var(--gray-600);
+  --color-neutral-700: var(--gray-700);
+  --color-neutral-800: var(--gray-800);
+  --color-neutral-850: var(--gray-850);
+  --color-neutral-900: var(--gray-900);
 
-  --color-warning: #f59e0b;
-  --warning-soft-bg: #fffbeb;
-  --warning-border: #fde68a;
+  /* 文本语义 */
+  --color-text-primary: var(--gray-850);
+  --color-text-secondary: #595959;
+  --color-text-muted: var(--gray-muted);
+  --color-text-inverse: var(--white);
+  --color-text-price: var(--color-text-primary);
+  --text-primary: var(--color-text-primary);
+  --text-tertiary: var(--gray-tertiary);
+  --text-muted: var(--gray-muted);
 
-  --color-danger: #dc2626;
+  /* 背景语义 */
+  --color-bg-primary: var(--white);
+  --color-bg-secondary: var(--color-neutral-50);
+  --color-bg-muted: var(--color-neutral-100);
+  --color-bg-card: var(--white);
+  --color-bg-page: var(--surface-page);
+  --bg-base: var(--color-bg-card);
+  --bg-hover: var(--surface-hover);
+  --bg-secondary: var(--juwo-primary-50);
+  --bg-muted: var(--color-neutral-50);
+
+  /* 边框与分隔线 */
+  --color-border-default: var(--gray-250);
+  --color-border-strong: var(--color-neutral-400);
+  --color-border-subtle: var(--color-neutral-200);
+  --divider-color: var(--color-border-default);
+
+  /* 交互状态 */
+  --color-hover-bg: var(--color-neutral-50);
+  --color-hover-border: var(--color-neutral-400);
+  --color-focus-ring: var(--focus-ring-soft);
+  --color-selected-bg: var(--color-neutral-100);
+  --color-selected-border: var(--color-neutral-300);
+  --focus-ring-color: rgba(0, 0, 0, 0.25);
+  --focus-ring-width: var(--border-width-2);
+  --focus-ring-offset: var(--border-width-2);
+
+  /* 反馈语义 */
+  --color-danger: var(--red-500);
+  --color-danger-hover: var(--red-600);
+  --color-warning: var(--amber-500);
+  --color-success: var(--green-500);
+  --color-info: var(--sky-500);
   --danger-soft-bg: #fef2f2;
   --danger-border: #fecaca;
+  --warning-soft-bg: var(--amber-soft-bg);
+  --warning-border: var(--amber-soft-border);
+  --success-soft-bg: var(--green-soft-bg);
+  --success-border: var(--green-soft-border);
+  --info-soft-bg: var(--sky-soft-bg);
+  --info-border: var(--sky-soft-border);
+  --semantic-danger: var(--red-500);
+  --semantic-danger-hover: var(--red-600);
+  --semantic-warning: var(--amber-500);
+  --semantic-warning-weak: #fff3cd;
+  --semantic-success: var(--lime-400);
+  --semantic-favorite: var(--gold-400);
+  --semantic-favorite-hover: var(--gold-300);
 
-  --color-info: #0ea5e9;
-  --info-soft-bg: #f0f9ff;
-  --info-border: #bae6fd;
-
-  /* 收藏（Favorite）三态 */
+  /* 链接与收藏 */
+  --link-color: var(--juwo-primary);
+  --link-hover-color: var(--juwo-primary-light);
+  --link-visited: #0036b3;
+  --link-disabled: var(--color-text-secondary);
   --favorite-icon-default: var(--color-text-secondary);
   --favorite-icon-hover: var(--color-text-primary);
   --favorite-icon-active: var(--juwo-primary);
 
-  /* 徽标/计数（Pill/Badge） */
+  /* 徽标与标签 */
   --badge-bg: var(--chip-bg);
   --badge-fg: var(--color-text-secondary);
   --badge-border: var(--color-border-default);
 
-  /* 分隔线 */
-  --divider-color: var(--color-border-default);
+  /* Element Plus 主题色 */
+  --el-color-primary: var(--slate-600);
+  --el-color-primary-light-1: var(--slate-550);
+  --el-color-primary-light-3: var(--slate-500);
+  --el-color-primary-light-5: var(--slate-400);
+  --el-color-primary-light-7: var(--slate-300);
+  --el-color-primary-light-8: var(--slate-250);
+  --el-color-primary-light-9: var(--slate-200);
+  --el-color-primary-dark-2: var(--slate-700);
 
-  /* 品牌别名（统一入口） */
-  --brand-primary: var(--juwo-primary);
+  /* 字体家族语义 */
+  --font-family-zh-sans: var(--font-family-zh-base);
+  --font-family-en-sans: var(--font-family-en-base);
+  --font-family-system: var(--font-family-system-base);
+  --font-english: var(--font-family-en-base);
+  --font-chinese: var(--font-family-zh-base);
+  --font-system: var(--font-family-system-base);
+
+  /* 字体大小/字重/行高语义 */
+  --font-size-2xs: var(--font-size-11);
+  --font-size-compact: var(--font-size-13);
+  --font-size-xs: var(--font-size-12);
+  --font-size-sm: var(--font-size-14);
+  --font-size-md: var(--font-size-16);
+  --font-size-lg: var(--font-size-20);
+  --font-size-xl: var(--font-size-24);
+  --font-size-xxl: var(--font-size-32);
+  --font-size-3xl: var(--font-size-40);
+  --font-size-xl-compact: var(--font-size-18);
+
+  --font-weight-regular: var(--font-weight-400);
+  --font-weight-medium: var(--font-weight-500);
+  --font-weight-semibold: var(--font-weight-600);
+  --font-weight-bold: var(--font-weight-700);
+
+  --line-height-tight: var(--line-height-120);
+  --line-height-snug: var(--line-height-130);
+  --line-height-normal: var(--line-height-140);
+  --line-height-relaxed: var(--line-height-160);
+  --line-height-loose: var(--line-height-180);
+  --font-numeric-variant: var(--font-variant-tabular);
+
+  /* Typography 语义包 */
+  --typography-body-default-size: var(--font-size-md);
+  --typography-body-default-weight: var(--font-weight-regular);
+  --typography-body-default-line: var(--line-height-relaxed);
+  --typography-body-default-family: var(--font-family-zh-sans);
+
+  --typography-body-small-size: var(--font-size-sm);
+  --typography-body-small-weight: var(--font-weight-regular);
+  --typography-body-small-line: var(--line-height-normal);
+  --typography-body-small-family: var(--font-family-zh-sans);
+
+  --typography-heading-page-size: var(--font-size-xxl);
+  --typography-heading-page-weight: var(--font-weight-bold);
+  --typography-heading-page-line: var(--line-height-tight);
+  --typography-heading-page-family: var(--font-family-zh-sans);
+
+  --typography-heading-card-size: var(--font-size-lg);
+  --typography-heading-card-weight: var(--font-weight-semibold);
+  --typography-heading-card-line: var(--line-height-normal);
+  --typography-heading-card-family: var(--font-family-zh-sans);
+
+  --typography-price-size: var(--font-size-22);
+  --typography-price-weight: var(--font-weight-bold);
+  --typography-price-line: var(--line-height-tight);
+  --typography-price-family: var(--font-family-en-sans);
+
+  --typography-address-size: var(--font-size-15);
+  --typography-address-weight: var(--font-weight-medium);
+  --typography-address-line: var(--line-height-snug);
+  --typography-address-family: var(--font-family-en-sans);
+
+  --typography-button-size: var(--font-size-md);
+  --typography-button-weight: var(--font-weight-medium);
+  --typography-button-line: var(--line-height-normal);
+  --typography-button-family: var(--font-family-zh-sans);
+
+  --typography-label-size: var(--font-size-sm);
+  --typography-label-weight: var(--font-weight-regular);
+  --typography-label-line: var(--line-height-normal);
+  --typography-label-family: var(--font-family-zh-sans);
+
+  /* 间距语义（紧凑 4-24 系列） */
+  --space-2xs: var(--size-4);
+  --space-xs: var(--size-6);
+  --space-sm: var(--size-8);
+  --space-md: var(--size-12);
+  --space-lg: var(--size-16);
+  --space-xl: var(--size-20);
+  --space-2xl: var(--size-24);
+  --space-3xl: var(--size-32);
+  --space-4xl: var(--size-40);
+  --space-5xl: var(--size-48);
+
+  /* Tailwind 映射/兼容令牌 */
+  --space-1-5: var(--size-6);
+  --space-2: var(--size-8);
+  --space-3: var(--size-12);
+  --space-3-5: var(--size-14);
+  --space-4: var(--size-16);
+  --space-6: var(--size-24);
+  --space-8: var(--size-32);
+
+  /* 圆角语义 */
+  --radius-none: var(--radius-0);
+  --radius-xs: var(--radius-2);
+  --radius-sm: var(--radius-8);
+  --radius-md: var(--radius-12);
+  --radius-lg: var(--radius-16);
+  --radius-xl: var(--radius-20);
+  --radius-full: var(--radius-full);
+  --radius-compact-sm: var(--radius-2);
+  --radius-compact-md: var(--radius-4);
+  --radius-compact-lg: var(--radius-6);
+  --radius-compact-xl: var(--radius-8);
+
+  /* 阴影语义 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: var(--shadow-100);
+  --shadow-md: var(--shadow-200);
+  --shadow-lg: var(--shadow-300);
+  --shadow-xl: var(--shadow-400);
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
+
+  /* 动效语义 */
+  --transition-fast: var(--duration-150) var(--easing-standard);
+  --transition-normal: var(--duration-200) var(--easing-standard);
+  --transition-slow: var(--duration-300) var(--easing-standard);
+  --motion-fast: var(--duration-120);
+  --motion-base: var(--duration-180);
+  --easing-standard: var(--easing-emphasized);
+
+  /* Tailwind 字体别名 */
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+  --font-semibold: var(--font-weight-semibold);
+
+  /* UI 结构语义 */
+  --border-width-thin: var(--border-width-1);
+  --border-width-thick: var(--border-width-2);
+  --icon-size-sm: var(--icon-16);
+  --icon-size-md: var(--icon-18);
+  --icon-size-lg: var(--icon-20);
+  --icon-size-xl: var(--icon-24);
+  --nav-hover-color: var(--juwo-primary);
+  --neutral-scrollbar-color: var(--scrollbar-thumb);
+  --neutral-scrollbar-hover-color: var(--scrollbar-thumb-hover);
+
+  /* Search / Chip 全站语义 */
+  --search-suffix-right: var(--space-md);
+  --search-suffix-hit: var(--space-3xl);
+  --chip-bg: var(--surface-hover);
+  --chip-bg-hover: var(--surface-chip-hover);
+  --chip-bg-selected: var(--surface-chip-selected);
+  --overlay-light-90: var(--overlay-white-90);
+  --overlay-dark-75: var(--overlay-black-75);
+}
+
+:root {
+  /* ------------------------------------------------------------------ */
+  /* Tier 3 · Component Tokens (组件令牌：特定组件语义)                */
+  /* ------------------------------------------------------------------ */
+
+  /* Filter Chip */
+  --filter-chip-bg: var(--chip-bg);
+  --filter-chip-border: var(--color-border-default);
+  --filter-chip-text: var(--color-text-primary);
+  --filter-chip-hover-bg: var(--chip-bg-hover);
+  --filter-chip-hover-border: var(--color-border-strong);
+  --filter-chip-padding-x: var(--size-10);
+  --filter-chip-padding-y: var(--space-xs);
+  --filter-chip-gap: var(--space-sm);
+  --filter-chip-radius: var(--radius-compact-md);
+  --filter-chip-font-size: var(--font-size-compact);
+  --filter-chip-font-weight: var(--font-weight-medium);
+
+  --filter-chip-remove-size: var(--size-16);
+  --filter-chip-remove-bg: var(--color-neutral-200);
+  --filter-chip-remove-color: var(--color-text-secondary);
+  --filter-chip-remove-hover-bg: var(--color-danger);
+  --filter-chip-remove-hover-color: var(--white);
+  --filter-chip-remove-radius: var(--radius-compact-sm);
+
+  /* Filter Search */
+  --filter-search-padding-x: var(--space-lg);
+  --filter-search-padding-y: var(--space-md);
+  --filter-search-padding-left: var(--size-40);
+  --filter-search-font-size: var(--font-size-md);
+  --filter-search-radius: var(--radius-compact-lg);
+  --filter-search-border: var(--color-border-default);
+  --filter-search-focus-border: var(--color-text-secondary);
+  --filter-search-hover-border: var(--color-border-strong);
+  --filter-search-icon-left: var(--space-lg);
+  --filter-search-icon-size: var(--icon-16);
+  --filter-search-icon-color: var(--color-text-secondary);
+
+  /* Filter Clear Button */
+  --filter-clear-btn-right: var(--space-xs);
+  --filter-clear-btn-size: var(--font-size-sm);
+  --filter-clear-btn-padding: var(--space-2xs);
+  --filter-clear-btn-radius: var(--radius-compact-md);
+  --filter-clear-btn-hover-bg: var(--color-bg-muted);
+
+  /* Filter Buttons */
+  --filter-btn-padding-x: var(--space-lg);
+  --filter-btn-padding-y: var(--space-md);
+  --filter-btn-font-size: var(--font-size-md);
+  --filter-btn-font-weight: var(--font-weight-medium);
+  --filter-btn-radius: var(--radius-compact-lg);
+  --filter-btn-gap: var(--space-md);
+
+  --filter-btn-primary-bg: var(--juwo-primary);
+  --filter-btn-primary-color: var(--white);
+  --filter-btn-primary-hover-bg: var(--juwo-primary-light);
+
+  --filter-btn-secondary-bg: var(--color-bg-primary);
+  --filter-btn-secondary-color: var(--color-text-secondary);
+  --filter-btn-secondary-border: var(--color-border-default);
+  --filter-btn-secondary-hover-border: var(--color-border-strong);
+  --filter-btn-secondary-hover-color: var(--color-text-primary);
+
+  /* Filter List Items */
+  --filter-list-item-padding-x: var(--space-lg);
+  --filter-list-item-padding-y: var(--size-14);
+  --filter-list-item-min-height: var(--size-48);
+  --filter-list-item-border: var(--color-border-subtle);
+  --filter-list-item-hover-bg: var(--color-hover-bg);
+  --filter-list-item-selected-bg: var(--color-selected-bg);
+  --filter-list-item-selected-border: var(--color-selected-border);
+
+  /* Filter Checkbox */
+  --filter-checkbox-size: var(--size-18);
+  --filter-checkbox-radius: var(--radius-3);
+  --filter-checkbox-accent: var(--color-text-secondary);
+
+  /* Filter Panel */
+  --filter-panel-bg: var(--color-bg-primary);
+  --filter-panel-radius: var(--radius-compact-xl);
+  --filter-panel-padding: var(--space-lg);
+  --filter-panel-header-border: var(--color-border-default);
+  --filter-panel-footer-border: var(--color-border-default);
+  --filter-panel-title-font-size: var(--font-size-md);
+  --filter-panel-title-font-weight: var(--font-weight-semibold);
+  --filter-panel-title-color: var(--color-text-primary);
+
+  --filter-close-btn-size: var(--size-20);
+  --filter-close-btn-padding: var(--space-2xs);
+  --filter-close-btn-radius: var(--radius-compact-md);
+  --filter-close-btn-color: var(--color-text-secondary);
+  --filter-close-btn-hover-bg: var(--color-hover-bg);
+  --filter-close-btn-hover-color: var(--color-text-primary);
+
+  /* Filter Empty State */
+  --filter-empty-bg: var(--color-bg-secondary);
+  --filter-empty-border: var(--color-border-subtle);
+  --filter-empty-radius: var(--radius-compact-xl);
+  --filter-empty-padding-x: var(--space-lg);
+  --filter-empty-padding-y: var(--space-xl);
+  --filter-empty-text-color: var(--color-text-secondary);
+  --filter-empty-font-size: var(--font-size-sm);
+  --filter-empty-font-weight: var(--font-weight-medium);
+
+  /* Filter Group Title */
+  --filter-group-title-bg: var(--color-bg-secondary);
+  --filter-group-title-padding-x: var(--space-lg);
+  --filter-group-title-padding-y: var(--space-sm);
+  --filter-group-title-font-size: var(--font-size-compact);
+  --filter-group-title-font-weight: var(--font-weight-semibold);
+  --filter-group-title-color: var(--color-text-primary);
+  --filter-group-title-border: var(--color-border-subtle);
+
+  /* Filter Action Link */
+  --filter-action-link-color: var(--color-text-secondary);
+  --filter-action-link-font-size: var(--font-size-sm);
+  --filter-action-link-font-weight: var(--font-weight-medium);
+  --filter-action-link-padding-x: var(--space-md);
+  --filter-action-link-padding-y: var(--space-xs);
+  --filter-action-link-radius: var(--radius-compact-lg);
+  --filter-action-link-hover-bg: var(--color-hover-bg);
+  --filter-action-link-hover-color: var(--color-text-primary);
+
+  /* Filter Field (element wrappers) */
+  --filter-field-height-pc: var(--size-40);
+  --filter-field-height-mob: var(--size-44);
+  --filter-field-font-pc: var(--font-size-sm);
+  --filter-field-font-mob: var(--font-size-md);
+  --filter-field-padding-x: var(--space-md);
+  --filter-suffix-right: var(--space-md);
+  --filter-suffix-hit: var(--size-28);
+  --date-field-min-ch: 12ch;
+
+  /* Panel Utility */
+  --filter-shadow-focus: var(--shadow-focus);
+
+  /* Property Spec Row */
+  --spec-icon-size: var(--icon-size-xl);
+  --spec-text-size: var(--font-size-md);
+  --spec-line-height: var(--size-24);
+  --spec-icon-gap: var(--space-xs);
+  --spec-item-gap: var(--size-10);
+}
+
+/* -------------------------------------------------------------------- */
+/* Utility Classes (保持兼容，引用新的语义令牌)                         */
+/* -------------------------------------------------------------------- */
+
+.filter-text-primary {
+  color: var(--color-text-primary);
+}
+.filter-text-secondary {
+  color: var(--color-text-secondary);
+}
+.filter-text-muted {
+  color: var(--color-text-muted);
+}
+
+.filter-bg-primary {
+  background-color: var(--color-bg-primary);
+}
+.filter-bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+.filter-bg-muted {
+  background-color: var(--color-bg-muted);
+}
+
+.filter-border-default {
+  border-color: var(--color-border-default);
+}
+.filter-border-strong {
+  border-color: var(--color-border-strong);
+}
+.filter-border-subtle {
+  border-color: var(--color-border-subtle);
+}
+
+.filter-space-xs {
+  gap: var(--space-2xs);
+}
+.filter-space-sm {
+  gap: var(--space-xs);
+}
+.filter-space-md {
+  gap: var(--space-sm);
+}
+.filter-space-lg {
+  gap: var(--space-md);
+}
+.filter-space-xl {
+  gap: var(--space-lg);
+}
+
+.filter-radius-sm {
+  border-radius: var(--radius-sm);
+}
+.filter-radius-md {
+  border-radius: var(--radius-md);
+}
+.filter-radius-lg {
+  border-radius: var(--radius-lg);
+}
+.filter-radius-xl {
+  border-radius: var(--radius-xl);
+}
+
+.filter-transition-fast {
+  transition: all var(--transition-fast);
+}
+.filter-transition-normal {
+  transition: all var(--transition-normal);
+}
+.filter-transition-slow {
+  transition: all var(--transition-slow);
 }
