@@ -252,7 +252,7 @@ watch(
 .search-icon {
   position: absolute;
   left: 12px;
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
   pointer-events: none;
   z-index: 1;
 }
@@ -262,20 +262,20 @@ watch(
   padding: 12px 16px 12px 40px;
   font-size: 14px;
   color: var(--color-text-primary);
-  background: var(--filter-color-bg-primary);
-  border: 1px solid var(--filter-color-border-default);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
   border-radius: 6px;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .areas-search:focus {
-  border-color: var(--filter-search-focus-border);
-  box-shadow: var(--filter-shadow-focus);
+  border-color: var(--search-focus-border);
+  box-shadow: var(--shadow-focus);
 }
 
 .areas-search:hover:not(:focus) {
-  border-color: var(--filter-search-hover-border);
+  border-color: var(--search-hover-border);
 }
 
 .clear-search-btn {
@@ -294,8 +294,8 @@ watch(
 }
 
 .clear-search-btn:hover {
-  background: var(--filter-color-hover-bg);
-  color: var(--filter-color-text-primary);
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
 }
 
 .clear-all-btn {
@@ -303,9 +303,9 @@ watch(
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 500;
-  background: var(--filter-color-bg-primary);
-  color: var(--filter-color-text-secondary);
-  border: 1px solid var(--filter-color-border-default);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -313,34 +313,34 @@ watch(
 }
 
 .clear-all-btn:hover:not(:disabled) {
-  background: var(--filter-color-bg-secondary);
-  color: var(--filter-color-text-primary);
-  border-color: var(--filter-color-border-strong);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
 }
 
 .clear-all-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: var(--filter-color-bg-secondary);
+  background: var(--color-bg-secondary);
 }
 
 .areas-body {
-  max-height: 280px;
+  max-height: var(--areas-body-max-height);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   border: none; /* 简化：移除外框横线 */
-  border-radius: 6px;
-  background: var(--filter-color-bg-primary);
+  border-radius: var(--areas-body-radius);
+  background: var(--areas-body-bg);
 }
 
 .loading-row,
 .empty-row {
-  padding: 20px 16px;
-  font-size: 14px;
+  padding: var(--areas-state-padding-y) var(--areas-state-padding-x);
+  font-size: var(--areas-state-font-size);
   color: var(--color-text-secondary);
-  background: var(--filter-color-bg-secondary);
+  background: var(--color-bg-secondary);
   text-align: center;
-  border-radius: 6px;
+  border-radius: var(--areas-state-radius);
 }
 
 
@@ -364,24 +364,24 @@ watch(
 }
 
 .area-item:hover {
-  background: var(--filter-color-hover-bg);
+  background: var(--color-surface-hover);
 }
 
 .area-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: var(--areas-row-gap);
+  padding: var(--areas-row-padding-y) var(--areas-row-padding-x);
   cursor: pointer;
   transition: all 0.15s ease;
-  min-height: 48px;
+  min-height: var(--areas-row-min-height);
 }
 
 .check {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  accent-color: var(--filter-checkbox-accent);
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border-radius: var(--checkbox-radius);
+  accent-color: var(--checkbox-accent);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -391,32 +391,32 @@ watch(
 }
 
 .area-name {
-  font-size: 14px;
+  font-size: var(--areas-name-font-size);
   color: var(--color-text-primary);
   user-select: none;
-  line-height: 1.4;
+  line-height: var(--areas-name-line-height);
   flex: 1;
 }
 
 /* 选中状态的行样式 */
 .area-item:has(.check:checked) {
-  background: var(--filter-color-selected-bg);
-  border-color: var(--filter-color-selected-border);
+  background: var(--color-selected-bg);
+  border-color: var(--color-selected-border);
 }
 
 .area-item:has(.check:checked) .area-name {
-  color: var(--filter-color-text-primary);
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-weight: var(--areas-name-font-weight-selected);
 }
 
 /* 如果浏览器不支持 :has，使用 JavaScript 类名回退 */
 .area-item.selected {
-  background: var(--filter-color-selected-bg);
-  border-color: var(--filter-color-selected-border);
+  background: var(--color-selected-bg);
+  border-color: var(--color-selected-border);
 }
 
 .area-item.selected .area-name {
-  color: var(--filter-color-text-primary);
-  font-weight: 600;
+  color: var(--color-text-primary);
+  font-weight: var(--areas-name-font-weight-selected);
 }
 </style>

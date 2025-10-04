@@ -201,84 +201,84 @@ defineExpose({
 
 .base-search-input__icon {
   position: absolute;
-  left: var(--filter-search-icon-left);
-  width: var(--filter-search-icon-size);
-  height: var(--filter-search-icon-size);
-  color: var(--filter-search-icon-color);
+  left: var(--search-icon-left);
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
+  color: var(--search-icon-color);
   pointer-events: none;
   z-index: 1;
 }
 
 .base-search-input__field {
   width: 100%;
-  padding: var(--filter-search-padding-y) var(--filter-search-padding-x)
-    var(--filter-search-padding-y) var(--filter-search-padding-left);
-  font-size: var(--filter-search-font-size);
-  color: var(--filter-color-text-primary);
-  background: var(--filter-color-bg-primary);
-  border: 1px solid var(--filter-search-border);
-  border-radius: var(--filter-search-radius);
+  padding: var(--search-padding-y) var(--search-padding-x)
+    var(--search-padding-y) var(--search-padding-left);
+  font-size: var(--search-font-size);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--search-border);
+  border-radius: var(--search-radius);
   outline: none;
-  transition: var(--filter-transition-normal);
-  line-height: var(--filter-line-height-normal);
+  transition: var(--transition-normal);
+  line-height: var(--line-height-normal);
 }
 
 .base-search-input__field::placeholder {
-  color: var(--filter-color-text-muted);
+  color: var(--color-text-muted);
 }
 
 .base-search-input__field:focus {
-  border-color: var(--filter-search-focus-border);
-  box-shadow: var(--filter-shadow-focus);
+  border-color: var(--search-focus-border);
+  box-shadow: var(--shadow-focus);
 }
 
 .base-search-input__field:hover:not(:focus, :disabled) {
-  border-color: var(--filter-search-hover-border);
+  border-color: var(--search-hover-border);
 }
 
 .base-search-input__field:disabled {
-  background: var(--filter-color-bg-muted);
-  color: var(--filter-color-text-muted);
+  background: var(--color-bg-muted);
+  color: var(--color-text-muted);
   cursor: not-allowed;
 }
 
 .base-search-input__clear {
   position: absolute;
-  right: var(--filter-clear-btn-right);
+  right: var(--clear-btn-right);
   background: none;
   border: none;
-  color: var(--filter-color-text-secondary);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  padding: var(--filter-clear-btn-padding);
-  border-radius: var(--filter-clear-btn-radius);
+  padding: var(--clear-btn-padding);
+  border-radius: var(--clear-btn-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--filter-transition-fast);
-  width: var(--filter-clear-btn-size);
-  height: var(--filter-clear-btn-size);
+  transition: var(--transition-fast);
+  width: var(--clear-btn-size);
+  height: var(--clear-btn-size);
 }
 
 .base-search-input__clear svg {
-  width: var(--filter-clear-btn-size);
-  height: var(--filter-clear-btn-size);
+  width: var(--clear-btn-size);
+  height: var(--clear-btn-size);
 }
 
 .base-search-input__clear:hover {
-  background: var(--filter-clear-btn-hover-bg);
-  color: var(--filter-color-text-primary);
+  background: var(--clear-btn-hover-bg);
+  color: var(--color-text-primary);
 }
 
 .base-search-input__clear:focus-visible {
-  outline: 2px solid var(--filter-color-focus-ring);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
 }
 
 /* 有清除按钮时调整输入框右内边距 */
 .base-search-input__field:not(:disabled) {
   padding-right: calc(
-    var(--filter-clear-btn-right) * 2 + var(--filter-clear-btn-size) +
-      var(--filter-clear-btn-padding) * 2
+    var(--clear-btn-right) * 2 + var(--clear-btn-size) +
+      var(--clear-btn-padding) * 2
   );
 }
 
@@ -286,14 +286,14 @@ defineExpose({
 @media (width <= 767px) {
   .base-search-input__field {
     font-size: 16px; /* iOS 防缩放 */
-    padding: calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-x)
-      calc(var(--filter-search-padding-y) + 2px) var(--filter-search-padding-left);
+    padding: calc(var(--search-padding-y) + 2px) var(--search-padding-x)
+      calc(var(--search-padding-y) + 2px) var(--search-padding-left);
   }
 
   .base-search-input__clear {
-    width: calc(var(--filter-clear-btn-size) + 4px);
-    height: calc(var(--filter-clear-btn-size) + 4px);
-    padding: calc(var(--filter-clear-btn-padding) + 2px);
+    width: calc(var(--clear-btn-size) + 4px);
+    height: calc(var(--clear-btn-size) + 4px);
+    padding: calc(var(--clear-btn-padding) + 2px);
   }
 }
 

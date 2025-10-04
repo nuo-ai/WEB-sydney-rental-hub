@@ -154,7 +154,7 @@ const sanitizedHtml = computed(() => {
   margin: 12px 0;
   padding: 8px 16px;
   border-left: 3px solid var(--juwo-primary);
-  background-color: var(--filter-color-bg-secondary);
+  background-color: var(--color-bg-secondary);
   color: var(--color-text-secondary);
 }
 

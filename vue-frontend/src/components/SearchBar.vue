@@ -638,10 +638,10 @@ watch(
   padding: 6px 10px;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: var(--filter-chip-bg);
-  color: var(--filter-chip-text, var(--color-text-secondary));
-  font-size: var(--filter-chip-font-size);
-  font-weight: var(--filter-chip-font-weight);
+  background: var(--chip-bg);
+  color: var(--chip-text, var(--color-text-secondary));
+  font-size: var(--chip-font-size);
+  font-weight: var(--chip-font-weight);
   line-height: 1;
   min-height: 32px; /* 与面板回显 chip 触控/对齐一致 */
 }
@@ -658,16 +658,16 @@ watch(
 }
 
 .inline-chip-more {
-  color: var(--filter-chip-text, var(--color-text-secondary));
-  background: var(--filter-chip-bg);
+  color: var(--chip-text, var(--color-text-secondary));
+  background: var(--chip-bg);
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
 }
 /* Hover 态轻微加深，保持中性风格（与面板一致） */
 .inline-chip:hover,
 .inline-chip-more:hover {
-  background: var(--filter-chip-hover-bg);
-  border-color: var(--filter-chip-hover-border);
+  background: var(--chip-hover-bg);
+  border-color: var(--chip-hover-border);
   color: var(--color-text-primary);
 }
 
@@ -676,8 +676,8 @@ watch(
   pointer-events: auto;
   margin-left: 6px;
   border: none;
-  background: var(--filter-chip-remove-bg);
-  color: var(--filter-chip-remove-color);
+  background: var(--chip-remove-bg);
+  color: var(--chip-remove-color);
   cursor: pointer;
   font-size: 12px;
   line-height: 1;
@@ -685,14 +685,14 @@ watch(
   display: inline-flex;          /* 与文本中线对齐 */
   align-items: center;           /* 垂直居中 */
   justify-content: center;
-  width: var(--filter-chip-remove-size);
-  height: var(--filter-chip-remove-size);
-  border-radius: var(--filter-chip-remove-radius);
+  width: var(--chip-remove-size);
+  height: var(--chip-remove-size);
+  border-radius: var(--chip-remove-radius);
 }
 
 .inline-chip-remove:hover {
-  background: var(--filter-chip-remove-hover-bg);
-  color: var(--filter-chip-remove-hover-color);
+  background: var(--chip-remove-hover-bg);
+  color: var(--chip-remove-hover-color);
 }
 
 /* 规范化焦点：移除浏览器默认浅蓝高亮（仅几何/可达性，不改配色语义） */
@@ -700,8 +700,8 @@ watch(
 .inline-chip-remove:focus-visible {
   outline: none;
   box-shadow: none;
-  background: var(--filter-chip-remove-bg);
-  color: var(--filter-chip-remove-color);
+  background: var(--chip-remove-bg);
+  color: var(--chip-remove-color);
 }
 
 /* 统一原生外观与点击高亮 */
@@ -712,8 +712,8 @@ watch(
 }
 
 .inline-chip-remove:active {
-  background: var(--filter-chip-remove-hover-bg);
-  color: var(--filter-chip-remove-hover-color);
+  background: var(--chip-remove-hover-bg);
+  color: var(--chip-remove-hover-color);
 }
 
 .suggestion-item {
