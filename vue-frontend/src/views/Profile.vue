@@ -212,7 +212,7 @@ onMounted(() => {
 
 .empty-state,
 .placeholder-state {
-  padding: var(--space-xl) var(--space-4);
+  padding: var(--space-3xl) var(--space-4);
   background-color: var(--color-bg-card);
   border: 1px dashed var(--color-border-default);
   border-radius: var(--radius-md);

@@ -474,11 +474,6 @@ body {
    范围：nav/header nav/.nav/.navbar/.navigation/.top-nav/.bottom-nav/[class*="nav"] 内的链接，不影响按钮/表单
    说明：使用更高选择器特异性 + !important，安全覆盖 Element Plus 的灰底/描边护栏
 */
-:root {
-  /* 导航 hover 颜色令牌，使用品牌橙 */
-  --nav-hover-color: var(--juwo-primary);
-}
-
 /* 基础链接规范（仅在导航容器中生效） */
 nav a,
 header nav a,
@@ -599,36 +594,6 @@ header nav .el-menu-item:hover,
   font-size: 48px;
   color: var(--color-border-default);
   margin-bottom: 16px;
-}
-
-/* ========== 新增：刻度令牌（声明性，零侵入；后续渐进替换使用） ========== */
-:root {
-  /* 边框宽度刻度（统一 1px/2px 使用语义引用） */
-  --border-width-1: 1px;
-  --border-width-2: 2px;
-
-  /* 层级刻度（避免浮层与导航/下拉抢层级） */
-  --z-search: 50;
-  --z-nav: 60;
-  --z-dropdown: 70;
-  --z-modal: 100;
-  --z-toast: 110;
-
-  /* 图标尺寸刻度（集中管理不同区域图标比例） */
-  --icon-16: 16px;
-  --icon-18: 18px;
-  --icon-20: 20px;
-  --icon-24: 24px;
-}
-
-/* ===== Element Plus 滚动指示器中性化（全局） =====
-   目的：移除非CTA处的品牌色渗透（如滚动条/指示器出现橙色），统一为中性灰
-   原则：仅样式层覆盖，不改动逻辑；全站可复用；必要时可在组件内再做 :deep 兜底
-   溯源：activeContext｜UI-NAV-GLOBAL-RULES（二次中性化）
-*/
-:root {
-  --neutral-scrollbar-color: #c0c4cc;
-  --neutral-scrollbar-hover-color: #909399;
 }
 
 /* 原生 WebKit 滚动条（全站） */
@@ -761,13 +726,6 @@ header nav .el-menu-item:hover,
    - 可选：对极少数按钮允许 .focus-visible-ring 强制启用灰 ring
    溯源：activeContext｜UI-NAV-GLOBAL-RULES & 本次“全站统一焦点策略”
 */
-
-/* 令牌：焦点 ring 风格（可按品牌调整） */
-:root {
-  --focus-ring-color: rgba(0, 0, 0, 0.25);
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px; /* 目前未使用，如需 offset 可改为 box-shadow 双层实现 */
-}
 
 /* 1) 重置 UA outline（所有可聚焦元素） */
 :where(a, button, [role='button'], input, select, textarea, [tabindex]):focus {
@@ -1031,11 +989,6 @@ header nav .el-menu-item:hover,
    2) SearchBar 与 FilterPanel 的标签/悬浮/聚焦走中性灰阶，聚焦态“边框加深 + 轻微外发光”
    3) 改动均为样式层，最小diff，可随时回滚
 */
-
-/* 补充强边框色变量（中性） */
-:root {
-  --color-border-strong: #c7ccd3;
-}
 
 /* Element Plus 输入/选择/日期等控件：圆角收紧 + 聚焦中性化 */
 .el-input__wrapper {
@@ -1338,14 +1291,6 @@ header nav .el-menu-item:hover,
 .english-text {
   font-family: var(--font-family-en-sans);
   letter-spacing: -0.01em;
-}
-
-:root {
-  --spec-icon-size: 24px;
-  --spec-text-size: 16px;
-  --spec-line-height: 24px;
-  --spec-icon-gap: 6px;
-  --spec-item-gap: 10px;
 }
 
 /* 房型规格统一样式（bed/bath/car） */
