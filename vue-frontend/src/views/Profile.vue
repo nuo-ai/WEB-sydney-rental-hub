@@ -1,23 +1,23 @@
 <template>
   <div class="page profile-page">
     <!-- 1. 页面头部: 完全遵循样板和视觉标准 -->
-    <header class="page__header header-with-actions">
+    <header class="page__header header-with-back">
       <!-- 返回上一页（无历史则回首页） -->
       <BaseIconButton aria-label="返回上一页" @click="goBack">
         <ArrowLeft />
       </BaseIconButton>
 
       <h1 class="typo-h1 page-title">{{ pageTitle }}</h1>
-
-      <!-- 回到首页 -->
-      <router-link to="/">
-        <BaseButton variant="ghost" aria-label="回到首页">回到首页</BaseButton>
-      </router-link>
     </header>
 
-    <!-- 账号操作：退出登录（次要按钮样式） -->
-    <section class="page-section account-actions">
-      <BaseButton variant="secondary" @click="handleLogout">退出登录</BaseButton>
+    <!-- 页面操作区：回到首页、退出登录 -->
+    <section class="page__toolbar account-toolbar" aria-label="页面操作">
+      <div class="account-toolbar__actions">
+        <router-link to="/" class="account-toolbar__link">
+          <BaseButton variant="ghost" aria-label="回到首页">回到首页</BaseButton>
+        </router-link>
+        <BaseButton variant="secondary" @click="handleLogout">退出登录</BaseButton>
+      </div>
     </section>
 
     <!-- 2. 页面内容区 -->
@@ -212,7 +212,7 @@ onMounted(() => {
 
 .empty-state,
 .placeholder-state {
-  padding: var(--space-3xl) var(--space-4);
+  padding: var(--space-xl) var(--space-4);
   background-color: var(--color-bg-card);
   border: 1px dashed var(--color-border-default);
   border-radius: var(--radius-md);
@@ -223,23 +223,29 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.header-with-actions {
+.header-with-back {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
 }
 
-.header-with-actions .page-title {
-  flex: 1;
-  text-align: center;
+.header-with-back .page-title {
   margin: 0;
 }
 
-/* 账号操作区与标题之间的节奏 */
-.account-actions {
-  padding-top: 0;
-  margin-top: var(--space-sm);
-  margin-bottom: var(--page-section-gap, 24px);
+.account-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.account-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.account-toolbar__link {
+  display: inline-flex;
+  text-decoration: none;
 }
 </style>
