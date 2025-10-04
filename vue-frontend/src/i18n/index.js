@@ -43,6 +43,15 @@ function isObject(val) {
   return val && typeof val === 'object' && !Array.isArray(val)
 }
 
+function formatMessage(value, params) {
+  if (typeof value !== 'string') return value
+  if (!params || typeof params !== 'object') return value
+  return Object.keys(params).reduce((acc, key) => {
+    const pattern = new RegExp(`\\{${key}\\}`, 'g')
+    return acc.replace(pattern, params[key])
+  }, value)
+}
+
 // 递归浅安全合并（右侧覆盖左侧），数组直接覆盖
 function deepMerge(target, source) {
   const out = isObject(target) ? { ...target } : {}
@@ -79,11 +88,11 @@ export default {
     }
 
     // t: 读取当前 locale 的文案，失败回退到 fallback，再回退 key
-    const t = (key) => {
+    const t = (key, params) => {
       const val = get(messages[locale], key)
-      if (val != null) return val
+      if (val != null) return formatMessage(val, params)
       const fb = get(messages[fallbackLocale], key)
-      return fb != null ? fb : key
+      return fb != null ? formatMessage(fb, params) : key
     }
 
     // 全局 $t，可直接在模板使用

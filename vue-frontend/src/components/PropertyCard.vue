@@ -31,14 +31,14 @@
       />
 
       <!-- 图片计数器 (仅多图片时显示) -->
-      <div v-if="validImages.length > 1" class="image-counter">
+      <div v-if="validImages.length > 1" class="image-counter typo-meta">
         {{ currentImageIndex + 1 }} / {{ validImages.length }}
       </div>
 
       <!-- 移除图片上的按钮 -->
 
       <!-- 新房源标签 -->
-      <div v-if="isNewProperty" class="property-status-tag typo-label">
+      <div v-if="isNewProperty" class="property-status-tag typo-badge">
         {{ $t('propertyCard.newBadge') }}
       </div>
     </div>
@@ -49,7 +49,7 @@
       <div class="property-header">
         <div class="property-price english-text typo-price">
           {{ formatPrice(property.rent_pw) }}
-          <span class="price-unit typo-label">{{ $t('propertyCard.perWeek') }}</span>
+          <span class="price-unit typo-price-unit">{{ $t('propertyCard.perWeek') }}</span>
         </div>
         <div class="property-actions">
           <!-- 收藏按钮 -->
@@ -75,7 +75,7 @@
                 <el-dropdown-item command="hide">
                   <EyeOff class="spec-icon" />
                   <span class="typo-body-sm">{{ $t('propertyCard.hide') }}</span>
-                  <div class="typo-body-sm text-xs text-secondary" style="margin-left: 24px">
+                  <div class="typo-body-xs text-secondary" style="margin-left: 24px">
                     {{ $t('propertyCard.hideHint') }}
                   </div>
                 </el-dropdown-item>
@@ -86,24 +86,28 @@
       </div>
 
       <!-- 地址信息 - 两行显示，保持英文 -->
-      <div class="property-address english-text">
-        <div class="property-address-primary">{{ streetAddress }},</div>
-        <div class="property-address-secondary">{{ locationInfo }}</div>
+      <div class="property-address">
+        <div class="property-address-primary english-text typo-address">
+          {{ streetAddress }},
+        </div>
+        <div class="property-address-secondary english-text typo-address-secondary">
+          {{ locationInfo }}
+        </div>
       </div>
 
       <!-- 房型信息 - Lucide 图标 + 数字 -->
       <div class="property-features spec-row">
         <div class="feature-item spec-item">
           <BedDouble class="spec-icon" />
-          <span class="spec-text">{{ property.bedrooms || 0 }}</span>
+          <span class="spec-text typo-metric">{{ property.bedrooms || 0 }}</span>
         </div>
         <div class="feature-item spec-item">
           <Bath class="spec-icon" />
-          <span class="spec-text">{{ property.bathrooms || 0 }}</span>
+          <span class="spec-text typo-metric">{{ property.bathrooms || 0 }}</span>
         </div>
         <div class="feature-item spec-item">
           <CarFront class="spec-icon" />
-          <span class="spec-text">{{ property.parking_spaces || 0 }}</span>
+          <span class="spec-text typo-metric">{{ property.parking_spaces || 0 }}</span>
         </div>
       </div>
 
@@ -186,12 +190,14 @@ const validImages = computed(() => {
 const placeholderImage = computed(() => {
   const background = getCssVarValue('--gray-100', '#f3f4f6')
   const foreground = getCssVarValue('--gray-400', '#9ca3af')
-  const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="${background}"/><text x="50%" y="50%" font-family="Inter, sans-serif" font-size="18" dy=".3em" fill="${foreground}" text-anchor="middle">${t('propertyCard.imageAlt')}</text></svg>`
+  const fontFamily = getCssVarValue('--font-family-en-sans', 'Inter, sans-serif')
+  const fontSize = getCssVarValue('--font-size-lg', '18px')
+  const placeholderSvg = `<svg width="580" height="386" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="${background}"/><text x="50%" y="50%" font-family="${fontFamily}" font-size="${fontSize}" dy=".3em" fill="${foreground}" text-anchor="middle">${t('propertyCard.imageAlt')}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(placeholderSvg)}`
 })
 
 const streetAddress = computed(() => {
-  if (!props.property.address) return '地址未知'
+  if (!props.property.address) return t('propertyCard.unknownAddress')
   const addressParts = props.property.address.split(',')
   return addressParts[0]?.trim() || props.property.address
 })
@@ -230,13 +236,13 @@ const formatPrice = (price) => {
 }
 
 const formatAvailabilityDate = (dateString) => {
-  if (!dateString) return '立即入住'
+  if (!dateString) return t('propertyCard.availableNow')
 
   const availDate = new Date(dateString)
   const today = new Date()
 
   if (availDate <= today) {
-    return '立即入住'
+    return t('propertyCard.availableNow')
   }
 
   // 格式化为中文日期
@@ -244,7 +250,7 @@ const formatAvailabilityDate = (dateString) => {
   const month = availDate.getMonth() + 1
   const day = availDate.getDate()
 
-  return `${year}年${month}月${day}日`
+  return t('propertyCard.availableDateFormat', { year, month, day })
 }
 
 const formatInspectionTime = (timeString) => {
@@ -302,11 +308,11 @@ const handleMoreAction = (command) => {
     // 实现分享功能
     const shareUrl = `${window.location.origin}/property/${props.property.listing_id}`
     navigator.clipboard.writeText(shareUrl)
-    ElMessage.success('链接已复制到剪贴板')
+    ElMessage.success(t('propertyCard.shareCopied'))
   } else if (command === 'hide') {
     // 实现隐藏功能
     propertiesStore.hideProperty(props.property.listing_id)
-    ElMessage.info('已从搜索结果中移除')
+    ElMessage.info(t('propertyCard.hideSuccess'))
   }
 }
 </script>
@@ -358,7 +364,7 @@ const handleMoreAction = (command) => {
   color: var(--color-text-inverse) !important; /* 中文注释：使用反色文本令牌，替代命名色 white */
   width: 40px !important;
   height: 60px !important;
-  font-size: 24px !important;
+  font-size: var(--size-24) !important;
   opacity: 0.7;
   transition: opacity 0.3s ease !important;
   border: none !important;
@@ -406,8 +412,6 @@ const handleMoreAction = (command) => {
   left: 12px;
   background: var(--overlay-dark-75);
   color: var(--color-text-inverse); /* 中文注释：反色文本令牌，便于主题切换与高对比 */
-  font-size: 11px;
-  font-weight: 400;
   padding: 3px 8px;
   border-radius: 4px;
   z-index: 10;
@@ -473,12 +477,8 @@ const handleMoreAction = (command) => {
   left: 12px;
   background: var(--brand-primary); /* 中文注释：改为品牌蓝，符合“新上线”品牌语义；可统一全站主题 */
   color: var(--color-text-inverse); /* 中文注释：文本走反色令牌，确保可读性与高对比模式 */
-  font-size: 10px;
-  font-weight: 600;
   padding: 4px 10px;
   border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   z-index: 10;
 }
 
@@ -501,17 +501,12 @@ const handleMoreAction = (command) => {
 
 /* 价格显示 - 匹配现有设计 */
 .property-price {
-  font-size: 22px;
-  font-weight: 700;
   color: var(--color-text-primary);
-  line-height: 1.2;
   margin-bottom: 8px;
 }
 
 .price-unit {
-  font-size: 14px;
   color: var(--color-text-secondary);
-  font-weight: 400;
 }
 
 /* 地址信息 - 两行显示 */
@@ -520,18 +515,12 @@ const handleMoreAction = (command) => {
 }
 
 .property-address-primary {
-  font-size: 15px;
   color: var(--color-text-primary);
-  font-weight: 500;
-  line-height: 1.3;
   margin-bottom: 4px;
 }
 
 .property-address-secondary {
-  font-size: 13px;
   color: var(--color-text-secondary);
-  font-weight: 500;
-  line-height: 1.3;
 }
 
 /* 房型信息图标 - Lucide */
@@ -569,13 +558,10 @@ const handleMoreAction = (command) => {
 }
 
 .feature-item .spec-text {
-  line-height: 1; /* 数字与图标基线对齐，前端表现更稳 */
 }
 
 .feature-item span {
   color: var(--color-text-primary);
-  font-weight: 600;
-  font-size: 14px;
 }
 
 /* 底部信息区域 */
@@ -588,15 +574,11 @@ const handleMoreAction = (command) => {
 
 .availability-text {
   color: var(--color-text-secondary);
-  font-size: 13px;
-  font-weight: 400;
   margin-bottom: 4px;
 }
 
 .inspection-text {
   color: var(--link-color);
-  font-size: 12px;
-  font-weight: 500;
 }
 
 /* 响应式适配 */

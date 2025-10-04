@@ -1,87 +1,175 @@
-/* Typography Tokens & Utilities
-   中文注释：新增“文字系统”基础令牌与语义类。仅新增，不改动现有 tokens/样式，保证向后兼容。
-*/
+/**
+ * Typography Tokens & Utilities
+ * --------------------------------------------------------------------------
+ * 统一管理字体家族、字号、字重、行高与语义化文字角色。
+ * 所有尺寸均引用 design-tokens.css 中的单一事实来源，保持主题一致。
+ */
 
 :root {
-  /* 8pt 字号尺度 */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 20px;
-  --font-size-xl: 24px;
-  --font-size-xxl: 32px;
-  --font-size-3xl: 40px;
+  /* ---------------------------------------------------------------------- */
+  /* Tier 1 · Primitive Typography Tokens                                   */
+  /* ---------------------------------------------------------------------- */
+  --font-family-zh-sans: var(--font-zh-base);
+  --font-family-en-sans: var(--font-en-base);
 
-  /* 字重与行高 */
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  /* 8pt 模度（继承自 size-* 原子尺寸） */
+  --font-size-2xs: var(--size-11);
+  --font-size-xs: var(--size-12);
+  --font-size-sm: var(--size-13);
+  --font-size-md: var(--size-14);
+  --font-size-lg: var(--size-16);
+  --font-size-xl: var(--size-18);
+  --font-size-2xl: var(--size-20);
+  --font-size-xxl: var(--size-32);
+  --font-size-3xl: var(--size-40);
 
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.4;
-  --line-height-relaxed: 1.6;
-  --line-height-loose: 1.8;
+  --font-weight-regular: var(--weight-regular);
+  --font-weight-medium: var(--weight-medium);
+  --font-weight-semibold: var(--weight-semibold);
+  --font-weight-bold: var(--weight-bold);
 
-  /* 数字可读性（价格/计数） */
+  --line-height-tight: var(--leading-tight);
+  --line-height-normal: var(--leading-normal);
+  --line-height-relaxed: var(--leading-relaxed);
+  --line-height-loose: var(--leading-loose);
+
   --font-numeric-variant: tabular-nums;
 
-  /* 语义令牌（拆分到 size/weight/lineHeight/family，便于复用与定制） */
+  /* ---------------------------------------------------------------------- */
+  /* Tier 2 · Semantic Typography Tokens                                    */
+  /* ---------------------------------------------------------------------- */
   /* 正文 */
   --typography-body-default-size: var(--font-size-md);
   --typography-body-default-weight: var(--font-weight-regular);
   --typography-body-default-line: var(--line-height-relaxed);
   --typography-body-default-family: var(--font-family-zh-sans);
 
-  /* 小正文/辅助 */
+  --typography-body-strong-size: var(--font-size-md);
+  --typography-body-strong-weight: var(--font-weight-medium);
+  --typography-body-strong-line: var(--line-height-normal);
+  --typography-body-strong-family: var(--font-family-zh-sans);
+
   --typography-body-small-size: var(--font-size-sm);
   --typography-body-small-weight: var(--font-weight-regular);
   --typography-body-small-line: var(--line-height-normal);
   --typography-body-small-family: var(--font-family-zh-sans);
 
-  /* 页面主标题 */
-  --typography-heading-page-size: var(--font-size-xxl);
+  --typography-body-xs-size: var(--font-size-2xs);
+  --typography-body-xs-weight: var(--font-weight-regular);
+  --typography-body-xs-line: var(--line-height-normal);
+  --typography-body-xs-family: var(--font-family-zh-sans);
+
+  /* 标题 */
+  --typography-heading-page-size: var(--font-size-3xl);
   --typography-heading-page-weight: var(--font-weight-bold);
   --typography-heading-page-line: var(--line-height-tight);
   --typography-heading-page-family: var(--font-family-zh-sans);
 
-  /* 卡片标题 */
-  --typography-heading-card-size: var(--font-size-lg);
+  --typography-heading-section-size: var(--font-size-xxl);
+  --typography-heading-section-weight: var(--font-weight-bold);
+  --typography-heading-section-line: var(--line-height-tight);
+  --typography-heading-section-family: var(--font-family-zh-sans);
+
+  --typography-heading-card-size: var(--font-size-xl);
   --typography-heading-card-weight: var(--font-weight-semibold);
   --typography-heading-card-line: var(--line-height-normal);
   --typography-heading-card-family: var(--font-family-zh-sans);
 
-  /* 价格（沿用现有 22px，数值等宽） */
-  --typography-price-size: 22px;
-  --typography-price-weight: var(--font-weight-bold);
-  --typography-price-line: var(--line-height-tight);
-  --typography-price-family: var(--font-family-en-sans);
+  --typography-heading-sub-size: var(--font-size-lg);
+  --typography-heading-sub-weight: var(--font-weight-medium);
+  --typography-heading-sub-line: var(--line-height-normal);
+  --typography-heading-sub-family: var(--font-family-zh-sans);
 
-  /* 地址（英文主导） */
-  --typography-address-size: 15px;
-  --typography-address-weight: var(--font-weight-medium);
-  --typography-address-line: 1.3;
-  --typography-address-family: var(--font-family-en-sans);
+  /* 价格与数字 */
+  --typography-price-primary-size: var(--size-22);
+  --typography-price-primary-weight: var(--font-weight-bold);
+  --typography-price-primary-line: var(--line-height-tight);
+  --typography-price-primary-family: var(--font-family-en-sans);
 
-  /* 按钮 */
-  --typography-button-size: var(--font-size-md);
-  --typography-button-weight: var(--font-weight-medium);
-  --typography-button-line: var(--line-height-normal);
-  --typography-button-family: var(--font-family-zh-sans);
+  --typography-price-unit-size: var(--font-size-sm);
+  --typography-price-unit-weight: var(--font-weight-medium);
+  --typography-price-unit-line: var(--line-height-normal);
+  --typography-price-unit-family: var(--font-family-zh-sans);
 
-  /* 标签/单位（如“每周”） */
+  --typography-metric-size: var(--font-size-sm);
+  --typography-metric-weight: var(--font-weight-semibold);
+  --typography-metric-line: 1;
+  --typography-metric-family: var(--font-family-en-sans);
+
+  /* 地址 */
+  --typography-address-primary-size: var(--size-15);
+  --typography-address-primary-weight: var(--font-weight-medium);
+  --typography-address-primary-line: 1.3;
+  --typography-address-primary-family: var(--font-family-en-sans);
+
+  --typography-address-secondary-size: var(--font-size-sm);
+  --typography-address-secondary-weight: var(--font-weight-medium);
+  --typography-address-secondary-line: 1.3;
+  --typography-address-secondary-family: var(--font-family-en-sans);
+
+  /* 操作与状态 */
+  --typography-button-primary-size: var(--font-size-md);
+  --typography-button-primary-weight: var(--font-weight-medium);
+  --typography-button-primary-line: var(--line-height-normal);
+  --typography-button-primary-family: var(--font-family-zh-sans);
+
+  --typography-button-compact-size: var(--font-size-sm);
+  --typography-button-compact-weight: var(--font-weight-medium);
+  --typography-button-compact-line: var(--line-height-tight);
+  --typography-button-compact-family: var(--font-family-zh-sans);
+
   --typography-label-size: var(--font-size-sm);
   --typography-label-weight: var(--font-weight-regular);
   --typography-label-line: var(--line-height-normal);
   --typography-label-family: var(--font-family-zh-sans);
+
+  --typography-badge-size: var(--font-size-xs);
+  --typography-badge-weight: var(--font-weight-semibold);
+  --typography-badge-line: var(--line-height-tight);
+  --typography-badge-family: var(--font-family-zh-sans);
+
+  --typography-meta-size: var(--font-size-xs);
+  --typography-meta-weight: var(--font-weight-regular);
+  --typography-meta-line: var(--line-height-tight);
+  --typography-meta-family: var(--font-family-zh-sans);
 }
 
-/* 语义工具类（前端表现：给元素加类名即可获得统一排印风格） */
+/* ------------------------------------------------------------------------ */
+/* Tier 3 · Utility Classes                                                 */
+/* ------------------------------------------------------------------------ */
+.typo-body,
+.typo-body-strong,
+.typo-body-sm,
+.typo-body-xs,
+.typo-heading-page,
+.typo-heading-section,
+.typo-heading-card,
+.typo-heading-sub,
+.typo-price,
+.typo-price-unit,
+.typo-address,
+.typo-address-secondary,
+.typo-button,
+.typo-button-compact,
+.typo-label,
+.typo-badge,
+.typo-meta,
+.typo-metric {
+  font-feature-settings: 'kern' 1;
+}
+
 .typo-body {
   font-family: var(--typography-body-default-family);
   font-size: var(--typography-body-default-size);
   font-weight: var(--typography-body-default-weight);
   line-height: var(--typography-body-default-line);
+}
+
+.typo-body-strong {
+  font-family: var(--typography-body-strong-family);
+  font-size: var(--typography-body-strong-size);
+  font-weight: var(--typography-body-strong-weight);
+  line-height: var(--typography-body-strong-line);
 }
 
 .typo-body-sm {
@@ -91,11 +179,25 @@
   line-height: var(--typography-body-small-line);
 }
 
+.typo-body-xs {
+  font-family: var(--typography-body-xs-family);
+  font-size: var(--typography-body-xs-size);
+  font-weight: var(--typography-body-xs-weight);
+  line-height: var(--typography-body-xs-line);
+}
+
 .typo-heading-page {
   font-family: var(--typography-heading-page-family);
   font-size: var(--typography-heading-page-size);
   font-weight: var(--typography-heading-page-weight);
   line-height: var(--typography-heading-page-line);
+}
+
+.typo-heading-section {
+  font-family: var(--typography-heading-section-family);
+  font-size: var(--typography-heading-section-size);
+  font-weight: var(--typography-heading-section-weight);
+  line-height: var(--typography-heading-section-line);
 }
 
 .typo-heading-card {
@@ -105,26 +207,62 @@
   line-height: var(--typography-heading-card-line);
 }
 
+.typo-heading-sub {
+  font-family: var(--typography-heading-sub-family);
+  font-size: var(--typography-heading-sub-size);
+  font-weight: var(--typography-heading-sub-weight);
+  line-height: var(--typography-heading-sub-line);
+}
+
 .typo-price {
-  font-family: var(--typography-price-family);
-  font-size: var(--typography-price-size);
-  font-weight: var(--typography-price-weight);
-  line-height: var(--typography-price-line);
+  font-family: var(--typography-price-primary-family);
+  font-size: var(--typography-price-primary-size);
+  font-weight: var(--typography-price-primary-weight);
+  line-height: var(--typography-price-primary-line);
+  font-variant-numeric: var(--font-numeric-variant);
+}
+
+.typo-price-unit {
+  font-family: var(--typography-price-unit-family);
+  font-size: var(--typography-price-unit-size);
+  font-weight: var(--typography-price-unit-weight);
+  line-height: var(--typography-price-unit-line);
+}
+
+.typo-metric {
+  font-family: var(--typography-metric-family);
+  font-size: var(--typography-metric-size);
+  font-weight: var(--typography-metric-weight);
+  line-height: var(--typography-metric-line);
   font-variant-numeric: var(--font-numeric-variant);
 }
 
 .typo-address {
-  font-family: var(--typography-address-family);
-  font-size: var(--typography-address-size);
-  font-weight: var(--typography-address-weight);
-  line-height: var(--typography-address-line);
+  font-family: var(--typography-address-primary-family);
+  font-size: var(--typography-address-primary-size);
+  font-weight: var(--typography-address-primary-weight);
+  line-height: var(--typography-address-primary-line);
+}
+
+.typo-address-secondary {
+  font-family: var(--typography-address-secondary-family);
+  font-size: var(--typography-address-secondary-size);
+  font-weight: var(--typography-address-secondary-weight);
+  line-height: var(--typography-address-secondary-line);
 }
 
 .typo-button {
-  font-family: var(--typography-button-family);
-  font-size: var(--typography-button-size);
-  font-weight: var(--typography-button-weight);
-  line-height: var(--typography-button-line);
+  font-family: var(--typography-button-primary-family);
+  font-size: var(--typography-button-primary-size);
+  font-weight: var(--typography-button-primary-weight);
+  line-height: var(--typography-button-primary-line);
+}
+
+.typo-button-compact {
+  font-family: var(--typography-button-compact-family);
+  font-size: var(--typography-button-compact-size);
+  font-weight: var(--typography-button-compact-weight);
+  line-height: var(--typography-button-compact-line);
 }
 
 .typo-label {
@@ -134,10 +272,29 @@
   line-height: var(--typography-label-line);
 }
 
+.typo-badge {
+  font-family: var(--typography-badge-family);
+  font-size: var(--typography-badge-size);
+  font-weight: var(--typography-badge-weight);
+  line-height: var(--typography-badge-line);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.typo-meta {
+  font-family: var(--typography-meta-family);
+  font-size: var(--typography-meta-size);
+  font-weight: var(--typography-meta-weight);
+  line-height: var(--typography-meta-line);
+}
+
 /* 兼容现有 english-text/chinese-text（可与上面类并用） */
-.en-text {
+.en-text,
+.english-text {
   font-family: var(--font-family-en-sans);
 }
-.zh-text {
+
+.zh-text,
+.chinese-text {
   font-family: var(--font-family-zh-sans);
 }
