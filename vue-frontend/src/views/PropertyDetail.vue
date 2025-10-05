@@ -758,8 +758,6 @@ onBeforeRouteLeave(() => {
 
 <style scoped>
 /* Domain.com.au 像素级还原样式 - 基于Figma精确设计 */
-@import url('@/assets/design-tokens.css');
-
 .property-detail-page {
   min-height: 100vh;
   background-color: var(--color-bg-page); /* 页面背景用页灰，卡片区域用 --color-bg-card */
