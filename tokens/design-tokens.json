@@ -1,0 +1,101 @@
+{
+  "color": {
+    "white": {
+      "value": "#ffffff",
+      "type": "color",
+      "description": "纯白色"
+    },
+    "black": {
+      "value": "#000000",
+      "type": "color",
+      "description": "纯黑色"
+    },
+    "gray": {
+      "50": { "value": "#f9fafb", "type": "color", "description": "中性灰 50" },
+      "75": { "value": "#f4f7f9", "type": "color", "description": "页面背景灰" },
+      "100": { "value": "#f3f4f6", "type": "color", "description": "中性灰 100" },
+      "200": { "value": "#e5e7eb", "type": "color", "description": "中性灰 200" },
+      "300": { "value": "#d1d5db", "type": "color", "description": "中性灰 300" },
+      "400": { "value": "#9ca3af", "type": "color", "description": "中性灰 400" },
+      "500": { "value": "#6b7280", "type": "color", "description": "中性灰 500" },
+      "600": { "value": "#4b5563", "type": "color", "description": "中性灰 600" },
+      "700": { "value": "#374151", "type": "color", "description": "中性灰 700" },
+      "800": { "value": "#1f2937", "type": "color", "description": "中性灰 800" },
+      "900": { "value": "#111827", "type": "color", "description": "中性灰 900" }
+    },
+    "brand": {
+      "primary": {
+        "value": "#0057ff",
+        "type": "color",
+        "description": "品牌主色，用于关键操作和高亮显示"
+      },
+      "hover": {
+        "value": "#0047e5",
+        "type": "color",
+        "description": "品牌主色悬停状态"
+      },
+      "active": {
+        "value": "#0036b3",
+        "type": "color",
+        "description": "品牌主色激活状态"
+      }
+    },
+    "semantic": {
+      "bg": {
+        "primary": { "value": "{color.white.value}", "type": "color", "description": "一级背景色，用于页面主内容区域" },
+        "secondary": { "value": "{color.gray.50.value}", "type": "color", "description": "二级背景色，用于区分不同区块" },
+        "page": { "value": "{color.gray.75.value}", "type": "color", "description": "整页背景色" }
+      },
+      "text": {
+        "primary": { "value": "{color.gray.800.value}", "type": "color", "description": "主要文字颜色" },
+        "secondary": { "value": "{color.gray.500.value}", "type": "color", "description": "次要文字颜色" },
+        "muted": { "value": "{color.gray.400.value}", "type": "color", "description": "提示性或置灰文字颜色" },
+        "inverse": { "value": "{color.white.value}", "type": "color", "description": "反色文字，用于深色背景" }
+      },
+      "border": {
+        "default": { "value": "{color.gray.300.value}", "type": "color", "description": "默认边框颜色" },
+        "subtle": { "value": "{color.gray.200.value}", "type": "color", "description": "更弱化的边框颜色" }
+      }
+    }
+  },
+  "font": {
+    "size": {
+      "xs": { "value": "12px", "type": "dimension", "description": "超小号字体" },
+      "sm": { "value": "13px", "type": "dimension", "description": "小号字体" },
+      "md": { "value": "14px", "type": "dimension", "description": "中号字体（正文）" },
+      "lg": { "value": "16px", "type": "dimension", "description": "大号字体" },
+      "xl": { "value": "18px", "type": "dimension", "description": "超大号字体" }
+    },
+    "weight": {
+      "regular": { "value": "400", "type": "fontWeight", "description": "常规字重" },
+      "medium": { "value": "500", "type": "fontWeight", "description": "中等字重" },
+      "semibold": { "value": "600", "type": "fontWeight", "description": "半粗字重" },
+      "bold": { "value": "700", "type": "fontWeight", "description": "加粗字重" }
+    }
+  },
+  "space": {
+    "xs": { "value": "6px", "type": "dimension", "description": "超小间距" },
+    "sm": { "value": "8px", "type": "dimension", "description": "小间距" },
+    "md": { "value": "12px", "type": "dimension", "description": "中间距" },
+    "lg": { "value": "16px", "type": "dimension", "description": "大间距" },
+    "xl": { "value": "20px", "type": "dimension", "description": "超大间距" }
+  },
+  "radius": {
+    "sm": { "value": "6px", "type": "dimension", "description": "小圆角" },
+    "md": { "value": "8px", "type": "dimension", "description": "中圆角" },
+    "lg": { "value": "12px", "type": "dimension", "description": "大圆角" },
+    "full": { "value": "9999px", "type": "dimension", "description": "全圆角（用于药丸形状）" }
+  },
+  "shadow": {
+    "sm": { "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)", "type": "shadow", "description": "小阴影" },
+    "md": { "value": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", "type": "shadow", "description": "中阴影" }
+  },
+  "component": {
+    "button": {
+      "primary": {
+        "bg": { "value": "{color.brand.primary.value}", "type": "color", "description": "主按钮背景色" },
+        "color": { "value": "{color.semantic.text.inverse.value}", "type": "color", "description": "主按钮文字颜色" }
+      }
+    }
+  }
+}

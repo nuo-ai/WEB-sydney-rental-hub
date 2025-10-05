@@ -1,0 +1,15 @@
+{
+  "name": "sydney-rental-hub-token-builder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Builds design tokens using Style Dictionary.",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "style-dictionary": "^3.9.2",
+    "fs-extra": "^11.1.1",
+    "globby": "^13.2.2"
+  }
+}

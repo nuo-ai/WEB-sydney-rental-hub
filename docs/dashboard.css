@@ -1,0 +1,244 @@
+/* General Body Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 0;
+    background-color: #f9fafb;
+    color: #1f2937;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 64px 1fr;
+    grid-template-areas:
+        "sidebar header"
+        "sidebar main";
+    height: 100vh;
+}
+
+/* Header Styles */
+.header {
+    grid-area: header;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    justify-content: space-between;
+}
+
+.logo {
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.search-bar {
+    width: 300px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+.top-nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    grid-area: sidebar;
+    background-color: #f3f4f6;
+    padding: 24px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.sidebar h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li a {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #374151;
+    font-weight: 500;
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+.sidebar li a:hover {
+    background-color: #e5e7eb;
+}
+
+.sidebar li a.active {
+    background-color: #e0e7ff;
+    color: #4338ca;
+}
+
+/* Main Content Styles */
+.main-content {
+    grid-area: main;
+    padding: 48px;
+    overflow-y: auto;
+}
+
+.main-content h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.main-content h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+.main-content p {
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+/* Card Styles */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+/* Color Swatch Grid */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+}
+
+.color-swatch-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.color-swatch {
+    height: 100px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.color-info {
+    padding: 16px;
+    background-color: #ffffff;
+}
+
+.color-info .name {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.color-info .value {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Typography Scale */
+.typo-demo {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+.typo-demo:last-child {
+    border-bottom: none;
+}
+.typo-demo .label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+.typo-h1 { font-size: 40px; font-weight: 700; }
+.typo-h2 { font-size: 32px; font-weight: 700; }
+.typo-body { font-size: 14px; font-weight: 400; line-height: 1.6; }
+.typo-small { font-size: 13px; font-weight: 400; }
+
+/* Code Block Styles */
+pre {
+    background-color: #111827;
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+/* Status Tag Styles */
+.status-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+.status-tag.active {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.status-tag.stale {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+.status-tag.outdated {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Component Card */
+.component-card .path {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+.component-card .description {
+    margin-bottom: 12px;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+}
+th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+tbody tr:hover {
+    background-color: #f9fafb;
+}

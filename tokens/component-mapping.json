@@ -1,0 +1,25 @@
+{
+  "components": {
+    "PropertyCard": {
+      "description": "房源卡片，用于在列表中展示房源的关键信息。",
+      "tokens": [
+        { "path": "color.semantic.bg.primary", "usage": "卡片背景色" },
+        { "path": "shadow.md", "usage": "卡片阴影，营造悬浮感" },
+        { "path": "radius.lg", "usage": "卡片圆角" },
+        { "path": "color.semantic.text.primary", "usage": "房源标题和价格文字颜色" },
+        { "path": "color.semantic.text.secondary", "usage": "地址和规格等次要信息文字颜色" }
+      ]
+    },
+    "PrimaryButton": {
+      "description": "主要号召性操作按钮，例如 '联系我们' 或 '应用筛选'。",
+      "tokens": [
+        { "path": "color.brand.primary", "usage": "按钮背景色" },
+        { "path": "color.brand.hover", "usage": "按钮悬停背景色" },
+        { "path": "color.semantic.text.inverse", "usage": "按钮文字颜色" },
+        { "path": "radius.md", "usage": "按钮圆角" },
+        { "path": "font.weight.medium", "usage": "按钮文字字重" },
+        { "path": "font.size.md", "usage": "按钮文字大小" }
+      ]
+    }
+  }
+}
