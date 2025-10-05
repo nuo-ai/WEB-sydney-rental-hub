@@ -1,5 +1,5 @@
 <template>
-  <teleport to="body">
+  <teleport v-if="teleportTarget" :to="teleportTarget">
     <transition name="dropdown-fade">
       <div v-if="isOpen" class="filter-dropdown-overlay" @click.self="closeDropdown">
         <div
@@ -75,6 +75,13 @@ const isOpen = computed({
 })
 
 const dropdownRef = ref(null)
+const teleportTarget = ref(null)
+const ensureTeleportTarget = () => {
+  if (teleportTarget.value) return teleportTarget.value
+  if (typeof document === 'undefined') return null
+  teleportTarget.value = document.body
+  return teleportTarget.value
+}
 const positionStyle = ref({})
 
 // 中文注释：记录关闭后要恢复的焦点来源（优先使用触发器，其次使用关闭前的活动元素）
@@ -230,10 +237,13 @@ const handleResize = () => {
 
 // 中文注释：锁定/恢复 body 滚动，避免出现页面滚动条与面板滚动条并列
 const lockBodyScroll = () => {
+  if (typeof document === 'undefined') return
+  ensureTeleportTarget()
   document.documentElement.style.overflow = 'hidden'
   document.body.style.overflow = 'hidden'
 }
 const unlockBodyScroll = () => {
+  if (typeof document === 'undefined') return
   document.documentElement.style.overflow = ''
   document.body.style.overflow = ''
 }
@@ -321,6 +331,7 @@ watch(
 )
 
 onMounted(() => {
+  ensureTeleportTarget()
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('resize', handleResize)
   window.addEventListener('scroll', handleResize, true)
@@ -330,6 +341,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('resize', handleResize)
   window.removeEventListener('scroll', handleResize, true)
+  teleportTarget.value = null
 })
 
 onUnmounted(() => {
