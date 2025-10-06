@@ -3,28 +3,25 @@
 统一启动脚本 - 启动所有服务
 适配新的项目目录结构
 """
-import shutil
 import signal
 import subprocess
 import sys
 import time
 from pathlib import Path
-from threading import Thread
 
 def start_backend():
     """启动后端API服务"""
     print("🚀 启动后端API服务...")
     project_root = Path(__file__).parent.parent
-    
-    cmd = [
-        sys.executable, "-m", "uvicorn", 
-        "backend.main:app", 
-        "--host", "0.0.0.0", 
-        "--port", "8000"
-    ]
-    
+    backend_path = project_root / "apps" / "backend"
+
+    cmd = ["pnpm", "--filter", "@web-sydney/backend", "dev"]
+
     try:
-        process = subprocess.Popen(cmd, cwd=str(project_root))
+        if sys.platform == "win32":
+            process = subprocess.Popen(" ".join(cmd), cwd=str(backend_path), shell=True)
+        else:
+            process = subprocess.Popen(cmd, cwd=str(backend_path))
         print("✅ 后端API启动成功 - http://localhost:8000")
         return process
     except Exception as e:
@@ -34,13 +31,17 @@ def start_backend():
 def start_frontend():
     """启动前端开发服务器"""
     print("🚀 启动前端服务...")
-    frontend_path = Path(__file__).parent.parent / "frontend"
-    
-    cmd = [sys.executable, "-m", "http.server", "8080"]
-    
+    project_root = Path(__file__).parent.parent
+    frontend_path = project_root / "apps" / "web"
+
+    cmd = ["pnpm", "--filter", "@web-sydney/web", "dev"]
+
     try:
-        process = subprocess.Popen(cmd, cwd=str(frontend_path))
-        print("✅ 前端服务启动成功 - http://localhost:8080")
+        if sys.platform == "win32":
+            process = subprocess.Popen(" ".join(cmd), cwd=str(frontend_path), shell=True)
+        else:
+            process = subprocess.Popen(cmd, cwd=str(frontend_path))
+        print("✅ 前端服务启动成功 - http://localhost:5173")
         return process
     except Exception as e:
         print(f"❌ 前端服务启动失败: {e}")
@@ -52,24 +53,13 @@ def start_mcp_server():
     project_root = Path(__file__).parent.parent
     mcp_path = project_root / "apps" / "mcp-server"
 
-    is_windows = sys.platform == "win32"
+    cmd = ["pnpm", "--filter", "@web-sydney/mcp-server", "dev"]
 
-    # 1. 编译
-    print("    - 正在编译MCP服务器...")
-    package_manager = shutil.which("pnpm") or "npm"
-    build_cmd = [package_manager, "run", "build"]
     try:
-        subprocess.run(build_cmd, cwd=str(mcp_path), check=True, shell=is_windows)
-        print("    - MCP服务器编译完成。")
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        print(f"❌ MCP服务器编译失败: {e}")
-        return None
-
-    # 2. 启动
-    # 直接用node运行编译后的文件，而不是npm start
-    start_cmd = ["node", "dist/index.js"]
-    try:
-        process = subprocess.Popen(start_cmd, cwd=str(mcp_path), shell=is_windows)
+        if sys.platform == "win32":
+            process = subprocess.Popen(" ".join(cmd), cwd=str(mcp_path), shell=True)
+        else:
+            process = subprocess.Popen(cmd, cwd=str(mcp_path))
         print("✅ MCP服务器启动成功 - http://localhost:3002")
         return process
     except Exception as e:
@@ -110,7 +100,7 @@ def main():
     
     print("\n" + "=" * 50)
     print("🎉 所有服务启动完成！")
-    print("📱 前端: http://localhost:8080")
+    print("📱 前端: http://localhost:5173")
     print("🔧 后端API: http://localhost:8000")
     print("🤖 MCP服务器: http://localhost:3002")
     print("\n按 Ctrl+C 停止所有服务")
