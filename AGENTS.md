@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Modules
-- `backend/`: FastAPI app, GraphQL schema, Celery tasks, DB CRUD and models.
+- `apps/backend/`: FastAPI app, GraphQL schema, Celery tasks, DB CRUD and models.
 - `vue-frontend/`: Vue 3 + Vite UI, Pinia stores, routing, ESLint/Prettier.
 - `apps/mcp-server/`: TypeScript MCP server for AI assistants.
 - `scripts/` and `database/`: Utilities, ETL helpers, SQL and data processors.
@@ -12,9 +12,9 @@
 - Backend
   - Create env: `python -m venv .venv && . .venv/bin/activate` (Windows: `.venv\Scripts\activate`)
   - Install: `pip install -r requirements.txt`
-  - Run API: `uvicorn backend.main:app --reload --port 8000`
-  - Celery worker: `celery -A backend.celery_worker.celery_app worker -l info`
-  - .env: copy from `backend/.env.example` or project `.env.example`.
+  - Run API: `pnpm --filter @web-sydney/backend dev`
+  - Celery worker: `pnpm --filter @web-sydney/backend worker`
+  - .env: copy from `apps/backend/.env.example` or project `.env.example`.
 - Frontend
   - `pnpm install --filter @web-sydney/web`
   - Dev: `pnpm --filter @web-sydney/web dev` (http://localhost:5173)
@@ -25,12 +25,12 @@
   - Start: `pnpm start` (requires local config and backend availability)
 
 ## Coding Style & Naming
-- Python: PEP 8, 4‑space indent, type hints; `snake_case` for modules/functions, `PascalCase` for classes. Keep API in `backend/api`, DB ops in `backend/crud`, models in `backend/models`.
+- Python: PEP 8, 4‑space indent, type hints; `snake_case` for modules/functions, `PascalCase` for classes. Keep API in `apps/backend/api`, DB ops in `apps/backend/crud`, models in `apps/backend/models`.
 - Vue/TS: follow `eslint.config.js` and Prettier; SFCs named `PascalCase` (e.g., `PropertyDetail.vue`), non‑component files `kebab-case`.
 - Commits and PR titles use Conventional Commits (see below).
 
 ## Testing Guidelines
-- Backend: targeted scripts exist; examples: `python backend/test_auth.py`, `python scripts/test_api.py`. Ensure DB/Redis and `.env` are set.
+- Backend: targeted scripts exist; examples: `python apps/backend/test_auth.py`, `python scripts/test_api.py`. Ensure DB/Redis and `.env` are set.
 - Frontend: Playwright configured (`playwright.config.js`). With dev server running, run: `npx playwright test`. Place specs under `tests/` as `*.spec.(ts|js)`.
 - Aim for meaningful assertions around APIs and critical UI flows.
 

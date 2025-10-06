@@ -40,5 +40,12 @@
     "stylelint-declaration-strict-value": "^1.10.11",
     "vite": "^7.0.6",
     "vite-plugin-vue-devtools": "^8.0.0"
+  },
+  "turbo": {
+    "pipeline": {
+      "dev": {
+        "dependsOn": ["^dev", "@web-sydney/backend#dev"]
+      }
+    }
   }
 }

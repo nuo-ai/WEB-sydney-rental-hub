@@ -4,7 +4,7 @@
 
 ## __0. 项目概述__
 
-这个 `backend` 文件夹是您整个应用的核心后端服务，使用 Python 和 FastAPI 框架构建。它采用了现代、分层的软件架构，结构清晰，功能强大，不仅提供数据查询接口，还集成了异步任务处理能力。
+位于 `apps/backend` 下的这个 `backend` 文件夹是您整个应用的核心后端服务，使用 Python 和 FastAPI 框架构建。它采用了现代、分层的软件架构，结构清晰，功能强大，不仅提供数据查询接口，还集成了异步任务处理能力。
 
 __核心功能与目的__
 
@@ -95,7 +95,7 @@ SECRET_KEY=a_very_secret_key_for_jwt
 
 ## 3. 启动服务
 
-您需要在**三个不同**的终端中启动三个独立的服务，所有命令都从项目根目录 (`WEB-sydney-rental-hub`) 执行。
+您需要在**三个不同**的终端中启动三个独立的服务。所有命令均在项目根目录 (`WEB-sydney-rental-hub`) 执行，通过 `pnpm` 调用工作区脚本，这些脚本会自动进入 `apps/backend` 目录。
 
 ### 终端 1: 启动 FastAPI 主服务
 
@@ -104,35 +104,20 @@ SECRET_KEY=a_very_secret_key_for_jwt
 **通用/macOS/Linux:**
 
 ```bash
-uvicorn backend.main:app --reload --port 8000
+pnpm --filter @web-sydney/backend dev
 ```
 
-**Windows (推荐的可靠方式):**
-
-```bash
-# 确保你已激活虚拟环境 (.venv\Scripts\activate)
-```
-
-.venv\Scripts\python.exe -m uvicorn backend.main:app --reload --port 8000
-
-```
-
-
-```
-
-```
-
-```
-
-服务启动后，您可以在 `http://localhost:8000` 访问它。
+该脚本会执行 `python -m uvicorn main:app --reload --port 8000 --env-file ../../.env`，自动读取仓库根目录的 `.env` 文件。服务启动后，您可以在 `http://localhost:8000` 访问它。
 
 ### 终端 2: 启动 Celery 异步任务工人
 
 此服务在后台处理耗时任务（如发送邮件、数据处理）。
 
 ```bash
-celery -A backend.celery_worker.celery_app worker --loglevel=info
+pnpm --filter @web-sydney/backend worker
 ```
+
+该脚本会运行 `celery -A celery_worker.celery_app worker -l info`。
 
 ### 终端 3: (可选) 启动 Celery Flower 监控面板
 
@@ -147,7 +132,7 @@ pip install flower
 然后运行:
 
 ```bash
-celery -A backend.celery_worker.celery_app flower --port=5555
+celery -A celery_worker.celery_app flower --port=5555
 ```
 
 之后您可以在 `http://localhost:5555` 访问 Flower 的监控面板。
@@ -197,8 +182,8 @@ celery -A backend.celery_worker.celery_app flower --port=5555
 ### Q3: Uvicorn 启动失败，提示 "无法找到文件" (Windows)？
 
 **原因**: Windows 的命令行启动器可能无法正确解析虚拟环境中的路径。
-**解决方案**: 不要直接运行 `uvicorn`，而是明确地使用虚拟环境中的 Python 解释器来运行 `uvicorn` 模块，如下所示：
+**解决方案**: 不要直接运行 `uvicorn`，而是明确地使用虚拟环境中的 Python 解释器来运行 `uvicorn` 模块，例如：
 
 ```bash
-.venv\Scripts\python.exe -m uvicorn backend.main:app --reload
+.venv\Scripts\python.exe -m uvicorn main:app --reload
 ```
