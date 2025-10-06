@@ -1,7 +1,7 @@
 # Git Hooks (Lightweight)
 
 This repo ships a lightweight pre-commit hook to catch low-level issues fast:
-- Frontend: ESLint (`vue-frontend`)
+- Frontend: ESLint (`pnpm --filter @web-sydney/web lint`)
 - MCP server: TypeScript typecheck (no emit)
 - Python: syntax errors via `compileall`
 

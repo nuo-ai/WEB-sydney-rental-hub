@@ -18,7 +18,7 @@
 
 ### 项目结构
 ```
-vue-frontend/
+apps/web/
 ├── src/views/          # 页面组件
 ├── src/components/     # 可复用组件
 ├── src/stores/         # Pinia状态管理
@@ -37,7 +37,7 @@ vue-frontend/
 ## 筛选系统技术约定
 
 ### URL 幂等与状态同步
-- **实现文件**: `vue-frontend/src/utils/query.js`（sanitizeQueryParams、isSameQuery）
+- **实现文件**: `apps/web/src/utils/query.js`（sanitizeQueryParams、isSameQuery）
 - **落地点**: FilterPanel 统一面板、五个分面、HomeView.sort
 - **前端表现**: 应用后 URL 可直链/刷新恢复，不写空键，地址栏不抖动
 
@@ -57,9 +57,9 @@ vue-frontend/
 
 ### 本地运行
 ```bash
-# Vue前端开发环境
-cd vue-frontend
-npm run dev              # localhost:5173
+# Web 前端开发环境
+pnpm install --filter @web-sydney/web
+pnpm --filter @web-sydney/web dev   # localhost:5173
 
 # 后端API服务
 cd ../
@@ -117,7 +117,7 @@ npx playwright test -g "URL 幂等与仅写非空键"
 
 ### Netlify 部署
 - **配置文件**: netlify.toml
-- **构建设置**: base="vue-frontend", command="npm run build", publish="dist"
+- **构建设置**: base="apps/web", command="pnpm --filter @web-sydney/web build", publish="dist"
 - **SPA 重写**: `/*` → `/index.html` (status=200)
 
 ### 本地运维（PowerShell）

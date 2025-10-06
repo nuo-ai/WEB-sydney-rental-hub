@@ -1,18 +1,16 @@
 {
-  "name": "vue-frontend",
+  "name": "@web-sydney/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --fix",
+    "lint": "eslint .",
     "lint:style": "stylelint \"src/**/*.{css,vue}\" --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "test": "playwright test"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",

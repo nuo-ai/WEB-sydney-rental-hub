@@ -356,9 +356,9 @@
      - 分页组件绑定服务端分页信息
      - 新增分页动作（nextPage, prevPage, setPageSize）
    - **影响文件**：
-     - `vue-frontend/src/stores/properties.js`
-     - `vue-frontend/src/services/api.js:63-79`
-     - `vue-frontend/src/views/HomeView.vue`
+     - `apps/web/src/stores/properties.js`
+     - `apps/web/src/services/api.js:63-79`
+     - `apps/web/src/views/HomeView.vue`
 
 ---
 

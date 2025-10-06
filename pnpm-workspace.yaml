@@ -1,5 +1,3 @@
 packages:
   - apps/*
   - packages/*
-  - vue-frontend
-  - mcp-server

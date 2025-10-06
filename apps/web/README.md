@@ -46,22 +46,19 @@
 ## 🚀 快速开始
 
 ### 环境要求
-- Node.js 18.x+
-- npm 或 pnpm
+- Node.js 20.x+
+- pnpm 8+
 
 ### 安装步骤
 
 ```bash
-# 1. 进入项目目录
-cd vue-frontend
+# 1. 安装依赖（仓库根目录）
+pnpm install
 
-# 2. 安装依赖
-npm install
+# 2. 启动开发服务器
+pnpm --filter @web-sydney/web dev
 
-# 3. 启动开发服务器
-npm run dev
-
-# 4. 访问应用
+# 3. 访问应用
 open http://localhost:5173
 ```
 
@@ -76,7 +73,7 @@ python scripts/run_backend.py
 ## 📁 项目结构
 
 ```
-vue-frontend/
+apps/web/
 ├── src/
 │   ├── components/          # 可复用组件
 │   │   ├── PropertyCard.vue    # 房源卡片
@@ -178,19 +175,19 @@ GET /api/properties?search=keyword&filters...
 
 ```bash
 # 开发模式
-npm run dev
+pnpm --filter @web-sydney/web dev
 
 # 构建生产版本
-npm run build
+pnpm --filter @web-sydney/web build
 
 # 预览生产版本
-npm run preview
+pnpm --filter @web-sydney/web preview
 
 # 代码检查
-npm run lint
+pnpm --filter @web-sydney/web lint
 
 # 代码格式化
-npm run format
+pnpm --filter @web-sydney/web format
 ```
 
 ## 🔮 未来扩展

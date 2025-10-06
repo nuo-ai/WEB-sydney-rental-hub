@@ -2,7 +2,7 @@
 
 ## Project Structure & Modules
 - `backend/`: FastAPI app, GraphQL schema, Celery tasks, DB CRUD and models.
-- `vue-frontend/`: Vue 3 + Vite UI, Pinia stores, routing, ESLint/Prettier.
+- `apps/web/`: Vue 3 + Vite UI, Pinia stores, routing, ESLint/Prettier.
 - `mcp-server/`: TypeScript MCP server for AI assistants.
 - `scripts/` and `database/`: Utilities, ETL helpers, SQL and data processors.
 - `crawler/`: Feature extraction and integration examples.
@@ -16,9 +16,9 @@
   - Celery worker: `celery -A backend.celery_worker.celery_app worker -l info`
   - .env: copy from `backend/.env.example` or project `.env.example`.
 - Frontend
-  - `cd vue-frontend && npm install`
-  - Dev: `npm run dev` (http://localhost:5173)
-  - Build: `npm run build`; Lint/format: `npm run lint`, `npm run format`
+  - `pnpm install --filter @web-sydney/web`
+  - Dev: `pnpm --filter @web-sydney/web dev` (http://localhost:5173)
+  - Build: `pnpm --filter @web-sydney/web build`; Lint/format: `pnpm --filter @web-sydney/web lint`, `pnpm --filter @web-sydney/web format`
 - MCP Server (optional; currently disabled)
   - Only enable if needed for AI tooling integration.
   - `cd mcp-server && npm install && npm run build`

@@ -127,14 +127,14 @@
         output_mode: "content")
   ⎿  Found 174 lines (ctrl+r to expand)
 
-● Search(pattern: "is_furnished|furnished", path: "vue-frontend", glob: "**/*.vue")
+● Search(pattern: "is_furnished|furnished", path: "apps/web", glob: "**/*.vue")
   ⎿  Found 3 files (ctrl+r to expand)
 
-● Search(pattern: "is_furnished|furnished", path: "vue-frontend/src/views/PropertyDetail.vue",
+● Search(pattern: "is_furnished|furnished", path: "apps/web/src/views/PropertyDetail.vue",
         output_mode: "content")
   ⎿  Found 5 lines (ctrl+r to expand)
 
-● Search(pattern: "is_furnished|furnished", path: "vue-frontend/src/components/FilterPanel.vue",
+● Search(pattern: "is_furnished|furnished", path: "apps/web/src/components/FilterPanel.vue",
         output_mode: "content")
   ⎿  Found 21 lines (ctrl+r to expand)
 
