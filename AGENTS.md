@@ -14,7 +14,7 @@
   - Install: `pip install -r requirements.txt`
   - Run API: `uvicorn backend.main:app --reload --port 8000`
   - Celery worker: `celery -A backend.celery_worker.celery_app worker -l info`
-  - .env: copy from `backend/.env.example` or project `.env.example`.
+  - .env: copy from `apps/backend/.env.example` or project `.env.example`.
 - Frontend
   - `cd vue-frontend && npm install`
   - Dev: `npm run dev` (http://localhost:5173)

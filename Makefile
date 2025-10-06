@@ -4,8 +4,16 @@ PYTHON ?= python
 BACKEND_DIR := apps/backend
 ENV_FILE ?= .env
 
+# Determine an env file argument only if the file exists to avoid uvicorn errors.
+ENV_FILE_ARG :=
+ifneq (,$(wildcard $(ENV_FILE)))
+ENV_FILE_ARG := --env-file $(ENV_FILE)
+else ifneq (,$(wildcard $(BACKEND_DIR)/.env))
+ENV_FILE_ARG := --env-file $(BACKEND_DIR)/.env
+endif
+
 backend-dev:
-	cd $(BACKEND_DIR) && $(PYTHON) -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 --env-file ../../$(ENV_FILE)
+	$(PYTHON) -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 $(ENV_FILE_ARG)
 
 backend-lint:
 	cd $(BACKEND_DIR) && ruff check
