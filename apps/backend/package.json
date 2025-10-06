@@ -6,6 +6,7 @@
     "dev": "python -m uvicorn main:app --reload --port 8000 --env-file ../../.env",
     "worker": "celery -A celery_worker.celery_app worker -l info",
     "test": "pytest .",
-    "build": "python -m compileall ."
+    "build": "python -m compileall .",
+    "typecheck": "python -m compileall ."
   }
 }
