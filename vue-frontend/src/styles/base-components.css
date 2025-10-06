@@ -450,7 +450,7 @@
   height: 20px;
   padding: 0 var(--space-1-5);
   font-size: var(--text-xs);
-  font-weight: var(--font-bold);
+  font-weight: var(--font-weight-bold);
   color: white;
   background: var(--brand-primary);
   border-radius: var(--radius-full);
