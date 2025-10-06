@@ -3,7 +3,7 @@
 ## Project Structure & Modules
 - `backend/`: FastAPI app, GraphQL schema, Celery tasks, DB CRUD and models.
 - `vue-frontend/`: Vue 3 + Vite UI, Pinia stores, routing, ESLint/Prettier.
-- `mcp-server/`: TypeScript MCP server for AI assistants.
+- `apps/mcp-server/`: TypeScript MCP server for AI assistants.
 - `scripts/` and `database/`: Utilities, ETL helpers, SQL and data processors.
 - `crawler/`: Feature extraction and integration examples.
 - Docs: see `README.md`, `AUTHENTICATION_GUIDE.md`, `FRONTEND_STYLE_GUIDE.md`, `SECURITY_CHECKLIST.md`, `GOOGLE_MAPS_API_SETUP.md`.
@@ -21,8 +21,8 @@
   - Build: `npm run build`; Lint/format: `npm run lint`, `npm run format`
 - MCP Server (optional; currently disabled)
   - Only enable if needed for AI tooling integration.
-  - `cd mcp-server && npm install && npm run build`
-  - Start: `npm start` (requires local config and backend availability)
+  - `cd apps/mcp-server && pnpm install && pnpm run build`
+  - Start: `pnpm start` (requires local config and backend availability)
 
 ## Coding Style & Naming
 - Python: PEP 8, 4‑space indent, type hints; `snake_case` for modules/functions, `PascalCase` for classes. Keep API in `backend/api`, DB ops in `backend/crud`, models in `backend/models`.

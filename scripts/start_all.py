@@ -3,10 +3,11 @@
 统一启动脚本 - 启动所有服务
 适配新的项目目录结构
 """
+import shutil
+import signal
 import subprocess
 import sys
 import time
-import signal
 from pathlib import Path
 from threading import Thread
 
@@ -49,13 +50,14 @@ def start_mcp_server():
     """启动MCP服务器"""
     print("🚀 启动MCP服务器...")
     project_root = Path(__file__).parent.parent
-    mcp_path = project_root / "mcp-server"
-    
+    mcp_path = project_root / "apps" / "mcp-server"
+
     is_windows = sys.platform == "win32"
-    
+
     # 1. 编译
     print("    - 正在编译MCP服务器...")
-    build_cmd = ["npm", "run", "build"]
+    package_manager = shutil.which("pnpm") or "npm"
+    build_cmd = [package_manager, "run", "build"]
     try:
         subprocess.run(build_cmd, cwd=str(mcp_path), check=True, shell=is_windows)
         print("    - MCP服务器编译完成。")
@@ -65,7 +67,7 @@ def start_mcp_server():
 
     # 2. 启动
     # 直接用node运行编译后的文件，而不是npm start
-    start_cmd = ["node", "build/api/index.js"]
+    start_cmd = ["node", "dist/index.js"]
     try:
         process = subprocess.Popen(start_cmd, cwd=str(mcp_path), shell=is_windows)
         print("✅ MCP服务器启动成功 - http://localhost:3002")

@@ -28,8 +28,8 @@ crawler/
 vue-frontend/node_modules/
 vue-frontend/dist/
 
-mcp-server/node_modules/
-mcp-server/build/
+apps/mcp-server/node_modules/
+apps/mcp-server/dist/
 
 backend/.venv/
 backend/venv/
