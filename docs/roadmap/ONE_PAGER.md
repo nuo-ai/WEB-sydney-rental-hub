@@ -91,7 +91,7 @@ curl "http://localhost:8000/api/properties?suburb=Zetland,Surry%20Hills&minPrice
 
 ## 10. 关联与溯源
 - 后端：`backend/main.py`（REST 白名单/日期语义）；`backend/crud/properties_crud.py`（构建器）
-- 前端：`vue-frontend/src/stores/properties.js`（失败降级/邮编兜底）；`vue-frontend/src/composables/useFilterPreviewCount.js`（并发守卫/防抖/卸载）
+- 前端：`apps/web/src/stores/properties.js`（失败降级/邮编兜底）；`apps/web/src/composables/useFilterPreviewCount.js`（并发守卫/防抖/卸载）
 - 文档：`backend/API_ENDPOINTS.md`、`docs/roadmap/TASKS.md`
 - 测试：`tests/api/test_properties_filters.py`（10 passed）
 - 最近提交：17527a4（参考）

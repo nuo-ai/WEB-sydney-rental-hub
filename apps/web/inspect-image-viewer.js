@@ -168,7 +168,7 @@ async function inspectImageViewer() {
 
       // Take a screenshot for visual reference
       await page.screenshot({
-        path: 'C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\vue-frontend\\image-viewer-screenshot.png',
+        path: 'C:\\Users\\nuoai\\Desktop\\WEB-sydney-rental-hub\\apps\\web\\image-viewer-screenshot.png',
         fullPage: true
       });
       console.log('\nScreenshot saved as image-viewer-screenshot.png');

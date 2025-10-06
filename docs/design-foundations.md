@@ -8,9 +8,9 @@
 
 文件总览（源码位置）
 
-- 全局令牌与规则：`vue-frontend/src/style.css`
-- 页面级令牌：`vue-frontend/src/styles/page-tokens.css`
-- 文字系统：`vue-frontend/src/styles/typography.css`
+- 全局令牌与规则：`apps/web/src/style.css`
+- 页面级令牌：`apps/web/src/styles/page-tokens.css`
+- 文字系统：`apps/web/src/styles/typography.css`
 - 颜色映射参考：`docs/color-token-mapping.md`
 - 系统模式与约束：`memory-bank/systemPatterns.md`
 

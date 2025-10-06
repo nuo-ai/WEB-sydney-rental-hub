@@ -7,14 +7,14 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$PROJECT_ROOT"
 
 # 1) Frontend ESLint (reuses existing script logic)
-if [ -d "vue-frontend" ]; then
+if [ -d "apps/web" ]; then
   echo "• Frontend: ESLint"
-  (cd vue-frontend && npm run -s lint)
+  pnpm --filter @web-sydney/web lint
 
   # Conditionally run Stylelint if available to enforce Design Token guardrails
-  if [ -x "vue-frontend/node_modules/.bin/stylelint" ]; then
+  if [ -x "apps/web/node_modules/.bin/stylelint" ]; then
     echo "• Frontend: Stylelint"
-    (cd vue-frontend && npm run -s lint:style)
+    pnpm --filter @web-sydney/web lint:style
   else
     echo "• Frontend: Stylelint skipped (binary not found)"
   fi

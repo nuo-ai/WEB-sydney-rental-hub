@@ -25,8 +25,8 @@ crawler/
 
 # 3. Ignore specific sub-directories within active modules
 # We need the source code for context, but not the dependencies.
-vue-frontend/node_modules/
-vue-frontend/dist/
+apps/web/node_modules/
+apps/web/dist/
 
 apps/mcp-server/node_modules/
 apps/mcp-server/dist/
@@ -38,6 +38,6 @@ database/sydney-suburbs-name.json
 
 # ===================================================================
 # By default, all other files are INCLUDED.
-# This ensures that memory-bank/, vue-frontend/, backend/ source,
+# This ensures that memory-bank/, apps/web/, backend/ source,
 # and root configuration files are always accessible.
 # ===================================================================
