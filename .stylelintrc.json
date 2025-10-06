@@ -17,8 +17,8 @@
   "overrides": [
     {
       "files": [
-        "vue-frontend/src/styles/design-tokens.css",
-        "vue-frontend/src/style.css"
+        "apps/web/src/styles/design-tokens.css",
+        "apps/web/src/style.css"
       ],
       "rules": {
         "color-no-hex": null,
@@ -26,7 +26,7 @@
       }
     },
     {
-      "files": ["vue-frontend/src/**/*.vue"],
+      "files": ["apps/web/src/**/*.vue"],
       "rules": {
         "color-no-hex": [true, { "severity": "warning" }],
         "color-named": ["never", { "severity": "warning" }],

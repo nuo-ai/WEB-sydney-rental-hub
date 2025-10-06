@@ -207,7 +207,7 @@ backend/
 
 ### 前端数据获取流程
 ```
-vue-frontend/src/
+apps/web/src/
 ├── services/api.js          # API调用
 ├── stores/properties.js     # 状态管理
 └── views/HomeView.vue       # 页面展示

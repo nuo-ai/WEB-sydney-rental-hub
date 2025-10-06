@@ -84,7 +84,7 @@ ID: FE-STORE-001
 前端表现:
 - 当 previewCount=null：“应用（N）/确定（N）”退回“应用/确定”，显示轻量错误提示，不刷新列表。
 涉及文件:
-- vue-frontend/src/stores/properties.js
+- apps/web/src/stores/properties.js
 验收标准:
 - 计数失败不再误导为“0 条”；列表不会被误清空；性能日志可追踪失败率。
 测试要点:
@@ -102,9 +102,9 @@ ID: FE-UI-001
 - 统一“更新草稿→标记分组→发起计数→_seq 并发守卫→onUnmounted 清理定时器/状态”。
 - 首批接入 PriceFilterPanel.vue、BedroomsFilterPanel.vue（最小 diff 保留前端表现）。
 涉及文件:
-- vue-frontend/src/composables/useFilterPreviewCount.js（新建）
-- vue-frontend/src/components/filter-panels/PriceFilterPanel.vue
-- vue-frontend/src/components/filter-panels/BedroomsFilterPanel.vue
+- apps/web/src/composables/useFilterPreviewCount.js（新建）
+- apps/web/src/components/filter-panels/PriceFilterPanel.vue
+- apps/web/src/components/filter-panels/BedroomsFilterPanel.vue
 验收标准:
 - 快速点击不同选项时旧响应不覆盖新状态；组件卸载后不再发请求。
 测试要点:
@@ -121,8 +121,8 @@ ID: FE-UI-002
 - AvailabilityFilterPanel.vue、MoreFilterPanel.vue 使用 useFilterPreviewCount。
 - 当 previewCount=null：禁用依赖 N 的文案，显示“应用/确定”与轻量错误提示。
 涉及文件:
-- vue-frontend/src/components/filter-panels/AvailabilityFilterPanel.vue
-- vue-frontend/src/components/filter-panels/MoreFilterPanel.vue
+- apps/web/src/components/filter-panels/AvailabilityFilterPanel.vue
+- apps/web/src/components/filter-panels/MoreFilterPanel.vue
 验收标准:
 - 计数口径一致；失败降级表现统一；移动端/PC 一致。
 测试要点:
@@ -139,8 +139,8 @@ ID: FE-UI-003
 - 对 AreasSelector 的 @requestCount 增加 200–300ms 节流或微任务收敛，降低 API 压力。
 - 接入 useFilterPreviewCount；保持 selectedLocations 草稿逻辑不变。
 涉及文件:
-- vue-frontend/src/components/filter-panels/AreaFilterPanel.vue
-- vue-frontend/src/components/AreasSelector.vue（若需）
+- apps/web/src/components/filter-panels/AreaFilterPanel.vue
+- apps/web/src/components/AreasSelector.vue（若需）
 验收标准:
 - 频繁选择/移除时计数请求次数显著下降；结果准确；无旧值回写。
 测试要点:
@@ -229,7 +229,7 @@ ID: FE-STORE-002
 描述:
 - enableFilterV2=true；更新 SECTION_KEY_MAP 含 V2 键名；移除前端 postcode 展开逻辑。
 涉及文件:
-- vue-frontend/src/stores/properties.js 等
+- apps/web/src/stores/properties.js 等
 工期估算: 1d
 风险: 中
 

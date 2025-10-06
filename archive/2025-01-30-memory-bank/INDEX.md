@@ -24,7 +24,7 @@
 
 ### 前端 (Vue 3)
 ```
-vue-frontend/
+apps/web/
 ├── src/
 │   ├── views/               # 页面组件
 │   │   ├── HomeView.vue         → 首页(房源列表)
@@ -199,7 +199,7 @@ Supabase云数据库 (AWS悉尼) + Redis缓存
 python scripts/run_backend.py
 
 # 启动前端
-cd vue-frontend && npm run dev
+cd apps/web && npm run dev
 
 # 检查服务状态
 curl http://localhost:5173/       # 前端

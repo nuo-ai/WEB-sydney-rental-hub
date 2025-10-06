@@ -8,7 +8,7 @@
     ```
     Browser (Vue @ :5173) -> Vite Proxy -> Python Backend (@ :8000)
     ```
-    -   **描述**: `vue-frontend` 应用通过 Vite 的开发服务器代理 (`/api`)，将其所有数据请求以 **RESTful** 方式发送到 `http://localhost:8000/api/...`。这是前端获取房源数据的**唯一**路径。
+    -   **描述**: `apps/web` 应用通过 Vite 的开发服务器代理 (`/api`)，将其所有数据请求以 **RESTful** 方式发送到 `http://localhost:8000/api/...`。这是前端获取房源数据的**唯一**路径。
     -   **GraphQL说明**: Python后端在`/graphql`路径下还提供了一个独立的GraphQL服务。此服务**不由前端直接调用**，而是为AI助手或内部工具提供更灵活的数据查询能力。
     -   **原则**: 这是获取房源列表、详情等核心数据的**唯一**且**正确**的路径。
 
@@ -17,7 +17,7 @@
     AI Agent -> MCP Server (Express @ :3001) -> External/DB Services
     ```
     -   **描述**: `mcp-server` 是一个独立的 Express 应用，它为 AI Agent (Cline) 提供特殊工具或数据接口，其内部实现可能涉及连接数据库或调用外部API。
-    -   **原则**: 此服务**决不能**被核心 Web 应用 (`vue-frontend`) 所依赖或调用。
+    -   **原则**: 此服务**决不能**被核心 Web 应用 (`apps/web`) 所依赖或调用。
 
 -   **反模式 (Anti-Pattern) 🚨**: **严禁**将前端的 `vite.config.js` 代理指向 `mcp-server` (`localhost:3001`)。
     -   **后果**: 这种错误配置会引入一个不必要的、脆弱的中间层，导致数据加载失败、增加延迟和隐藏真正的错误源，对整个系统的稳定性造成严重破坏。我们在 2025-08-25 的故障排查中已证实了这一点。

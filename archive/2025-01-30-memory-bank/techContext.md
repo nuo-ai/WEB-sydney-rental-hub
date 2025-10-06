@@ -43,7 +43,7 @@
 ### 2.1. 项目结构设计
 
 ```
-vue-frontend/
+apps/web/
 ├── src/
 │   ├── components/          # 可复用组件
 │   │   ├── PropertyCard.vue     # 房源卡片 (580px标准)
@@ -119,7 +119,7 @@ const apiClient = axios.create({
 
 ```bash
 # Vue项目启动
-cd vue-frontend
+cd apps/web
 npm install               # 安装依赖
 npm run dev              # 启动开发服务器 (localhost:5175)
 
