@@ -39,7 +39,7 @@ fi
 
 # 3) Python syntax check (fast, no dependencies)
 echo "• Python: syntax check (compileall)"
-python -m compileall -q backend scripts database crawler || {
+python -m compileall -q apps/backend scripts database crawler || {
   echo "❌ Python syntax errors detected";
   exit 1;
 }
