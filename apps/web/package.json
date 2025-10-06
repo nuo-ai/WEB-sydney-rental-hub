@@ -39,8 +39,10 @@
     "stylelint": "^16.24.0",
     "stylelint-config-standard": "^39.0.0",
     "stylelint-declaration-strict-value": "^1.10.11",
+    "typescript": "^5.6.3",
     "vite": "^7.0.6",
-    "vite-plugin-vue-devtools": "^8.0.0"
+    "vite-plugin-vue-devtools": "^8.0.0",
+    "vue-tsc": "^2.1.6"
   },
   "turbo": {
     "pipeline": {
