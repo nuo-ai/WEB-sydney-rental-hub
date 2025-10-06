@@ -9,11 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # 从项目根目录运行
 python scripts/run_backend.py
 
-# 或直接使用 uvicorn (从项目根目录)
-uvicorn backend.main:app --reload --port 8000
+# 或直接使用 pnpm（推荐方式）
+pnpm --filter @web-sydney/backend dev
 
-# Windows 用户推荐方式
-.venv\Scripts\python.exe -m uvicorn backend.main:app --reload --port 8000
+# Windows 用户也可以直接执行（需激活虚拟环境）
+.venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000 --env-file ..\..\.env
 ```
 
 ### 测试 API
@@ -28,10 +28,10 @@ http://localhost:8000/graphql
 ### 运行 Celery（如需异步任务）
 ```bash
 # 启动 Celery worker
-celery -A backend.celery_worker.celery_app worker --loglevel=info
+pnpm --filter @web-sydney/backend worker
 
-# 启动 Flower 监控（可选）
-celery -A backend.celery_worker.celery_app flower --port=5555
+# 启动 Flower 监控（可选，需先进入 apps/backend 目录）
+celery -A celery_worker.celery_app flower --port=5555
 ```
 
 ## 架构概览

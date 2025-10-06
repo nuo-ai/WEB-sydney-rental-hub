@@ -31,13 +31,13 @@ apps/web/dist/
 apps/mcp-server/node_modules/
 apps/mcp-server/dist/
 
-backend/.venv/
-backend/venv/
+apps/backend/.venv/
+apps/backend/venv/
 
 database/sydney-suburbs-name.json
 
 # ===================================================================
 # By default, all other files are INCLUDED.
-# This ensures that memory-bank/, apps/web/, backend/ source,
+# This ensures that memory-bank/, apps/web/, apps/backend/ source,
 # and root configuration files are always accessible.
 # ===================================================================
