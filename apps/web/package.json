@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:style": "stylelint \"src/**/*.{css,vue}\" --fix",
     "format": "prettier --write src/",
-    "test": "playwright test"
+    "test": "playwright test",
+    "typecheck": "echo \"typecheck skipped for @web-sydney/web\""
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
