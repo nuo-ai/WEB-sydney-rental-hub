@@ -1,0 +1,17 @@
+{
+  "name": "web-sydney-rental-hub",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "lint:style": "turbo run lint:style",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test --filter=@web-sydney/playwright",
+    "playwright": "pnpm --filter @web-sydney/playwright test"
+  },
+  "devDependencies": {
+    "turbo": "^2.2.3"
+  }
+}

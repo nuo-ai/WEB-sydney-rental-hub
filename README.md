@@ -27,6 +27,47 @@
 
 请参考 **`memory-bank/techContext.md`** 中的 “本地开发环境设置” 部分，来启动您的本地开发服务器。
 
+### Monorepo 概览
+
+该仓库采用 pnpm + Turborepo 工作区结构：
+
+- `apps/web` (`@web-sydney/web`): Vite + Vue 3 前端应用。
+- `apps/mcp-server` (`@web-sydney/mcp-server`): 面向 AI 助手的 TypeScript MCP Server。
+- `tools/playwright` (`@web-sydney/playwright`): Playwright 配置与端到端测试集合。
+- `packages/eslint-config`, `packages/stylelint-config`, `packages/tsconfig`: 供各应用复用的统一工程配置。
+
+### 常用工作区命令
+
+```bash
+# 安装依赖并链接工作区
+pnpm install
+
+# 并行启动所有 dev 任务（例如前端 + MCP）
+pnpm dev
+
+# 构建全部包（turbo 会处理依赖关系）
+pnpm build
+
+# 仅在前端应用中运行开发服务器 / 构建 / Lint
+pnpm --filter @web-sydney/web dev
+pnpm --filter @web-sydney/web build
+pnpm --filter @web-sydney/web lint
+pnpm --filter @web-sydney/web lint:style
+
+# MCP Server 编译与类型检查
+pnpm --filter @web-sydney/mcp-server build
+pnpm --filter @web-sydney/mcp-server lint
+
+# 端到端测试（需先启动前端）
+pnpm --filter @web-sydney/playwright test
+```
+
+### 质量检查与 CI
+
+- Turborepo 任务：`pnpm turbo run lint`, `pnpm turbo run test`
+- Netlify 部署：`pnpm install --frozen-lockfile && pnpm turbo run build --filter @web-sydney/web`
+- GitHub Actions 如需 Node 流程，同样使用 `pnpm install` + 对应 `turbo` 任务。
+
 ---
 
 *该项目由AI软件工程师Cline协助开发和维护。*

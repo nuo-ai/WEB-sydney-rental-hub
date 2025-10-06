@@ -226,14 +226,14 @@ curl "http://localhost:8000/api/properties?listing_id=123456"
 - 点名过滤稳定性
 
 用例位置
-- tests/api/test_properties_filters.py（pytest + requests）
+- tools/playwright/tests/api/test_properties_filters.py（pytest + requests）
 
 运行
 ```bash
 # 先确保后端服务运行在 http://localhost:8000
 # 可通过环境变量覆盖：BACKEND_BASE_URL=http://localhost:8001
 
-pytest -q tests/api/test_properties_filters.py
+pytest -q tools/playwright/tests/api/test_properties_filters.py
 ```
 
 断言要点

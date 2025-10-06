@@ -1,0 +1,8 @@
+{
+  "extends": "@web-sydney/tsconfig/base",
+  "compilerOptions": {
+    "types": ["@playwright/test"],
+    "noEmit": true
+  },
+  "include": ["./**/*.ts"]
+}

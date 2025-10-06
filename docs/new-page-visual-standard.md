@@ -85,7 +85,7 @@
 - 使用 FilterTabs/FilterPanel 等稳定组件集成筛选
 - 空状态/骨架屏使用统一样式
 - 不新增硬编码颜色、阴影、圆角
-- 本地自检：npm run lint 与 npm run lint:style
+- 本地自检：`pnpm --filter @web-sydney/web lint` 与 `pnpm --filter @web-sydney/web lint:style`
 
 示例骨架（伪代码）
 - Header：面包屑（aria-label="Breadcrumb"）+ h1（.typo-h1）

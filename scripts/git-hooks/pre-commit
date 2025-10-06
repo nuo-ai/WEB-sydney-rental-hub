@@ -7,27 +7,25 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$PROJECT_ROOT"
 
 # 1) Frontend ESLint (reuses existing script logic)
-if [ -d "vue-frontend" ]; then
+if [ -d "apps/web" ]; then
   echo "• Frontend: ESLint"
-  (cd vue-frontend && npm run -s lint)
+  pnpm --filter @web-sydney/web lint
 
-  # Conditionally run Stylelint if available to enforce Design Token guardrails
-  if [ -x "vue-frontend/node_modules/.bin/stylelint" ]; then
-    echo "• Frontend: Stylelint"
-    (cd vue-frontend && npm run -s lint:style)
+  echo "• Frontend: Stylelint"
+  if pnpm --filter @web-sydney/web exec -- stylelint --version >/dev/null 2>&1; then
+    pnpm --filter @web-sydney/web lint:style
   else
-    echo "• Frontend: Stylelint skipped (binary not found)"
+    echo "  ↪︎ Stylelint skipped (binary not found)"
   fi
 fi
 
 # 2) TypeScript typecheck for MCP server (no emit)
-if [ -d "mcp-server" ]; then
+if [ -d "apps/mcp-server" ]; then
   echo "• MCP Server: TypeScript typecheck"
-  if [ -f "mcp-server/node_modules/typescript/bin/tsc" ]; then
-    (cd mcp-server && node node_modules/typescript/bin/tsc --noEmit)
+  if pnpm --filter @web-sydney/mcp-server exec -- tsc --noEmit >/dev/null 2>&1; then
+    pnpm --filter @web-sydney/mcp-server exec -- tsc --noEmit
   else
-    # Fallback to normal build if local tsc not found
-    (cd mcp-server && npm run -s build)
+    pnpm --filter @web-sydney/mcp-server build
   fi
 fi
 

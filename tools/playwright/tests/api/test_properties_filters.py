@@ -10,7 +10,7 @@ QA-001 回归测试（最小可检清单）— /api/properties
 运行方式：
 - 确保后端服务运行于 http://localhost:8000（或设置环境变量 BACKEND_BASE_URL）
   export BACKEND_BASE_URL=http://localhost:8000
-- 安装 pytest 和 requests 后运行：pytest -q tests/api/test_properties_filters.py
+- 安装 pytest 和 requests 后运行：pytest -q tools/playwright/tests/api/test_properties_filters.py
 """
 
 import os

@@ -17,9 +17,9 @@
 - 文档更新：backend/API_ENDPOINTS.md 已对齐白名单与错误体样例，补充 QA-001 运行说明与“前端表现”。
 
 执行记录（溯源）
-- BE-002：backend/main.py（/api/properties 白名单）+ backend/API_ENDPOINTS.md（文档）；tests/api/test_properties_filters.py 覆盖；本地结果 10 passed；最近 commit: 17527a4
+- BE-002：backend/main.py（/api/properties 白名单）+ backend/API_ENDPOINTS.md（文档）；tools/playwright/tests/api/test_properties_filters.py 覆盖；本地结果 10 passed；最近 commit: 17527a4
 - QA-001：核心断言包含“total 与分页累加一致”“排序白名单”“未知键 400”“listing_id 点名过滤”；动态从 /api/locations/all 选择 suburb，避免硬编码
-- 关联文件：backend/main.py、backend/API_ENDPOINTS.md、tests/api/test_properties_filters.py
+- 关联文件：backend/main.py、backend/API_ENDPOINTS.md、tools/playwright/tests/api/test_properties_filters.py
 
 验收口径（前端表现）
 - “应用（N）/确定（N）”不回跳旧值；关闭面板后无“幽灵计数”

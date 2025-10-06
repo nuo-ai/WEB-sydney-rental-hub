@@ -33,13 +33,13 @@ def start_backend():
 def start_frontend():
     """启动前端开发服务器"""
     print("🚀 启动前端服务...")
-    frontend_path = Path(__file__).parent.parent / "frontend"
-    
-    cmd = [sys.executable, "-m", "http.server", "8080"]
-    
+    project_root = Path(__file__).parent.parent
+
+    cmd = ["pnpm", "--filter", "@web-sydney/web", "dev"]
+
     try:
-        process = subprocess.Popen(cmd, cwd=str(frontend_path))
-        print("✅ 前端服务启动成功 - http://localhost:8080")
+        process = subprocess.Popen(cmd, cwd=str(project_root))
+        print("✅ 前端服务启动成功 - http://localhost:5173")
         return process
     except Exception as e:
         print(f"❌ 前端服务启动失败: {e}")
@@ -49,26 +49,24 @@ def start_mcp_server():
     """启动MCP服务器"""
     print("🚀 启动MCP服务器...")
     project_root = Path(__file__).parent.parent
-    mcp_path = project_root / "mcp-server"
-    
+
     is_windows = sys.platform == "win32"
-    
+
     # 1. 编译
     print("    - 正在编译MCP服务器...")
-    build_cmd = ["npm", "run", "build"]
+    build_cmd = ["pnpm", "--filter", "@web-sydney/mcp-server", "build"]
     try:
-        subprocess.run(build_cmd, cwd=str(mcp_path), check=True, shell=is_windows)
+        subprocess.run(build_cmd, cwd=str(project_root), check=True, shell=is_windows)
         print("    - MCP服务器编译完成。")
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
         print(f"❌ MCP服务器编译失败: {e}")
         return None
 
     # 2. 启动
-    # 直接用node运行编译后的文件，而不是npm start
-    start_cmd = ["node", "build/api/index.js"]
+    start_cmd = ["pnpm", "--filter", "@web-sydney/mcp-server", "start"]
     try:
-        process = subprocess.Popen(start_cmd, cwd=str(mcp_path), shell=is_windows)
-        print("✅ MCP服务器启动成功 - http://localhost:3002")
+        process = subprocess.Popen(start_cmd, cwd=str(project_root), shell=is_windows)
+        print("✅ MCP服务器启动成功 - http://localhost:3001")
         return process
     except Exception as e:
         print(f"❌ MCP服务器启动失败: {e}")
@@ -108,9 +106,9 @@ def main():
     
     print("\n" + "=" * 50)
     print("🎉 所有服务启动完成！")
-    print("📱 前端: http://localhost:8080")
+    print("📱 前端: http://localhost:5173")
     print("🔧 后端API: http://localhost:8000")
-    print("🤖 MCP服务器: http://localhost:3002")
+    print("🤖 MCP服务器: http://localhost:3001")
     print("\n按 Ctrl+C 停止所有服务")
     
     def signal_handler(sig, frame):

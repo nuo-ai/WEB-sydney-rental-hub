@@ -1,11 +1,9 @@
-# Netlify build configuration (vue-frontend)
+# Netlify build configuration (apps/web)
 [build]
-  # 在子目录 vue-frontend 下执行构建
-  base = "vue-frontend"
-  # 使用 Vite 标准构建脚本（Netlify 会自动安装依赖）
-  command = "npm run build"
-  # 发布目录相对 base，为 dist
-  publish = "dist"
+  # Turborepo root build executed with pnpm
+  base = "."
+  command = "pnpm install --frozen-lockfile && pnpm turbo run build --filter @web-sydney/web"
+  publish = "apps/web/dist"
 
 # 单页应用（SPA）回退规则：所有路径回退到 index.html
 [[redirects]]

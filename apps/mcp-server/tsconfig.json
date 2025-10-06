@@ -1,0 +1,15 @@
+{
+  "extends": "@web-sydney/tsconfig/base",
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "outDir": "./build",
+    "rootDir": "./api",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["api/**/*"],
+  "exclude": ["node_modules", "build"]
+}

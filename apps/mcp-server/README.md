@@ -13,25 +13,26 @@
 
 ### 前置要求
 
-- Node.js 18+ 
-- npm 或 yarn
+- Node.js 20+
+- pnpm 8+ (已通过 `corepack` 提供)
 
 ### 安装依赖
 
 ```bash
-npm install
+# 在仓库根目录执行
+pnpm install
 ```
 
 ### 编译 TypeScript
 
 ```bash
-npm run build
+pnpm --filter @web-sydney/mcp-server build
 ```
 
 ### 启动服务器
 
 ```bash
-npm start
+pnpm --filter @web-sydney/mcp-server start
 ```
 
 或直接运行编译后的文件：
@@ -87,7 +88,7 @@ node build/index.js
   "mcpServers": {
     "sydney-rental": {
       "command": "node",
-      "args": ["/path/to/mcp-server/build/index.js"],
+      "args": ["/path/to/repo/apps/mcp-server/build/index.js"],
       "env": {}
     }
   }
@@ -110,7 +111,7 @@ node test-mcp.js
 ### 项目结构
 
 ```
-mcp-server/
+apps/mcp-server/
 ├── api/
 │   └── index.ts          # 主服务器文件
 ├── build/                 # 编译输出目录

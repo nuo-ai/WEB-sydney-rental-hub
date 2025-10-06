@@ -24,7 +24,7 @@ Frontend ──▶ API Gateway ──▶ REST API ──▶ GraphQL API ──�
 #### A. Railway 部署
 ```bash
 # 1. 安装 Railway CLI
-npm install -g @railway/cli
+pnpm add --global @railway/cli
 
 # 2. 登录
 railway login
@@ -50,7 +50,7 @@ railway up
 #### C. Vercel 部署
 ```bash
 # 1. 安装 Vercel CLI
-npm i -g vercel
+pnpm add --global vercel
 
 # 2. 部署
 vercel --prod

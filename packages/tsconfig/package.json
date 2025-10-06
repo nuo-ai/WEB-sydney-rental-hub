@@ -1,0 +1,10 @@
+{
+  "name": "@web-sydney/tsconfig",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./base.json",
+    "./base": "./base.json",
+    "./node": "./node.json",
+    "./vue": "./vue.json"
+  }
+}

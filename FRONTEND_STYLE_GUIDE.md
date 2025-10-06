@@ -4,7 +4,7 @@ Conventions for the Vue 3 + Vite front end.
 
 ## General
 - Use TypeScript with `<script setup lang="ts">` in single file components.
-- Run `npm run lint` and `npm run format` before committing.
+- Run `pnpm --filter @web-sydney/web lint` and `pnpm --filter @web-sydney/web format` before committing.
 - Prettier controls formatting; do not hand craft spacing.
 - State management uses Pinia; place stores in `src/stores`.
 - Components use `PascalCase` filenames. Composables are `camelCase`.
@@ -16,4 +16,4 @@ Conventions for the Vue 3 + Vite front end.
 - Reusable components: `src/components/`
 - Pages and routes: `src/pages/`
 - Composables: `src/composables/`
-- Tests: `tests/` with `*.spec.ts` names.
+- Tests: `tools/playwright/tests/` with `*.spec.ts` names (Playwright workspace).

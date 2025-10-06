@@ -1,7 +1,7 @@
 # Git Hooks (Lightweight)
 
 This repo ships a lightweight pre-commit hook to catch low-level issues fast:
-- Frontend: ESLint (`vue-frontend`)
+- Frontend: ESLint (`apps/web`)
 - MCP server: TypeScript typecheck (no emit)
 - Python: syntax errors via `compileall`
 
@@ -22,6 +22,6 @@ chmod +x .git/hooks/pre-commit
 
 ## Notes
 - The hook uses installed local dev tools only; it won’t install packages.
-- If `typescript` is not installed in `mcp-server`, it falls back to `npm run build`.
+- If `typescript` is not installed in `apps/mcp-server`, it falls back to `pnpm --filter @web-sydney/mcp-server build`.
 - Keep hooks fast; add heavier checks to CI or pre-push if needed.
 

@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-15
+**最后更新**: 2025-10-06
 
 ---
 
@@ -18,7 +18,7 @@
 
 ### 项目结构
 ```
-vue-frontend/
+apps/web/
 ├── src/views/          # 页面组件
 ├── src/components/     # 可复用组件
 ├── src/stores/         # Pinia状态管理
@@ -37,7 +37,7 @@ vue-frontend/
 ## 筛选系统技术约定
 
 ### URL 幂等与状态同步
-- **实现文件**: `vue-frontend/src/utils/query.js`（sanitizeQueryParams、isSameQuery）
+- **实现文件**: `apps/web/src/utils/query.js`（sanitizeQueryParams、isSameQuery）
 - **落地点**: FilterPanel 统一面板、五个分面、HomeView.sort
 - **前端表现**: 应用后 URL 可直链/刷新恢复，不写空键，地址栏不抖动
 
@@ -57,22 +57,20 @@ vue-frontend/
 
 ### 本地运行
 ```bash
+# 安装前端/工具依赖（首次）
+pnpm install
+
 # Vue前端开发环境
-cd vue-frontend
-npm run dev              # localhost:5173
+pnpm --filter @web-sydney/web dev   # localhost:5173
 
 # 后端API服务
-cd ../
-python scripts/run_backend.py  # localhost:8000
+python scripts/run_backend.py       # localhost:8000
 ```
 
 ### E2E 测试
 ```bash
-# 安装依赖（如首次）
-npx playwright install
-
-# 运行 URL 幂等冒烟测试
-npx playwright test -g "URL 幂等与仅写非空键"
+# 运行 URL 幂等冒烟测试（需先启动前端）
+pnpm --filter @web-sydney/playwright test -g "URL 幂等与仅写非空键"
 ```
 
 ### 当前运行状态
@@ -117,7 +115,7 @@ npx playwright test -g "URL 幂等与仅写非空键"
 
 ### Netlify 部署
 - **配置文件**: netlify.toml
-- **构建设置**: base="vue-frontend", command="npm run build", publish="dist"
+- **构建设置**: base=".", command="pnpm turbo run build --filter @web-sydney/web", publish="apps/web/dist"
 - **SPA 重写**: `/*` → `/index.html` (status=200)
 
 ### 本地运维（PowerShell）

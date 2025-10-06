@@ -1,0 +1,35 @@
+{
+  "name": "@web-sydney/mcp-server",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Sydney Rental MCP Server - 为Cline提供悉尼租房搜索功能",
+  "type": "module",
+  "main": "api/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc --watch",
+    "lint": "eslint api --ext ts",
+    "test": "node test-mcp.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.1",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.0.0",
+    "@types/pg": "^8.15.5",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "@web-sydney/eslint-config": "workspace:^0.1.0",
+    "@web-sydney/tsconfig": "workspace:^0.1.0",
+    "eslint": "^9.31.0",
+    "typescript": "^5.0.0"
+  }
+}
