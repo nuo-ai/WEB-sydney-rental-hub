@@ -13,17 +13,22 @@ from threading import Thread
 def start_backend():
     """启动后端API服务"""
     print("🚀 启动后端API服务...")
-    project_root = Path(__file__).parent.parent
-    
+    project_root = Path(__file__).resolve().parent.parent
+    backend_path = project_root / "apps" / "backend"
+
+    if not backend_path.exists():
+        print(f"❌ 后端目录不存在: {backend_path}")
+        return None
+
     cmd = [
-        sys.executable, "-m", "uvicorn", 
-        "backend.main:app", 
-        "--host", "0.0.0.0", 
+        sys.executable, "-m", "uvicorn",
+        "backend.main:app",
+        "--host", "0.0.0.0",
         "--port", "8000"
     ]
-    
+
     try:
-        process = subprocess.Popen(cmd, cwd=str(project_root))
+        process = subprocess.Popen(cmd, cwd=str(backend_path))
         print("✅ 后端API启动成功 - http://localhost:8000")
         return process
     except Exception as e:
@@ -33,7 +38,11 @@ def start_backend():
 def start_frontend():
     """启动前端开发服务器"""
     print("🚀 启动前端服务...")
-    frontend_path = Path(__file__).parent.parent / "frontend"
+    frontend_path = Path(__file__).resolve().parent.parent / "vue-frontend"
+
+    if not frontend_path.exists():
+        print(f"❌ 找不到前端目录: {frontend_path}")
+        return None
     
     cmd = [sys.executable, "-m", "http.server", "8080"]
     

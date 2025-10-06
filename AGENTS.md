@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Modules
-- `backend/`: FastAPI app, GraphQL schema, Celery tasks, DB CRUD and models.
+- `apps/backend/`: FastAPI app, GraphQL schema, Celery tasks, DB CRUD and models.
 - `vue-frontend/`: Vue 3 + Vite UI, Pinia stores, routing, ESLint/Prettier.
 - `mcp-server/`: TypeScript MCP server for AI assistants.
 - `scripts/` and `database/`: Utilities, ETL helpers, SQL and data processors.
@@ -25,7 +25,7 @@
   - Start: `npm start` (requires local config and backend availability)
 
 ## Coding Style & Naming
-- Python: PEP 8, 4‑space indent, type hints; `snake_case` for modules/functions, `PascalCase` for classes. Keep API in `backend/api`, DB ops in `backend/crud`, models in `backend/models`.
+- Python: PEP 8, 4‑space indent, type hints; `snake_case` for modules/functions, `PascalCase` for classes. Keep API in `apps/backend/api`, DB ops in `apps/backend/crud`, models in `apps/backend/models`.
 - Vue/TS: follow `eslint.config.js` and Prettier; SFCs named `PascalCase` (e.g., `PropertyDetail.vue`), non‑component files `kebab-case`.
 - Commits and PR titles use Conventional Commits (see below).
 

@@ -155,7 +155,7 @@ properties表:
 
 ### 后端API流程
 ```
-backend/
+apps/backend/
 ├── main.py                     # API端点定义
 ├── db.py                       # Supabase连接
 ├── crud/properties_crud.py     # 数据库查询

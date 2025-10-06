@@ -1,0 +1,8 @@
+{
+  "name": "backend",
+  "private": true,
+  "scripts": {
+    "dev": "make -C ../.. backend-dev",
+    "lint": "make -C ../.. backend-lint"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "sydney-rental-hub",
+  "private": true,
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  }
+}

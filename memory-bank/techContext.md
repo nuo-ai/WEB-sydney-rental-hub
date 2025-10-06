@@ -18,6 +18,9 @@
 
 ### 项目结构
 ```
+apps/
+└── backend/            # FastAPI + GraphQL 服务（通过 Turborepo 管理）
+
 vue-frontend/
 ├── src/views/          # 页面组件
 ├── src/components/     # 可复用组件
@@ -25,6 +28,11 @@ vue-frontend/
 ├── src/services/       # API服务层
 ├── src/router/         # Vue Router配置
 └── vite.config.js      # Vite配置 (CORS代理到localhost:8000)
+
+mcp-server/             # AI 辅助工具（可选）
+Makefile                # 后端便捷命令（dev/lint/install）
+turbo.json              # Turborepo 管道配置
+pnpm-workspace.yaml     # pnpm 工作区定义
 ```
 
 ### API集成架构
@@ -57,13 +65,25 @@ vue-frontend/
 
 ### 本地运行
 ```bash
-# Vue前端开发环境
-cd vue-frontend
-npm run dev              # localhost:5173
+# 1) Python 环境（一次性）
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 
-# 后端API服务
-cd ../
-python scripts/run_backend.py  # localhost:8000
+# 2) Node/pnpm 依赖
+pnpm install                        # 安装 Turborepo 及工作区依赖
+
+# 3) 启动后端（FastAPI + Uvicorn，持久任务）
+pnpm turbo run dev --filter backend
+# (可选) 直接使用 Makefile: make backend-dev
+
+# 4) 启动前端（依赖 backend dev 任务）
+pnpm turbo run dev --filter vue-frontend
+# 或在独立终端进入 vue-frontend/ 运行 npm run dev
+
+# 5) 便捷脚本
+python scripts/run_backend.py       # 兼容旧的启动脚本
+scripts/start_all.py                # 一次性启动后端 + 前端 + MCP
 ```
 
 ### E2E 测试
