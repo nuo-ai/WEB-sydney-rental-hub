@@ -8,6 +8,7 @@ Follow these steps to enable Google Maps features.
 4. Generate an API key and restrict it to approved domains or IPs.
 5. Store the key in environment variables:
    - Backend: `GOOGLE_MAPS_API_KEY=your_key`
+   - MCP Server: `apps/mcp-server/.env` with `GOOGLE_MAPS_API_KEY=your_key`
    - Frontend: `.env` with `VITE_GOOGLE_MAPS_API_KEY=your_key`
 6. Load the script in the front end:
 ```ts

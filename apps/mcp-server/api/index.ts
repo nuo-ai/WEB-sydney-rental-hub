@@ -3,6 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import { z } from 'zod';
 import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Express App Setup
 const app = express();
@@ -10,8 +13,16 @@ app.use(cors());
 app.use(express.json());
 
 // GraphQL API配置
-const GRAPHQL_ENDPOINT = 'http://127.0.0.1:8000/graphql';
+const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'http://127.0.0.1:8000/graphql';
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY';
+
+if (!process.env.GRAPHQL_ENDPOINT) {
+  console.warn('GRAPHQL_ENDPOINT is not set. Falling back to http://127.0.0.1:8000/graphql');
+}
+
+if (!process.env.GOOGLE_MAPS_API_KEY) {
+  console.warn('GOOGLE_MAPS_API_KEY is not set. Commute calculations will be disabled.');
+}
 
 const axiosInstance = axios.create({
   baseURL: GRAPHQL_ENDPOINT,

@@ -9,36 +9,51 @@
 - 🚌 **通勤计算**: 计算到指定地点的通勤时间和路线
 - 🎯 **智能推荐**: 基于用户需求提供个性化房产推荐
 
+> 📁 该包现在位于 `apps/mcp-server/`，作为 Turborepo 工作空间的一部分。
+
 ## 安装和运行
 
 ### 前置要求
 
-- Node.js 18+ 
-- npm 或 yarn
+- Node.js 18+
+- pnpm 8+
 
 ### 安装依赖
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 编译 TypeScript
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### 启动服务器
 
 ```bash
-npm start
+pnpm start
 ```
 
 或直接运行编译后的文件：
 
 ```bash
-node build/index.js
+node dist/index.js
 ```
+
+### 环境变量
+
+复制 `.env.example` 创建 `.env`，配置 GraphQL 与地图密钥：
+
+```bash
+cp .env.example .env
+```
+
+| 变量名 | 说明 |
+| --- | --- |
+| `GRAPHQL_ENDPOINT` | 后端 GraphQL 服务地址，例如 `http://127.0.0.1:8000/graphql` |
+| `GOOGLE_MAPS_API_KEY` | Google Maps Directions API 密钥 |
 
 ## 可用工具
 
@@ -87,7 +102,7 @@ node build/index.js
   "mcpServers": {
     "sydney-rental": {
       "command": "node",
-      "args": ["/path/to/mcp-server/build/index.js"],
+      "args": ["/path/to/apps/mcp-server/dist/index.js"],
       "env": {}
     }
   }
@@ -110,21 +125,22 @@ node test-mcp.js
 ### 项目结构
 
 ```
-mcp-server/
-├── api/
-│   └── index.ts          # 主服务器文件
-├── build/                 # 编译输出目录
-├── package.json
-├── tsconfig.json
-├── test-mcp.js           # 测试脚本
-└── README.md
+apps/
+└── mcp-server/
+    ├── api/
+    │   └── index.ts          # 主服务器文件
+    ├── dist/                 # 编译输出目录
+    ├── package.json
+    ├── tsconfig.json
+    ├── test-mcp.js           # 测试脚本
+    └── README.md
 ```
 
 ### 开发模式
 
 ```bash
 # 监听文件变化并自动编译
-npx tsc --watch
+pnpm run dev
 ```
 
 ## 技术栈

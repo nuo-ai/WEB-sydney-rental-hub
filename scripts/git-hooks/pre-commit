@@ -21,13 +21,19 @@ if [ -d "apps/web" ]; then
 fi
 
 # 2) TypeScript typecheck for MCP server (no emit)
-if [ -d "mcp-server" ]; then
+MCP_DIR="apps/mcp-server"
+PKG_MGR="pnpm"
+if ! command -v pnpm >/dev/null 2>&1; then
+  PKG_MGR="npm"
+fi
+
+if [ -d "$MCP_DIR" ]; then
   echo "• MCP Server: TypeScript typecheck"
-  if [ -f "mcp-server/node_modules/typescript/bin/tsc" ]; then
-    (cd mcp-server && node node_modules/typescript/bin/tsc --noEmit)
+  if [ -f "$MCP_DIR/node_modules/typescript/bin/tsc" ]; then
+    (cd "$MCP_DIR" && node node_modules/typescript/bin/tsc --noEmit)
   else
     # Fallback to normal build if local tsc not found
-    (cd mcp-server && npm run -s build)
+    (cd "$MCP_DIR" && "$PKG_MGR" run -s build)
   fi
 fi
 
