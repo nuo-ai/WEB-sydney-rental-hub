@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Sydney Rental Hub DS</div>
+        <input type="text" class="search-bar" placeholder="Search components...">
+        <nav class="top-nav">
+            <a href="#">Principles</a>
+            <a href="#">Visuals</a>
+            <a href="#">Components</a>
+            <a href="#">Resources</a>
+        </nav>
+    </header>
+
+    <aside class="sidebar">
+        <h3>Overview</h3>
+        <ul>
+            <li><a href="#overview" class="active">Introduction</a></li>
+        </ul>
+        <h3>Tokens</h3>
+        <ul>
+            <li><a href="#tokens">All Tokens</a></li>
+        </ul>
+        <h3>Foundations</h3>
+        <ul>
+            <li><a href="#colors">Colors</a></li>
+            <li><a href="#typography">Typography</a></li>
+        </ul>
+        <h3>Components</h3>
+        <ul>
+            <li><a href="#components">Component Library</a></li>
+        </ul>
+        <h3>Health</h3>
+        <ul>
+            <li><a href="#file-health">File Health</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content" id="main-content">
+        <section id="overview" class="card">
+            <h1>Design System Dashboard</h1>
+            <p>Welcome to the automatically generated design system dashboard for the Sydney Rental Hub project. This dashboard provides a comprehensive overview of the visual language, components, and health of the frontend codebase.</p>
+        </section>
+
+        <section id="tokens">
+            <h2>Tokens</h2>
+            <div class="card">
+                <p>Design tokens are the primitive values of the design system, managed in <code>tokens/design-tokens.json</code> and compiled via Style Dictionary.</p>
+                <div id="tokens-container"></div>
+            </div>
+        </section>
+        
+        <section id="colors">
+            <h2>🎨 Colors</h2>
+            <div class="card">
+                <p>The color system is divided into Brand, Gray Scale, and Semantic colors.</p>
+                <div class="color-grid" id="colors-container"></div>
+            </div>
+        </section>
+
+        <section id="typography">
+            <h2>🔠 Typography</h2>
+            <div class="card">
+                <p>The typography system uses a semantic scale for consistent and meaningful text styles.</p>
+                <div id="typography-container">
+                    <div class="typo-demo"><div class="label">Heading Page (h1)</div><div class="typo-h1">Page Title</div></div>
+                    <div class="typo-demo"><div class="label">Heading Section (h2)</div><div class="typo-h2">Section Title</div></div>
+                    <div class="typo-demo"><div class="label">Body Default</div><div class="typo-body">This is the default body text, used for paragraphs and main content.</div></div>
+                    <div class="typo-demo"><div class="label">Body Small</div><div class="typo-small">This is smaller body text, often used for captions or metadata.</div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="components">
+            <h2>🧱 Components</h2>
+            <div class="card">
+                <p>The component library is organized into base, common, and feature-specific components.</p>
+                <div id="components-container"></div>
+            </div>
+        </section>
+
+        <section id="file-health">
+            <h2>📁 File Health</h2>
+            <div class="card">
+                <p>This report shows the maintenance status of component files based on their last modification date.</p>
+                <table id="file-health-table">
+                    <thead>
+                        <tr>
+                            <th>Path</th>
+                            <th>Last Modified</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Data from the audit report
+        const auditData = {
+            "tokens": [
+                { "name": "color.brand.primary", "value": "#0057ff", "source": "tokens/design-tokens.json", "description": "品牌主色" },
+                { "name": "color.gray.500", "value": "#6b7280", "source": "tokens/design-tokens.json", "description": "中性灰 500" },
+                { "name": "font.size.md", "value": "14px", "source": "tokens/design-tokens.json", "description": "中号字体" },
+                { "name": "space.md", "value": "12px", "source": "tokens/design-tokens.json", "description": "中间距" },
+                { "name": "radius.md", "value": "8px", "source": "tokens/design-tokens.json", "description": "中圆角" },
+                { "name": "shadow.md", "value": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", "source": "tokens/design-tokens.json", "description": "中阴影" }
+            ],
+            "colors": [
+                { "category": "Brand", "name": "brand-primary", "value": "#0057ff" },
+                { "category": "Gray Scale", "name": "gray-50", "value": "#f9fafb" },
+                { "category": "Gray Scale", "name": "gray-100", "value": "#f3f4f6" },
+                { "category": "Gray Scale", "name": "gray-200", "value": "#e5e7eb" },
+                { "category": "Gray Scale", "name": "gray-300", "value": "#d1d5db" },
+                { "category": "Gray Scale", "name": "gray-500", "value": "#6b7280" },
+                { "category": "Gray Scale", "name": "gray-800", "value": "#1f2937" },
+                { "category": "Gray Scale", "name": "gray-900", "value": "#111827" },
+                { "category": "Semantic", "name": "semantic-bg-primary", "value": "#ffffff" },
+                { "category": "Semantic", "name": "semantic-text-primary", "value": "#1f2937" }
+            ],
+            "components": [
+                { "path": "base/BaseButton.vue", "description": "基础按钮", "reusable": "High", "has_storybook": true, "status": "Active" },
+                { "path": "PropertyCard.vue", "description": "房源卡片", "reusable": "High", "has_storybook": true, "status": "Active" },
+                { "path": "filter-panels/AreaFilterPanel.vue", "description": "区域筛选面板", "reusable": "Low", "has_storybook": false, "status": "Active" },
+                { "path": "modals/AuthModal.vue", "description": "用户认证模态框", "reusable": "Low", "has_storybook": false, "status": "Active" }
+            ],
+            "file_health": [
+                { "path": "base/BaseButton.vue", "status": "Active", "last_modified": "2025-10-05" },
+                { "path": "VirtualPropertyList.vue", "status": "Stale", "last_modified": "2025-09-12" },
+                { "path": "icons/IconEcosystem.vue", "status": "Outdated", "last_modified": "2025-08-23" }
+            ]
+        };
+
+        function renderTokens() {
+            const container = document.getElementById('tokens-container');
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr><th>Name</th><th>Value</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    ${auditData.tokens.map(token => `
+                        <tr>
+                            <td><code>${token.name}</code></td>
+                            <td><code>${token.value}</code></td>
+                            <td>${token.description}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            container.appendChild(table);
+        }
+
+        function renderColors() {
+            const container = document.getElementById('colors-container');
+            auditData.colors.forEach(color => {
+                const card = document.createElement('div');
+                card.className = 'color-swatch-card';
+                card.innerHTML = `
+                    <div class="color-swatch" style="background-color: ${color.value};"></div>
+                    <div class="color-info">
+                        <span class="name">${color.name}</span>
+                        <span class="value">${color.value}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function renderComponents() {
+            const container = document.getElementById('components-container');
+            auditData.components.forEach(component => {
+                const card = document.createElement('div');
+                card.className = 'card component-card';
+                const statusTag = `<span class="status-tag ${component.status.toLowerCase()}">${component.status}</span>`;
+                const storybookTag = component.has_storybook ? '<span class="status-tag active">Storybook</span>' : '';
+
+                card.innerHTML = `
+                    <div class="path">${component.path}</div>
+                    <h3>${component.description}</h3>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        ${statusTag}
+                        ${storybookTag}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderFileHealth() {
+            const tbody = document.querySelector('#file-health-table tbody');
+            auditData.file_health.forEach(file => {
+                const row = document.createElement('tr');
+                const statusClass = file.status.toLowerCase();
+                 row.innerHTML = `
+                    <td><code>${file.path}</code></td>
+                    <td>${file.last_modified}</td>
+                    <td><span class="status-tag ${statusClass}">${file.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTokens();
+            renderColors();
+            renderComponents();
+            renderFileHealth();
+        });
+    </script>
+</body>
+</html>

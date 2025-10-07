@@ -6,7 +6,7 @@
       <div class="filter-tab-entry">
         <button
           ref="areaTabRef"
-          class="filter-tab"
+          class="filter-tab typo-body-sm"
           :class="{ active: activePanel === 'area', applied: areaApplied }"
           @click.stop="togglePanel('area', $event)"
         >
@@ -61,7 +61,7 @@
       <div class="filter-tab-entry">
         <button
           ref="bedroomsTabRef"
-          class="filter-tab"
+          class="filter-tab typo-body-sm"
           :class="{ active: activePanel === 'bedrooms', applied: bedroomsApplied }"
           @click.stop="togglePanel('bedrooms', $event)"
         >
@@ -116,7 +116,7 @@
       <div class="filter-tab-entry">
         <button
           ref="priceTabRef"
-          class="filter-tab"
+          class="filter-tab typo-body-sm"
           :class="{ active: activePanel === 'price', applied: priceApplied }"
           @click.stop="togglePanel('price', $event)"
         >
@@ -171,7 +171,7 @@
       <div class="filter-tab-entry">
         <button
           ref="availabilityTabRef"
-          class="filter-tab"
+          class="filter-tab typo-body-sm"
           :class="{ active: activePanel === 'availability', applied: availabilityApplied }"
           @click.stop="togglePanel('availability', $event)"
         >
@@ -226,7 +226,7 @@
       <div class="filter-tab-entry">
         <button
           ref="moreTabRef"
-          class="filter-tab"
+          class="filter-tab typo-body-sm"
           :class="{ active: activePanel === 'more', applied: moreApplied }"
           @click.stop="togglePanel('more', $event)"
         >
@@ -280,7 +280,7 @@
       <!-- 保存搜索按钮 -->
       <div class="save-search-section">
         <button
-          class="save-search-btn"
+          class="save-search-btn typo-button"
           :class="{ disabled: !hasActiveFilters }"
           :disabled="!hasActiveFilters"
           @click="handleSaveSearch"
@@ -301,7 +301,7 @@
               stroke-linejoin="round"
             />
           </svg>
-          <span>保存搜索</span>
+          <span>{{ $t('filterTabs.actions.saveSearch') }}</span>
         </button>
       </div>
     </div>
@@ -309,7 +309,7 @@
 
   <!-- 移动端触发统一面板的按钮 -->
   <div v-else class="filter-tabs-mobile">
-    <button class="filter-button" @click="$emit('requestOpenFullPanel')">
+    <button class="filter-button typo-body-sm" @click="$emit('requestOpenFullPanel')">
       <svg
         class="filter-icon"
         xmlns="http://www.w3.org/2000/svg"
@@ -325,12 +325,12 @@
           stroke-linecap="round"
         />
       </svg>
-      <span>筛选</span>
+      <span>{{ $t('filterTabs.actions.openFilter') }}</span>
     </button>
 
     <!-- 移动端保存搜索按钮 -->
     <button
-      class="save-search-btn-mobile"
+      class="save-search-btn-mobile typo-button"
       :class="{ disabled: !hasActiveFilters }"
       :disabled="!hasActiveFilters"
       @click="handleSaveSearch"
@@ -351,7 +351,7 @@
           stroke-linejoin="round"
         />
       </svg>
-      <span>保存</span>
+      <span>{{ $t('filterTabs.actions.save') }}</span>
     </button>
   </div>
 
@@ -364,7 +364,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, inject } from 'vue'
 import FilterDropdown from './FilterDropdown.vue'
 import AreaFilterPanel from './filter-panels/AreaFilterPanel.vue'
 import BedroomsFilterPanel from './filter-panels/BedroomsFilterPanel.vue'
@@ -386,7 +386,23 @@ const activePanel = ref(null) // 'area', 'bedrooms', 'price', 'availability', 'm
 
 // 依赖 Store 的“已应用参数 + 草稿”用于顶部标签文案与小蓝点
 const propertiesStore = usePropertiesStore()
+const t = inject('t') || ((key) => key)
+const formatMessage = (key, params) => {
+  const template = t(key)
+  if (!params) return template
+  return template.replace(/\{(\w+)\}/g, (_match, token) => {
+    const value = params[token]
+    return value == null ? '' : value
+  })
+}
+
 const appliedParams = computed(() => propertiesStore.currentFilterParams || {})
+
+const areaDefaultText = computed(() => t('filterTabs.tabs.area'))
+const bedroomsDefaultText = computed(() => t('filterTabs.tabs.bedrooms'))
+const priceDefaultText = computed(() => t('filterTabs.tabs.price'))
+const availabilityDefaultText = computed(() => t('filterTabs.tabs.availability'))
+const moreDefaultText = computed(() => t('filterTabs.tabs.more'))
 
 /* 移除未应用变更小蓝点相关计算，保留 applied 文案与高亮 */
 
@@ -395,12 +411,15 @@ const areaApplied = computed(() => (propertiesStore.selectedLocations?.length ||
 /* removed: areaHasDraft */
 const areaTabText = computed(() => {
   const list = propertiesStore.selectedLocations || []
-  if (!list.length) return '区域'
+  if (!list.length) return areaDefaultText.value
   const names = list.map((l) => (l?.name ? String(l.name) : '')).filter(Boolean)
-  if (!names.length) return '区域'
+  if (!names.length) return areaDefaultText.value
   const first = names[0]
   const more = Math.max(0, names.length - 1)
-  return more > 0 ? `${first} +${more}` : first
+  if (more > 0) {
+    return formatMessage('filterTabs.summary.areaMultiple', { first, count: more })
+  }
+  return first
 })
 
 // 2) 卧室
@@ -410,10 +429,16 @@ const bedroomsApplied = computed(() => {
 })
 /* removed: bedroomsHasDraft */
 const bedroomsTabText = computed(() => {
-  if (!bedroomsApplied.value) return '卧室'
-  const v = String(appliedParams.value?.bedrooms)
-  if (v === '0' || v.toLowerCase() === 'studio') return 'Studio'
-  return v.endsWith('+') ? `${v}卧` : `${v}卧`
+  if (!bedroomsApplied.value) return bedroomsDefaultText.value
+  const raw = String(appliedParams.value?.bedrooms)
+  if (raw === '0' || raw.toLowerCase() === 'studio') {
+    return t('filterTabs.tabOptions.studio')
+  }
+  if (raw.endsWith('+')) {
+    const count = raw.replace('+', '')
+    return formatMessage('filterTabs.summary.bedAtLeast', { count })
+  }
+  return formatMessage('filterTabs.summary.bedExact', { count: raw })
 })
 
 // 3) 价格
@@ -430,10 +455,14 @@ const priceTabText = computed(() => {
   const max = p.maxPrice ?? p.price_max
   const minNum = min != null && min !== '' ? Number(min) : null
   const maxNum = max != null && max !== '' ? Number(max) : null
-  if (minNum == null && maxNum == null) return '价格'
-  if (minNum != null && maxNum != null) return `$${minNum} - $${maxNum}`
-  if (minNum != null) return `≥$${minNum}`
-  return `≤$${maxNum}`
+  if (minNum == null && maxNum == null) return priceDefaultText.value
+  if (minNum != null && maxNum != null) {
+    return formatMessage('filterTabs.summary.priceRange', { min: minNum, max: maxNum })
+  }
+  if (minNum != null) {
+    return formatMessage('filterTabs.summary.priceMin', { min: minNum })
+  }
+  return formatMessage('filterTabs.summary.priceMax', { max: maxNum })
 })
 
 // 4) 空出时间
@@ -446,10 +475,10 @@ const availabilityTabText = computed(() => {
   const p = appliedParams.value || {}
   const from = p.date_from ? String(p.date_from).slice(0, 10) : null
   const to = p.date_to ? String(p.date_to).slice(0, 10) : null
-  if (from && to) return `${from} - ${to}`
-  if (from) return `From ${from}`
-  if (to) return `Until ${to}`
-  return '空出时间'
+  if (from && to) return formatMessage('filterTabs.summary.dateRange', { from, to })
+  if (from) return formatMessage('filterTabs.summary.dateFrom', { from })
+  if (to) return formatMessage('filterTabs.summary.dateTo', { to })
+  return availabilityDefaultText.value
 })
 
 // 5) 更多
@@ -461,9 +490,10 @@ const moreApplied = computed(() => {
 /* removed: moreHasDraft */
 const moreTabText = computed(() => {
   const p = appliedParams.value || {}
-  // 中文注释：仅在 Furnished 为 true 时显示；否则显示“更多”
-  if (p.isFurnished === true || p.furnished === true) return 'Furnished'
-  return '更多'
+  if (p.isFurnished === true || p.furnished === true) {
+    return t('filterTabs.tabOptions.furnished')
+  }
+  return moreDefaultText.value
 })
 
 // 面板触发元素引用
@@ -708,8 +738,6 @@ const handleSearchSaved = async (savedSearch) => {
   background: var(--chip-bg);
   border: none;
   border-radius: 0;
-  font-size: 14px;
-  font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
   transition:
@@ -754,9 +782,6 @@ const handleSearchSaved = async (savedSearch) => {
   border-radius: var(--radius-sm);
   background: var(--color-bg-card);
   color: var(--color-text-secondary);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1;
 }
 
 .filter-button:hover {
@@ -794,9 +819,6 @@ const handleSearchSaved = async (savedSearch) => {
   border-radius: 8px;
   background: var(--juwo-primary);
   color: white;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -844,9 +866,6 @@ const handleSearchSaved = async (savedSearch) => {
   border-radius: var(--radius-sm);
   background: var(--juwo-primary);
   color: white;
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;

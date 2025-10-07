@@ -105,4 +105,33 @@ export default {
     anyPrice: '不限价格',
     selectRegionFirst: '请先选择区域后再筛选',
   },
+  filterTabs: {
+    tabs: {
+      area: '区域',
+      bedrooms: '卧室',
+      price: '价格',
+      availability: '空出时间',
+      more: '更多',
+    },
+    actions: {
+      saveSearch: '保存搜索',
+      openFilter: '筛选',
+      save: '保存',
+    },
+    summary: {
+      areaMultiple: '{first} +{count}',
+      bedAtLeast: '{count}卧+',
+      bedExact: '{count}卧',
+      priceRange: '${min} - ${max}',
+      priceMin: '≥${min}',
+      priceMax: '≤${max}',
+      dateRange: '{from} - {to}',
+      dateFrom: '从 {from}',
+      dateTo: '至 {to}',
+    },
+    tabOptions: {
+      studio: 'Studio',
+      furnished: 'Furnished',
+    },
+  },
 }

@@ -163,3 +163,6 @@ dev-debug.log
 
 # Crawler output
 crawler/output/
+
+.gemini/
+gha-creds-*.json

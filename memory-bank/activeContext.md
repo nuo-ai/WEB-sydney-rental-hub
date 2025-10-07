@@ -13,7 +13,8 @@
   - useFilterWizard 扩展：完整的保存搜索功能支持
   - HomeView 集成：完整的事件处理链路和用户反馈
   - 保存搜索功能：完整实现并测试通过
-- **当前焦点**：FilterWizard 组件已开发但尚未接入主流程（主页仍使用 FilterPanel）；Profile 页已接入 SavedSearchesManager 并提供已保存搜索管理
+  - 2025-10-05｜Storybook 初版接入：新增 BaseButton/BaseChip/BaseBadge、PropertyCard、FilterPanel Stories 与 Tokens 文档，preview 注入 Pinia/ElementPlus/i18n 与内存版 localStorage
+- **当前焦点**：FilterWizard 特性开关接入评估；Chromatic 运行时错误（decorator 读取 config 为空）根因定位并处理；Profile 页已接入 SavedSearchesManager
 
 ## 下一步计划
 - **[P0] 筛选向导接入评估**：以特性开关接入 FilterWizard（默认关闭），A/B 对比现有 FilterPanel，出现异常可一键回退
