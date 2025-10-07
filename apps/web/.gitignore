@@ -34,3 +34,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+*storybook.log
+storybook-static

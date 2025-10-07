@@ -17,6 +17,7 @@
 - **2025-09-16｜筛选向导组件**: FilterWizard 组件开发完成，尚未接入主流程（主页仍使用 FilterPanel），将以特性开关评估接入
 
 ### 设计系统合规性冲刺
+- **2025-10-05｜Storybook 基础搭建**: 接入 Vue3+Vite Storybook、注册 BaseButton/BaseChip/BaseBadge、PropertyCard、FilterPanel stories，并补充 Tokens 文档页；preview 注入 Pinia/i18n/ElementPlus 与内存 localStorage 以兼容 Chromatic
 - **2025-09-12｜导航收敛**: 顶栏聚焦"搜索/收藏/AI助手/我的"｜溯源：47cab8b..125e590
 - **2025-09-11｜图标系统统一**: 全站 lucide-vue-next + currentColor｜溯源：fe8f012..2a9dd4d
 - **2025-09-11｜规格行变量驱动**: 列表与详情"图标+数字"尺寸间距一致｜溯源：5b7254c..25ff698
