@@ -8,6 +8,7 @@
   - **Tokens 自动化**: 引入 `Style Dictionary` 并建立了完整的自动化流程。
   - **组件开发环境**: 成功配置 `Storybook` 并展示了第一个由 Tokens 驱动的 `BaseButton` 组件。
   - **初步集成**: 主应用 `apps/web` 已成功集成 Tokens CSS 文件。
+- **设计系统建设 - 第三阶段**: 成功将 `apps/web/src/components/base/` 目录下的所有基础组件 (`BaseBadge`, `BaseChip`, `BaseButton`, `BaseIconButton`, `BaseListItem`, `BaseSearchInput`, `BaseToggle`) 迁移至 `@sydney-rental-hub/ui` 设计系统包。
 
 ## 当前焦点 (Current Focus)
 - **设计系统建设 - 第三阶段**: 丰富组件库，并逐步将 `apps/web` 中的旧组件替换为设计系统组件。

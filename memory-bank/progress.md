@@ -4,6 +4,9 @@
 
 ## 近期重要里程碑（2025-10）
 
+### 设计系统组件库丰富
+- **2025-10-09｜设计系统组件库丰富**: 成功将 `apps/web/src/components/base/` 目录下的 7 个基础组件 (`BaseBadge`, `BaseChip`, `BaseButton`, `BaseIconButton`, `BaseListItem`, `BaseSearchInput`, `BaseToggle`) 迁移至 `@sydney-rental-hub/ui` 包，显著丰富了设计系统组件库。｜溯源: 1ce1a43
+
 ### Monorepo 治理与设计系统奠基
 - **2025-10-09｜Monorepo 基础治理完成**: 统一 pnpm 工作流，清理多余锁文件，扩展 workspace 范围，标准化 `.env.example`，并为 Python 栈引入 `requirements.lock`。｜溯源: 45af8aa
 - **2025-10-09｜设计系统脚手架搭建**: 创建 `@sydney-rental-hub/ui` 包，引入 Style Dictionary 实现 Tokens 自动化，并搭建 Storybook 组件开发环境。｜溯源: 724ce82
