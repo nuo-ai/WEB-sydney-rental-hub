@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@sydney-rental-hub/ui": "workspace:*",
     "@element-plus/icons-vue": "^2.3.2",
     "@tanstack/vue-virtual": "^3.13.12",
     "axios": "^1.11.0",

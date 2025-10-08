@@ -42,19 +42,19 @@
     },
     "semantic": {
       "bg": {
-        "primary": { "value": "{color.white.value}", "type": "color", "description": "一级背景色，用于页面主内容区域" },
-        "secondary": { "value": "{color.gray.50.value}", "type": "color", "description": "二级背景色，用于区分不同区块" },
-        "page": { "value": "{color.gray.75.value}", "type": "color", "description": "整页背景色" }
+        "primary": { "value": "{color.white}", "type": "color", "description": "一级背景色，用于页面主内容区域" },
+        "secondary": { "value": "{color.gray.50}", "type": "color", "description": "二级背景色，用于区分不同区块" },
+        "page": { "value": "{color.gray.75}", "type": "color", "description": "整页背景色" }
       },
       "text": {
-        "primary": { "value": "{color.gray.800.value}", "type": "color", "description": "主要文字颜色" },
-        "secondary": { "value": "{color.gray.500.value}", "type": "color", "description": "次要文字颜色" },
-        "muted": { "value": "{color.gray.400.value}", "type": "color", "description": "提示性或置灰文字颜色" },
-        "inverse": { "value": "{color.white.value}", "type": "color", "description": "反色文字，用于深色背景" }
+        "primary": { "value": "{color.gray.800}", "type": "color", "description": "主要文字颜色" },
+        "secondary": { "value": "{color.gray.500}", "type": "color", "description": "次要文字颜色" },
+        "muted": { "value": "{color.gray.400}", "type": "color", "description": "提示性或置灰文字颜色" },
+        "inverse": { "value": "{color.white}", "type": "color", "description": "反色文字，用于深色背景" }
       },
       "border": {
-        "default": { "value": "{color.gray.300.value}", "type": "color", "description": "默认边框颜色" },
-        "subtle": { "value": "{color.gray.200.value}", "type": "color", "description": "更弱化的边框颜色" }
+        "default": { "value": "{color.gray.300}", "type": "color", "description": "默认边框颜色" },
+        "subtle": { "value": "{color.gray.200}", "type": "color", "description": "更弱化的边框颜色" }
       }
     }
   },
@@ -93,8 +93,8 @@
   "component": {
     "button": {
       "primary": {
-        "bg": { "value": "{color.brand.primary.value}", "type": "color", "description": "主按钮背景色" },
-        "color": { "value": "{color.semantic.text.inverse.value}", "type": "color", "description": "主按钮文字颜色" }
+        "bg": { "value": "{color.brand.primary}", "type": "color", "description": "主按钮背景色" },
+        "color": { "value": "{color.semantic.text.inverse}", "type": "color", "description": "主按钮文字颜色" }
       }
     }
   }
