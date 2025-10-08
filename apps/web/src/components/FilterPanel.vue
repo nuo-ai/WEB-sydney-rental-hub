@@ -90,7 +90,7 @@ import { usePropertiesStore } from '@/stores/properties'
 import { ElMessage } from 'element-plus'
 // 移除了 useRouter 和 useRoute，因为组件不再直接操作 URL
 import AreasSelector from '@/components/AreasSelector.vue'
-import BaseChip from '@/components/base/BaseChip.vue'
+import { BaseChip } from '@sydney-rental-hub/ui'
 
 // #################################################################
 // # 1. COMPOSABLE 函数 (逻辑提取)
@@ -948,4 +948,3 @@ const focusAndScroll = async () => {
   }
 }
 </style>
-

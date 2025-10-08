@@ -115,7 +115,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Search, Edit2, Trash2, X } from 'lucide-vue-next'
 import { useFilterWizard } from '@/composables/useFilterWizard'
-import BaseButton from '@/components/base/BaseButton.vue'
+import { BaseButton } from '@sydney-rental-hub/ui'
 
 defineOptions({ name: 'SavedSearchesManager' })
 

@@ -8,6 +8,7 @@
 ## 当前技术栈
 
 - **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia + lucide-vue-next（图标）
+- **小程序计划**: 评估 TorUI 组件库（Taro/小程序生态）并验证 VS Code 下主题与 token 扩展的可行性
 - **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
 - **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL）
 - **地图**: Google Maps JavaScript/Static Map（前端）+ Google Directions（后端，生产）；当前无 Haversine 回退
@@ -17,15 +18,15 @@
 ## 项目架构概览
 
 ### 项目结构
-```
-apps/web/
-├── src/views/          # 页面组件
-├── src/components/     # 可复用组件
-├── src/stores/         # Pinia状态管理
-├── src/services/       # API服务层
-├── src/router/         # Vue Router配置
-└── vite.config.js      # Vite配置 (CORS代理到localhost:8000)
-```
+- **Monorepo**: 采用 `pnpm` + `Turborepo` 结构。
+- **工作区**:
+  - `apps/*`: 存放各个独立的应用程序（前端、后端等）。
+  - `packages/*`: 存放共享的库和包，例如设计系统。
+    - `@sydney-rental-hub/ui`: 设计系统的核心包，包含可复用的UI组件和样式令牌。
+- **配置**:
+  - `pnpm-workspace.yaml`: 定义工作区范围（`apps/*`, `packages/*` 等）。
+  - `turbo.json`: 统一任务编排与缓存策略。
+  - 根 `package.json`: 提供顶层命令 (`dev`, `build`, `lint` 等)。
 
 ### API集成架构
 - **代理配置**: 默认将 `/api`转发到 `http://localhost:8000`
@@ -56,14 +57,29 @@ apps/web/
 ## 开发环境
 
 ### 本地运行
-```bash
-# Web 前端开发环境
-pnpm install --filter @web-sydney/web
-pnpm --filter @web-sydney/web dev   # localhost:5173
 
-# 后端API服务
-cd ../
-python scripts/run_backend.py  # localhost:8000
+项目已迁移至 `pnpm` + `Turborepo` 工作流，请在**项目根目录**执行所有命令。
+
+```bash
+# 1. 安装所有依赖 (首次或依赖更新后)
+pnpm install
+
+# 2. 启动所有服务 (推荐，并行启动前后端)
+pnpm dev
+
+# 3. 构建设计系统产物 (Tokens)
+pnpm build:tokens
+
+# 4. 独立运行设计系统开发环境 (Storybook)
+pnpm --filter @sydney-rental-hub/ui run storybook
+
+# --- 或单独启动 ---
+
+# 只启动 Vue 前端 (@web-sydney/web)
+pnpm --filter @web-sydney/web dev
+
+# 只启动 FastAPI 后端 (@web-sydney/backend)
+pnpm --filter @web-sydney/backend dev
 ```
 
 ### E2E 测试
@@ -84,23 +100,36 @@ npx playwright test -g "URL 幂等与仅写非空键"
 
 ---
 
-## 设计系统
+## 设计系统与工具链
 
-### JUWO品牌设计系统
-- **主色**: #0057ff (纯正蓝)
-- **统一圆角**: 6px（组件设计令牌）
-- **布局对齐**: 1200px最大宽度，32px间距
-- **响应式断点**: 768px（平板）、1200px（桌面）、1920px（超宽）
+### 1. 设计令牌 (Design Tokens)
+- **单一事实来源**: `tokens/design-tokens.json` 是所有设计决策的唯一来源，遵循 W3C Design Tokens 规范。
+- **自动化流程**: 使用 `Style Dictionary` 工具链将 JSON 令牌自动转换为多种格式。
+  - **命令**: `pnpm build:tokens`
+  - **产物**:
+    - `packages/ui/dist/tokens.css`: 供所有前端应用消费的 CSS 自定义属性。
+    - `packages/ui/dist/tokens.mjs`: 供 JS/TS 使用的令牌对象。
+- **集成**: 主应用 `apps/web` 已全局导入 `tokens.css`，取代了旧的手动样式文件。
 
-### 设计令牌约束
-- **强制使用**: `var(--*)` 形式的 CSS 自定义属性
-- **禁止**: 硬编码颜色、`var(--token, #hex)` 兜底形式
-- **护栏**: Stylelint 规则拦截新增硬编码色
+### 2. 组件开发 (Component Development)
+- **核心包**: `@sydney-rental-hub/ui` 是所有可复用UI组件的家。
+- **开发环境**: 使用 `Storybook` 作为独立的组件开发和文档环境。
+  - **命令**: `pnpm --filter @sydney-rental-hub/ui run storybook`
+  - **目的**: 在隔离的环境中开发、测试和可视化组件，确保其通用性和健壮性。
+- **组件规范**:
+  - 组件应**完全基于 Design Tokens** 构建，不包含任何硬编码样式值。
+  - 优先从 `apps/web/src/components/base/` 中提炼和迁移现有基础组件。
 
-### 图标系统
-- **标准**: 全站使用 `lucide-vue-next` SVG 图标库
+### 3. 图标系统
+- **标准**: 全站使用 `lucide-vue-next` SVG 图标库。
 - **导入**: `import { IconName } from 'lucide-vue-next'`
-- **颜色**: `stroke: currentColor`，由外层控制
+- **颜色**: `stroke: currentColor`，由外层文字颜色 (`color`) 控制。
+
+### 2025-10-07 平台战略更新
+- **平台先后**: 小程序 → App → Android，所有设计规范以小程序实现为基线，再向其他端扩散。
+- **组件框架策略**: 引入 TorUI 组件库验证 VS Code 下的主题/Token 配置能力，必要时封装补充原子组件以覆盖空缺。
+- **Design Token 统一**: 借鉴 Polaris Migrator 的自动迁移手法，为颜色、字体、图标、标签、间距建立跨端 token 映射与校验脚本。
+- **MVP 功能聚焦**: 先交付房源筛选、排序、搜索-查看-收藏-客服下单流程；后续迭代再扩展地铁/火车站点筛选、帖子发布、付费通知等高级能力。
 
 ---
 

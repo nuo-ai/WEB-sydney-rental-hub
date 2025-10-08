@@ -1,29 +1,30 @@
-# 当前上下文与紧急焦点
-最后更新：2025-09-16
+# 当前上下文与焦点
+**最后更新**：2025-10-09
 
-## 当前状态
-- **服务运行**：前端 :5173 / 后端 :8000 正常；数据库连接正常；Directions API 配置完好
-- **最新完成**：
-  - 筛选系统重构：创建了新的线性四步筛选流程
-  - useFilterWizard Composable：简化状态管理，统一筛选逻辑
-  - FilterWizard 组件：实现向导式筛选体验
-  - SearchResultHeader 组件：智能中文化结果描述
-  - SaveSearchModal 组件：Zillow风格的保存搜索弹窗
-  - FilterTabs 组件：集成保存搜索按钮（PC端和移动端）
-  - useFilterWizard 扩展：完整的保存搜索功能支持
-  - HomeView 集成：完整的事件处理链路和用户反馈
-  - 保存搜索功能：完整实现并测试通过
-  - 2025-10-05｜Storybook 初版接入：新增 BaseButton/BaseChip/BaseBadge、PropertyCard、FilterPanel Stories 与 Tokens 文档，preview 注入 Pinia/ElementPlus/i18n 与内存版 localStorage
-- **当前焦点**：FilterWizard 特性开关接入评估；Chromatic 运行时错误（decorator 读取 config 为空）根因定位并处理；Profile 页已接入 SavedSearchesManager
+## 已完成状态 (Completed Status)
+- **Monorepo 治理**: 已完成基础治理，包括统一 pnpm 工作流、扩展 workspace、标准化 `.env.example` 以及为 Python 栈生成 `requirements.lock`。
+- **设计系统奠基**: 已成功搭建设计系统脚手架。
+  - **核心包**: 创建了 `@sydney-rental-hub/ui`。
+  - **Tokens 自动化**: 引入 `Style Dictionary` 并建立了完整的自动化流程。
+  - **组件开发环境**: 成功配置 `Storybook` 并展示了第一个由 Tokens 驱动的 `BaseButton` 组件。
+  - **初步集成**: 主应用 `apps/web` 已成功集成 Tokens CSS 文件。
+- **设计系统建设 - 第三阶段**: 成功将 `apps/web/src/components/base/` 目录下的所有基础组件 (`BaseBadge`, `BaseChip`, `BaseButton`, `BaseIconButton`, `BaseListItem`, `BaseSearchInput`, `BaseToggle`) 迁移至 `@sydney-rental-hub/ui` 设计系统包。
 
-## 下一步计划
-- **[P0] 筛选向导接入评估**：以特性开关接入 FilterWizard（默认关闭），A/B 对比现有 FilterPanel，出现异常可一键回退
-- **[P0] 图标系统余量迁移**：清理 Font Awesome 遗留，统一至 lucide-vue-next + currentColor
-- **[P1] 令牌定义梳理**：assets/design-tokens.css 标注 deprecated（--color-accent/--font-size-base/--spacing-lg）并提供语义映射
-- **[P2] 移除 var() 颜色兜底**：渐进清理 var(--token, #xxx) fallback
+## 当前焦点 (Current Focus)
+- **设计系统建设 - 第三阶段**: 丰富组件库，并逐步将 `apps/web` 中的旧组件替换为设计系统组件。
+
+## 下一步计划 (Next Steps)
+1.  **[计划] 制定组件迁移路线图**:
+    - 优先从 `apps/web/src/components/base/` 目录中的基础组件开始。
+    - 逐个将它们迁移到 `@sydney-rental-hub/ui` 包中，确保它们完全由 Design Tokens 驱动，并拥有完善的 Storybook 文档。
+2.  **[执行] 迁移第一个基础组件**:
+    - 选择 `BaseBadge` 或 `BaseChip` 作为第一个迁移对象。
+    - 在 `@sydney-rental-hub/ui` 中重建该组件及其 Story。
+3.  **[执行] 在 `apps/web` 中使用新组件**:
+    - 更新 `apps/web` 的代码，使其从 `@sydney-rental-hub/ui` 导入并使用新的 `BaseBadge` 组件，替换掉旧的本地版本。
+4.  **[验收] 验证端到端流程**:
+    - 确认 `apps/web` 中的组件表现与 Storybook 中完全一致，验证整个设计系统消费流程的通畅。
 
 ## 技术提醒
-- **筛选系统**：V1 契约稳定，V2 映射默认关闭（enableFilterV2=false），可安全回滚
-- **设计令牌**：Stylelint 护栏已启用，新代码强制使用 var(--*)，禁止硬编码颜色
-- **Memory Bank 维护**：activeContext 仅保留当前与未来任务快照，已完成功能沉淀到 systemPatterns/progress
-![1757946160449](image/activeContext/1757946160449.png)- **运维约束**：本地固定用 PowerShell 执行 Python/SQL/HTTP，避免跨壳路径问题
+- **开发流程**: 所有新组件或迁移组件都必须在 `@sydney-rental-hub/ui` 的 Storybook 环境中进行开发和验证。
+- **代码提交**: 所有与设计系统相关的变更，完成后将由我（Cline）负责提交和推送。

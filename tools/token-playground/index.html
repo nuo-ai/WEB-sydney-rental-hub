@@ -1,13 +1,246 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Token Playground</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Tokens - 可视化盘点</title>
+    <style>
+        :root {
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            --color-bg: #f4f7f9;
+            --color-card-bg: #ffffff;
+            --color-text-primary: #1f2937;
+            --color-text-secondary: #6b7280;
+            --color-border: #e5e7eb;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius-lg: 12px;
+            --radius-md: 8px;
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            margin: 0 0 1rem 0;
+            font-weight: 600;
+        }
+        h1 { font-size: 2.25rem; }
+        h2 { font-size: 1.5rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem; margin-top: 2.5rem; }
+        h3 { font-size: 1.25rem; margin-top: 2rem; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: var(--color-card-bg);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1rem;
+        }
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .token-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .token-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .token-value {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        .token-desc {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        .color-swatch {
+            width: 100%;
+            height: 80px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            margin-bottom: 0.5rem;
+        }
+        .font-preview {
+            padding: 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+        }
+        .space-preview {
+            background-color: #0057ff33;
+            height: 2rem;
+        }
+        .radius-preview, .shadow-preview {
+            width: 100px;
+            height: 100px;
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Design Tokens 可视化盘点</h1>
+        <p>这是对 <code>tokens/design-tokens.json</code> 文件内容的自动可视化展示，用于审查和确认设计系统的基础。</p>
+        
+        <div id="tokens-container"></div>
+    </div>
+
+    <script>
+        const tokens = {
+          "color": {
+            "white": { "value": "#ffffff", "type": "color", "description": "纯白色" },
+            "black": { "value": "#000000", "type": "color", "description": "纯黑色" },
+            "gray": {
+              "50": { "value": "#f9fafb", "type": "color", "description": "中性灰 50" },
+              "75": { "value": "#f4f7f9", "type": "color", "description": "页面背景灰" },
+              "100": { "value": "#f3f4f6", "type": "color", "description": "中性灰 100" },
+              "200": { "value": "#e5e7eb", "type": "color", "description": "中性灰 200" },
+              "300": { "value": "#d1d5db", "type": "color", "description": "中性灰 300" },
+              "400": { "value": "#9ca3af", "type": "color", "description": "中性灰 400" },
+              "500": { "value": "#6b7280", "type": "color", "description": "中性灰 500" },
+              "600": { "value": "#4b5563", "type": "color", "description": "中性灰 600" },
+              "700": { "value": "#374151", "type": "color", "description": "中性灰 700" },
+              "800": { "value": "#1f2937", "type": "color", "description": "中性灰 800" },
+              "900": { "value": "#111827", "type": "color", "description": "中性灰 900" }
+            },
+            "brand": {
+              "primary": { "value": "#0057ff", "type": "color", "description": "品牌主色" },
+              "hover": { "value": "#0047e5", "type": "color", "description": "品牌主色悬停" },
+              "active": { "value": "#0036b3", "type": "color", "description": "品牌主色激活" }
+            }
+          },
+          "font": {
+            "size": {
+              "xs": { "value": "12px", "type": "dimension" }, "sm": { "value": "13px", "type": "dimension" },
+              "md": { "value": "14px", "type": "dimension" }, "lg": { "value": "16px", "type": "dimension" },
+              "xl": { "value": "18px", "type": "dimension" }
+            },
+            "weight": {
+              "regular": { "value": "400", "type": "fontWeight" }, "medium": { "value": "500", "type": "fontWeight" },
+              "semibold": { "value": "600", "type": "fontWeight" }, "bold": { "value": "700", "type": "fontWeight" }
+            }
+          },
+          "space": {
+            "xs": { "value": "6px", "type": "dimension" }, "sm": { "value": "8px", "type": "dimension" },
+            "md": { "value": "12px", "type": "dimension" }, "lg": { "value": "16px", "type": "dimension" },
+            "xl": { "value": "20px", "type": "dimension" }
+          },
+          "radius": {
+            "sm": { "value": "6px", "type": "dimension" }, "md": { "value": "8px", "type": "dimension" },
+            "lg": { "value": "12px", "type": "dimension" }, "full": { "value": "9999px", "type": "dimension" }
+          },
+          "shadow": {
+            "sm": { "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)", "type": "shadow" },
+            "md": { "value": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", "type": "shadow" }
+          }
+        };
+
+        // A simple resolver for semantic tokens
+        function resolveValue(value) {
+            if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
+                const path = value.slice(1, -1).split('.');
+                let current = tokens;
+                for (const key of path) {
+                    current = current[key];
+                    if (!current) return value; // Not found
+                }
+                return current.value || value;
+            }
+            return value;
+        }
+
+        const container = document.getElementById('tokens-container');
+
+        function createTokenItem(name, data) {
+            const value = resolveValue(data.value);
+            let preview = '';
+            switch (data.type) {
+                case 'color':
+                    preview = `<div class="color-swatch" style="background-color: ${value}"></div>`;
+                    break;
+                case 'dimension':
+                    if (name.includes('space')) {
+                        preview = `<div class="space-preview" style="width: ${value};"></div>`;
+                    } else if (name.includes('radius')) {
+                        preview = `<div class="radius-preview" style="border-radius: ${value};"><span>${value}</span></div>`;
+                    }
+                    break;
+                case 'fontWeight':
+                     preview = `<div class="font-preview" style="font-weight: ${value};">字重 ${value}</div>`;
+                    break;
+                case 'shadow':
+                    preview = `<div class="shadow-preview" style="box-shadow: ${value};"><span>Shadow</span></div>`;
+                    break;
+            }
+             if (name.startsWith('font.size')) {
+                preview = `<div class="font-preview" style="font-size: ${value};">字体大小 ${value}</div>`;
+            }
+
+            return `
+                <div class="token-item">
+                    ${preview}
+                    <span class="token-name">${name}</span>
+                    <span class="token-value">${data.value}</span>
+                    ${data.description ? `<span class="token-desc">${data.description}</span>` : ''}
+                </div>
+            `;
+        }
+
+        function renderTokens(data, parentKey = '') {
+            let html = '';
+            let itemsHtml = '';
+            const subGroups = {};
+
+            for (const key in data) {
+                const currentKey = parentKey ? `${parentKey}.${key}` : key;
+                if (data[key].value) {
+                    itemsHtml += createTokenItem(currentKey, data[key]);
+                } else {
+                    subGroups[key] = data[key];
+                }
+            }
+            
+            if (itemsHtml) {
+                html += `<div class="token-grid">${itemsHtml}</div>`;
+            }
+
+            for (const key in subGroups) {
+                const currentKey = parentKey ? `${parentKey}.${key}` : key;
+                html += `<h3>${currentKey}</h3>`;
+                html += renderTokens(subGroups[key], currentKey);
+            }
+            
+            return html;
+        }
+
+        // Main render logic
+        const topLevelCategories = {
+            'Color': tokens.color,
+            'Font': tokens.font,
+            'Space': tokens.space,
+            'Radius': tokens.radius,
+            'Shadow': tokens.shadow
+        };
+
+        let finalHtml = '';
+        for (const category in topLevelCategories) {
+            finalHtml += `<div class="card"><h2>${category}</h2>${renderTokens(topLevelCategories[category], category.toLowerCase())}</div>`;
+        }
+        container.innerHTML = finalHtml;
+
+    </script>
+</body>
 </html>

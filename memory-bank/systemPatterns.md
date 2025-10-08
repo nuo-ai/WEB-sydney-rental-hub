@@ -4,6 +4,31 @@
 
 ## 核心架构原则
 
+### Monorepo 架构
+- **方案**: `pnpm` Workspaces + `Turborepo`
+- **结构**: 所有应用（前端、后端等）均存放在 `apps/*` 目录下。
+- **目标**: 统一依赖管理、共享工具链、高效任务编排（通过根目录的 `package.json` 和 `turbo.json`）。
+- **原则**: 新功能或应用应作为新的 `apps/` 或 `packages/` 子目录加入工作区。
+
+---
+
+## 设计系统模式 (Design System Patterns)
+
+### 1. 单一事实来源 (Single Source of Truth)
+- **核心原则**: 设计系统的所有基础元素（颜色、字体、间距等）必须源自一个统一的、与技术无关的数据源。
+- **实现**: `tokens/design-tokens.json` 文件是所有设计决策的唯一权威。
+- **反模式** ❌: 在组件代码或应用样式中出现任何硬编码的样式值（如 `#FFF`, `16px`）。
+
+### 2. 自动化令牌管道 (Automated Token Pipeline)
+- **模式**: 设计令牌通过自动化的构建流程，转换为前端可直接消费的多种代码格式。
+- **实现**: `Style Dictionary` 工具链负责读取 `tokens.json` 并生成 CSS 自定义属性和 JS 对象。
+- **价值**: 确保设计变更可以安全、一致地同步到所有前端应用，杜绝手动修改和遗漏。
+
+### 3. 独立的组件开发环境
+- **模式**: UI 组件在一个与业务应用完全隔离的环境中进行开发、测试和文档化。
+- **实现**: `@sydney-rental-hub/ui` 包内置 `Storybook`，为每个组件提供独立的“画廊”。
+- **原则**: 组件在 Storybook 中必须表现完美，才能被主应用消费。这强制实现了组件的上下文无关性和高复用性。
+
 ### 数据流架构
 ```bash
 # 核心数据流路径 (必须遵守)
@@ -57,21 +82,19 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - **原则**: 仅删除指定分组旧键再合并，避免跨面板覆盖
 - **分组**: area/price/bedrooms/availability/more
 
----
+### 4. 布局与样式模式
 
-## CSS与布局模式
-
-### 布局对齐策略
+#### 布局对齐策略
 - **统一容器**: `max-width: 1200px` 和 `padding: 0 32px`
 - **双层结构**: 外层容器全宽背景 + 内层居中内容区
 - **响应式断点**: 768px（平板）、1200px（桌面）、1920px（超宽）
 
-### 设计令牌约束
-- **强制使用**: `var(--*)` 形式的 CSS 自定义属性
-- **禁止**: 硬编码颜色、`var(--token, #hex)` 兜底形式
-- **护栏**: Stylelint 规则拦截新增硬编码色
+#### 设计令牌约束
+- **强制使用**: `var(--*)` 形式的 CSS 自定义属性，由自动化令牌管道生成。
+- **禁止**: 硬编码颜色、`var(--token, #hex)` 兜底形式。
+- **护栏**: Stylelint 规则应配置为拦截任何新增的硬编码样式值。
 
-### 分段控件（Segmented）模式
+#### 分段控件（Segmented）模式
 - **目的**: 数字/枚举按钮视觉连体，仅改几何关系
 - **实现**: 相邻无缝、端部圆角 2px、边框折叠
 - **约束**: 不覆写颜色/状态逻辑，沿用既有设计令牌
@@ -101,17 +124,14 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - **结构**: `{status, data, pagination, error}`
 - **建议**: 契约单元测试校验字段一致性
 
----
+### 5. 图标系统模式
 
-## 图标系统与组件化
+#### 统一图标库
+- **标准**: 以 `lucide-vue-next` 为标准图标库。
+- **封装**: 图标应被封装为独立的组件，以便统一管理和使用。
+- **颜色**: 图标颜色必须使用 `stroke: currentColor`，使其能够继承父元素的文字颜色 (`color`)，从而可以通过 Design Tokens 进行控制。
 
-### 统一图标库
-- **标准**: 迁移进行中——以 `lucide-vue-next` 为标准，允许少量 Font Awesome 遗留（待清理）
-- **导入**: `import { IconName } from 'lucide-vue-next'`
-- **使用**: `<IconName class="spec-icon" />`
-- **颜色**: `stroke: currentColor`，由外层控制
-
-### 规格行变量驱动
+#### 规格行变量驱动
 - **全局变量**: --spec-icon-size/--spec-text-size/--spec-line-height/--spec-icon-gap/--spec-item-gap
 - **结构类**: .spec-row/.spec-item/.spec-text
 - **原则**: 统一"图标 + 数字"信息行的尺寸与间距

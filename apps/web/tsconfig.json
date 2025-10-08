@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowJs": true,
+    "noEmit": true,
     "checkJs": false,
     "strict": false,
     "jsx": "preserve",
@@ -26,5 +27,12 @@
     "src/**/*.vue",
     "src/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/components/base/BaseIconButton.vue",
+    "src/components/base/BaseListItem.vue",
+    "src/components/base/BaseSearchInput.vue",
+    "src/components/base/BaseToggle.vue"
+  ]
 }

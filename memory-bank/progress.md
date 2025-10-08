@@ -2,6 +2,21 @@
 
 **说明**: 仅保近 30 天关键里程碑，详细过程请查看对应 commit/PR
 
+## 近期重要里程碑（2025-10）
+
+### 设计系统组件库丰富
+- **2025-10-09｜设计系统组件库丰富**: 成功将 `apps/web/src/components/base/` 目录下的 7 个基础组件 (`BaseBadge`, `BaseChip`, `BaseButton`, `BaseIconButton`, `BaseListItem`, `BaseSearchInput`, `BaseToggle`) 迁移至 `@sydney-rental-hub/ui` 包，显著丰富了设计系统组件库。｜溯源: 1ce1a43
+
+### Monorepo 治理与设计系统奠基
+- **2025-10-09｜Monorepo 基础治理完成**: 统一 pnpm 工作流，清理多余锁文件，扩展 workspace 范围，标准化 `.env.example`，并为 Python 栈引入 `requirements.lock`。｜溯源: 45af8aa
+- **2025-10-09｜设计系统脚手架搭建**: 创建 `@sydney-rental-hub/ui` 包，引入 Style Dictionary 实现 Tokens 自动化，并搭建 Storybook 组件开发环境。｜溯源: 724ce82
+
+### 多端战略重排序
+- **2025-10-07｜小程序 → App → Android 路线确立**: 决定以小程序作为设计与交互基线，验证后再扩展到 App 与 Android。
+- **2025-10-07｜TorUI 评估启动**: 计划引入 TorUI 组件库，确保 VS Code 下支持主题/Design Token 定制与调试。
+- **2025-10-07｜Design Token 行动计划**: 以颜色、字体、图标、标签、间距为首轮统一对象，搭建“原子组件 → 业务组件”链路，并参考 Polaris Migrator 的自动化策略。
+- **2025-10-07｜MVP 功能聚焦**: 第一阶段聚焦房源筛选/排序/搜索-查看-收藏-客服下单，后续再扩展地铁/站点筛选、帖子发布、付费通知等功能。
+
 ## 近期重要里程碑（2025-09）
 
 ### 保存搜索功能完成

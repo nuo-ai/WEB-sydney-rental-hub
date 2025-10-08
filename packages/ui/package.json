@@ -1,0 +1,37 @@
+{
+  "name": "@sydney-rental-hub/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The core UI component library and design system for Sydney Rental Hub.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "echo 'Linting @sydney-rental-hub/ui... (no-op)'",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "keywords": [
+    "design-system",
+    "vue",
+    "components"
+  ],
+  "author": "Sydney Rental Hub Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@chromatic-com/storybook": "^4.1.1",
+    "@storybook/addon-a11y": "^9.1.10",
+    "@storybook/addon-docs": "^9.1.10",
+    "@storybook/addon-vitest": "^9.1.10",
+    "@storybook/vue3-vite": "^9.1.10",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
+    "playwright": "^1.56.0",
+    "storybook": "^9.1.10",
+    "vitest": "^3.2.4"
+  }
+}

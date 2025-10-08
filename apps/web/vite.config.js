@@ -48,7 +48,8 @@ export default defineConfig({
       },
     },
   },
-  test: {
+  // 仅在 Storybook 环境下加载测试配置
+  test: isStorybook ? {
     projects: [
       {
         extends: true,
@@ -75,5 +76,5 @@ export default defineConfig({
         },
       },
     ],
-  },
+  } : undefined,
 })

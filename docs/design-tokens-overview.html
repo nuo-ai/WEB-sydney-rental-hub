@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>Design Tokens Overview</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 32px; background: #f6f8fa; color:#1f2328; }
+    h1 { margin-top: 0; font-size: 32px; }
+    h2 { margin-top: 48px; font-size: 24px; }
+    h3 { margin-top: 32px; font-size: 20px; }
+    a { color: #0057ff; }
+    .intro { background: #fff; border-radius: 16px; padding: 24px; box-shadow:0 10px 30px rgba(15,23,42,0.08); }
+    nav { margin: 24px 0; }
+    nav ul { display:flex; flex-wrap:wrap; gap:12px; padding:0; list-style:none; }
+    nav a { display:inline-block; padding:8px 16px; border-radius:999px; background:#eef2ff; color:#1d4ed8; font-weight:600; }
+    table { width:100%; border-collapse:collapse; margin-top:16px; background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(15,23,42,0.05); }
+    th, td { padding:12px 16px; vertical-align:top; border-bottom:1px solid #edf2f7; }
+    th { background:#f8fafc; text-align:left; font-size:14px; letter-spacing:0.5px; text-transform:uppercase; color:#64748b; }
+    tr:last-child td { border-bottom:none; }
+    code { background:#f1f5f9; padding:2px 6px; border-radius:6px; font-size:13px; }
+    .swatch { display:inline-block; width:40px; height:24px; border-radius:6px; border:1px solid rgba(15,23,42,0.12); margin-right:8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35); }
+    .value-cell { display:flex; align-items:center; gap:8px; }
+    .usage { color:#475569; font-size:14px; }
+    .note { background:#fff; padding:16px 20px; border-left:4px solid #2563eb; border-radius:12px; margin-top:24px; display:flex; gap:12px; }
+    .checklist { background:#fff; padding:20px; border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,0.06); }
+    .checklist ul { margin:0; padding-left:20px; }
+    footer { margin-top:48px; color:#6366f1; font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="intro">
+    <h1>设计令牌目录（静态总览）</h1>
+    <p><strong>目标：</strong>快速对照颜色、字体、图标、标签、间距等核心 Token 的取值与使用场景，配合真实页面截图，保证设计与开发语义一致。</p>
+    <p><strong>使用建议：</strong>在填充真实截图前，可先按表格核对命名与用途；待组件开发阶段再评估是否引入第三方 Playground（如 Storybook token 插件或开源 sandbox）。</p>
+  </div>
+  <nav><ul>
+    <li><a href="#section-color">颜色 Colors</a></li>
+    <li><a href="#section-component">组件 Tokens</a></li>
+    <li><a href="#section-font">字体 Typography</a></li>
+    <li><a href="#section-radius">圆角 Radius</a></li>
+    <li><a href="#section-shadow">阴影 Shadow</a></li>
+    <li><a href="#section-space">间距 Spacing</a></li>
+  </ul></nav>
+  <section id="section-color">
+    <h2>颜色 Colors</h2>
+    <table>
+      <thead><tr><th>Token 名称</th><th>值</th><th>类型</th><th>原始描述</th><th>真实用途说明</th><th>预览 / 截图占位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>color.black</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#000000;"></span><code>#000000</code></td>
+          <td>color</td>
+          <td>纯黑色</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#000000;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_black.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.brand.active</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#0036b3;"></span><code>#0036b3</code></td>
+          <td>color</td>
+          <td>品牌主色激活状态</td>
+          <td class="usage">按钮按压、选中态</td>
+          <td><span class="swatch" style="background:#0036b3;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_brand_active.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.brand.hover</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#0047e5;"></span><code>#0047e5</code></td>
+          <td>color</td>
+          <td>品牌主色悬停状态</td>
+          <td class="usage">按钮悬停、交互高亮</td>
+          <td><span class="swatch" style="background:#0047e5;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_brand_hover.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.brand.primary</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#0057ff;"></span><code>#0057ff</code></td>
+          <td>color</td>
+          <td>品牌主色，用于关键操作和高亮显示</td>
+          <td class="usage">主操作按钮、核心 CTA 背景</td>
+          <td><span class="swatch" style="background:#0057ff;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_brand_primary.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.100</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#f3f4f6;"></span><code>#f3f4f6</code></td>
+          <td>color</td>
+          <td>中性灰 100</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#f3f4f6;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_100.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.200</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#e5e7eb;"></span><code>#e5e7eb</code></td>
+          <td>color</td>
+          <td>中性灰 200</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#e5e7eb;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_200.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.300</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#d1d5db;"></span><code>#d1d5db</code></td>
+          <td>color</td>
+          <td>中性灰 300</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#d1d5db;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_300.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.400</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#9ca3af;"></span><code>#9ca3af</code></td>
+          <td>color</td>
+          <td>中性灰 400</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#9ca3af;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_400.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.50</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#f9fafb;"></span><code>#f9fafb</code></td>
+          <td>color</td>
+          <td>中性灰 50</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#f9fafb;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_50.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.500</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#6b7280;"></span><code>#6b7280</code></td>
+          <td>color</td>
+          <td>中性灰 500</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#6b7280;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_500.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.600</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#4b5563;"></span><code>#4b5563</code></td>
+          <td>color</td>
+          <td>中性灰 600</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#4b5563;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_600.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.700</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#374151;"></span><code>#374151</code></td>
+          <td>color</td>
+          <td>中性灰 700</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#374151;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_700.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.75</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#f4f7f9;"></span><code>#f4f7f9</code></td>
+          <td>color</td>
+          <td>页面背景灰</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#f4f7f9;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_75.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.800</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#1f2937;"></span><code>#1f2937</code></td>
+          <td>color</td>
+          <td>中性灰 800</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#1f2937;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_800.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.gray.900</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#111827;"></span><code>#111827</code></td>
+          <td>color</td>
+          <td>中性灰 900</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#111827;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_gray_900.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.bg.page</code></td>
+          <td class="value-cell"><code>{color.gray.75.value}</code></td>
+          <td>color</td>
+          <td>整页背景色</td>
+          <td class="usage">整页背景</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_bg_page.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.bg.primary</code></td>
+          <td class="value-cell"><code>{color.white.value}</code></td>
+          <td>color</td>
+          <td>一级背景色，用于页面主内容区域</td>
+          <td class="usage">主内容区域背景</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_bg_primary.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.bg.secondary</code></td>
+          <td class="value-cell"><code>{color.gray.50.value}</code></td>
+          <td>color</td>
+          <td>二级背景色，用于区分不同区块</td>
+          <td class="usage">区块分隔背景</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_bg_secondary.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.border.default</code></td>
+          <td class="value-cell"><code>{color.gray.300.value}</code></td>
+          <td>color</td>
+          <td>默认边框颜色</td>
+          <td class="usage">通用描边/边框</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_border_default.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.border.subtle</code></td>
+          <td class="value-cell"><code>{color.gray.200.value}</code></td>
+          <td>color</td>
+          <td>更弱化的边框颜色</td>
+          <td class="usage">弱化分隔线</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_border_subtle.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.text.inverse</code></td>
+          <td class="value-cell"><code>{color.white.value}</code></td>
+          <td>color</td>
+          <td>反色文字，用于深色背景</td>
+          <td class="usage">深色背景上的文字</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_text_inverse.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.text.muted</code></td>
+          <td class="value-cell"><code>{color.gray.400.value}</code></td>
+          <td>color</td>
+          <td>提示性或置灰文字颜色</td>
+          <td class="usage">提示语、置灰信息</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_text_muted.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.text.primary</code></td>
+          <td class="value-cell"><code>{color.gray.800.value}</code></td>
+          <td>color</td>
+          <td>主要文字颜色</td>
+          <td class="usage">主文本、列表关键信息</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_text_primary.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.semantic.text.secondary</code></td>
+          <td class="value-cell"><code>{color.gray.500.value}</code></td>
+          <td>color</td>
+          <td>次要文字颜色</td>
+          <td class="usage">辅助文字、描述信息</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_semantic_text_secondary.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>color.white</code></td>
+          <td class="value-cell"><span class="swatch" style="background:#ffffff;"></span><code>#ffffff</code></td>
+          <td>color</td>
+          <td>纯白色</td>
+          <td class="usage">—</td>
+          <td><span class="swatch" style="background:#ffffff;"></span><div><small>截图占位：</small><br><code>docs/image/tokens/color/color_white.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="section-component">
+    <h2>组件 Tokens</h2>
+    <table>
+      <thead><tr><th>Token 名称</th><th>值</th><th>类型</th><th>原始描述</th><th>真实用途说明</th><th>预览 / 截图占位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>component.button.primary.bg</code></td>
+          <td class="value-cell"><code>{color.brand.primary.value}</code></td>
+          <td>color</td>
+          <td>主按钮背景色</td>
+          <td class="usage">主按钮背景色</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/component/component_button_primary_bg.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>component.button.primary.color</code></td>
+          <td class="value-cell"><code>{color.semantic.text.inverse.value}</code></td>
+          <td>color</td>
+          <td>主按钮文字颜色</td>
+          <td class="usage">主按钮文字</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/component/component_button_primary_color.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="section-font">
+    <h2>字体 Typography</h2>
+    <table>
+      <thead><tr><th>Token 名称</th><th>值</th><th>类型</th><th>原始描述</th><th>真实用途说明</th><th>预览 / 截图占位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>font.size.lg</code></td>
+          <td class="value-cell"><code>16px</code></td>
+          <td>dimension</td>
+          <td>大号字体</td>
+          <td class="usage">标题或按钮字号</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_size_lg.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.size.md</code></td>
+          <td class="value-cell"><code>14px</code></td>
+          <td>dimension</td>
+          <td>中号字体（正文）</td>
+          <td class="usage">正文默认字号</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_size_md.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.size.sm</code></td>
+          <td class="value-cell"><code>13px</code></td>
+          <td>dimension</td>
+          <td>小号字体</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_size_sm.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.size.xl</code></td>
+          <td class="value-cell"><code>18px</code></td>
+          <td>dimension</td>
+          <td>超大号字体</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_size_xl.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.size.xs</code></td>
+          <td class="value-cell"><code>12px</code></td>
+          <td>dimension</td>
+          <td>超小号字体</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_size_xs.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.weight.bold</code></td>
+          <td class="value-cell"><code>700</code></td>
+          <td>fontWeight</td>
+          <td>加粗字重</td>
+          <td class="usage">需要强调的标题文字</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_weight_bold.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.weight.medium</code></td>
+          <td class="value-cell"><code>500</code></td>
+          <td>fontWeight</td>
+          <td>中等字重</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_weight_medium.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.weight.regular</code></td>
+          <td class="value-cell"><code>400</code></td>
+          <td>fontWeight</td>
+          <td>常规字重</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_weight_regular.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>font.weight.semibold</code></td>
+          <td class="value-cell"><code>600</code></td>
+          <td>fontWeight</td>
+          <td>半粗字重</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/font/font_weight_semibold.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="section-radius">
+    <h2>圆角 Radius</h2>
+    <table>
+      <thead><tr><th>Token 名称</th><th>值</th><th>类型</th><th>原始描述</th><th>真实用途说明</th><th>预览 / 截图占位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>radius.full</code></td>
+          <td class="value-cell"><code>9999px</code></td>
+          <td>dimension</td>
+          <td>全圆角（用于药丸形状）</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/radius/radius_full.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>radius.lg</code></td>
+          <td class="value-cell"><code>12px</code></td>
+          <td>dimension</td>
+          <td>大圆角</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/radius/radius_lg.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>radius.md</code></td>
+          <td class="value-cell"><code>8px</code></td>
+          <td>dimension</td>
+          <td>中圆角</td>
+          <td class="usage">卡片、输入框默认圆角</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/radius/radius_md.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>radius.sm</code></td>
+          <td class="value-cell"><code>6px</code></td>
+          <td>dimension</td>
+          <td>小圆角</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/radius/radius_sm.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="section-shadow">
+    <h2>阴影 Shadow</h2>
+    <table>
+      <thead><tr><th>Token 名称</th><th>值</th><th>类型</th><th>原始描述</th><th>真实用途说明</th><th>预览 / 截图占位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>shadow.md</code></td>
+          <td class="value-cell"><code>0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)</code></td>
+          <td>shadow</td>
+          <td>中阴影</td>
+          <td class="usage">浮层、弹窗阴影</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/shadow/shadow_md.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>shadow.sm</code></td>
+          <td class="value-cell"><code>0 1px 2px 0 rgba(0, 0, 0, 0.05)</code></td>
+          <td>shadow</td>
+          <td>小阴影</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/shadow/shadow_sm.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="section-space">
+    <h2>间距 Spacing</h2>
+    <table>
+      <thead><tr><th>Token 名称</th><th>值</th><th>类型</th><th>原始描述</th><th>真实用途说明</th><th>预览 / 截图占位</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>space.lg</code></td>
+          <td class="value-cell"><code>16px</code></td>
+          <td>dimension</td>
+          <td>大间距</td>
+          <td class="usage">模块间竖向间距</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/space/space_lg.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>space.md</code></td>
+          <td class="value-cell"><code>12px</code></td>
+          <td>dimension</td>
+          <td>中间距</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/space/space_md.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>space.sm</code></td>
+          <td class="value-cell"><code>8px</code></td>
+          <td>dimension</td>
+          <td>小间距</td>
+          <td class="usage">组件内部水平间距</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/space/space_sm.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>space.xl</code></td>
+          <td class="value-cell"><code>20px</code></td>
+          <td>dimension</td>
+          <td>超大间距</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/space/space_xl.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+        <tr>
+          <td><code>space.xs</code></td>
+          <td class="value-cell"><code>6px</code></td>
+          <td>dimension</td>
+          <td>超小间距</td>
+          <td class="usage">—</td>
+          <td><div><small>截图占位：</small><br><code>docs/image/tokens/space/space_xs.png</code></div></td>
+          <td>待补充</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <div class="note">
+    <div>
+      <strong>截图命名规范：</strong>
+      <p>所有截图请放入 <code>docs/image/tokens/&lt;category&gt;/&lt;token_name_with_underscores&gt;.png</code>。上传后即可在表格中直接预览路径。</p>
+      <p>截图建议从真实页面/组件中截取，并在图上标注对应 Token 名称，方便业务同学理解。</p>
+    </div>
+  </div>
+  <div class="checklist">
+    <h3>后续扩展建议</h3>
+    <ul>
+      <li>补齐所有 Token 的截图，并在表格里勾选完成状态。</li>
+      <li>Storybook 中新增 <code>Tokens/Overview</code> 页面，与该表格共享数据源。</li>
+      <li>调研并接入第三方 Playground（如 Backlight、Storybook token 插件），用于交互式调试。</li>
+      <li>编写 lint / codemod 脚本，防止旧 Token 再次出现。</li>
+    </ul>
+  </div>
+  <footer>最后更新：本页由脚本自动生成，如需更新请修改 tokens/design-tokens.json 并重新运行脚本。</footer>
+</body>
+</html>

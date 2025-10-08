@@ -89,8 +89,8 @@ import { ArrowLeft } from 'lucide-vue-next'
 // 假设你的 store 文件和基础组件路径如下
 import { usePropertiesStore } from '@/stores/properties'
 import PropertyCard from '@/components/PropertyCard.vue'
-import BaseButton from '@/components/base/BaseButton.vue' // 确保路径正确
-import BaseIconButton from '@/components/base/BaseIconButton.vue'
+import { BaseButton } from '@sydney-rental-hub/ui' // 确保路径正确
+import { BaseIconButton } from '@sydney-rental-hub/ui'
 import SavedSearchesManager from '@/components/SavedSearchesManager.vue'
 import { useFilterWizard } from '@/composables/useFilterWizard'
 

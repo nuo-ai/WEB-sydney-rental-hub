@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@sydney-rental-hub/ui": "workspace:*",
     "@element-plus/icons-vue": "^2.3.2",
     "@tanstack/vue-virtual": "^3.13.12",
     "axios": "^1.11.0",
@@ -47,6 +48,7 @@
     "stylelint-declaration-strict-value": "^1.10.11",
     "typescript": "^5.6.3",
     "vite": "^7.0.6",
-    "vite-plugin-vue-devtools": "^8.0.0"
+    "vite-plugin-vue-devtools": "^8.0.0",
+    "vitest": "^3.2.4"
   }
 }
