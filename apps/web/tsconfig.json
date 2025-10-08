@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowJs": true,
+    "noEmit": true,
     "checkJs": false,
     "strict": false,
     "jsx": "preserve",

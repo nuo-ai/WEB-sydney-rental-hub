@@ -17,18 +17,21 @@
 - **部署**: Netlify (前端) + Python backend (localhost:8000)
 - **地图服务**: Google Maps API for directions and static maps
 
-## 项目结构
+## Project Structure
 
 ```
-├── backend/                    # Python FastAPI backend
-├── vue-frontend/              # Vue 3 frontend
+├── apps/                       # Turborepo applications
+│   ├── web/                    # Vue 3 frontend application
+│   ├── backend/                # Python FastAPI backend
+│   └── mcp-server/             # MCP server components
+├── memory-bank/               # Project documentation (core design docs)
 ├── crawler/                   # Data crawling scripts
 ├── database/                  # Database configurations
-├── mcp-server/               # MCP server components
-├── memory-bank/              # Project documentation (core design docs)
-├── Property_data/            # Property data files
-├── scripts/                  # Utility scripts
-├── tests/                    # Test files
+├── scripts/                   # Utility scripts
+├── tokens/                    # Design tokens
+├── tools/                     # Development tools
+├── archive/                   # Archived components
+├── docs/                      # Additional documentation
 └── ...
 ```
 
@@ -42,37 +45,38 @@
 
 ## Building and Running
 
-### 后端服务 (localhost:8000)
+### Monorepo Setup (Turborepo + pnpm)
 ```bash
-# 安装依赖 (首次运行)
-pip install -r requirements.txt
+# Install all dependencies (first time or after dependency updates)
+pnpm install
 
-# 启动后端服务
-python scripts/run_backend.py
+# Start all services (recommended, parallel start of frontend/backend)
+pnpm dev
+
+# --- Or start individually ---
+
+# Start Vue frontend only (@web-sydney/web)
+pnpm --filter @web-sydney/web dev
+
+# Start FastAPI backend only (@web-sydney/backend)
+pnpm --filter @web-sydney/backend dev
 ```
 
-### 前端开发 (localhost:5173)
-```bash
-cd vue-frontend
-npm install
-npm run dev
-```
+### Environment Variables
+Copy `.env.example` to `.env` and configure the following:
+- `DATABASE_URL`: PostgreSQL database connection string
+- `REDIS_URL`: Redis connection string  
+- `GOOGLE_MAPS_API_KEY`: Google Maps API key
+- `SECRET_KEY`: JWT secret key
+- `API_KEY`: API access key
 
-### 环境变量配置
-复制 `.env.example` 到 `.env` 并配置以下环境变量：
-- `DATABASE_URL`: PostgreSQL数据库连接字符串
-- `REDIS_URL`: Redis连接字符串  
-- `GOOGLE_MAPS_API_KEY`: Google Maps API密钥
-- `SECRET_KEY`: JWT密钥
-- `API_KEY`: API访问密钥
-
-### E2E 测试
+### E2E Testing
 ```bash
-# 安装 Playwright 浏览器
+# Install Playwright browsers (if first time)
 npx playwright install
 
-# 运行测试
-npx playwright test
+# Run URL idempotency smoke tests
+npx playwright test -g "URL 幂等与仅写非空键"
 ```
 
 ## 核心功能
@@ -128,76 +132,89 @@ npx playwright test
 - **服务卡片**: 支持展示房源、法律咨询、合同审核、代看房等服务
 - **大学推荐**: 针对UTS/UNSW/USYD等大学的房源推荐
 
-### 当前进展 (2025-09-16)
+### 当前进展 (2025-10-07)
 - ✅ 保存搜索功能完成 (Zillow风格)
 - ✅ 筛选系统P0完成 (URL幂等、预估计数、分组隔离)
 - ✅ 设计系统合规 (Storybook、图标统一、令牌化)
 - ✅ AI聊天助手功能
 - ✅ 移动端优化
+- ✅ 多端战略：小程序 → App → Android (小程序为设计基线)
 
 ### 下一步计划
-- **P0**: 筛选向导特性开关接入评估
-- **P0**: 图标系统余量迁移
-- **P1**: 令牌定义梳理
-- **P2**: 移除var()颜色兜底
+- **P0**: Design Token 先行 - 完成颜色/字体/图标/标签/间距的第一轮统一
+- **P0**: TorUI 验证 - 在 VS Code 环境下测试 TorUI 主题与 Token 扩展可行性
+- **P0**: MVP 功能范围控制 - 优先交付核心房源流程，暂缓增强功能
+- **P1**: 引入 TorUI 组件库，建立统一 Design Token 体系
 
 ## 开发工具
 
-### 前端工具链
-- **构建工具**: Vite
-- **测试**: Vitest + Playwright + Storybook
-- **代码风格**: ESLint + Prettier + Stylelint
-- **代理**: Vite proxy to localhost:8000
+### Frontend Toolchain
+- **Build System**: Vite + Turborepo
+- **Testing**: Vitest + Playwright + Storybook
+- **Code Style**: ESLint + Prettier + Stylelint (with CSS variable enforcement)
+- **Proxy**: Vite proxy to localhost:8000 (API requests)
 
-### 后端工具链
-- **Web框架**: FastAPI
-- **数据库**: PostgreSQL (Supabase) + asyncpg
+### Backend Toolchain
+- **Web Framework**: FastAPI
+- **Database**: PostgreSQL (Supabase) + asyncpg
 - **GraphQL**: Strawberry GraphQL
-- **缓存**: Redis + FastAPICache
-- **队列**: Celery for background tasks
-- **安全**: JWT + rate limiting + input validation
+- **Caching**: Redis + FastAPICache
+- **Queue**: Celery for background tasks
+- **Security**: JWT + rate limiting + input validation
 
-## 部署配置
+## Deployment Configuration
 
-### 前端部署 (Netlify)
-- 构建命令: `npm run build`
-- 发布目录: `dist/`
-- SPA重写: `/*` → `/index.html`
+### Netlify Deployment
+- **Config File**: netlify.toml
+- **Build Settings**: base="apps/web", command="pnpm --filter @web-sydney/web build", publish="dist"
+- **SPA Rewrite**: `/*` → `/index.html` (status=200)
 
-### 后端部署
-- **开发**: uvicorn with --reload
-- **生产**: gunicorn/uvicorn workers
-- **监控**: 内置health check和cache stats端点
+### Backend Deployment
+- **Dev**: uvicorn with --reload (localhost:8000)
+- **Prod**: gunicorn/uvicorn workers with process management
+- **Health Check**: Built-in health check and cache stats endpoints
 
-## API端点
+## API Endpoints
 
-### 主要API
-- `GET /api/properties` - 房源列表 (带筛选分页)
-- `GET /api/properties/{id}` - 房源详情
-- `GET /api/locations/suggestions` - 搜索建议
-- `POST /api/chat` - AI聊天系统
-- `GET /api/directions` - 通勤计算
-- `GET /api/health` - 健康检查
-- `POST /api/cache/invalidate` - 缓存管理
+### Main REST API
+- `GET /api/properties` - Property list (with filtering/pagination)
+- `GET /api/properties/{id}` - Property detail (superset of list endpoint)
+- `GET /api/locations/suggestions` - Search suggestions with auto-complete
+- `POST /api/chat` - AI chat system
+- `GET /api/directions` - Commute time calculation
+- `GET /api/health` - Health check
+- `POST /api/cache/invalidate` - Cache management
 
-### GraphQL端点
+### GraphQL Endpoint
 - `GET/POST /graphql` - GraphQL API with GraphiQL
-- 支持房源查询、用户认证等操作
+- Supports property queries, user authentication, and advanced filtering
 
-## 特殊说明
+## Special Notes
 
-### 记忆库驱动开发 (Memory-Bank-Driven Development)
-本项目采用记忆库驱动开发模式，所有产品需求、技术架构、开发计划都记录在 `/memory-bank` 目录中。在开始任何工作前，务必先阅读相关文档。
+### Memory-Bank-Driven Development
+This project uses memory-bank-driven development. All product requirements, technical architecture, and development plans are documented in `/memory-bank`. Always read relevant docs before starting work.
 
-### 安全措施
-- API密钥认证
-- JWT令牌验证
-- 输入参数白名单校验
-- SQL注入防护
-- 跨域策略控制
+### Architecture Constraints
+- **Data Flow**: Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
+- **No Reverse Dependencies**: AI agents must not create reverse dependencies
+- **API Consistency**: Detail endpoints must be supersets of list endpoints
 
-### 外部依赖
+### Security Measures
+- API key authentication
+- JWT token validation
+- Input parameter whitelisting
+- SQL injection protection
+- CORS policy control
+
+### Multi-Platform Strategy (as of 2025-10-07)
+- **Platform Order**: 小程序 → App → Android
+- **Design Baseline**: All design specs based on小程序 implementation
+- **Component Library**: Evaluating TorUI for cross-platform compatibility
+- **MVP Focus**: Property search/sort/view收藏/customer service (defer advanced features)
+
+### External Dependencies
 - Google Maps API (Directions/Static Maps)
 - Supabase PostgreSQL
-- Redis缓存
-- Email服务 (SendGrid/Mailgun)
+- Redis caching
+- Email service (SendGrid/Mailgun)
+- Lucide Vue Icons
