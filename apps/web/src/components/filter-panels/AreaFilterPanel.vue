@@ -87,7 +87,7 @@ import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import AreasSelector from '@/components/AreasSelector.vue'
-import BaseChip from '@/components/base/BaseChip.vue'
+import { BaseChip } from '@sydney-rental-hub/ui'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
  // 中文注释：区域筛选专用面板，拆分自原 FilterPanel

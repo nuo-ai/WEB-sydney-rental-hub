@@ -85,7 +85,7 @@ import { ref, inject, computed, watch, onMounted } from 'vue'
 import { usePropertiesStore } from '@/stores/properties'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
-import BaseButton from '@/components/base/BaseButton.vue'
+import { BaseButton } from '@sydney-rental-hub/ui'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：价格筛选专用面板，拆分自原 FilterPanel

@@ -58,7 +58,7 @@ import { ref, computed, inject, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 import { usePropertiesStore } from '@/stores/properties'
-import BaseButton from '@/components/base/BaseButton.vue'
+import { BaseButton } from '@sydney-rental-hub/ui'
 import { useFilterPreviewCount } from '@/composables/useFilterPreviewCount'
 
 // 中文注释：更多（高级）筛选面板。仅在“应用”时提交到 store；与其它分离式面板一致。

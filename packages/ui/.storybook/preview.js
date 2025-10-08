@@ -1,4 +1,5 @@
 import '../dist/tokens.css';
+import '../../../apps/web/src/style.css';
 
 /** @type { import('@storybook/vue3-vite').Preview } */
 const preview = {

@@ -191,7 +191,7 @@ import FilterPanel from '@/components/FilterPanel.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
 import { Loading, Warning, House } from '@element-plus/icons-vue'
 import { Bell, ArrowUpDown } from 'lucide-vue-next'
-import BaseToggle from '@/components/base/BaseToggle.vue'
+import { BaseToggle } from '@sydney-rental-hub/ui'
 import { sanitizeQueryParams, isSameQuery } from '@/utils/query'
 
 /* 路由 */
