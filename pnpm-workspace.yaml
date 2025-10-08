@@ -1,3 +1,6 @@
 packages:
-  - apps/*
-  - packages/*
+  - 'apps/*'
+  - 'crawler'
+  - 'database'
+  # TODO: 根据审计报告，评估 vue-frontend 价值后决定保留或归档
+  - 'vue-frontend'
