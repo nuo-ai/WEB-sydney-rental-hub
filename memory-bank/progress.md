@@ -4,6 +4,10 @@
 
 ## 近期重要里程碑（2025-10）
 
+### Monorepo 治理与设计系统奠基
+- **2025-10-09｜Monorepo 基础治理完成**: 统一 pnpm 工作流，清理多余锁文件，扩展 workspace 范围，标准化 `.env.example`，并为 Python 栈引入 `requirements.lock`。｜溯源: 45af8aa
+- **2025-10-09｜设计系统脚手架搭建**: 创建 `@sydney-rental-hub/ui` 包，引入 Style Dictionary 实现 Tokens 自动化，并搭建 Storybook 组件开发环境。｜溯源: 724ce82
+
 ### 多端战略重排序
 - **2025-10-07｜小程序 → App → Android 路线确立**: 决定以小程序作为设计与交互基线，验证后再扩展到 App 与 Android。
 - **2025-10-07｜TorUI 评估启动**: 计划引入 TorUI 组件库，确保 VS Code 下支持主题/Design Token 定制与调试。

@@ -19,12 +19,12 @@
 
 ### 项目结构
 - **Monorepo**: 采用 `pnpm` + `Turborepo` 结构。
-- **工作区 (`apps/*`)**:
-  - `apps/web`: Vue 3 前端应用。
-  - `apps/backend`: Python FastAPI 后端服务。
-  - `apps/mcp-server`: MCP 服务。
+- **工作区**:
+  - `apps/*`: 存放各个独立的应用程序（前端、后端等）。
+  - `packages/*`: 存放共享的库和包，例如设计系统。
+    - `@sydney-rental-hub/ui`: 设计系统的核心包，包含可复用的UI组件和样式令牌。
 - **配置**:
-  - `pnpm-workspace.yaml`: 定义工作区范围 (`apps/*`)。
+  - `pnpm-workspace.yaml`: 定义工作区范围（`apps/*`, `packages/*` 等）。
   - `turbo.json`: 统一任务编排与缓存策略。
   - 根 `package.json`: 提供顶层命令 (`dev`, `build`, `lint` 等)。
 
@@ -67,6 +67,12 @@ pnpm install
 # 2. 启动所有服务 (推荐，并行启动前后端)
 pnpm dev
 
+# 3. 构建设计系统产物 (Tokens)
+pnpm build:tokens
+
+# 4. 独立运行设计系统开发环境 (Storybook)
+pnpm --filter @sydney-rental-hub/ui run storybook
+
 # --- 或单独启动 ---
 
 # 只启动 Vue 前端 (@web-sydney/web)
@@ -94,23 +100,30 @@ npx playwright test -g "URL 幂等与仅写非空键"
 
 ---
 
-## 设计系统
+## 设计系统与工具链
 
-### JUWO品牌设计系统
-- **主色**: #0057ff (纯正蓝)
-- **统一圆角**: 6px（组件设计令牌）
-- **布局对齐**: 1200px最大宽度，32px间距
-- **响应式断点**: 768px（平板）、1200px（桌面）、1920px（超宽）
+### 1. 设计令牌 (Design Tokens)
+- **单一事实来源**: `tokens/design-tokens.json` 是所有设计决策的唯一来源，遵循 W3C Design Tokens 规范。
+- **自动化流程**: 使用 `Style Dictionary` 工具链将 JSON 令牌自动转换为多种格式。
+  - **命令**: `pnpm build:tokens`
+  - **产物**:
+    - `packages/ui/dist/tokens.css`: 供所有前端应用消费的 CSS 自定义属性。
+    - `packages/ui/dist/tokens.mjs`: 供 JS/TS 使用的令牌对象。
+- **集成**: 主应用 `apps/web` 已全局导入 `tokens.css`，取代了旧的手动样式文件。
 
-### 设计令牌约束
-- **强制使用**: `var(--*)` 形式的 CSS 自定义属性
-- **禁止**: 硬编码颜色、`var(--token, #hex)` 兜底形式
-- **护栏**: Stylelint 规则拦截新增硬编码色
+### 2. 组件开发 (Component Development)
+- **核心包**: `@sydney-rental-hub/ui` 是所有可复用UI组件的家。
+- **开发环境**: 使用 `Storybook` 作为独立的组件开发和文档环境。
+  - **命令**: `pnpm --filter @sydney-rental-hub/ui run storybook`
+  - **目的**: 在隔离的环境中开发、测试和可视化组件，确保其通用性和健壮性。
+- **组件规范**:
+  - 组件应**完全基于 Design Tokens** 构建，不包含任何硬编码样式值。
+  - 优先从 `apps/web/src/components/base/` 中提炼和迁移现有基础组件。
 
-### 图标系统
-- **标准**: 全站使用 `lucide-vue-next` SVG 图标库
+### 3. 图标系统
+- **标准**: 全站使用 `lucide-vue-next` SVG 图标库。
 - **导入**: `import { IconName } from 'lucide-vue-next'`
-- **颜色**: `stroke: currentColor`，由外层控制
+- **颜色**: `stroke: currentColor`，由外层文字颜色 (`color`) 控制。
 
 ### 2025-10-07 平台战略更新
 - **平台先后**: 小程序 → App → Android，所有设计规范以小程序实现为基线，再向其他端扩散。
