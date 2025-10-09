@@ -4,8 +4,14 @@
 
 ## 近期重要里程碑（2025-10）
 
+### 小程序设计系统增强
+- **2025-10-09｜小程序设计系统增强**: 完成了设计令牌系统的增强，添加了组件级别的令牌定义（Button, Card, Input），增强了构建脚本功能，完善了组件测试策略，并更新了 Storybook 集成支持主题切换和视口适配。｜溯源: 当前 commit
+
 ### 小程序设计令牌实现
 - **2025-10-09｜小程序设计令牌自动化**: 成功配置 Style Dictionary 为小程序平台生成 WXSS 文件，实现 px 到 rpx 的自动转换，为多端设计系统奠定基础。｜溯源: 当前 commit
+
+### 小程序组件库增强
+- **2025-10-09｜小程序组件库增强**: 成功创建小程序项目结构，配置设计令牌自动化构建流程，修复单位转换问题，确保生成的 WXSS 文件符合小程序规范。｜溯源: 当前 commit
 
 ### 设计系统组件库丰富
 - **2025-10-09｜设计系统组件库丰富**: 成功将 `apps/web/src/components/base/` 目录下的 7 个基础组件 (`BaseBadge`, `BaseChip`, `BaseButton`, `BaseIconButton`, `BaseListItem`, `BaseSearchInput`, `BaseToggle`) 迁移至 `@sydney-rental-hub/ui` 包，显著丰富了设计系统组件库。｜溯源: 1ce1a43

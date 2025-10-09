@@ -3,7 +3,7 @@
 [Overview]
 本计划旨在将现有的 Vue 3 Web 应用重塑为一个专业、现代的微信小程序 MVP，核心是建立一个强大且灵活的设计令牌（Design Token）系统，并以此驱动所有 UI 组件的开发，确保最终产品在视觉和交互上达到行业顶尖水准。
 
-我们将严格遵循“逻辑复用，UI重塑”的战略，最大化保留现有的业务逻辑（Pinia Stores），同时为小程序平台量身定制全新的、体验优先的视图层。整个过程将以“原子设计”和“组件驱动开发”为指导思想，通过 Style Dictionary 实现设计令牌的自动化构建，并以 Storybook 作为组件开发和验证的核心环境。
+我们将严格遵循"逻辑复用，UI重塑"的战略，最大化保留现有的业务逻辑（Pinia Stores），同时为小程序平台量身定制全新的、体验优先的视图层。整个过程将以"原子设计"和"组件驱动开发"为指导思想，通过 Style Dictionary 实现设计令牌的自动化构建，并以 Storybook 作为组件开发和验证的核心环境。
 
 [Types]
 我们将定义一套严格的三层设计令牌结构（Primitive, Semantic, Component），以 JSON 格式进行管理，确保设计语言的系统性和可扩展性。
@@ -58,14 +58,26 @@
 *   **路径**: `tokens/components/`
 *   **结构**:
     ```json
-    // tokens/components/card.json
+    // tokens/components/button.json
     {
       "component": {
-        "card": {
-          "background-color": { "value": "{color.background.surface.value}" },
-          "border-radius": { "value": "{radius.md.value}" },
-          "padding": { "value": "{space.lg.value}" },
-          "shadow": { "value": "{shadow.sm.value}" }
+        "button": {
+          "primary": {
+            "background-color": { "value": "{color.action.primary.value}" },
+            "color": { "value": "{color.text.inverse.value}" },
+            "border-radius": { "value": "{radius.button.value}" },
+            "height": { "value": "{size.button.height.value}" },
+            "padding-horizontal": { "value": "{space.button.horizontal.value}" },
+            "font-size": { "value": "{font.size.button.value}" },
+            "font-weight": { "value": "{font.weight.button.value}" },
+            "hover": {
+              "background-color": { "value": "{color.action.primary.hover.value}" }
+            },
+            "disabled": {
+              "background-color": { "value": "{color.action.disabled.value}" },
+              "color": { "value": "{color.text.disabled.value}" }
+            }
+          }
         }
       }
     }
@@ -84,6 +96,7 @@
     *   `build-tokens.js`: 在项目根目录创建 Style Dictionary 构建脚本。
     *   `tokens/base/color/brand.json`, `tokens/base/color/neutral.json`, `tokens/base/size/space.json`, etc.
     *   `tokens/themes/light.json`, `tokens/themes/dark.json`
+    *   `tokens/components/button.json`, `tokens/components/card.json`, `tokens/components/input.json`: 组件特定令牌
     *   `packages/ui/src/components/PropertyCard/PropertyCard.vue`: 新建小程序版的房源卡片组件。
 
 *   **修改的文件**:
@@ -100,6 +113,8 @@
 *   **新建函数**:
     *   `getStyleDictionaryConfig(theme)`: 在 `build-tokens.js` 中，用于动态生成亮色/暗色主题的配置。
     *   `registerWxssFormat()`: 在 `build-tokens.js` 中，注册一个自定义格式，以确保生成的 CSS 变量能被小程序正确识别。
+    *   `shouldRebuild()`: 检查源文件是否发生变化，支持增量构建
+    *   `generateBuildReport()`: 生成详细的构建报告
 
 *   **修改的函数**:
     *   `apps/web/src/utils/` 中的纯逻辑函数将被评估，并可能移动到 `packages/utils` 共享包中，供 Web 和小程序共同使用。
@@ -115,6 +130,10 @@
     *   `@dcloudio/vite-plugin-uni`: `uni-app` 的 Vite 插件。
     *   `@dcloudio/uni-mp-weixin`: `uni-app` 微信小程序平台支持。
     *   `thorui-uni-app`: ThorUI 组件库。
+    *   `@storybook/addon-viewport`: Storybook 视口插件
+    *   `@storybook/addon-a11y`: Storybook 无障碍插件
+    *   `husky`: Git 钩子工具
+    *   `lint-staged`: 代码检查工具
 
 *   **版本确认**: 所有新依赖将使用最新的稳定版本。
 
@@ -127,6 +146,8 @@
 *   **测试策略**:
     *   **单元测试**: 使用 `Vitest` 对组件的 props 传递和事件触发进行测试。
     *   **视觉测试**: 在 Storybook 中为每个组件创建 stories，覆盖不同 props 和主题（亮/暗）下的视觉表现。
+    *   **集成测试**: 测试组件与 Pinia store 的集成
+    *   **无障碍测试**: 使用 Storybook a11y 插件进行无障碍检查
 
 [Implementation Order]
 我们将遵循一个严谨的、自下而上的顺序，先建立设计系统基础，再构建组件，最后组装页面。
@@ -136,16 +157,22 @@
     *   按照 `[Files]` 部分的规划，重构 `tokens/` 目录结构。
     *   使用 `交互式AI设计令牌工作流.html` 工具，与您共同确定最终的 `brand.json` 和 `themes/*.json` 内容。
 3.  **自动化管道配置**:
-    *   创建并配置 `build-tokens.js` 脚本。
+    *   创建并配置 `build-tokens.js` 脚本，添加增量构建和详细报告功能
     *   运行 `npm run build:tokens`，生成初始的 `theme-light.wxss` 和 `theme-dark.wxss` 文件。
 4.  **Storybook 集成**:
-    *   修改 Storybook 配置，使其能够加载并应用生成的 `wxss` 文件。
+    *   修改 Storybook 配置，使其能够加载并应用生成的 `wxss` 文件
+    *   添加主题切换和视口支持
 5.  **原子组件开发**:
     *   基于对 `Domain.com.au` 的分析，优先开发或调整 `packages/ui` 中的核心原子组件（如 `Button`, `Tag`, `Icon`），确保它们在小程序环境（Storybook 预览）中表现正确。
 6.  **`PropertyCard` 组件重塑**:
-    *   创建 `PropertyCard.vue` 组件，其 `<template>` 部分使用 `uni-app` 的原生组件（如 `<view>`, `<image>`, `<text>`），`<style>` 部分完全使用已定义的语义化令牌。
+    *   创建 `PropertyCard.vue` 组件，其 `<template>` 部分使用 `uni-app` 的原生组件（如 `<view>`, `<image>`, `<text>`），`<style>` 部分完全使用已定义的语义化令牌
+    *   添加加载状态、错误状态和更好的交互效果
 7.  **页面组装与逻辑注入**:
-    *   搭建四个核心页面的静态布局。
-    *   将 `Pinia stores` 从 `apps/web` 引入到 `apps/mini-program`，并完成状态和事件的绑定。
+    *   搭建四个核心页面的静态布局
+    *   将 `Pinia stores` 从 `apps/web` 引入到 `apps/mini-program`，并完成状态和事件的绑定
 8.  **联调与测试**:
-    *   进行端到端的功能测试和 UI 视觉走查。
+    *   进行端到端的功能测试和 UI 视觉走查
+    *   运行无障碍测试确保可访问性
+9.  **CI/CD 配置**:
+    *   设置自动化构建、测试和部署流程
+    *   配置 Git 钩子和代码检查

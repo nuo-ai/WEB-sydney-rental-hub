@@ -1,0 +1,99 @@
+{
+  "component": {
+    "input": {
+      "background-color": { "value": "{color.semantic.bg.primary}" },
+      "border": { "value": "1px solid {color.semantic.border.default}" },
+      "border-radius": { "value": "{radius.sm}" },
+      "padding": { "value": "{space.md}" },
+      "font-size": { "value": "{font.size.md}" },
+      "line-height": { "value": "{font.line-height.md}" },
+      "color": { "value": "{color.semantic.text.primary}" },
+      "placeholder-color": { "value": "{color.semantic.text.muted}" },
+      "height": { "value": "40px" },
+      "focus": {
+        "border": { "value": "1px solid {color.brand.primary}" },
+        "outline": { "value": "2px solid {color.brand.primary}" },
+        "outline-offset": { "value": "1px" }
+      },
+      "hover": {
+        "border": { "value": "1px solid {color.semantic.border.default}" }
+      },
+      "disabled": {
+        "background-color": { "value": "{color.gray.50}" },
+        "color": { "value": "{color.gray.400}" },
+        "border": { "value": "1px solid {color.gray.200}" }
+      },
+      "error": {
+        "border": { "value": "1px solid {color.semantic.feedback.error}" },
+        "focus": {
+          "border": { "value": "1px solid {color.semantic.feedback.error}" },
+          "outline": { "value": "2px solid {color.semantic.feedback.error}" }
+        }
+      },
+      "success": {
+        "border": { "value": "1px solid {color.semantic.feedback.success}" }
+      }
+    },
+    "textarea": {
+      "background-color": { "value": "{color.semantic.bg.primary}" },
+      "border": { "value": "1px solid {color.semantic.border.default}" },
+      "border-radius": { "value": "{radius.sm}" },
+      "padding": { "value": "{space.md}" },
+      "font-size": { "value": "{font.size.md}" },
+      "line-height": { "value": "{font.line-height.md}" },
+      "color": { "value": "{color.semantic.text.primary}" },
+      "placeholder-color": { "value": "{color.semantic.text.muted}" },
+      "min-height": { "value": "80px" },
+      "focus": {
+        "border": { "value": "1px solid {color.brand.primary}" },
+        "outline": { "value": "2px solid {color.brand.primary}" },
+        "outline-offset": { "value": "1px" }
+      },
+      "hover": {
+        "border": { "value": "1px solid {color.semantic.border.default}" }
+      },
+      "disabled": {
+        "background-color": { "value": "{color.gray.50}" },
+        "color": { "value": "{color.gray.400}" },
+        "border": { "value": "1px solid {color.gray.200}" }
+      },
+      "error": {
+        "border": { "value": "1px solid {color.semantic.feedback.error}" },
+        "focus": {
+          "border": { "value": "1px solid {color.semantic.feedback.error}" },
+          "outline": { "value": "2px solid {color.semantic.feedback.error}" }
+        }
+      }
+    },
+    "select": {
+      "background-color": { "value": "{color.semantic.bg.primary}" },
+      "border": { "value": "1px solid {color.semantic.border.default}" },
+      "border-radius": { "value": "{radius.sm}" },
+      "padding": { "value": "{space.md}" },
+      "font-size": { "value": "{font.size.md}" },
+      "line-height": { "value": "{font.line-height.md}" },
+      "color": { "value": "{color.semantic.text.primary}" },
+      "height": { "value": "40px" },
+      "focus": {
+        "border": { "value": "1px solid {color.brand.primary}" },
+        "outline": { "value": "2px solid {color.brand.primary}" },
+        "outline-offset": { "value": "1px" }
+      },
+      "hover": {
+        "border": { "value": "1px solid {color.semantic.border.default}" }
+      },
+      "disabled": {
+        "background-color": { "value": "{color.gray.50}" },
+        "color": { "value": "{color.gray.400}" },
+        "border": { "value": "1px solid {color.gray.200}" }
+      },
+      "error": {
+        "border": { "value": "1px solid {color.semantic.feedback.error}" },
+        "focus": {
+          "border": { "value": "1px solid {color.semantic.feedback.error}" },
+          "outline": { "value": "2px solid {color.semantic.feedback.error}" }
+        }
+      }
+    }
+  }
+}

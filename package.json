@@ -6,14 +6,30 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "build:tokens": "node build-tokens.js",
+    "build:tokens:watch": "node build-tokens.js --watch",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build",
+    "storybook:mini-program": "storybook dev -p 6007 -c packages/ui/.storybook",
+    "test:visual": "loki test",
+    "test:visual:approve": "loki approve",
+    "test:visual:update": "loki update",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "rimraf": "^6.0.1",
     "style-dictionary": "^5.1.1",
-    "turbo": "^2.5.8"
+    "turbo": "^2.5.8",
+    "@storybook/addon-viewport": "^7.0.0",
+    "@storybook/addon-a11y": "^7.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0",
+    "loki": "^0.34.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0"
   }
 }

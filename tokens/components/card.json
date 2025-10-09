@@ -1,0 +1,41 @@
+{
+  "component": {
+    "card": {
+      "background-color": { "value": "{color.semantic.bg.primary}" },
+      "border-radius": { "value": "{radius.md}" },
+      "padding": { "value": "{space.lg}" },
+      "shadow": { "value": "{shadow.sm}" },
+      "border": { "value": "1px solid {color.semantic.border.default}" },
+      "hover": {
+        "shadow": { "value": "{shadow.md}" },
+        "transform": { "value": "translateY(-2px)" }
+      },
+      "active": {
+        "shadow": { "value": "{shadow.sm}" },
+        "transform": { "value": "translateY(0)" }
+      },
+      "favorite": {
+        "border": { "value": "2px solid {color.semantic.feedback.success}" },
+        "shadow": { "value": "{shadow.lg}" }
+      },
+      "loading": {
+        "background-color": { "value": "{color.semantic.bg.secondary}" }
+      },
+      "error": {
+        "border": { "value": "1px solid {color.semantic.feedback.error}" },
+        "background-color": { "value": "{color.gray.50}" }
+      }
+    },
+    "card-header": {
+      "padding": { "value": "{space.md}" },
+      "border-bottom": { "value": "1px solid {color.semantic.border.subtle}" }
+    },
+    "card-body": {
+      "padding": { "value": "{space.md}" }
+    },
+    "card-footer": {
+      "padding": { "value": "{space.md}" },
+      "border-top": { "value": "1px solid {color.semantic.border.subtle}" }
+    }
+  }
+}

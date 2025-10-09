@@ -23,37 +23,5 @@
         "info": { "value": "#3b82f6", "type": "color", "description": "信息状态" }
       }
     }
-  },
-  "component": {
-    "button": {
-      "primary": {
-        "bg": { "value": "{color.brand.primary}", "type": "color" },
-        "color": { "value": "{color.white}", "type": "color" },
-        "border": { "value": "{color.brand.primary}", "type": "color" },
-        "bg-hover": { "value": "{color.brand.hover}", "type": "color" },
-        "border-hover": { "value": "{color.brand.hover}", "type": "color" }
-      },
-      "secondary": {
-        "bg": { "value": "{color.white}", "type": "color" },
-        "color": { "value": "{color.semantic.text.primary}", "type": "color" },
-        "border": { "value": "{color.semantic.border.default}", "type": "color" },
-        "bg-hover": { "value": "{color.semantic.bg.secondary}", "type": "color" },
-        "color-hover": { "value": "{color.brand.primary}", "type": "color" },
-        "border-hover": { "value": "{color.brand.primary}", "type": "color" }
-      },
-      "ghost": {
-        "bg": { "value": "transparent", "type": "color" },
-        "color": { "value": "{color.semantic.text.secondary}", "type": "color" },
-        "bg-hover": { "value": "{color.semantic.bg.secondary}", "type": "color" },
-        "color-hover": { "value": "{color.semantic.text.primary}", "type": "color" }
-      },
-      "danger": {
-        "bg": { "value": "{color.semantic.feedback.error}", "type": "color" },
-        "color": { "value": "{color.white}", "type": "color" },
-        "border": { "value": "{color.semantic.feedback.error}", "type": "color" },
-        "bg-hover": { "value": "#d93737", "type": "color", "description": "Hardcoded darker red for hover" },
-        "border-hover": { "value": "#d93737", "type": "color" }
-      }
-    }
   }
 }
