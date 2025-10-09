@@ -14,16 +14,10 @@
 - **设计系统建设 - 第三阶段**: 丰富组件库，并逐步将 `apps/web` 中的旧组件替换为设计系统组件。
 
 ## 下一步计划 (Next Steps)
-1.  **[计划] 制定组件迁移路线图**:
-    - 优先从 `apps/web/src/components/base/` 目录中的基础组件开始。
-    - 逐个将它们迁移到 `@sydney-rental-hub/ui` 包中，确保它们完全由 Design Tokens 驱动，并拥有完善的 Storybook 文档。
-2.  **[执行] 迁移第一个基础组件**:
-    - 选择 `BaseBadge` 或 `BaseChip` 作为第一个迁移对象。
-    - 在 `@sydney-rental-hub/ui` 中重建该组件及其 Story。
-3.  **[执行] 在 `apps/web` 中使用新组件**:
-    - 更新 `apps/web` 的代码，使其从 `@sydney-rental-hub/ui` 导入并使用新的 `BaseBadge` 组件，替换掉旧的本地版本。
-4.  **[验收] 验证端到端流程**:
-    - 确认 `apps/web` 中的组件表现与 Storybook 中完全一致，验证整个设计系统消费流程的通畅。
+1.  **[执行] 修复 Storybook MDX 解析错误**:
+    - 修复了 Typography.mdx 文件中设计令牌变量引用错误
+    - 解决了 "Could not parse expression with acorn" 问题
+    - 确保所有组件文档能正确显示
 
 ## 技术提醒
 - **开发流程**: 所有新组件或迁移组件都必须在 `@sydney-rental-hub/ui` 的 Storybook 环境中进行开发和验证。

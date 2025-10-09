@@ -1,0 +1,70 @@
+import { Meta, Title, Typeset } from '@storybook/blocks';
+import * as tokens from '@sydney-rental-hub/ui/tokens';
+
+<Meta title="Design System/Typography" />
+
+<Title>Typography</Title>
+
+排版是设计系统的基础。以下是我们定义的所有排版相关的 Design Token。
+Font Families
+
+<Typeset
+fontSizes={[tokens.FontSizeMd]}
+sampleText="The quick brown fox jumps over the lazy dog"
+fontFamily={tokens.FontFamilyBase}
+/>
+<Typeset
+fontSizes={[tokens.FontSizeMd]}
+sampleText="0123456789"
+fontFamily={tokens.FontFamilyMono}
+/>
+Font Sizes
+
+<Typeset
+fontSizes={[
+tokens.FontSizeXs,
+tokens.FontSizeSm,
+tokens.FontSizeMd,
+tokens.FontSizeLg,
+tokens.FontSizeXl
+]}
+sampleText="The quick brown fox jumps over the lazy dog"
+/>
+Font Weights
+
+<Typeset
+fontSizes={[tokens.FontSizeLg]}
+fontWeight={tokens.FontWeightRegular}
+sampleText={`Regular (${tokens.FontWeightRegular})`}
+/>
+<Typeset
+fontSizes={[tokens.FontSizeLg]}
+fontWeight={tokens.FontWeightMedium}
+sampleText={`Medium (${tokens.FontWeightMedium})`}
+/>
+<Typeset
+fontSizes={[tokens.FontSizeLg]}
+fontWeight={tokens.FontWeightSemibold}
+sampleText={`Semibold (${tokens.FontWeightSemibold})`}
+/>
+<Typeset
+fontSizes={[tokens.FontSizeLg]}
+fontWeight={tokens.FontWeightBold}
+sampleText={`Bold (${tokens.FontWeightBold})`}
+/>
+Line Heights
+
+<div style={{ fontFamily: tokens.FontFamilyBase, fontSize: tokens.FontSizeMd, fontWeight: tokens.FontWeightRegular }}>
+<h4>Line Height: Small ({tokens.FontLineHeightSm})</h4>
+<p style={{ lineHeight: tokens.FontLineHeightSm, border: '1px solid #eee', padding: '8px' }}>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonne merninisti licere mihi ista probare, quae sunt a te dicta? Refert tamen, quo modo.
+</p>
+<h4>Line Height: Medium ({tokens.FontLineHeightMd})</h4>
+<p style={{ lineHeight: tokens.FontLineHeightMd, border: '1px solid #eee', padding: '8px' }}>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonne merninisti licere mihi ista probare, quae sunt a te dicta? Refert tamen, quo modo.
+</p>
+<h4>Line Height: Large ({tokens.FontLineHeightLg})</h4>
+<p style={{ lineHeight: tokens.FontLineHeightLg, border: '1px solid #eee', padding: '8px' }}>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nonne merninisti licere mihi ista probare, quae sunt a te dicta? Refert tamen, quo modo.
+</p>
+</div>
