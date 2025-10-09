@@ -1,0 +1,8 @@
+{
+  "radius": {
+    "sm": { "value": "6px", "type": "dimension", "description": "小圆角" },
+    "md": { "value": "8px", "type": "dimension", "description": "中圆角" },
+    "lg": { "value": "12px", "type": "dimension", "description": "大圆角" },
+    "full": { "value": "9999px", "type": "dimension", "description": "全圆角（用于药丸形状）" }
+  }
+}

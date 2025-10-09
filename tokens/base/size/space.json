@@ -1,0 +1,11 @@
+{
+  "space": {
+    "xs": { "value": "6px", "type": "dimension", "description": "超小间距" },
+    "sm": { "value": "8px", "type": "dimension", "description": "小间距" },
+    "md": { "value": "12px", "type": "dimension", "description": "中间距" },
+    "lg": { "value": "16px", "type": "dimension", "description": "大间距" },
+    "xl": { "value": "20px", "type": "dimension", "description": "超大间距" },
+    "xxl": { "value": "24px", "type": "dimension", "description": "超超大间距" },
+    "3xl": { "value": "32px", "type": "dimension", "description": "3xl 间距" }
+  }
+}

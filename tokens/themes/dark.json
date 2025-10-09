@@ -1,0 +1,59 @@
+{
+  "color": {
+    "semantic": {
+      "bg": {
+        "primary": { "value": "{color.gray.800}", "type": "color", "description": "一级背景色，用于页面主内容区域" },
+        "secondary": { "value": "{color.gray.900}", "type": "color", "description": "二级背景色，用于区分不同区块" },
+        "page": { "value": "{color.black}", "type": "color", "description": "整页背景色" }
+      },
+      "text": {
+        "primary": { "value": "{color.gray.100}", "type": "color", "description": "主要文字颜色" },
+        "secondary": { "value": "{color.gray.400}", "type": "color", "description": "次要文字颜色" },
+        "muted": { "value": "{color.gray.500}", "type": "color", "description": "提示性或置灰文字颜色" },
+        "inverse": { "value": "{color.black}", "type": "color", "description": "反色文字，用于浅色背景" }
+      },
+      "border": {
+        "default": { "value": "{color.gray.700}", "type": "color", "description": "默认边框颜色" },
+        "subtle": { "value": "{color.gray.800}", "type": "color", "description": "更弱化的边框颜色" }
+      },
+      "feedback": {
+        "success": { "value": "#10b981", "type": "color", "description": "成功状态" },
+        "warning": { "value": "#f59e0b", "type": "color", "description": "警告状态" },
+        "error": { "value": "#ef4444", "type": "color", "description": "错误状态" },
+        "info": { "value": "#3b82f6", "type": "color", "description": "信息状态" }
+      }
+    }
+  },
+  "component": {
+    "button": {
+      "primary": {
+        "bg": { "value": "{color.brand.primary}", "type": "color" },
+        "color": { "value": "{color.white}", "type": "color" },
+        "border": { "value": "{color.brand.primary}", "type": "color" },
+        "bg-hover": { "value": "{color.brand.hover}", "type": "color" },
+        "border-hover": { "value": "{color.brand.hover}", "type": "color" }
+      },
+      "secondary": {
+        "bg": { "value": "{color.gray.700}", "type": "color" },
+        "color": { "value": "{color.semantic.text.primary}", "type": "color" },
+        "border": { "value": "{color.semantic.border.default}", "type": "color" },
+        "bg-hover": { "value": "{color.gray.600}", "type": "color" },
+        "color-hover": { "value": "{color.brand.primary}", "type": "color" },
+        "border-hover": { "value": "{color.brand.primary}", "type": "color" }
+      },
+      "ghost": {
+        "bg": { "value": "transparent", "type": "color" },
+        "color": { "value": "{color.semantic.text.secondary}", "type": "color" },
+        "bg-hover": { "value": "{color.gray.800}", "type": "color" },
+        "color-hover": { "value": "{color.semantic.text.primary}", "type": "color" }
+      },
+      "danger": {
+        "bg": { "value": "{color.semantic.feedback.error}", "type": "color" },
+        "color": { "value": "{color.white}", "type": "color" },
+        "border": { "value": "{color.semantic.feedback.error}", "type": "color" },
+        "bg-hover": { "value": "#d93737", "type": "color", "description": "Hardcoded darker red for hover" },
+        "border-hover": { "value": "#d93737", "type": "color" }
+      }
+    }
+  }
+}

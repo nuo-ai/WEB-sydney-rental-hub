@@ -14,6 +14,7 @@ function getAbsolutePath(value) {
 /** @type { import('@storybook/vue3-vite').StorybookConfig } */
 const config = {
   "stories": [
+    "../src/stories/**/*.mdx",
     "../src/components/**/*.stories.js"
   ],
   "addons": [
@@ -22,15 +23,30 @@ const config = {
     getAbsolutePath("@storybook/addon-a11y"),
     getAbsolutePath("@storybook/addon-vitest")
   ],
+  core: {
+    builder: '@storybook/builder-vite',
+  },
   "framework": {
     "name": getAbsolutePath('@storybook/vue3-vite'),
     "options": {}
   },
+  docs: {
+    source: {
+      type: 'code', // Renders the source code block as an editable field.
+    },
+  },
   async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
     // Add the vue plugin to the vite config.
     config.plugins = config.plugins ?? [];
     config.plugins.push(vue());
-    return config;
+
+    // Explicitly include storybook-blocks for Vite pre-bundling.
+    return mergeConfig(config, {
+      optimizeDeps: {
+        include: ['@storybook/blocks'],
+      },
+    });
   },
 };
 export default config;

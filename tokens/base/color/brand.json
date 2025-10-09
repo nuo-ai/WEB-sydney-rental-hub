@@ -1,0 +1,31 @@
+{
+  "color": {
+    "white": {
+      "value": "#ffffff",
+      "type": "color",
+      "description": "纯白色"
+    },
+    "black": {
+      "value": "#000000",
+      "type": "color",
+      "description": "纯黑色"
+    },
+    "brand": {
+      "primary": {
+        "value": "#0057ff",
+        "type": "color",
+        "description": "品牌主色，用于关键操作和高亮显示"
+      },
+      "hover": {
+        "value": "#0047e5",
+        "type": "color",
+        "description": "品牌主色悬停状态"
+      },
+      "active": {
+        "value": "#0036b3",
+        "type": "color",
+        "description": "品牌主色激活状态"
+      }
+    }
+  }
+}

@@ -9,15 +9,16 @@
   - **组件开发环境**: 成功配置 `Storybook` 并展示了第一个由 Tokens 驱动的 `BaseButton` 组件。
   - **初步集成**: 主应用 `apps/web` 已成功集成 Tokens CSS 文件。
 - **设计系统建设 - 第三阶段**: 成功将 `apps/web/src/components/base/` 目录下的所有基础组件 (`BaseBadge`, `BaseChip`, `BaseButton`, `BaseIconButton`, `BaseListItem`, `BaseSearchInput`, `BaseToggle`) 迁移至 `@sydney-rental-hub/ui` 设计系统包。
+- **小程序设计令牌实现**: 成功为小程序平台配置 Style Dictionary，实现 px 到 rpx 的自动转换，并创建了基础的 PropertyCard 组件。
 
 ## 当前焦点 (Current Focus)
-- **设计系统建设 - 第三阶段**: 丰富组件库，并逐步将 `apps/web` 中的旧组件替换为设计系统组件。
+- **多端设计系统扩展**: 基于现有设计令牌体系，扩展支持小程序平台。
 
 ## 下一步计划 (Next Steps)
-1.  **[执行] 修复 Storybook MDX 解析错误**:
-    - 修复了 Typography.mdx 文件中设计令牌变量引用错误
-    - 解决了 "Could not parse expression with acorn" 问题
-    - 确保所有组件文档能正确显示
+1.  **[规划] 小程序组件库开发**:
+    - 基于现有的设计令牌，开发更多小程序基础组件
+    - 完善小程序的组件文档和示例
+    - 建立小程序专用的开发和调试环境
 
 ## 技术提醒
 - **开发流程**: 所有新组件或迁移组件都必须在 `@sydney-rental-hub/ui` 的 Storybook 环境中进行开发和验证。

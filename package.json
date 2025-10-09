@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "build:tokens": "style-dictionary build --config sd.config.js",
+    "build:tokens": "node build-tokens.js",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"

@@ -1,0 +1,7 @@
+{
+  "layout": {
+    "container": {
+      "padding": { "value": "{space.3xl}", "type": "dimension", "description": "容器内边距" }
+    }
+  }
+}
