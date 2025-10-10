@@ -58,6 +58,17 @@ Browser (Vue @ :5173) → Vite Proxy → Python Backend (@ :8000)
 - **路由系统**: Vue Router (SPA架构)
 - **UI库**: Element Plus (JUWO主题定制)
 
+### Uni-app 子应用模式（Monorepo）
+- **位置与结构**: 子包位于 `apps/uni-app`，基于 Vite+Vue3 的 uni-app 官方模板。
+- **组件库接入**: 统一使用官方 uni-ui；通过 `pages.json` 的 easycom 规则开启自动解析：
+  - `"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"`
+- **运行与构建**（通过 pnpm workspace）:
+  - H5 开发：`pnpm --filter ./apps/uni-app run dev:h5`
+  - 其他平台（示例）：`pnpm --filter ./apps/uni-app run dev:mp-weixin`
+- **依赖恢复手册**: 出现安装异常（如 EPERM）：
+  1) 删除根 `node_modules`；2) 在根执行 `pnpm install`；3) 子包内按需 `pnpm --filter ./apps/uni-app add <pkg>`。
+- **第三方组件原则**: 优先官方 uni-ui；严格按 easycom 使用，避免手动 import/注册；平台差异通过条件编译隔离。
+
 ---
 
 ## 保存搜索功能模式

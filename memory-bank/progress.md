@@ -4,6 +4,13 @@
 
 ## 近期重要里程碑（2025-10）
 
+### Monorepo 下的 uni-app + uni-ui 接入
+- **2025-10-11｜子应用接入与验证**:
+  - **子包创建**: 新建 apps/uni-app（Vite + Vue3 + uni-app 官方模板）。
+  - **组件库接入**: 安装并配置 @dcloudio/uni-ui；在 pages.json 启用 easycom 规则（`^uni-(.*)`）。
+  - **验证**: 首页增加 `<uni-badge>` 并成功渲染；H5 开发服务启动（Vite）。
+  - **问题处理**: 通过清理 node_modules 与 `pnpm install`、分包安装依赖修复 EPERM 报错；Sass legacy JS API 仅为信息性告警。
+  
 ### 设计令牌提取与文档化
 - **2025-10-11｜核心组件设计令牌提取完成**:
   - **工作流**: 建立并执行了从Figma组件链接到结构化令牌定义的增量式分析工作流。

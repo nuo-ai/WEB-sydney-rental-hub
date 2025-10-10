@@ -8,6 +8,7 @@
 ## 当前技术栈
 
 - **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia + lucide-vue-next（图标）
+- **小程序/H5 子应用**: uni-app（Vite+Vue3）+ 官方 uni-ui（apps/uni-app 子包，已接入验证）
 - **小程序计划**: 评估 TorUI 组件库（Taro/小程序生态）并验证 VS Code 下主题与 token 扩展的可行性
 - **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
 - **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL）
@@ -28,6 +29,19 @@
   - `pnpm-workspace.yaml`: 定义工作区范围（`apps/*`, `packages/*` 等）。
   - `turbo.json`: 统一任务编排与缓存策略。
   - 根 `package.json`: 提供顶层命令 (`dev`, `build`, `lint` 等)。
+
+### Uni-app 子应用（apps/uni-app）
+
+- 位置：`apps/uni-app`（uni-app 官方 Vite+Vue3 模板）
+- 组件库：`@dcloudio/uni-ui`（通过 pages.json easycom 规则自动引入）
+- easycom 规则：
+  - `^uni-(.*)`: `@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue`
+- 常用命令（pnpm workspace）：
+  - 开发（H5）：`pnpm --filter ./apps/uni-app run dev:h5`
+  - 微信小程序（示例）：`pnpm --filter ./apps/uni-app run dev:mp-weixin`
+- 安装注意：
+  - 若遇 EPERM/锁问题：删除根 node_modules → `pnpm install` → 再在子包安装依赖
+  - Sass 警告属信息提示（legacy JS API），不影响开发
 
 ### API集成架构
 
