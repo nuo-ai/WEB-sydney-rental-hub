@@ -127,6 +127,34 @@ function getStyleDictionaryConfig(theme) {
             "selector": `.${theme}-theme`
           }
         }]
+      },
+      "css": {
+        "transforms": ['attribute/cti', 'name/kebab', 'color/css'],
+        "buildPath": `packages/ui/src/styles/`,
+        "files": [{
+          "destination": `tokens.css`,
+          "format": "css/variables",
+          "options": {
+            "outputReferences": true,
+            "selector": `:root`
+          }
+        }]
+      },
+      "json": {
+        "transformGroup": "js",
+        "buildPath": `packages/ui/dist/style-dictionary/json/`,
+        "files": [{
+          "destination": "tokens.json",
+          "format": "json/nested"
+        }]
+      },
+      "ts": {
+        "transformGroup": "js",
+        "buildPath": `packages/ui/dist/`,
+        "files": [{
+          "destination": "tokens.mjs",
+          "format": "javascript/es6"
+        }]
       }
     }
   };

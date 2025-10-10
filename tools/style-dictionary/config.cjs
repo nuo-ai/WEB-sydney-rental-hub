@@ -4,7 +4,8 @@ const path = require('path');
 const toPosix = (p) => p.replace(/\\/g, '/');
 const ROOT = path.resolve(__dirname, '../..');
 const TOKENS_DIR = toPosix(path.join(ROOT, 'tokens'));
-const OUT_DIR = toPosix(path.join(ROOT, 'packages/ui/dist'));
+const DIST_DIR = toPosix(path.join(ROOT, 'packages/ui/dist'));
+const SRC_DIR = toPosix(path.join(ROOT, 'packages/ui/src'));
 
 module.exports = {
   source: [
@@ -15,7 +16,7 @@ module.exports = {
   platforms: {
     css: {
       transformGroup: 'css',
-      buildPath: `${OUT_DIR}/`,
+      buildPath: `${SRC_DIR}/styles/`,
       files: [
         {
           destination: 'tokens.css',
@@ -28,7 +29,7 @@ module.exports = {
     },
     json: {
       transformGroup: 'js',
-      buildPath: `${OUT_DIR}/style-dictionary/json/`,
+      buildPath: `${DIST_DIR}/style-dictionary/json/`,
       files: [
         {
           destination: 'tokens.json',
@@ -38,7 +39,7 @@ module.exports = {
     },
     ts: {
       transformGroup: 'js',
-      buildPath: `${OUT_DIR}/style-dictionary/ts/`,
+      buildPath: `${DIST_DIR}/style-dictionary/ts/`,
       files: [
         {
           destination: 'types.ts',

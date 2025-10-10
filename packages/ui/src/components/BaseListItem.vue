@@ -120,14 +120,13 @@ const handleKeydown = (event) => {
 
 <style scoped>
 .base-list-item {
-  /* 使用设计令牌 */
   display: flex;
   align-items: center;
-  padding: var(--list-item-padding-y) var(--list-item-padding-x);
-  min-height: var(--list-item-min-height);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  transition: var(--transition-fast);
+  padding: var(--component-list-item-padding-y) var(--component-list-item-padding-x);
+  min-height: var(--component-list-item-min-height);
+  background: var(--color-semantic-bg-primary);
+  color: var(--color-semantic-text-primary);
+  transition: all 0.2s ease-in-out; /* Consider adding to tokens */
   position: relative;
 }
 
@@ -146,8 +145,8 @@ const handleKeydown = (event) => {
 .base-list-item__title {
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-normal);
-  color: var(--color-text-primary);
+  line-height: var(--font-line-height-md);
+  color: var(--color-semantic-text-primary);
 
   /* 文本截断 */
   overflow: hidden;
@@ -158,9 +157,9 @@ const handleKeydown = (event) => {
 .base-list-item__description {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-normal);
-  color: var(--color-text-secondary);
-  margin-top: var(--space-2xs);
+  line-height: var(--font-line-height-sm);
+  color: var(--color-semantic-text-secondary);
+  margin-top: var(--space-xs); /* Fallback, space-2xs not defined */
 
   /* 文本截断 */
   overflow: hidden;
@@ -177,7 +176,7 @@ const handleKeydown = (event) => {
 
 /* 边框样式 */
 .base-list-item--bordered {
-  border-bottom: 1px solid var(--list-item-border);
+  border-bottom: 1px solid var(--component-list-item-border);
 }
 
 .base-list-item--bordered:last-child {
@@ -190,21 +189,26 @@ const handleKeydown = (event) => {
 }
 
 .base-list-item--clickable:hover:not(.base-list-item--disabled) {
-  background: var(--list-item-hover-bg);
+  background: var(--component-list-item-hover-bg);
 }
 
 .base-list-item--clickable:active:not(.base-list-item--disabled) {
-  background: var(--color-bg-muted);
+  background: var(--color-semantic-bg-secondary); /* Fallback */
 }
 
 /* 选中状态 */
 .base-list-item--selected {
-  background: var(--list-item-selected-bg);
-  border-color: var(--list-item-selected-border);
+  background: var(--component-list-item-selected-bg);
+  border-color: var(--component-list-item-selected-border);
+  color: var(--color-semantic-text-inverse);
+}
+
+.base-list-item--selected .base-list-item__title,
+.base-list-item--selected .base-list-item__description {
+  color: var(--color-semantic-text-inverse);
 }
 
 .base-list-item--selected .base-list-item__title {
-  color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -217,18 +221,18 @@ const handleKeydown = (event) => {
 
 /* 焦点样式 */
 .base-list-item--clickable:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: 2px solid var(--component-list-item-focus-ring);
   outline-offset: -2px;
 }
 
 /* 分组标题样式（特殊变体） */
 .base-list-item--group-title {
-  background: var(--panel-group-bg);
-  padding: var(--panel-group-padding-y) var(--panel-group-padding-x);
-  font-size: var(--panel-group-font-size);
-  font-weight: var(--panel-group-font-weight);
-  color: var(--panel-group-color);
-  border-bottom: 1px solid var(--panel-group-border);
+  background: var(--component-panel-group-bg);
+  padding: var(--component-panel-group-padding-y) var(--component-panel-group-padding-x);
+  font-size: var(--component-panel-group-font-size);
+  font-weight: var(--component-panel-group-font-weight);
+  color: var(--component-panel-group-color);
+  border-bottom: 1px solid var(--component-panel-group-border);
   position: sticky;
   top: 0;
   z-index: 2;
@@ -296,7 +300,7 @@ const handleKeydown = (event) => {
 
 /* 紧凑模式 */
 .base-list-item--compact {
-  padding: var(--space-xs) var(--list-item-padding-x);
+  padding: var(--space-xs) var(--component-list-item-padding-x);
   min-height: auto;
 }
 
@@ -305,8 +309,8 @@ const handleKeydown = (event) => {
 }
 
 .base-list-item--compact .base-list-item__description {
-  font-size: var(--font-size-2xs);
-  margin-top: var(--space-2xs);
+  font-size: var(--font-size-xs); /* Fallback, 2xs not defined */
+  margin-top: var(--space-xs); /* Fallback, 2xs not defined */
 }
 
 /* 多行文本支持 */

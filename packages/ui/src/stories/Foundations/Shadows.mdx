@@ -1,0 +1,32 @@
+import { Meta } from '@storybook/blocks';
+import tokens from '../../../dist/style-dictionary/json/tokens.json';
+
+<Meta title="Foundations/Shadows" />
+
+# Shadows
+
+The shadow scale is used to create depth and elevation in the UI.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
+  {Object.entries(tokens.shadow).map(([name, value]) => (
+    <div key={name} style={{ textAlign: 'center' }}>
+      <div
+        style={{
+          width: '120px',
+          height: '120px',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: value,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+      </div>
+      <div style={{ marginTop: '1rem', fontFamily: 'sans-serif', fontSize: '0.875rem' }}>
+        <div>shadow.{name}</div>
+        <div style={{ color: '#666', maxWidth: '120px', whiteSpace: 'normal' }}>{value}</div>
+      </div>
+    </div>
+  ))}
+</div>

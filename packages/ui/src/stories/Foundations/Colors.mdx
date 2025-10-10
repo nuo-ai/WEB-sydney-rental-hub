@@ -1,0 +1,43 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
+import tokens from '../../../dist/style-dictionary/json/tokens.json';
+
+<Meta title="Foundations/Colors" />
+
+# Colors
+
+Colors are a fundamental part of the design system. Here is the palette of colors used in this project.
+
+## Brand Colors
+
+<ColorPalette>
+  <ColorItem
+    title="Brand Primary"
+    subtitle="color.brand.primary"
+    colors={[tokens.color.brand.primary]}
+  />
+  <ColorItem
+    title="Brand Hover"
+    subtitle="color.brand.hover"
+    colors={[tokens.color.brand.hover]}
+  />
+  <ColorItem
+    title="Brand Active"
+    subtitle="color.brand.active"
+    colors={[tokens.color.brand.active]}
+  />
+</ColorPalette>
+
+## Neutral Colors (Gray Scale)
+
+<ColorPalette>
+  <ColorItem title="White" subtitle="color.white" colors={[tokens.color.white]} />
+  <ColorItem title="Black" subtitle="color.black" colors={[tokens.color.black]} />
+  {Object.entries(tokens.color.gray).map(([key, value]) => (
+    <ColorItem
+      key={key}
+      title={`Gray ${key}`}
+      subtitle={`color.gray.${key}`}
+      colors={[value]}
+    />
+  ))}
+</ColorPalette>

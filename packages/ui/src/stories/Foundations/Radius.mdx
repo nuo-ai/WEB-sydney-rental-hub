@@ -1,0 +1,33 @@
+import { Meta } from '@storybook/blocks';
+import tokens from '../../../dist/style-dictionary/json/tokens.json';
+
+<Meta title="Foundations/Radius" />
+
+# Radius
+
+The radius scale is used for defining the roundness of corners on elements like buttons and cards.
+
+<div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
+  {Object.entries(tokens.radius).map(([name, value]) => (
+    <div key={name} style={{ textAlign: 'center' }}>
+      <div
+        style={{
+          width: '100px',
+          height: '100px',
+          backgroundColor: '#0057ff',
+          borderRadius: value,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '1rem',
+        }}
+      >
+        {value}
+      </div>
+      <div style={{ marginTop: '0.5rem', fontFamily: 'sans-serif', fontSize: '0.875rem' }}>
+        radius.{name}
+      </div>
+    </div>
+  ))}
+</div>

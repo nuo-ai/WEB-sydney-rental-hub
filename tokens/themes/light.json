@@ -20,7 +20,15 @@
         "success": { "value": "#10b981", "type": "color", "description": "成功状态" },
         "warning": { "value": "#f59e0b", "type": "color", "description": "警告状态" },
         "error": { "value": "#ef4444", "type": "color", "description": "错误状态" },
-        "info": { "value": "#3b82f6", "type": "color", "description": "信息状态" }
+        "info": { "value": "#3b82f6", "type": "color", "description": "信息状态" },
+        "success-soft-bg": { "value": "#f0fdf4", "type": "color", "description": "成功状态的柔和背景色" },
+        "success-border": { "value": "{color.semantic.feedback.success}", "type": "color", "description": "成功状态的边框色" },
+        "warning-soft-bg": { "value": "#fffbeb", "type": "color", "description": "警告状态的柔和背景色" },
+        "warning-border": { "value": "{color.semantic.feedback.warning}", "type": "color", "description": "警告状态的边框色" },
+        "danger-soft-bg": { "value": "#fef2f2", "type": "color", "description": "危险状态的柔和背景色" },
+        "danger-border": { "value": "{color.semantic.feedback.error}", "type": "color", "description": "危险状态的边框色" },
+        "info-soft-bg": { "value": "#eff6ff", "type": "color", "description": "信息状态的柔和背景色" },
+        "info-border": { "value": "{color.semantic.feedback.info}", "type": "color", "description": "信息状态的边框色" }
       }
     }
   }

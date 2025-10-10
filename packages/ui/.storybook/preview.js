@@ -1,6 +1,5 @@
 import { setup } from '@storybook/vue3';
-import '../dist/tokens.css';
-import '../dist/style-dictionary/css/variables.css';
+import '../src/styles/tokens.css';
 
 // 设置全局装饰器
 export const decorators = [

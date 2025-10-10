@@ -1,6 +1,7 @@
 
 
-import { join, dirname } from "path"
+import { join, dirname } from "path";
+import { fileURLToPath, URL } from "node:url";
 import vue from '@vitejs/plugin-vue';
 
 /**
@@ -20,8 +21,7 @@ const config = {
   "addons": [
     getAbsolutePath('@chromatic-com/storybook'),
     getAbsolutePath('@storybook/addon-docs'),
-    getAbsolutePath("@storybook/addon-a11y"),
-    getAbsolutePath("@storybook/addon-vitest")
+    getAbsolutePath("@storybook/addon-a11y")
   ],
   core: {
     builder: '@storybook/builder-vite',
@@ -37,12 +37,16 @@ const config = {
   },
   async viteFinal(config) {
     const { mergeConfig } = await import('vite');
-    // Add the vue plugin to the vite config.
+    
     config.plugins = config.plugins ?? [];
     config.plugins.push(vue());
 
-    // Explicitly include storybook-blocks for Vite pre-bundling.
     return mergeConfig(config, {
+      resolve: {
+        alias: {
+          "@": fileURLToPath(new URL("../src", import.meta.url)),
+        },
+      },
       optimizeDeps: {
         include: ['@storybook/blocks'],
       },

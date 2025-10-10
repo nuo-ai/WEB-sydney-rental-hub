@@ -201,84 +201,84 @@ defineExpose({
 
 .base-search-input__icon {
   position: absolute;
-  left: var(--search-icon-left);
-  width: var(--search-icon-size);
-  height: var(--search-icon-size);
-  color: var(--search-icon-color);
+  left: var(--component-search-input-icon-left);
+  width: var(--component-search-input-icon-size);
+  height: var(--component-search-input-icon-size);
+  color: var(--component-search-input-icon-color);
   pointer-events: none;
   z-index: 1;
 }
 
 .base-search-input__field {
   width: 100%;
-  padding: var(--search-padding-y) var(--search-padding-x)
-    var(--search-padding-y) var(--search-padding-left);
-  font-size: var(--search-font-size);
-  color: var(--color-text-primary);
-  background: var(--color-bg-primary);
-  border: 1px solid var(--search-border);
-  border-radius: var(--search-radius);
+  padding: var(--component-search-input-padding-y) var(--component-search-input-padding-x)
+    var(--component-search-input-padding-y) var(--component-search-input-padding-left);
+  font-size: var(--component-search-input-font-size);
+  color: var(--color-semantic-text-primary);
+  background: var(--color-semantic-bg-primary);
+  border: 1px solid var(--component-search-input-border);
+  border-radius: var(--component-search-input-radius);
   outline: none;
-  transition: var(--transition-normal);
-  line-height: var(--line-height-normal);
+  transition: all 0.2s ease-in-out; /* Consider adding to tokens */
+  line-height: var(--font-line-height-md);
 }
 
 .base-search-input__field::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-semantic-text-muted);
 }
 
 .base-search-input__field:focus {
-  border-color: var(--search-focus-border);
-  box-shadow: var(--shadow-focus);
+  border-color: var(--component-search-input-focus-border);
+  box-shadow: 0 0 0 2px var(--color-brand-primary-alpha-20); /* Fallback, consider adding to tokens */
 }
 
 .base-search-input__field:hover:not(:focus, :disabled) {
-  border-color: var(--search-hover-border);
+  border-color: var(--component-search-input-hover-border);
 }
 
 .base-search-input__field:disabled {
-  background: var(--color-bg-muted);
-  color: var(--color-text-muted);
+  background: var(--color-semantic-bg-secondary);
+  color: var(--color-semantic-text-muted);
   cursor: not-allowed;
 }
 
 .base-search-input__clear {
   position: absolute;
-  right: var(--clear-btn-right);
+  right: var(--component-search-input-clear-btn-right);
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--color-semantic-text-secondary);
   cursor: pointer;
-  padding: var(--clear-btn-padding);
-  border-radius: var(--clear-btn-radius);
+  padding: var(--component-search-input-clear-btn-padding);
+  border-radius: var(--component-search-input-clear-btn-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-fast);
-  width: var(--clear-btn-size);
-  height: var(--clear-btn-size);
+  transition: all 0.2s ease-in-out;
+  width: var(--component-search-input-clear-btn-size);
+  height: var(--component-search-input-clear-btn-size);
 }
 
 .base-search-input__clear svg {
-  width: var(--clear-btn-size);
-  height: var(--clear-btn-size);
+  width: var(--component-search-input-clear-btn-size);
+  height: var(--component-search-input-clear-btn-size);
 }
 
 .base-search-input__clear:hover {
-  background: var(--clear-btn-hover-bg);
-  color: var(--color-text-primary);
+  background: var(--component-search-input-clear-btn-hover-bg);
+  color: var(--color-semantic-text-primary);
 }
 
 .base-search-input__clear:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: 2px solid var(--color-brand-primary);
   outline-offset: 1px;
 }
 
 /* 有清除按钮时调整输入框右内边距 */
 .base-search-input__field:not(:disabled) {
   padding-right: calc(
-    var(--clear-btn-right) * 2 + var(--clear-btn-size) +
-      var(--clear-btn-padding) * 2
+    var(--component-search-input-clear-btn-right) * 2 + var(--component-search-input-clear-btn-size) +
+      var(--component-search-input-clear-btn-padding) * 2
   );
 }
 

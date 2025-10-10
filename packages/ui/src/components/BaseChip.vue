@@ -59,20 +59,19 @@ const handleRemove = (event) => {
 
 <style scoped>
 .base-chip {
-  /* 使用设计令牌 */
   display: inline-flex;
   align-items: center;
-  gap: var(--chip-gap);
-  padding: var(--chip-padding-y) var(--chip-padding-x);
-  border: 1px solid var(--chip-border);
-  border-radius: var(--chip-radius);
-  background: var(--chip-bg);
-  color: var(--chip-text);
-  font-size: var(--chip-font-size);
-  font-weight: var(--chip-font-weight);
-  line-height: var(--line-height-normal);
+  gap: var(--component-chip-gap);
+  padding: var(--component-chip-padding-y) var(--component-chip-padding-x);
+  border: 1px solid var(--component-chip-default-border);
+  border-radius: var(--component-chip-radius);
+  background: var(--component-chip-default-bg);
+  color: var(--component-chip-default-text);
+  font-size: var(--component-chip-font-size);
+  font-weight: var(--component-chip-font-weight);
+  line-height: var(--component-chip-line-height);
   max-width: 200px;
-  transition: var(--transition-fast);
+  transition: var(--component-chip-transition);
   cursor: default;
 }
 
@@ -84,13 +83,12 @@ const handleRemove = (event) => {
 }
 
 .base-chip__remove {
-  /* 使用中性 remove 背景，避免父级选中/hover 背景透出 */
-  background: var(--chip-remove-bg);
+  background: var(--component-chip-remove-bg);
   border: none;
-  color: var(--chip-remove-color);
-  width: var(--chip-remove-size);
-  height: var(--chip-remove-size);
-  border-radius: var(--chip-remove-radius);
+  color: var(--component-chip-remove-color);
+  width: var(--component-chip-remove-size);
+  height: var(--component-chip-remove-size);
+  border-radius: var(--component-chip-remove-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -98,26 +96,26 @@ const handleRemove = (event) => {
   line-height: 1;
   padding: 0;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: var(--component-chip-transition);
   flex-shrink: 0;
 }
 
 /* 悬浮状态 */
 .base-chip:hover {
-  border-color: var(--chip-hover-border);
-  background: var(--chip-hover-bg);
+  border-color: var(--component-chip-default-hover-border);
+  background: var(--component-chip-default-hover-bg);
 }
 
 .base-chip__remove:hover {
-  background: var(--chip-remove-hover-bg);
-  color: var(--chip-remove-hover-color);
+  background: var(--component-chip-remove-hover-bg);
+  color: var(--component-chip-remove-hover-color);
 }
 
 /* 选中/hover 场景下，仍保持 x 的中性背景，避免父级底色透出 */
 .base-chip:hover .base-chip__remove,
 .base-chip--selected .base-chip__remove,
 .base-chip.base-chip--hover .base-chip__remove {
-  background: var(--chip-remove-bg) !important;
+  background: var(--component-chip-remove-bg) !important;
 }
 
 /* 规范化原生外观与点击高亮（消除桌面端浅蓝背景） */
@@ -128,27 +126,26 @@ const handleRemove = (event) => {
 }
 
 .base-chip__remove:active {
-  /* 点击时使用 hover-bg，非选中/焦点时保持透明 */
-  background: var(--chip-remove-hover-bg);
-  color: var(--chip-remove-hover-color);
+  background: var(--component-chip-remove-hover-bg);
+  color: var(--component-chip-remove-hover-color);
 }
 
 /* 变体样式 */
 .base-chip--selected {
-  background: var(--color-selected-bg);
-  border-color: var(--color-selected-border);
-  color: var(--color-text-primary);
+  background: var(--component-chip-selected-bg);
+  border-color: var(--component-chip-selected-border);
+  color: var(--component-chip-selected-text);
   font-weight: var(--font-weight-semibold);
 }
 
 .base-chip--hover {
-  background: var(--chip-hover-bg);
-  border-color: var(--chip-hover-border);
+  background: var(--component-chip-default-hover-bg);
+  border-color: var(--component-chip-default-hover-border);
 }
 
 /* 可移除状态的额外样式 */
 .base-chip--removable {
-  padding-right: calc(var(--chip-padding-x) - 2px); /* 为移除按钮调整内边距 */
+  padding-right: calc(var(--component-chip-padding-x) - 2px); /* 为移除按钮调整内边距 */
 }
 
 /* 无障碍支持（中性化：移除浏览器默认浅蓝高亮） */

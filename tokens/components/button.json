@@ -13,7 +13,7 @@
         "padding-horizontal": { "value": "{space.md}" },
         "font-size": { "value": "{font.size.md}" },
         "font-weight": { "value": "{font.weight.medium}" },
-        "line-height": { "value": "{font.line-height.md}" },
+        "line-height": { "value": "{font.lineHeight.md}" },
         "hover": {
           "background-color": { "value": "{component.button.primary.bg-hover}" },
           "border": { "value": "{component.button.primary.border-hover}" }
@@ -43,7 +43,7 @@
         "padding-horizontal": { "value": "{space.md}" },
         "font-size": { "value": "{font.size.md}" },
         "font-weight": { "value": "{font.weight.medium}" },
-        "line-height": { "value": "{font.line-height.md}" },
+        "line-height": { "value": "{font.lineHeight.md}" },
         "hover": {
           "background-color": { "value": "{component.button.secondary.bg-hover}" },
           "color": { "value": "{component.button.secondary.color-hover}" },
@@ -73,7 +73,7 @@
         "padding-horizontal": { "value": "{space.md}" },
         "font-size": { "value": "{font.size.md}" },
         "font-weight": { "value": "{font.weight.medium}" },
-        "line-height": { "value": "{font.line-height.md}" },
+        "line-height": { "value": "{font.lineHeight.md}" },
         "hover": {
           "background-color": { "value": "{component.button.ghost.bg-hover}" },
           "color": { "value": "{component.button.ghost.color-hover}" }

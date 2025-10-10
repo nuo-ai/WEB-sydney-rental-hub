@@ -49,24 +49,16 @@ function toggle() {
 </script>
 
 <style scoped>
-/* 中文注释：令牌化，不引入硬编码色；on 态使用品牌主色，off 态中性灰 */
 .base-toggle {
-  --toggle-w-md: 42px;
-  --toggle-h-md: 24px;
-  --toggle-w-sm: 36px;
-  --toggle-h-sm: 20px;
-  --thumb-d-md: 18px;
-  --thumb-d-sm: 16px;
-  --pad: 3px;
-
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--component-toggle-text-gap);
   border: 0;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--component-toggle-text-color);
   cursor: pointer;
   padding: 0;
+  transition: var(--component-toggle-transition);
 }
 
 .base-toggle.disabled,
@@ -78,71 +70,76 @@ function toggle() {
 .base-toggle .toggle-track {
   position: relative;
   display: inline-block;
-  width: var(--toggle-w-md);
-  height: var(--toggle-h-md);
-  background: var(--surface-2, var(--bg-hover));
-  border: 1px solid var(--color-border-default);
+  background: var(--component-toggle-track-off-bg);
+  border: 1px solid var(--component-toggle-track-off-border);
   border-radius: 9999px;
-  transition:
-    background-color var(--motion-base, 180ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
-    border-color var(--motion-base, 180ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1));
+  transition: inherit;
   box-sizing: border-box;
 }
 
 .base-toggle .toggle-thumb {
   position: absolute;
   top: 50%;
-  left: var(--pad);
-  width: var(--thumb-d-md);
-  height: var(--thumb-d-md);
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  background: var(--component-toggle-thumb-bg);
+  border: 1px solid var(--component-toggle-thumb-border);
   border-radius: 9999px;
   transform: translate(0, -50%);
-  transition:
-    transform var(--motion-fast, 120ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1)),
-    border-color var(--motion-base, 180ms) var(--easing-standard, cubic-bezier(0.2, 0, 0, 1));
+  transition: inherit;
   box-sizing: border-box;
+}
+
+/* 尺寸：md (默认) */
+.base-toggle.size-md .toggle-track {
+  width: var(--component-toggle-md-width);
+  height: var(--component-toggle-md-height);
+}
+.base-toggle.size-md .toggle-thumb {
+  left: var(--component-toggle-md-padding);
+  width: var(--component-toggle-md-thumb-size);
+  height: var(--component-toggle-md-thumb-size);
 }
 
 /* 尺寸：sm */
 .base-toggle.size-sm .toggle-track {
-  width: var(--toggle-w-sm);
-  height: var(--toggle-h-sm);
+  width: var(--component-toggle-sm-width);
+  height: var(--component-toggle-sm-height);
 }
 .base-toggle.size-sm .toggle-thumb {
-  width: var(--thumb-d-sm);
-  height: var(--thumb-d-sm);
+  left: var(--component-toggle-sm-padding);
+  width: var(--component-toggle-sm-thumb-size);
+  height: var(--component-toggle-sm-thumb-size);
 }
 
 /* on 态：使用品牌主色作为轨道背景；thumb 移至右侧 */
 .base-toggle.is-on .toggle-track {
-  background: var(--juwo-primary);
-  border-color: var(--juwo-primary);
+  background: var(--component-toggle-track-on-bg);
+  border-color: var(--component-toggle-track-on-border);
 }
 .base-toggle.is-on .toggle-thumb {
-  border-color: var(--juwo-primary);
-  transform: translate(calc(var(--toggle-w-md) - var(--thumb-d-md) - var(--pad) * 2), -50%);
+  border-color: var(--component-toggle-track-on-border);
+}
+.base-toggle.size-md.is-on .toggle-thumb {
+  transform: translate(calc(var(--component-toggle-md-width) - var(--component-toggle-md-thumb-size) - var(--component-toggle-md-padding) * 2), -50%);
 }
 .base-toggle.size-sm.is-on .toggle-thumb {
-  transform: translate(calc(var(--toggle-w-sm) - var(--thumb-d-sm) - var(--pad) * 2), -50%);
+  transform: translate(calc(var(--component-toggle-sm-width) - var(--component-toggle-sm-thumb-size) - var(--component-toggle-sm-padding) * 2), -50%);
 }
 
 /* hover：中性灰加强 */
 .base-toggle:not(.disabled):hover .toggle-track {
-  border-color: var(--color-border-strong, var(--color-border-default));
+  border-color: var(--component-toggle-track-hover-border);
 }
 
 /* 文案（可选） */
 .toggle-text {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-size: var(--component-toggle-text-font-size);
+  font-weight: var(--component-toggle-text-font-weight);
+  color: var(--component-toggle-text-color);
 }
 
 /* 焦点可见性：中性可见焦点 */
 .base-toggle:focus-visible .toggle-track {
-  outline: 2px solid var(--color-border-strong);
+  outline: 2px solid var(--component-toggle-focus-outline);
   outline-offset: 2px;
 }
 </style>

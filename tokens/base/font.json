@@ -17,9 +17,6 @@
       "md": { "value": "1.5", "type": "lineHeight", "description": "中行高（正文）" },
       "lg": { "value": "1.6", "type": "lineHeight", "description": "大行高" }
     },
-    "line-height": {
-      "md": { "value": "1.5", "type": "lineHeight", "description": "中行高（正文）" }
-    },
     "weight": {
       "regular": { "value": "400", "type": "fontWeight", "description": "常规字重" },
       "medium": { "value": "500", "type": "fontWeight", "description": "中等字重" },
