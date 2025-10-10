@@ -167,8 +167,7 @@ import { ref, watch, onMounted, onUnmounted, computed, inject, nextTick } from '
 import { usePropertiesStore } from '@/stores/properties'
 import { locationAPI } from '@/services/api'
 import { Search, PlusCircle, X, ChevronLeft, Lightbulb } from 'lucide-vue-next'
-import BaseChip from './base/BaseChip.vue'
-import BaseListItem from './base/BaseListItem.vue'
+import { BaseChip, BaseListItem } from '@sydney-rental-hub/ui'
 
 const emit = defineEmits(['close', 'open-filter-panel', 'openFilterPanel'])
 

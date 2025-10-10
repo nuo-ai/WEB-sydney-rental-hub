@@ -7,8 +7,8 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 
-// 导入自动化设计系统
-import '@sydney-rental-hub/ui/dist/tokens.css'; // 自动生成的 Design Tokens
+// 导入自动化设计系统（通过 UI 包暴露的设计令牌）
+import '@sydney-rental-hub/ui/dist/tokens.css'
 import './style.css' // 全局样式
 
 import { useAuthStore } from './stores/auth'

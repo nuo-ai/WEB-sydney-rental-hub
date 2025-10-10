@@ -1,0 +1,260 @@
+diff --git a/apps/web/src/main.js b/apps/web/src/main.js
+index 51fa0d2f4b468cdcebcd2c107101c9a3310a0bb4..289aca5777e9e1cf6430c46916d7257d61348f1a 100644
+--- a/apps/web/src/main.js
++++ b/apps/web/src/main.js
+@@ -1,36 +1,36 @@
+ import { createApp } from 'vue'
+ import { createPinia } from 'pinia'
+ import ElementPlus from 'element-plus'
+ import 'element-plus/dist/index.css'
+ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+ 
+ import App from './App.vue'
+ import router from './router'
+ 
+-// 导入自动化设计系统
+-import '@sydney-rental-hub/ui/dist/tokens.css'; // 自动生成的 Design Tokens
++// 导入自动化设计系统（通过 UI 包暴露的设计令牌）
++import '@sydney-rental-hub/ui/dist/tokens.css'
+ import './style.css' // 全局样式
+ 
+ import { useAuthStore } from './stores/auth'
+ import i18n from './i18n'
+ 
+ const app = createApp(App)
+ 
+ // Configure Element Plus with JUWO brand colors
+ app.use(ElementPlus, {
+   // Global configuration for JUWO brand
+ })
+ 
+ // Register all Element Plus icons
+ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+   app.component(key, component)
+ }
+ 
+ app.use(createPinia())
+ app.use(i18n)
+ app.use(router)
+ 
+ // Initialize auth store after Pinia is set up
+ const authStore = useAuthStore()
+ authStore.initAuth()
+ 
+diff --git a/apps/web/vite.config.js b/apps/web/vite.config.js
+index a257cca0543d570d02fa5a02fae3e1562223c517..75f4190597b33e0d3d829f0134a67fbd6a76a96b 100644
+--- a/apps/web/vite.config.js
++++ b/apps/web/vite.config.js
+@@ -1,80 +1,108 @@
+ /// <reference types="vitest/config" />
+ import { fileURLToPath, URL } from 'node:url'
+ import { defineConfig } from 'vite'
+ import vue from '@vitejs/plugin-vue'
+ import vueDevTools from 'vite-plugin-vue-devtools'
+ 
+ // https://vite.dev/config/
+ import path from 'node:path'
+-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
+ const dirname =
+   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url))
+ 
+ // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
+ const isStorybook = process.env.STORYBOOK === 'true'
+ 
+-export default defineConfig({
+-  plugins: isStorybook ? [vue()] : [vue(), vueDevTools()],
+-  resolve: {
+-    alias: {
+-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+-    },
++const viteInspectCompatPatch = {
++  name: 'vite-plugin-inspect-compat-patch',
++  enforce: 'pre',
++  configureServer(server) {
++    if (server && server.environments == null) {
++      // Vite 7 removed the `server.environments` property that
++      // `vite-plugin-inspect` expects. The plugin is bundled with
++      // `vite-plugin-vue-devtools` and crashes when it tries to access
++      // the missing property. Providing an empty object keeps the
++      // plugin operational without altering any behaviour.
++      server.environments = {}
++    }
+   },
+-  server: {
++}
++
++const enableVueDevTools = process.env.ENABLE_VUE_DEVTOOLS === 'true'
++
++export default defineConfig(async () => {
++  const plugins = [vue()]
++  if (!isStorybook && enableVueDevTools) {
++    plugins.unshift(viteInspectCompatPatch)
++    plugins.push(vueDevTools())
++  }
++
++  let testConfig
++  if (isStorybook) {
++    const { storybookTest } = await import('@storybook/addon-vitest/vitest-plugin')
++    testConfig = {
++      projects: [
++        {
++          extends: true,
++          plugins: [
++            storybookTest({
++              configDir: path.join(dirname, '.storybook'),
++            }),
++          ],
++          test: {
++            name: 'storybook',
++            browser: {
++              enabled: true,
++              headless: true,
++              provider: 'playwright',
++              instances: [
++                {
++                  browser: 'chromium',
++                },
++              ],
++            },
++            setupFiles: ['.storybook/vitest.setup.js'],
++          },
++        },
++      ],
++    }
++  }
++
++  return {
++    plugins,
++    resolve: {
++      alias: {
++        '@': fileURLToPath(new URL('./src', import.meta.url)),
++      },
++    },
++    server: {
+     // 固定端口，避免 Google Maps API 限制问题
+     port: 5173,
+     strictPort: true,
+     // 如果端口被占用则报错，而不是尝试下一个端口
+     host: true,
+     // 监听所有地址
+ 
+     // 允许通过 ngrok 访问（解决 403 Forbidden / Host 校验）
+     // 也可设置为 true 完全放开（仅开发环境使用）：
+     // allowedHosts: true,
+     allowedHosts: ['.ngrok-free.app'],
+     // 可选：若需要稳定 HMR，通过 ngrok 的 wss 连接（演示可不配置）
+     // hmr: {
+     //   host: 'YOUR_SUBDOMAIN.ngrok-free.app', // 替换为实际 ngrok 子域名
+     //   protocol: 'wss',
+     //   clientPort: 443,
+     // },
+ 
+     proxy: {
+       '/api': {
+         // 本地后端（通过 Vite 代理转发），更稳：统一指向 localhost
+         target: 'http://localhost:8000',
+         changeOrigin: true,
+         secure: false,
+       },
+     },
+-  },
+-  // 仅在 Storybook 环境下加载测试配置
+-  test: isStorybook ? {
+-    projects: [
+-      {
+-        extends: true,
+-        plugins: [
+-          // The plugin will run tests for the stories defined in your Storybook config
+-          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
+-          storybookTest({
+-            configDir: path.join(dirname, '.storybook'),
+-          }),
+-        ],
+-        test: {
+-          name: 'storybook',
+-          browser: {
+-            enabled: true,
+-            headless: true,
+-            provider: 'playwright',
+-            instances: [
+-              {
+-                browser: 'chromium',
+-              },
+-            ],
+-          },
+-          setupFiles: ['.storybook/vitest.setup.js'],
+-        },
+-      },
+-    ],
+-  } : undefined,
++    },
++    // 仅在 Storybook 环境下加载测试配置
++    test: testConfig,
++  }
+ })
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 672fce3e7bc92069d94e980fdf42585bd9977567..eb26cf39d90b6525fbf465b994c8c408ad093ca9 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -1,43 +1,44 @@
+ {
+   "name": "@sydney-rental-hub/ui",
+   "version": "0.0.0",
+   "private": true,
+   "description": "The core UI component library and design system for Sydney Rental Hub.",
+   "main": "./src/index.ts",
+   "module": "./src/index.ts",
+   "types": "./src/index.ts",
+   "files": [
+     "dist",
+     "src"
+   ],
+   "exports": {
+     ".": {
+       "types": "./src/index.ts",
+       "import": "./src/index.ts"
+     },
+-    "./dist/tokens.css": "./dist/tokens.css",
++    "./dist/tokens.css": "./src/styles/tokens.css",
++    "./styles/tokens.css": "./src/styles/tokens.css",
+     "./tokens": "./dist/style-dictionary/json/tokens.json",
+     "./dist/tokens.mjs": "./dist/tokens.mjs"
+   },
+   "scripts": {
+     "lint": "echo 'Linting @sydney-rental-hub/ui... (no-op)'",
+     "storybook": "storybook dev -p 6006",
+     "build-storybook": "storybook build"
+   },
+   "keywords": [
+     "design-system",
+     "vue",
+     "components"
+   ],
+   "author": "Sydney Rental Hub Team",
+   "license": "UNLICENSED",
+   "devDependencies": {
+     "@chromatic-com/storybook": "^4.1.1",
+     "@storybook/addon-a11y": "^8.6.14",
+     "@storybook/addon-docs": "^8.6.14",
+     "@storybook/blocks": "^8.6.14",
+     "@storybook/vue3-vite": "^8.6.14",
+     "@vitejs/plugin-vue": "^6.0.1",
+     "@vitest/browser": "^3.2.4",
+     "@vitest/coverage-v8": "^3.2.4",
+     "playwright": "^1.56.0",
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8386fdfe6e9dd946070b927dff067fa52a6ecf88
+--- /dev/null
++++ b/packages/ui/src/index.ts
+@@ -0,0 +1,10 @@
++export { default as BaseBadge } from './components/BaseBadge.vue'
++export { default as BaseButton } from './components/BaseButton.vue'
++export { default as BaseCard } from './components/BaseCard.vue'
++export { default as BaseChip } from './components/BaseChip.vue'
++export { default as BaseIconButton } from './components/BaseIconButton.vue'
++export { default as BaseInput } from './components/BaseInput.vue'
++export { default as BaseListItem } from './components/BaseListItem.vue'
++export { default as BaseSearchInput } from './components/BaseSearchInput.vue'
++export { default as BaseToggle } from './components/BaseToggle.vue'
++

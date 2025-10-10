@@ -102,6 +102,15 @@ npx playwright test -g "URL 幂等与仅写非空键"
 - ✅ Vue前端: 正常运行 (localhost:5173)
 - ✅ Python后端: 正常运行 (localhost:8000)
 - ✅ 数据库连接: 正常 (Supabase PostgreSQL)
+
+### Vite 启动问题排查 (2025-10-10)
+
+- **问题1**: Storybook v8 与 `@storybook/addon-vitest` (v9) 版本不兼容，导致 `import` 失败。
+  - **解决方案**: 在 `vite.config.js` 中改为异步和条件导入 `addon-vitest`，仅在 `isStorybook` 环境下加载。
+- **问题2**: `vite-plugin-vue-devtools` 内部依赖的 `vite-plugin-inspect` 与 Vite 7+ 不兼容，因 `server.environments` 属性被移除而崩溃。
+  - **解决方案**: 添加一个自定义的 `viteInspectCompatPatch` 插件，在 `configureServer` 钩子中为 `server.environments` 提供一个空对象 `{}` 作为 polyfill，确保插件能正常运行。
+- **问题3**: 之前的开发进程未完全关闭，导致端口被占用。
+  - **解决方案**: 使用 `netstat -aon | findstr <PORT>` 找到进程 PID，然后通过 `taskkill /PID <PID> /F` 强制终止。
 - ✅ 认证系统: JWT + 邮箱验证框架
 - ✅ 通勤计算: Google Directions（生产）；无 Haversine 回退
 

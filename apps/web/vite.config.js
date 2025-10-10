@@ -6,21 +6,75 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 import path from 'node:path'
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 const dirname =
   typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url))
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 const isStorybook = process.env.STORYBOOK === 'true'
 
-export default defineConfig({
-  plugins: isStorybook ? [vue()] : [vue(), vueDevTools()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+const viteInspectCompatPatch = {
+  name: 'vite-plugin-inspect-compat-patch',
+  enforce: 'pre',
+  configureServer(server) {
+    if (server && server.environments == null) {
+      // Vite 7 removed the `server.environments` property that
+      // `vite-plugin-inspect` expects. The plugin is bundled with
+      // `vite-plugin-vue-devtools` and crashes when it tries to access
+      // the missing property. Providing an empty object keeps the
+      // plugin operational without altering any behaviour.
+      server.environments = {}
+    }
   },
-  server: {
+}
+
+const enableVueDevTools = process.env.ENABLE_VUE_DEVTOOLS === 'true'
+
+export default defineConfig(async () => {
+  const plugins = [vue()]
+  if (!isStorybook && enableVueDevTools) {
+    plugins.unshift(viteInspectCompatPatch)
+    plugins.push(vueDevTools())
+  }
+
+  let testConfig
+  if (isStorybook) {
+    const { storybookTest } = await import('@storybook/addon-vitest/vitest-plugin')
+    testConfig = {
+      projects: [
+        {
+          extends: true,
+          plugins: [
+            storybookTest({
+              configDir: path.join(dirname, '.storybook'),
+            }),
+          ],
+          test: {
+            name: 'storybook',
+            browser: {
+              enabled: true,
+              headless: true,
+              provider: 'playwright',
+              instances: [
+                {
+                  browser: 'chromium',
+                },
+              ],
+            },
+            setupFiles: ['.storybook/vitest.setup.js'],
+          },
+        },
+      ],
+    }
+  }
+
+  return {
+    plugins,
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
+    server: {
     // 固定端口，避免 Google Maps API 限制问题
     port: 5173,
     strictPort: true,
@@ -47,34 +101,8 @@ export default defineConfig({
         secure: false,
       },
     },
-  },
-  // 仅在 Storybook 环境下加载测试配置
-  test: isStorybook ? {
-    projects: [
-      {
-        extends: true,
-        plugins: [
-          // The plugin will run tests for the stories defined in your Storybook config
-          // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          storybookTest({
-            configDir: path.join(dirname, '.storybook'),
-          }),
-        ],
-        test: {
-          name: 'storybook',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: 'playwright',
-            instances: [
-              {
-                browser: 'chromium',
-              },
-            ],
-          },
-          setupFiles: ['.storybook/vitest.setup.js'],
-        },
-      },
-    ],
-  } : undefined,
+    },
+    // 仅在 Storybook 环境下加载测试配置
+    test: testConfig,
+  }
 })
