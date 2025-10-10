@@ -1,0 +1,298 @@
+<!--
+Color Inspector – quick way for anyone to see what a hex color looks like
+Usage:
+- Double‑click this file to open in your browser (or use VSCode Live Server)
+- Type/Paste a hex like #0057FF or use the picker
+- See RGB/HSL, contrast on black/white, and a big preview box
+-->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>Color Inspector (#hex → 真实颜色)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2e;
+      --muted: #8ea1c0;
+      --text: #e9eef7;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      background: radial-gradient(1200px 600px at 25% -10%, #162035 0%, #0b1220 60%);
+      color: var(--text); font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans SC, Arial, sans-serif;
+    }
+    h1 { font-size: 18px; margin: 0 0 16px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .controls { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+    .field {
+      display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 8px;
+      margin-bottom: 8px;
+    }
+    label { color: var(--muted); }
+    input[type="text"] {
+      height: 40px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+      background: #0e1728; color: var(--text); padding: 0 12px; font-size: 14px;
+      outline: none;
+    }
+    input[type="color"] {
+      width: 64px; height: 40px; border: none; background: transparent; cursor: pointer;
+    }
+    button {
+      height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+      background: #0f1930; color: var(--text); cursor: pointer;
+    }
+    .preview {
+      min-height: 200px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.12);
+      display: grid; grid-template-columns: 1fr 1fr; overflow: hidden;
+    }
+    .block {
+      padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      justify-content: space-between;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px;
+      font-size: 13px; border: 1px solid rgba(255,255,255,0.16); background: rgba(0,0,0,0.25);
+    }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .stat {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; padding: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .kvs { display: grid; gap: 4px; }
+    .k { color: var(--muted); }
+    .contrast { display: grid; gap: 12px; }
+    .ratio { display: inline-flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 8px; font-weight: 600; }
+    .pass { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35); color: #86efac; }
+    .warn { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.35); color: #fcd34d; }
+    .fail { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35); color: #fca5a5; }
+    .samples { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .sample {
+      height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.12);
+      font-weight: 600;
+    }
+    @media (max-width: 768px) {
+      .preview { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+      .samples { grid-template-columns: 1fr; }
+    }
+    .footer { margin-top: 16px; color: var(--muted); font-size: 12px; }
+    a { color: #87b3ff; }
+  </style>
+</head>
+<body>
+  <h1>Color Inspector（给十六进制颜色一个“实物图”）</h1>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="controls">
+      <div class="field">
+        <label for="hex">Hex 颜色</label>
+        <input id="hex" type="text" value="#0057FF" placeholder="#0057FF / 0057FF" />
+      </div>
+      <input id="picker" type="color" value="#0057FF" title="选择颜色" />
+    </div>
+  </div>
+
+  <div class="preview card" id="preview">
+    <div class="block" id="onWhite" style="background:#ffffff;color:#000">
+      <div>
+        <div class="chip">背景: White</div>
+        <div class="samples" id="samplesWhite"></div>
+      </div>
+      <div class="contrast" id="contrastWhite"></div>
+    </div>
+    <div class="block" id="onBlack" style="background:#0b1220;color:#fff">
+      <div>
+        <div class="chip">背景: Dark</div>
+        <div class="samples" id="samplesBlack"></div>
+      </div>
+      <div class="contrast" id="contrastBlack"></div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:16px;">
+    <div class="card" style="flex:1; min-width: 280px;">
+      <div class="kvs" id="numbers"></div>
+    </div>
+    <div class="card" style="flex:1; min-width: 280px;">
+      <div class="kvs">
+        <div><span class="k">快速方法：</span>Google 搜索 “#0057FF color”；或在浏览器 DevTools 的样式里写 <code>background: #0057FF;</code> 点击小色块。</div>
+        <div><span class="k">VSCode：</span>代码中写十六进制，左侧会显示色块，悬停可取色。</div>
+        <div><span class="k">设计软件：</span>Figma/PS 直接输入 Hex。</div>
+        <div class="footer">本页离线可用，仅教学/预览用途。</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+
+    function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+    function parseHex(input) {
+      if (!input) return null;
+      let hex = input.trim();
+      if (hex.startsWith('#')) hex = hex.slice(1);
+      if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+      if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+      const r = parseInt(hex.slice(0,2), 16);
+      const g = parseInt(hex.slice(2,4), 16);
+      const b = parseInt(hex.slice(4,6), 16);
+      return { r, g, b, hex: '#' + hex.toUpperCase() };
+    }
+
+    function toHSL({r,g,b}) {
+      r/=255; g/=255; b/=255;
+      const max = Math.max(r,g,b), min = Math.min(r,g,b);
+      let h, s, l = (max + min)/2;
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d/(2 - max - min) : d/(max + min);
+        switch(max){
+          case r: h = (g-b)/d + (g<b?6:0); break;
+          case g: h = (b-r)/d + 2; break;
+          case b: h = (r-g)/d + 4; break;
+        }
+        h /= 6;
+      }
+      return {
+        h: Math.round(h*360),
+        s: Math.round(s*100),
+        l: Math.round(l*100),
+      };
+    }
+
+    // Relative luminance per WCAG
+    function luminance({r,g,b}) {
+      const srgb = [r,g,b].map(v => {
+        v/=255;
+        return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+      });
+      return 0.2126*srgb[0] + 0.7152*srgb[1] + 0.0722*srgb[2];
+    }
+
+    function contrastRatio(rgb1, rgb2) {
+      const L1 = luminance(rgb1);
+      const L2 = luminance(rgb2);
+      const lighter = Math.max(L1, L2);
+      const darker  = Math.min(L1, L2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    function ratioBadge(ratio) {
+      // WCAG: AA normal >= 4.5; AA large (>= 18.66px / 14px bold) >= 3.0; AAA normal >= 7.0
+      let cls = 'fail';
+      if (ratio >= 7) cls = 'pass';
+      else if (ratio >= 4.5) cls = 'warn';
+      else if (ratio >= 3.0) cls = 'warn';
+      return `<span class="ratio ${cls}">对比度: ${ratio.toFixed(2)}:1</span>`;
+    }
+
+    function update() {
+      const hexInput = $('#hex').value;
+      const parsed = parseHex(hexInput);
+      if (!parsed) {
+        $('#numbers').innerHTML = `<div style="color:#fca5a5">请输入有效的十六进制颜色（如 #0057FF）</div>`;
+        return;
+      }
+      const { r,g,b, hex } = parsed;
+      const rgb = { r, g, b };
+      const hsl = toHSL(rgb);
+
+      // 更新数字信息区
+      $('#numbers').innerHTML = `
+        <div class="stats">
+          <div class="stat">
+            <div class="k">HEX</div>
+            <div><b>${hex}</b></div>
+          </div>
+          <div class="stat">
+            <div class="k">RGB</div>
+            <div><b>${r}, ${g}, ${b}</b></div>
+          </div>
+          <div class="stat">
+            <div class="k">HSL</div>
+            <div><b>${hsl.h}°, ${hsl.s}%, ${hsl.l}%</b></div>
+          </div>
+        </div>
+      `;
+
+      // 同步取色器
+      const picker = $('#picker');
+      if (picker && picker.value.toUpperCase() !== hex) picker.value = hex;
+
+      // 样例渲染
+      function samplesHTML(bgHex, useDarkBg) {
+        const textOnBgColor = useDarkBg ? "#ffffff" : "#000000";
+        return `
+          <div class="sample" style="background:${bgHex}; color:${textOnBgColor}">背景色（${textOnBgColor === "#000000" ? "黑字" : "白字"}）</div>
+          <div class="sample" style="background:${hex}; color:#000">用作背景（黑字）</div>
+          <div class="sample" style="background:${hex}; color:#fff">用作背景（白字）</div>
+        `;
+      }
+
+      // 白色背景区
+      $('#samplesWhite').innerHTML = samplesHTML("#ffffff", false);
+      // 深色背景区（与页面背景一致）
+      $('#samplesBlack').innerHTML = samplesHTML("#0b1220", true);
+
+      // 对比度区域
+      const WHITE = { r:255, g:255, b:255 };
+      const BLACK = { r:0, g:0, b:0 };
+      const DARK  = { r:11, g:18, b:32 }; // #0b1220
+
+      // 情景1：将颜色作为“文字色”放在背景上
+      const ratioTextOnWhite = contrastRatio(rgb, WHITE);
+      const ratioTextOnDark  = contrastRatio(rgb, DARK);
+
+      // 情景2：将颜色作为“背景色”，选择白字或黑字
+      const ratioWhiteOnColor = contrastRatio(WHITE, rgb);
+      const ratioBlackOnColor = contrastRatio(BLACK, rgb);
+      const preferOnColor = ratioWhiteOnColor >= ratioBlackOnColor ? "白字" : "黑字";
+
+      $('#contrastWhite').innerHTML = `
+        <div>作为文字色：${ratioBadge(ratioTextOnWhite)}（文字: ${hex} / 背景: #FFFFFF）</div>
+        <div>作为背景色：白字 ${ratioBadge(ratioWhiteOnColor)}，黑字 ${ratioBadge(ratioBlackOnColor)}，
+          建议：<b>${preferOnColor}</b>
+        </div>
+      `;
+
+      $('#contrastBlack').innerHTML = `
+        <div>作为文字色：${ratioBadge(ratioTextOnDark)}（文字: ${hex} / 背景: #0B1220）</div>
+        <div>作为背景色：白字 ${ratioBadge(ratioWhiteOnColor)}，黑字 ${ratioBadge(ratioBlackOnColor)}，
+          建议：<b>${preferOnColor}</b>
+        </div>
+      `;
+    }
+
+    // 事件绑定
+    $('#hex').addEventListener('input', (e) => {
+      const parsed = parseHex(e.target.value);
+      if (parsed) { $('#picker').value = parsed.hex; }
+      update();
+    });
+    $('#picker').addEventListener('input', (e) => {
+      $('#hex').value = e.target.value.toUpperCase();
+      update();
+    });
+
+    // 初始渲染
+    update();
+  </script>
+</body>
+</html>

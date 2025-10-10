@@ -1643,7 +1643,7 @@ onBeforeRouteLeave(() => {
   padding: 0;
   font-size: 14px;
   font-weight: 600; /* 加粗以匹配设计 */
-  color: var(--juwo-primary); /* 使用品牌主色 */
+  color: var(--accent-primary); /* 试点：文本型 CTA 使用系统强调色 */
   background: none;
   border: none;
   cursor: pointer;
@@ -1652,6 +1652,7 @@ onBeforeRouteLeave(() => {
 }
 
 .view-less-btn:hover {
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 
@@ -1849,12 +1850,14 @@ onBeforeRouteLeave(() => {
 }
 
 .enquire-btn {
-  background: var(--juwo-primary);
-  color: var(--color-text-inverse);
+  /* 试点：主 CTA 改用系统强调色 */
+  background: var(--accent-primary);
+  color: var(--accent-contrast-on);
 }
 
 .enquire-btn:hover {
-  background: var(--juwo-primary);
+  /* 悬浮使用强调色 hover 阶梯 */
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }

@@ -1,43 +1,62 @@
 import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
-import tokens from '../../../dist/style-dictionary/json/tokens.json';
 
-<Meta title="Foundations/Colors" />
+<Meta title="设计规范 (Foundations)/Colors (颜色)" />
 
-# Colors
+# Colors (颜色)
 
-Colors are a fundamental part of the design system. Here is the palette of colors used in this project.
+项目的颜色系统遵循“原始 → 语义”的分层架构，确保了视觉一致性和主题化能力。
 
-## Brand Colors
+## 原始令牌 (Primitive Tokens)
 
+这些是构成我们调色板基础的纯色值。
+
+### 灰阶 (Grays)
 <ColorPalette>
-  <ColorItem
-    title="Brand Primary"
-    subtitle="color.brand.primary"
-    colors={[tokens.color.brand.primary]}
-  />
-  <ColorItem
-    title="Brand Hover"
-    subtitle="color.brand.hover"
-    colors={[tokens.color.brand.hover]}
-  />
-  <ColorItem
-    title="Brand Active"
-    subtitle="color.brand.active"
-    colors={[tokens.color.brand.active]}
-  />
+  <ColorItem title="--gray-50" subtitle="Gray 50" colors={{ Gray: '#F9FAFB' }} />
+  <ColorItem title="--gray-100" subtitle="Gray 100" colors={{ Gray: '#F3F4F6' }} />
+  <ColorItem title="--gray-200" subtitle="Gray 200" colors={{ Gray: '#E5E7EB' }} />
+  <ColorItem title="--gray-300" subtitle="Gray 300" colors={{ Gray: '#D1D5DB' }} />
+  <ColorItem title="--gray-400" subtitle="Gray 400" colors={{ Gray: '#9CA3AF' }} />
+  <ColorItem title="--gray-500" subtitle="Gray 500" colors={{ Gray: '#6B7280' }} />
+  <ColorItem title="--gray-600" subtitle="Gray 600" colors={{ Gray: '#4B5563' }} />
+  <ColorItem title="--gray-700" subtitle="Gray 700" colors={{ Gray: '#374151' }} />
+  <ColorItem title="--gray-800" subtitle="Gray 800" colors={{ Gray: '#1F2937' }} />
+  <ColorItem title="--gray-900" subtitle="Gray 900" colors={{ Gray: '#111827' }} />
 </ColorPalette>
 
-## Neutral Colors (Gray Scale)
-
+### 品牌蓝 (Brand Blue)
 <ColorPalette>
-  <ColorItem title="White" subtitle="color.white" colors={[tokens.color.white]} />
-  <ColorItem title="Black" subtitle="color.black" colors={[tokens.color.black]} />
-  {Object.entries(tokens.color.gray).map(([key, value]) => (
-    <ColorItem
-      key={key}
-      title={`Gray ${key}`}
-      subtitle={`color.gray.${key}`}
-      colors={[value]}
-    />
-  ))}
+  <ColorItem title="--brand-blue-400" subtitle="Brand Blue 400" colors={{ Blue: '#0047e5' }} />
+  <ColorItem title="--brand-blue-500" subtitle="Brand Blue 500" colors={{ Blue: '#0057ff' }} />
+  <ColorItem title="--brand-blue-600" subtitle="Brand Blue 600" colors={{ Blue: '#0036b3' }} />
+</ColorPalette>
+
+## 语义令牌 (Semantic Tokens)
+
+这些令牌为原始颜色赋予了业务含义，是组件开发中应优先使用的。
+
+### 强调色 (Accent)
+<ColorPalette>
+  <ColorItem title="--accent-primary" subtitle="Accent Primary" colors={{ Accent: '#6699cc' }} />
+  <ColorItem title="--accent-hover" subtitle="Accent Hover" colors={{ Accent: '#7aaee6' }} />
+</ColorPalette>
+
+### 背景色 (Background)
+<ColorPalette>
+  <ColorItem title="--color-bg-page" subtitle="Page Background" colors={{ Background: 'var(--color-bg-page)' }} />
+  <ColorItem title="--color-bg-card" subtitle="Card Background" colors={{ Background: 'var(--color-bg-card)' }} />
+  <ColorItem title="--color-bg-primary" subtitle="Primary Background" colors={{ Background: 'var(--color-bg-primary)' }} />
+</ColorPalette>
+
+### 文本色 (Text)
+<ColorPalette>
+  <ColorItem title="--text-contrast-strong" subtitle="Strong" colors={{ Text: 'var(--text-contrast-strong)' }} />
+  <ColorItem title="--text-contrast-medium" subtitle="Medium" colors={{ Text: 'var(--text-contrast-medium)' }} />
+  <ColorItem title="--text-contrast-weak" subtitle="Weak" colors={{ Text: 'var(--text-contrast-weak)' }} />
+</ColorPalette>
+
+### 边框色 (Border)
+<ColorPalette>
+  <ColorItem title="--color-border-default" subtitle="Default Border" colors={{ Border: 'var(--color-border-default)' }} />
+  <ColorItem title="--color-border-strong" subtitle="Strong Border" colors={{ Border: 'var(--color-border-strong)' }} />
 </ColorPalette>

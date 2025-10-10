@@ -378,7 +378,7 @@ import { usePropertiesStore } from '@/stores/properties'
 // 使用 requestOpenFullPanel 事件触发移动端的统一面板
 
 // 定义事件（在模板中通过 $emit 使用）
- 
+
 const emit = defineEmits(['requestOpenFullPanel', 'searchSaved'])
 
 // 响应式状态
@@ -738,7 +738,8 @@ const handleSearchSaved = async (savedSearch) => {
   background: var(--chip-bg);
   border: none;
   border-radius: 0;
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
+  line-height: var(--line-height-ui);
   cursor: pointer;
   transition:
     background-color 0.2s ease,
@@ -749,13 +750,13 @@ const handleSearchSaved = async (savedSearch) => {
 
 .filter-tab:hover {
   background: var(--chip-bg-hover);
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
 }
 
 /* 激活状态样式 */
 .filter-tab.active {
   background: var(--chip-bg-selected); /* 中文注释：激活态统一为中性 chips 选中底色 */
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
 }
 
 /* 箭头图标 */
@@ -781,12 +782,13 @@ const handleSearchSaved = async (savedSearch) => {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
   background: var(--color-bg-card);
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
+  line-height: var(--line-height-ui);
 }
 
 .filter-button:hover {
   border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
   background: var(--bg-hover);
 }
 
@@ -798,7 +800,7 @@ const handleSearchSaved = async (savedSearch) => {
 /* 已应用高亮（严格使用 design token，与 active 保持一致风格） */
 .filter-tab.applied {
   background: var(--chip-bg-selected);
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
 }
 
 /* 移除小蓝点样式 */
@@ -835,7 +837,7 @@ const handleSearchSaved = async (savedSearch) => {
   opacity: 0.5;
   cursor: not-allowed;
   background: var(--color-border-default);
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
 }
 
 .save-search-btn:disabled:hover,
@@ -882,7 +884,7 @@ const handleSearchSaved = async (savedSearch) => {
   cursor: not-allowed;
   background: var(--color-border-default);
   border-color: var(--color-border-default);
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
 }
 
 /* 更多筛选面板占位 */
@@ -890,7 +892,7 @@ const handleSearchSaved = async (savedSearch) => {
   width: 280px;
   padding: 20px;
   text-align: center;
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
 }
 
 /* PC端保存搜索按钮在筛选按钮右侧的布局调整 */

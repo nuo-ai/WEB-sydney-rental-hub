@@ -207,6 +207,12 @@
   --link-visited: var(--brand-primary-active);
   --link-disabled: var(--color-text-secondary);
 
+  /* 强调色（Accent）——按“蓝宝石钢蓝”方案 */
+  --accent-primary: #6699cc;       /* 常用强调/CTA/高亮 */
+  --accent-hover: #7fb0de;         /* 悬浮态 */
+  --accent-active: #4e7fb5;        /* 按下/活跃态 */
+  --accent-contrast-on: #ffffff;   /* 强调底色上的前景（按钮文字等） */
+
   --success-soft-bg: #ecfdf5;
   --success-border: #bbf7d0;
   --warning-soft-bg: #fffbeb;
@@ -337,6 +343,16 @@
 
   --focus-ring-color: var(--color-focus-ring);
   --focus-ring-width: 3px;
+
+  /* 行高场景语义（文字系统） */
+  --line-height-title: 1.2;
+  --line-height-body: 1.6;
+  --line-height-ui: 1.4;
+
+  /* 文本对比层级别名（去强调→强调） */
+  --text-contrast-strong: var(--color-text-primary);
+  --text-contrast-medium: var(--color-text-secondary);
+  --text-contrast-weak: var(--color-text-muted);
 }
 
 :root {
@@ -498,4 +514,9 @@
 
   /* 阴影与焦点 */
   --focus-shadow: var(--shadow-focus);
+
+  /* 兼容别名：供现有组件使用（FilterTabs 等） */
+  --chip-bg-hover: var(--chip-hover-bg);
+  --chip-bg-selected: var(--color-selected-bg);
+  --chip-selected-border: var(--color-selected-border);
 }

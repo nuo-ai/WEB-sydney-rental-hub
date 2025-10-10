@@ -52,6 +52,11 @@ const router = createRouter({
       component: () => import('../views/CommuteTimes.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/globals-demo',
+      name: 'GlobalsDemo',
+      component: () => import('../views/GlobalsDemo.vue'),
+    },
   ],
 })
 

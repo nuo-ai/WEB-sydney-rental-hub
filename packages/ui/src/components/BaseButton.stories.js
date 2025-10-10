@@ -2,13 +2,13 @@ import BaseButton from './BaseButton.vue';
 import { Plus } from 'lucide-vue-next';
 
 export default {
-  title: 'Components/BaseButton',
+  title: '组件 (Components)/Form Elements/BaseButton',
   component: BaseButton,
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'ghost', 'danger'],
-      description: '按钮视觉风格，对应不同品牌语义（主操作/次要/悬浮/警示）',
+      options: ['primary', 'secondary', 'ghost', 'danger', 'text'],
+      description: '按钮视觉风格，对应不同品牌语义（主操作/次要/悬浮/警示/文本）',
     },
     size: {
       control: { type: 'select' },
@@ -68,39 +68,8 @@ const renderFactory = (options = {}) => (args) => ({
   `,
 });
 
-export const Primary = {
-  name: '主要按钮',
-  args: {
-    variant: 'primary',
-    default: '立即联系',
-  },
-  render: renderFactory(),
-};
-
-export const Secondary = {
-  name: '次要按钮',
-  args: {
-    variant: 'secondary',
-    default: '查看更多',
-  },
-  render: renderFactory(),
-};
-
-export const Ghost = {
-  name: '幽灵按钮',
-  args: {
-    variant: 'ghost',
-    default: '轻量操作',
-  },
-  render: renderFactory(),
-};
-
-export const Danger = {
-  name: '危险按钮',
-  args: {
-    variant: 'danger',
-    default: '删除房源',
-  },
+export const Default = {
+  name: '默认交互',
   render: renderFactory(),
 };
 

@@ -2,7 +2,7 @@ import BaseIconButton from './BaseIconButton.vue';
 import { Heart, Share2 } from 'lucide-vue-next';
 
 export default {
-  title: 'Components/BaseIconButton',
+  title: '组件 (Components)/Form Elements/BaseIconButton',
   component: BaseIconButton,
   argTypes: {
     variant: {
@@ -19,6 +19,19 @@ export default {
     ariaLabel: {
       control: 'text',
     },
+    default: {
+      control: { type: 'text' },
+      description: '按钮内部的内容 (默认插槽)，通常是一个图标组件',
+    },
+  },
+  args: {
+    variant: 'ghost',
+    size: 'md',
+    disabled: false,
+    ariaLabel: 'Icon Button',
+  },
+  parameters: {
+    layout: 'centered',
   },
 };
 
@@ -35,11 +48,12 @@ const Template = (args) => ({
 });
 
 export const Default = Template.bind({});
+Default.storyName = '默认交互';
 Default.args = {
   ariaLabel: 'Favorite',
 };
 
-export const AllVariants = (args) => ({
+export const States = (args) => ({
   components: { BaseIconButton, Heart, Share2 },
   setup() {
     return { args };
@@ -54,3 +68,4 @@ export const AllVariants = (args) => ({
     </div>
   `,
 });
+States.storyName = '状态对比';

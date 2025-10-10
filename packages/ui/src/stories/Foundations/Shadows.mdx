@@ -1,32 +1,21 @@
 import { Meta } from '@storybook/blocks';
-import tokens from '../../../dist/style-dictionary/json/tokens.json';
 
-<Meta title="Foundations/Shadows" />
+<Meta title="设计规范 (Foundations)/Shadows (阴影)" />
 
-# Shadows
+# Shadows (阴影)
 
-The shadow scale is used to create depth and elevation in the UI.
+阴影系统为界面元素提供了深度和层级感。
 
-<div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
-  {Object.entries(tokens.shadow).map(([name, value]) => (
-    <div key={name} style={{ textAlign: 'center' }}>
-      <div
-        style={{
-          width: '120px',
-          height: '120px',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          boxShadow: value,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-      </div>
-      <div style={{ marginTop: '1rem', fontFamily: 'sans-serif', fontSize: '0.875rem' }}>
-        <div>shadow.{name}</div>
-        <div style={{ color: '#666', maxWidth: '120px', whiteSpace: 'normal' }}>{value}</div>
-      </div>
-    </div>
-  ))}
-</div>
+export const ShadowBlock = ({ shadow, value }) => (
+  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+    <div style={{ width: '150px', fontFamily: 'monospace' }}>{shadow}</div>
+    <div style={{ height: '80px', width: '120px', boxShadow: `var(${shadow})`, border: '1px solid var(--color-border-default)', borderRadius: 'var(--radius-md)' }} />
+  </div>
+);
+
+## 阴影令牌
+
+<ShadowBlock shadow="--shadow-sm" />
+<ShadowBlock shadow="--shadow-md" />
+<ShadowBlock shadow="--shadow-lg" />
+<ShadowBlock shadow="--shadow-xl" />

@@ -443,12 +443,12 @@ const handleMoreAction = (command) => {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
   padding: 0;
 }
 
 .action-btn:hover {
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
 }
 
 .action-btn:focus,
@@ -464,8 +464,8 @@ const handleMoreAction = (command) => {
 
 /* 收藏按钮样式 */
 .favorite-btn .spec-icon.is-favorite {
-  color: var(--juwo-primary);
-  fill: var(--juwo-primary);
+  color: var(--accent-primary);
+  fill: var(--accent-primary);
 }
 
 /* 更多选项按钮 */
@@ -501,12 +501,12 @@ const handleMoreAction = (command) => {
 
 /* 价格显示 - 匹配现有设计 */
 .property-price {
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
   margin-bottom: 8px;
 }
 
 .price-unit {
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
 }
 
 /* 地址信息 - 两行显示 */
@@ -515,12 +515,12 @@ const handleMoreAction = (command) => {
 }
 
 .property-address-primary {
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
   margin-bottom: 4px;
 }
 
 .property-address-secondary {
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
 }
 
 /* 房型信息图标 - Lucide */
@@ -542,7 +542,7 @@ const handleMoreAction = (command) => {
 
   gap: 0; /* 间距交由 .spec-row 的 margin-left 控制，避免与 gap 叠加 */
   margin-bottom: 12px;
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
 }
 
 .feature-item {
@@ -561,7 +561,7 @@ const handleMoreAction = (command) => {
 }
 
 .feature-item span {
-  color: var(--color-text-primary);
+  color: var(--text-contrast-strong);
 }
 
 /* 底部信息区域 */
@@ -573,12 +573,12 @@ const handleMoreAction = (command) => {
 }
 
 .availability-text {
-  color: var(--color-text-secondary);
+  color: var(--text-contrast-medium);
   margin-bottom: 4px;
 }
 
 .inspection-text {
-  color: var(--link-color);
+  color: var(--accent-primary);
 }
 
 /* 响应式适配 */

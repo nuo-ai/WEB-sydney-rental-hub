@@ -1,0 +1,51 @@
+import { Meta, Typeset } from '@storybook/blocks';
+
+<Meta title="设计规范 (Foundations)/Typography (排版)" />
+
+# Typography (排版)
+
+排版系统定义了项目的文本层级、可读性和视觉节奏。
+
+## 字体族 (Font Family)
+
+- **--font-family-zh-sans**: 中文无衬线字体
+- **--font-family-en-sans**: 英文无衬线字体
+
+## 字重 (Font Weight)
+
+- **--font-weight-regular**: 400
+- **--font-weight-medium**: 500
+- **--font-weight-semibold**: 600
+- **--font-weight-bold**: 700
+
+## 字号 (Font Size)
+
+<Typeset
+  fontSizes={[
+    '12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px'
+  ]}
+  sampleText="悉尼租房中心 Sydney Rental Hub"
+/>
+
+## 场景化行高 (Line Height)
+
+- **--line-height-title**: 用于页面或章节标题。
+- **--line-height-body**: 用于大段的正文内容。
+- **--line-height-ui**: 用于界面控件（按钮、输入框等）中的文本。
+
+## 综合示例
+
+<div style={{ fontFamily: 'var(--font-family-zh-sans)' }}>
+  <h1 style={{ fontSize: 'var(--font-size-xxl)', fontWeight: 'var(--font-weight-bold)', lineHeight: 'var(--line-height-title)' }}>
+    页面主标题 (H1)
+  </h1>
+  <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-semibold)', lineHeight: 'var(--line-height-title)' }}>
+    章节标题 (H2)
+  </h2>
+  <p style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-regular)', lineHeight: 'var(--line-height-body)' }}>
+    这是一段正文内容。我们致力于为海外留学生提供最信赖的一站式租房解决方案，通过技术手段消除信息差，解决执行难的问题。
+  </p>
+  <button style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', lineHeight: 'var(--line-height-ui)' }}>
+    UI 控件文本
+  </button>
+</div>

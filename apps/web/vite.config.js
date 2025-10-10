@@ -76,7 +76,7 @@ export default defineConfig(async () => {
     },
     server: {
     // 固定端口，避免 Google Maps API 限制问题
-    port: 5173,
+    port: 5174,
     strictPort: true,
     // 如果端口被占用则报错，而不是尝试下一个端口
     host: true,

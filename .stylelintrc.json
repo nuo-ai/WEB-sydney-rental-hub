@@ -31,7 +31,7 @@
         "color-no-hex": [true, { "severity": "warning" }],
         "color-named": ["never", { "severity": "warning" }],
         "scale-unlimited/declaration-strict-value": [
-          ["/color/", "fill", "stroke", "background", "background-color", "border", "border-color", "box-shadow", "outline", "outline-color"],
+          ["/color/", "fill", "stroke", "background", "background-color", "border", "border-color", "box-shadow", "outline", "outline-color", "font-size", "line-height"],
           { "ignoreValues": ["transparent", "currentColor", "currentcolor", "inherit", "none"] }
         ]
       }

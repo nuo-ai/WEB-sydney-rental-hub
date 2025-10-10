@@ -12,6 +12,10 @@
         <component :is="item.iconComp" class="nav-icon" aria-hidden="true" />
         <span class="chinese-text">{{ item.label }}</span>
       </router-link>
+      <!-- 移动端主题切换按钮 -->
+      <button class="theme-toggle" @click="toggleTheme" :aria-pressed="isDarkTheme" aria-label="切换主题">
+        {{ isDarkTheme ? '亮色' : '暗色' }}
+      </button>
     </div>
   </nav>
 
@@ -50,6 +54,10 @@
           <component :is="item.iconComp" class="nav-icon" aria-hidden="true" />
           <span class="chinese-text">{{ item.label }}</span>
         </router-link>
+        <!-- 全站主题切换（亮/暗），持久化到 localStorage -->
+        <button class="theme-toggle" @click="toggleTheme" :aria-pressed="isDarkTheme" aria-label="切换主题">
+          {{ isDarkTheme ? '亮色' : '暗色' }}
+        </button>
       </div>
     </div>
   </nav>
@@ -162,8 +170,43 @@ const handleResize = () => {
   windowWidth.value = window.innerWidth
 }
 
+/* 主题切换（全站） */
+const THEME_KEY = 'srh_theme'
+const isDarkTheme = ref(false)
+
+const applyTheme = (theme) => {
+  const el = document.documentElement
+  if (theme === 'dark') {
+    el.classList.add('dark')
+    isDarkTheme.value = true
+  } else {
+    el.classList.remove('dark')
+    isDarkTheme.value = false
+  }
+  try { localStorage.setItem(THEME_KEY, theme) } catch (_e) { /* ignore storage errors */ }
+}
+
+const initTheme = () => {
+  let saved
+  try { saved = localStorage.getItem(THEME_KEY) } catch (_e) { /* ignore storage errors */ }
+  if (saved === 'dark' || saved === 'light') {
+    applyTheme(saved)
+    return
+  }
+  const prefers =
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  applyTheme(prefers ? 'dark' : 'light')
+}
+
+const toggleTheme = () => {
+  applyTheme(isDarkTheme.value ? 'light' : 'dark')
+}
+
 onMounted(() => {
   window.addEventListener('resize', handleResize)
+  initTheme()
 })
 
 onUnmounted(() => {
@@ -184,7 +227,7 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--color-bg-primary);
   border-top: 1px solid var(--color-border-default);
   box-shadow: var(--nav-shadow, none);
   z-index: 100;
@@ -241,7 +284,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border-default);
   height: var(--nav-height);
   box-shadow: var(--nav-shadow, none);
@@ -367,6 +410,20 @@ onUnmounted(() => {
 .user-nav-item .nav-icon {
   width: var(--nav-icon-size);
   height: var(--nav-icon-size);
+}
+
+/* 主题切换按钮（与语义令牌联动，亮/暗自适应） */
+.theme-toggle {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.theme-toggle:hover {
+  background: var(--bg-hover);
 }
 
 /* 响应式适配 */

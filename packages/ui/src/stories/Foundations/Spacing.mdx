@@ -1,24 +1,26 @@
 import { Meta } from '@storybook/blocks';
-import tokens from '../../../dist/style-dictionary/json/tokens.json';
 
-<Meta title="Foundations/Spacing" />
+<Meta title="设计规范 (Foundations)/Spacing (间距)" />
 
-# Spacing
+# Spacing (间距)
 
-The spacing scale is used for margins, paddings, and gaps between elements. It is based on a 4px grid.
+间距系统是构建一致、和谐布局的基础。我们使用基于 4px 倍数的间距令牌。
 
-export const SpacingBlock = ({ name, size }) => (
-  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-    <div style={{ height: size, width: size, backgroundColor: '#0057ff', marginRight: '1rem', flexShrink: 0 }}></div>
-    <div style={{ fontFamily: 'sans-serif' }}>
-      <div style={{ fontWeight: 'bold', color: '#333' }}>{name}</div>
-      <div style={{ color: '#666' }}>{size}</div>
-    </div>
+export const SpacingBlock = ({ space, value }) => (
+  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+    <div style={{ width: '120px', fontFamily: 'monospace' }}>{space}</div>
+    <div style={{ width: '60px', color: '#666' }}>{value}</div>
+    <div style={{ height: value, width: value, backgroundColor: 'var(--accent-primary)' }} />
   </div>
 );
 
-<div style={{ display: 'flex', flexDirection: 'column' }}>
-  {Object.entries(tokens.space).map(([name, value]) => (
-    <SpacingBlock key={name} name={`space.${name}`} size={value} />
-  ))}
-</div>
+## 间距令牌
+
+<SpacingBlock space="--space-xs" value="4px" />
+<SpacingBlock space="--space-sm" value="8px" />
+<SpacingBlock space="--space-md" value="12px" />
+<SpacingBlock space="--space-lg" value="16px" />
+<SpacingBlock space="--space-xl" value="24px" />
+<SpacingBlock space="--space-2xl" value="32px" />
+<SpacingBlock space="--space-3xl" value="48px" />
+<SpacingBlock space="--space-4xl" value="64px" />

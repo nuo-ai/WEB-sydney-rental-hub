@@ -2,57 +2,79 @@ import BaseListItem from './BaseListItem.vue';
 import { ChevronRight, Mail } from 'lucide-vue-next';
 
 export default {
-  title: 'Components/BaseListItem',
+  title: '组件 (Components)/Data Display/BaseListItem',
   component: BaseListItem,
   argTypes: {
     selected: { control: 'boolean' },
     disabled: { control: 'boolean' },
     clickable: { control: 'boolean' },
     bordered: { control: 'boolean' },
+    default: {
+      control: { type: 'text' },
+      description: '列表项主标题 (默认插槽)',
+    },
+    description: {
+      control: { type: 'text' },
+      description: '列表项描述文本 (description 插槽)',
+    },
+  },
+  args: {
+    selected: false,
+    disabled: false,
+    clickable: true,
+    bordered: true,
+    default: '个人资料',
+    description: '设置您的账户信息',
+  },
+  parameters: {
+    layout: 'padded',
   },
 };
 
 const Template = (args) => ({
-  components: { BaseListItem },
+  components: { BaseListItem, Mail, ChevronRight },
   setup() {
     return { args };
   },
   template: `
     <BaseListItem v-bind="args">
-      List Item Title
-      <template #description>Description for the list item</template>
+      <template #prefix><Mail /></template>
+      {{ args.default }}
+      <template #description>{{ args.description }}</template>
+      <template #suffix><ChevronRight /></template>
     </BaseListItem>
   `,
 });
 
 export const Default = Template.bind({});
-Default.args = {};
+Default.storyName = '默认交互';
 
-export const WithSlots = (args) => ({
+export const States = (args) => ({
   components: { BaseListItem, ChevronRight, Mail },
   setup() {
     return { args };
   },
   template: `
     <div style="max-width: 320px;">
-      <BaseListItem>
+      <BaseListItem clickable>
         <template #prefix><Mail /></template>
-        List Item with Prefix
-        <template #description>Description text</template>
+        默认状态
+        <template #description>这是一个标准的列表项</template>
         <template #suffix><ChevronRight /></template>
       </BaseListItem>
-      <BaseListItem selected>
+      <BaseListItem clickable selected>
         <template #prefix><Mail /></template>
-        Selected Item
-        <template #description>This item is selected</template>
+        选中状态
+        <template #description>此项目已被选中</template>
         <template #suffix><ChevronRight /></template>
       </BaseListItem>
-      <BaseListItem disabled>
+      <BaseListItem clickable disabled>
         <template #prefix><Mail /></template>
-        Disabled Item
-        <template #description>This item is disabled</template>
+        禁用状态
+        <template #description>此项目不可用</template>
         <template #suffix><ChevronRight /></template>
       </BaseListItem>
     </div>
   `,
 });
+States.storyName = '状态对比';

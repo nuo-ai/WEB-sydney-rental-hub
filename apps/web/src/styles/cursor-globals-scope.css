@@ -1,0 +1,119 @@
+/*
+ * cursor-globals-scope.css
+ * 目的：仅在 .globals-scope 容器内应用“globals.css 的排版/重置风格”
+ * 好处：不干扰全站现有 App.vue/style.css 全局规则，便于在演示页精准验证
+ */
+
+/* 标题 */
+.globals-scope h1,
+.globals-scope h2,
+.globals-scope h3,
+.globals-scope h4,
+.globals-scope h5,
+.globals-scope h6 {
+  font-weight: var(--font-bold, 700);
+  line-height: var(--leading-tight, 1.25);
+  letter-spacing: -0.02em;
+}
+
+.globals-scope h1 { font-size: var(--text-4xl, 3.052rem); margin-bottom: var(--space-8, 2rem); }
+.globals-scope h2 { font-size: var(--text-3xl, 2.441rem); margin-bottom: var(--space-6, 1.5rem); }
+.globals-scope h3 { font-size: var(--text-2xl, 1.953rem); margin-bottom: var(--space-5, 1.25rem); }
+.globals-scope h4 { font-size: var(--text-xl, 1.563rem);  margin-bottom: var(--space-4, 1rem); }
+.globals-scope h5 { font-size: var(--text-lg, 1.25rem);   margin-bottom: var(--space-3, 0.75rem); }
+.globals-scope h6 { font-size: var(--text-base, 1rem);    margin-bottom: var(--space-3, 0.75rem); }
+
+/* 段落 */
+.globals-scope p {
+  margin-bottom: var(--space-4, 1rem);
+  line-height: var(--leading-relaxed, 1.75);
+}
+
+/* 链接（显式下划线，覆盖站内全局链接无下划线的策略，仅在演示容器中生效） */
+.globals-scope a {
+  color: inherit;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+  transition: opacity var(--transition-fast, 150ms ease);
+}
+.globals-scope a:hover {
+  opacity: 0.7;
+}
+
+/* 强调与斜体 */
+.globals-scope strong,
+.globals-scope b { font-weight: var(--font-semibold, 600); }
+.globals-scope em,
+.globals-scope i { font-style: italic; }
+
+.globals-scope small { font-size: var(--text-sm, 0.8rem); }
+
+/* 列表 */
+.globals-scope ul,
+.globals-scope ol {
+  margin-bottom: var(--space-4, 1rem);
+  padding-left: var(--space-6, 1.5rem);
+}
+
+.globals-scope li { margin-bottom: var(--space-2, 0.5rem); }
+
+/* 代码与预格式化 */
+.globals-scope code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+  font-size: 0.875em;
+  padding: var(--space-0-5, 0.125rem) var(--space-1, 0.25rem);
+  background-color: var(--color-gray-100, #f7f7f7);
+  border-radius: var(--radius-sm, 0.125rem);
+}
+
+.globals-scope pre {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+  font-size: var(--text-sm, 0.8rem);
+  padding: var(--space-4, 1rem);
+  background-color: var(--color-gray-100, #f7f7f7);
+  border-radius: var(--radius-base, 0.25rem);
+  overflow-x: auto;
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.globals-scope pre code {
+  padding: 0;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+/* 引用块与分隔线 */
+.globals-scope blockquote {
+  padding-left: var(--space-4, 1rem);
+  border-left: var(--border-width-2, 2px) solid var(--color-black, #000);
+  margin-bottom: var(--space-4, 1rem);
+  font-style: italic;
+}
+
+.globals-scope hr {
+  border: none;
+  border-top: var(--border-width, 1px) solid var(--color-border, var(--color-border-default, #e5e5e5));
+  margin: var(--space-8, 2rem) 0;
+}
+
+/* 表格 */
+.globals-scope table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-4, 1rem);
+}
+
+.globals-scope th,
+.globals-scope td {
+  text-align: left;
+  padding: var(--space-3, 0.75rem);
+  border-bottom: var(--border-width, 1px) solid var(--color-border, var(--color-border-default, #e5e5e5));
+}
+
+.globals-scope th {
+  font-weight: var(--font-semibold, 600);
+  background-color: var(--color-gray-50, #fafafa);
+}
+
+/* 演示容器中的“滚动区域”建议用自带的内联样式设置边框与背景。
+   全局滚动条样式由站点已有规则控制，这里不做全局覆盖。 */

@@ -1,12 +1,12 @@
 import { setup } from '@storybook/vue3';
-import '../src/styles/tokens.css';
+import '../../../apps/web/src/styles/design-tokens.css';
 
 // 设置全局装饰器
 export const decorators = [
   (story, context) => {
     const theme = context.globals.theme || 'light';
     return {
-      template: `<div class="${theme}-theme" style="padding: 20px;"><story/></div>`
+      template: `<div class="${theme}"><story/></div>`
     };
   }
 ];

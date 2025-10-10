@@ -1,0 +1,26 @@
+/**
+ * 调试用样式：在页面角落显示一个小徽标，确认 cursor-globals 是否被加载生效
+ * 启用条件：当 html 元素具有类名 __globals-debug 时显示
+ * 使用：仅用于开发验证，确认后可删除本文件及相关 import 与类名注入
+ */
+html.__globals-debug::after {
+  content: "globals.css active";
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 2147483647; /* 最高层级，确保可见 */
+  font: 500 12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 6px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+  pointer-events: none; /* 不影响页面操作 */
+}
+
+/* 若需要更明显，可临时打开以下高对比调试色（验证后请注释/删除） */
+/*
+html.__globals-debug body {
+  outline: 4px dashed hotpink;
+}
+*/

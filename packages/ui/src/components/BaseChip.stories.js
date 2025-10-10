@@ -1,7 +1,7 @@
 import BaseChip from './BaseChip.vue';
 
 export default {
-  title: 'Components/BaseChip',
+  title: '组件 (Components)/Data Display/BaseChip',
   component: BaseChip,
   argTypes: {
     variant: {
@@ -11,7 +11,19 @@ export default {
     removable: {
       control: { type: 'boolean' },
     },
+    default: {
+      control: { type: 'text' },
+      description: 'Chip 内部的文本内容 (默认插槽)',
+    },
     onRemove: { action: 'removed' },
+  },
+  args: {
+    variant: 'default',
+    removable: true,
+    default: '筛选标签',
+  },
+  parameters: {
+    layout: 'centered',
   },
 };
 
@@ -20,33 +32,26 @@ const Template = (args) => ({
   setup() {
     return { args };
   },
-  template: '<BaseChip v-bind="args" @remove="args.onRemove">Chip Label</BaseChip>',
+  template: '<BaseChip v-bind="args" @remove="args.onRemove">{{ args.default }}</BaseChip>',
 });
 
 export const Default = Template.bind({});
-Default.args = {
-  variant: 'default',
-  removable: true,
-};
+Default.storyName = '默认交互';
 
-export const Selected = Template.bind({});
-Selected.args = {
-  variant: 'selected',
-  removable: true,
-};
-
-export const NotRemovable = Template.bind({});
-NotRemovable.args = {
-  variant: 'default',
-  removable: false,
-};
-
-export const LongText = Template.bind({});
-LongText.args = {
-    variant: 'default',
-    removable: true,
-    default: 'This is a very long chip label that should be truncated'
-};
-LongText.slots = {
-    default: 'This is a very long chip label that should be truncated'
-}
+export const States = (args) => ({
+  components: { BaseChip },
+  setup() {
+    return { args };
+  },
+  template: `
+    <div style="display: flex; align-items: flex-start; gap: 8px;">
+      <BaseChip variant="default" removable @remove="args.onRemove">Default</BaseChip>
+      <BaseChip variant="selected" removable @remove="args.onRemove">Selected</BaseChip>
+      <BaseChip variant="default" :removable="false">Not Removable</BaseChip>
+      <BaseChip variant="default" removable @remove="args.onRemove" style="max-width: 150px;">
+        This is a very long chip label
+      </BaseChip>
+    </div>
+  `,
+});
+States.storyName = '状态对比';

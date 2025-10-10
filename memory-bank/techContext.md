@@ -65,7 +65,6 @@
 
 项目已迁移至 `pnpm` + `Turborepo` 工作流，请在**项目根目录**执行所有命令。
 
-```bash
 # 1. 安装所有依赖 (首次或依赖更新后)
 pnpm install
 
@@ -76,7 +75,8 @@ pnpm dev
 pnpm build:tokens
 
 # 4. 独立运行设计系统开发环境 (Storybook)
-pnpm run storybook -- -c packages/ui/.storybook
+# 注意：由于 pnpm workspace 的依赖链接问题，请使用以下命令直接调用二进制文件
+./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook
 
 # --- 或单独启动 ---
 
@@ -85,7 +85,6 @@ pnpm --filter @web-sydney/web dev
 
 # 只启动 FastAPI 后端 (@web-sydney/backend)
 pnpm --filter @web-sydney/backend dev
-```
 
 ### E2E 测试
 
@@ -103,14 +102,22 @@ npx playwright test -g "URL 幂等与仅写非空键"
 - ✅ Python后端: 正常运行 (localhost:8000)
 - ✅ 数据库连接: 正常 (Supabase PostgreSQL)
 
-### Vite 启动问题排查 (2025-10-10)
+### Vite 与 Storybook 启动问题排查
 
-- **问题1**: Storybook v8 与 `@storybook/addon-vitest` (v9) 版本不兼容，导致 `import` 失败。
-  - **解决方案**: 在 `vite.config.js` 中改为异步和条件导入 `addon-vitest`，仅在 `isStorybook` 环境下加载。
-- **问题2**: `vite-plugin-vue-devtools` 内部依赖的 `vite-plugin-inspect` 与 Vite 7+ 不兼容，因 `server.environments` 属性被移除而崩溃。
-  - **解决方案**: 添加一个自定义的 `viteInspectCompatPatch` 插件，在 `configureServer` 钩子中为 `server.environments` 提供一个空对象 `{}` 作为 polyfill，确保插件能正常运行。
-- **问题3**: 之前的开发进程未完全关闭，导致端口被占用。
-  - **解决方案**: 使用 `netstat -aon | findstr <PORT>` 找到进程 PID，然后通过 `taskkill /PID <PID> /F` 强制终止。
+- **Storybook 启动失败 (2025-10-11)**:
+  - **问题**: `pnpm storybook` 命令失败，提示 `Cannot find module 'storybook/bin/index.cjs'`。
+  - **原因**: `pnpm` 在 Monorepo 环境下的依赖提升 (hoisting) 策略与 Storybook 的脚本查找机制存在冲突。
+  - **解决方案**:
+    1.  **（已尝试，无效）** 在 `packages/ui` 中手动添加 `@storybook/cli` 作为开发依赖。
+    2.  **（最终方案）** 绕过 `pnpm` 脚本，在项目根目录直接调用 Storybook 的二进制文件，并使用 `-c` 参数指定配置文件目录：`./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook`。
+
+- **Vite 启动问题 (2025-10-10)**:
+  - **问题1**: Storybook v8 与 `@storybook/addon-vitest` (v9) 版本不兼容，导致 `import` 失败。
+    - **解决方案**: 在 `vite.config.js` 中改为异步和条件导入 `addon-vitest`，仅在 `isStorybook` 环境下加载。
+  - **问题2**: `vite-plugin-vue-devtools` 内部依赖的 `vite-plugin-inspect` 与 Vite 7+ 不兼容，因 `server.environments` 属性被移除而崩溃。
+    - **解决方案**: 添加一个自定义的 `viteInspectCompatPatch` 插件，在 `configureServer` 钩子中为 `server.environments` 提供一个空对象 `{}` 作为 polyfill，确保插件能正常运行。
+  - **问题3**: 端口被占用。
+    - **解决方案**: 使用 `taskkill /F /IM node.exe` 强制终止所有 Node.js 进程，或在启动时使用 `-p` 参数指定一个新端口。
 - ✅ 认证系统: JWT + 邮箱验证框架
 - ✅ 通勤计算: Google Directions（生产）；无 Haversine 回退
 
@@ -120,20 +127,23 @@ npx playwright test -g "URL 幂等与仅写非空键"
 
 ### 1. 设计令牌 (Design Tokens)
 
-- **单一事实来源**: `tokens/design-tokens.json` 是所有设计决策的唯一来源，遵循 W3C Design Tokens 规范。
-- **自动化流程**: 使用 `Style Dictionary` 工具链将 JSON 令牌自动转换为多种格式。
-  - **命令**: `pnpm build:tokens`
-  - **产物**:
-    - `packages/ui/dist/tokens.css`: 供所有前端应用消费的 CSS 自定义属性。
-    - `packages/ui/dist/tokens.mjs`: 供 JS/TS 使用的令牌对象。
-- **集成**: 主应用 `apps/web` 已全局导入 `tokens.css`，取代了旧的手动样式文件。
+- **分层架构**: 遵循“原始 → 语义 → 组件”三层架构。
+- **单一事实来源**: 原始令牌定义在 `tokens/base/*.json`，遵循 W3C Design Tokens 规范。
+- **自动化流程**: 使用 `Style Dictionary` 工具链 (`pnpm build:tokens`) 将 JSON 令牌自动转换为 `packages/ui/dist/tokens.css`。
+- **消费与主题化**:
+  - **Web 应用**: 在 `apps/web/src/styles/design-tokens.css` 中定义语义与组件令牌，并引用 `tokens.css` 的原始值。
+  - **暗色主题**: `apps/web/src/styles/theme-dark.css` 仅覆盖语义层令牌，通过 `.dark` 类作用域激活。
+  - **强调色**: 系统强调色已统一为“蓝宝石钢蓝” (`--accent-primary: #6699cc`)，并映射覆盖了外部设计系统（cursor-starter）的强调色。
+- **文字系统**:
+  - **颜色**: 必须使用 `--text-contrast-strong/medium/weak` 控制视觉层级。
+  - **行高**: 必须使用 `--line-height-title/body/ui` 确保垂直节律。
 
 ### 2. 组件开发 (Component Development)
 
 - **核心包**: `@sydney-rental-hub/ui` 是所有可复用UI组件的家。
-- **开发环境**: 使用 `Storybook` 作为独立的组件开发和文档环境。
-  - **命令**: `pnpm --filter @sydney-rental-hub/ui run storybook`
-  - **目的**: 在隔离的环境中开发、测试和可视化组件，确保其通用性和健壮性。
+- **开发环境**: **Storybook** 是组件开发的**唯一事实来源**。所有新组件的开发和现有组件的迭代都应在此环境中进行。
+  - **启动命令**: 在项目根目录运行 `./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook`
+  - **目的**: 在隔离的环境中开发、测试和可视化组件，确保其通用性、健壮性，并与设计规范保持一致。
 - **组件规范**:
   - 组件应**完全基于 Design Tokens** 构建，不包含任何硬编码样式值。
   - 优先从 `apps/web/src/components/base/` 中提炼和迁移现有基础组件。
