@@ -5,7 +5,6 @@
 
 # 1. Ignore universal build artifacts, dependencies, and logs
 node_modules/
-dist/
 build/
 __pycache__/
 *.log

@@ -1,33 +1,44 @@
-# Monorepo Structure Evaluation
+# Monorepo 结构评估报告 (2025-10-10)
 
-## Workspace Layout
-- The root workspace is managed by `pnpm` and is configured to include every app under `apps/*`, enabling shared tooling and dependency hoisting for each product surface.【F:pnpm-workspace.yaml†L1-L3】
-- The top-level package defines Turbo-powered scripts (`dev`, `build`, `lint`, `test`, `typecheck`) so that workspaces inherit a common task runner entry point after the restructure.【F:package.json†L2-L16】
-- `turbo.json` centralizes task defaults such as caching policies and cross-package build dependencies, confirming that the monorepo orchestration layer is in place.【F:turbo.json†L1-L21】
+## 1. 总体评估
 
-## App Packages
-- The backend service remains encapsulated in `@web-sydney/backend`, exposing Python-based dev, worker, test, build, and type-check commands through the workspace scripts interface.【F:apps/backend/package.json†L1-L11】
-- The web frontend is published as `@web-sydney/web`, with Vite development scripts, Playwright tests, and explicit lint/format hooks aligned to the shared Turbo pipeline, demonstrating that the restructure preserved end-to-end tooling for this app.【F:apps/web/package.json†L1-L53】
+本项目采用了 `pnpm workspaces` + `Turborepo` 的技术栈，整体结构清晰，遵循了现代 Monorepo 的主流最佳实践。项目将应用（apps）和共享包（packages）分离，并通过 Turborepo 优化构建和任务流程，这为项目的可维护性和扩展性奠定了良好基础。
 
-## Uni-app Mini Program Impact
-- There is currently no dedicated Uni-app workspace or dependency footprint (`@dcloudio/*`, `uni-app` etc.) in the repo; the roadmap simply lists the mini program as a future deliverable, so no monorepo conflicts are present today.【F:apps/web/README.md†L193-L209】
-- Only one package in the workspace declares a `vue` dependency (the web frontend), meaning there are no competing Vue runtime versions that would interfere with introducing a Uni-app package later.【F:apps/web/package.json†L16-L27】
+**结论：结构健康，符合 Monorepo 标准。**
 
-## Success Criteria Check
-- The workspace root scripts (`dev`, `build`, `lint`, `test`, `typecheck`) are wired through Turborepo, ensuring every package can participate in the shared pipeline without custom per-app overrides—evidence that the restructure achieved its goal of centralised orchestration.【F:package.json†L2-L16】【F:turbo.json†L1-L21】
-- Each existing app exposes the expected pnpm scripts after the move (`@web-sydney/backend` for Python services and `@web-sydney/web` for the Vue client), confirming that the restructure preserved developer workflows across surfaces.【F:apps/backend/package.json†L1-L11】【F:apps/web/package.json†L1-L53】
-- No duplicate framework versions or unresolved peer dependencies appear in the workspace manifests, indicating that dependency hoisting remains stable post-restructure.【F:pnpm-lock.yaml†L1-L40】
+---
 
-## Recommendations
-1. Create the missing `packages/` directory or remove it from the workspace globs to avoid confusion for new contributors following the restructure blueprint.【F:pnpm-workspace.yaml†L1-L3】
-2. When bootstrapping the Uni-app mini program, add it as a sibling workspace (for example, `apps/uni-mini/`) so it benefits from the existing Turbo and pnpm configuration, and pin its framework dependencies to versions compatible with the existing Vue stack to maintain a conflict-free graph.【F:package.json†L5-L16】【F:apps/web/package.json†L16-L27】
+## 2. 优点分析
 
-## Confidence & Next Steps
-- **Confidence level:** ~75% that the current monorepo foundation can absorb a Uni-app workspace without structural changes. The confidence is tempered by the absence of an actual Uni-app package to validate pnpm peer dependency resolution in practice.【F:pnpm-workspace.yaml†L1-L3】【F:apps/web/package.json†L16-L27】
-- To raise confidence, prototype a minimal Uni-app workspace (`apps/uni-mini`) with stub build scripts and run the shared `pnpm dev`/`turbo run` commands to observe any latent conflicts early.
+1.  **清晰的目录结构**:
+    *   `apps/` 目录清晰地隔离了不同的可部署应用（`backend`, `web`, `mini-program`, `mcp-server`），职责明确。
+    *   `packages/` 目录用于存放共享代码（如 `ui` 组件库），促进了代码复用和一致性。
 
-## Current Status & Developer Actions
-- **Restructure completion:** The monorepo refactor described in this report has been merged into the default branch, so no follow-up migrations are pending before teammates pull the latest codebase.【F:pnpm-workspace.yaml†L1-L3】【F:package.json†L2-L16】
-- **Safe to sync locally:** Developers can run `git pull` and then `pnpm install` at the repository root to align local workspaces; the consolidated scripts defined in the root `package.json` remain the single source of truth after the restructure.【F:package.json†L2-L16】
-- **Resolving pull strategy prompt:** If Git asks how to reconcile divergent branches (for example, `fatal: 需要指定如何调和偏离的分支`), run one of the standard configuration commands before pulling: `git config pull.rebase false` (merge), `git config pull.rebase true` (rebase), or `git config pull.ff only` (fast-forward only). After choosing the preferred strategy, re-run `git pull` followed by `pnpm install` to ensure dependencies are up to date.
-- **Post-sync checklist:** When `git pull` finishes cleanly (no further prompts) and your branch matches `origin/main`, install workspace dependencies with `pnpm install`, then resume development with the usual scripts—`pnpm --filter @web-sydney/web dev` for the Vite frontend, `pnpm --filter @web-sydney/backend dev` for the FastAPI backend, or root-level `pnpm dev` to fan out Turbo tasks across packages.【F:package.json†L5-L10】【F:apps/web/package.json†L6-L13】【F:apps/backend/package.json†L5-L10】
+2.  **高效的构建系统**:
+    *   使用 `Turborepo` 作为构建协调器，通过 `turbo.json` 中的配置，实现了任务依赖管理和构建缓存，可以显著提升开发和 CI/CD 的效率。
+    *   根 `package.json` 中的脚本（如 `dev`, `build`）都通过 `turbo run` 执行，这是标准的 Turborepo 工作流。
+
+3.  **统一的依赖管理**:
+    *   使用 `pnpm workspaces` 统一管理所有子包的依赖，避免了版本冲突，并利用 pnpm 的符号链接机制节省了磁盘空间。
+    *   `pnpm-workspace.yaml` 文件正确配置了工作区范围。
+
+---
+
+## 3. 待讨论与改进建议
+
+1.  **顶层包的组织方式**:
+    *   **现状**: `crawler` 和 `database` 两个目录被直接放在项目根目录，并被包含在 `pnpm-workspace.yaml` 中。
+    *   **评估**: 虽然这在技术上可行，但它打破了 `apps/` 和 `packages/` 的标准分类模式。通常，`crawler` 作为一个数据抓取应用，更适合放在 `apps/` 目录下。`database` 目录如果主要包含数据库迁移脚本、种子文件等，可以考虑将其归入 `packages/` 并命名为 `db-scripts` 或类似名称，或者如果它是一个独立的服务，也应放在 `apps/` 中。
+    *   **建议**:
+        *   将 `crawler/` 移动到 `apps/crawler/`。
+        *   评估 `database/` 的性质。如果它是应用的一部分，考虑将其移动到 `apps/` 或 `packages/` 下，以保持结构的一致性。
+
+2.  **待评估的 `vue-frontend`**:
+    *   **现状**: `pnpm-workspace.yaml` 中包含一个 `vue-frontend` 包，并有 `TODO` 注释提示需要评估其价值。
+    *   **建议**: 尽快完成评估。如果该包已废弃，应将其从工作区配置中移除，并移入 `archive/` 目录，以减少项目的认知负荷。
+
+---
+
+## 4. 总结
+
+该 Monorepo 项目的基础非常扎实。通过对上述建议（尤其是顶层包的组织方式）进行小的调整，可以使项目结构更加规范和易于理解，进一步发挥 Monorepo 的优势。

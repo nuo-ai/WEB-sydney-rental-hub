@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "python3 -m uvicorn main:app --reload --port 8000 --env-file ../../.env",
+    "dev": "python -m uvicorn main:app --reload --port 8000 --env-file ../../.env",
     "worker": "celery -A celery_worker.celery_app worker -l info",
     "test": "pytest .",
-    "build": "python3 -m compileall .",
-    "typecheck": "python3 -m compileall ."
+    "build": "python -m compileall .",
+    "typecheck": "python -m compileall ."
   }
 }

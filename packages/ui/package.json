@@ -3,22 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "description": "The core UI component library and design system for Sydney Rental Hub.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
     },
-    "./tokens": {
-      "import": "./dist/tokens.mjs",
-      "types": "./dist/tokens.d.ts"
-    }
+    "./dist/tokens.css": "./dist/tokens.css",
+    "./tokens": "./dist/style-dictionary/json/tokens.json",
+    "./dist/tokens.mjs": "./dist/tokens.mjs"
   },
   "scripts": {
     "lint": "echo 'Linting @sydney-rental-hub/ui... (no-op)'",
@@ -37,7 +36,7 @@
     "@storybook/addon-a11y": "^9.1.10",
     "@storybook/addon-docs": "^9.1.10",
     "@storybook/addon-vitest": "^9.1.10",
-    "@storybook/blocks": "^8.6.14",
+    "@storybook/blocks": "^9.1.10",
     "@storybook/vue3-vite": "^9.1.10",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitest/browser": "^3.2.4",

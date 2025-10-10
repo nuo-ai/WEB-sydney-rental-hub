@@ -1,6 +1,6 @@
 import { setup } from '@storybook/vue3';
-import '../../apps/mini-program/src/styles/generated/light.wxss';
-import '../../apps/mini-program/src/styles/generated/dark.wxss';
+import '../dist/tokens.css';
+import '../dist/style-dictionary/css/variables.css';
 
 // 设置全局装饰器
 export const decorators = [
