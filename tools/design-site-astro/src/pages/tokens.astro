@@ -22,10 +22,10 @@ import '../../../../packages/ui/src/styles/tokens.dark.css';
         --accent: var(--color-action-primary);
 
         /* SRH variables (runtime set via JS) */
-        --srh-color-text-primary: #3d3b40;
-        --srh-color-text-secondary: #3d3b40;
-        --srh-card-bg: #ffffff;
-        --srh-shadow-card: 0 1px 4px 0 rgba(0,0,0,0.16);
+        --srh-color-text-primary: var(--color-text-primary);
+        --srh-color-text-secondary: var(--color-text-secondary);
+        --srh-card-bg: var(--color-background-surface);
+        --srh-shadow-card: var(--shadow-md);
 
         --srh-space-2xs: 4px;
         --srh-space-xs: 8px;
@@ -325,293 +325,238 @@ import '../../../../packages/ui/src/styles/tokens.dark.css';
       const scaleSizeKeys = ['fontSizeXs','fontSizeSm','fontSizeMd','fontSizeLg','fontSizeXl'];
       const scaleLineKeys = ['lineHeightXs','lineHeightSm','lineHeightMd','lineHeightLg','lineHeightXl'];
 
-      let initialTokens = null;
-      let tokens = null;
+      // --- Theme-aware Token Playground ---
 
-      function toPx(v){ const n=Number(v); return Number.isFinite(n)? n+'px': String(v); }
+      // All token keys managed by this playground
+      const allTokenKeys = {
+        color: ['colorTextPrimary', 'colorTextSecondary', 'cardBg'],
+        shadow: ['shadow'],
+        number: [
+          'space2xs','spaceXs','spaceSm','spaceMd','spaceLg',
+          'radiusSm','radiusMd', 'metaIconSize','metaGap', 'buttonSize',
+          'imageAspect', 'fontWeightRegular','fontWeightMedium','fontWeightSemibold','fontWeightBold',
+          'letterSpacingTight','letterSpacingNormal','letterSpacingWide',
+          'fontSizeXs','lineHeightXs', 'fontSizeSm','lineHeightSm', 'fontSizeMd','lineHeightMd',
+          'fontSizeLg','lineHeightLg', 'fontSizeXl','lineHeightXl',
+          'fontSizePrice','lineHeightPrice', 'fontSizeAddress','lineHeightAddress',
+          'fontSizeInspection','lineHeightInspection'
+        ],
+        string: ['fontFamilyEN', 'fontFamilyZH']
+      };
 
-      function applyTokens(obj){
-        const r = document.documentElement;
-        // colors
-        r.style.setProperty('--srh-color-text-primary', obj.colorTextPrimary);
-        r.style.setProperty('--srh-color-text-secondary', obj.colorTextSecondary);
-        r.style.setProperty('--srh-card-bg', obj.cardBg);
-        r.style.setProperty('--srh-shadow-card', obj.shadow);
+      // Mapping from playground token names to CSS custom property names
+      const keyToCssVar = {
+        colorTextPrimary: '--srh-color-text-primary',
+        colorTextSecondary: '--srh-color-text-secondary',
+        cardBg: '--srh-card-bg',
+        shadow: '--srh-shadow-card',
+        space2xs: '--srh-space-2xs',
+        spaceXs: '--srh-space-xs',
+        spaceSm: '--srh-space-sm',
+        spaceMd: '--srh-space-md',
+        spaceLg: '--srh-space-lg',
+        radiusSm: '--srh-radius-sm',
+        radiusMd: '--srh-radius-md',
+        metaIconSize: '--srh-meta-icon-size',
+        metaGap: '--srh-meta-gap',
+        buttonSize: '--srh-button-size',
+        imageAspect: '--srh-image-aspect',
+        fontFamilyEN: '--srh-font-family-en',
+        fontFamilyZH: '--srh-font-family-zh',
+        fontWeightRegular: '--srh-font-weight-regular',
+        fontWeightMedium: '--srh-font-weight-medium',
+        fontWeightSemibold: '--srh-font-weight-semibold',
+        fontWeightBold: '--srh-font-weight-bold',
+        letterSpacingTight: '--srh-letter-spacing-tight',
+        letterSpacingNormal: '--srh-letter-spacing-normal',
+        letterSpacingWide: '--srh-letter-spacing-wide',
+        fontSizeXs: '--srh-font-size-xs',
+        lineHeightXs: '--srh-line-height-xs',
+        fontSizeSm: '--srh-font-size-sm',
+        lineHeightSm: '--srh-line-height-sm',
+        fontSizeMd: '--srh-font-size-md',
+        lineHeightMd: '--srh-line-height-md',
+        fontSizeLg: '--srh-font-size-lg',
+        lineHeightLg: '--srh-line-height-lg',
+        fontSizeXl: '--srh-font-size-xl',
+        lineHeightXl: '--srh-line-height-xl',
+        fontSizePrice: '--srh-font-size-price',
+        lineHeightPrice: '--srh-line-height-price',
+        fontSizeAddress: '--srh-font-size-address',
+        lineHeightAddress: '--srh-line-height-address',
+        fontSizeInspection: '--srh-font-size-inspection',
+        lineHeightInspection: '--srh-line-height-inspection',
+      };
 
-        // spacing, radius, meta, button, aspect
-        r.style.setProperty('--srh-space-2xs', toPx(obj.space2xs));
-        r.style.setProperty('--srh-space-xs', toPx(obj.spaceXs));
-        r.style.setProperty('--srh-space-sm', toPx(obj.spaceSm));
-        r.style.setProperty('--srh-space-md', toPx(obj.spaceMd));
-        r.style.setProperty('--srh-space-lg', toPx(obj.spaceLg));
-        r.style.setProperty('--srh-radius-sm', toPx(obj.radiusSm));
-        r.style.setProperty('--srh-radius-md', toPx(obj.radiusMd));
-        r.style.setProperty('--srh-meta-icon-size', toPx(obj.metaIconSize));
-        r.style.setProperty('--srh-meta-gap', toPx(obj.metaGap));
-        r.style.setProperty('--srh-button-size', toPx(obj.buttonSize));
-        r.style.setProperty('--srh-image-aspect', String(obj.imageAspect));
+      let tokens = {}; // The current state of all tokens
 
-        // typography families (base = EN + , + ZH)
-        r.style.setProperty('--srh-font-family-en', obj.fontFamilyEN);
-        r.style.setProperty('--srh-font-family-zh', obj.fontFamilyZH);
-        r.style.setProperty('--srh-font-family-base', `${obj.fontFamilyEN}, ${obj.fontFamilyZH}`);
+      // --- Helper Functions ---
+      function el(id) { return document.getElementById(id); }
+      function toPx(v) { const n = Number(v); return Number.isFinite(n) ? `${n}px` : String(v); }
 
-        // weights
-        r.style.setProperty('--srh-font-weight-regular', String(obj.fontWeightRegular));
-        r.style.setProperty('--srh-font-weight-medium', String(obj.fontWeightMedium));
-        r.style.setProperty('--srh-font-weight-semibold', String(obj.fontWeightSemibold));
-        r.style.setProperty('--srh-font-weight-bold', String(obj.fontWeightBold));
+      // --- Core Logic ---
 
-        // letter spacing (px)
-        r.style.setProperty('--srh-letter-spacing-tight', toPx(obj.letterSpacingTight));
-        r.style.setProperty('--srh-letter-spacing-normal', toPx(obj.letterSpacingNormal));
-        r.style.setProperty('--srh-letter-spacing-wide', toPx(obj.letterSpacingWide));
+      // Applies a single token value as an inline style on the root element.
+      function applyToken(key, value) {
+        const cssVar = keyToCssVar[key];
+        if (!cssVar) return;
 
-        // scale sizes
-        r.style.setProperty('--srh-font-size-xs', toPx(obj.fontSizeXs));
-        r.style.setProperty('--srh-line-height-xs', toPx(obj.lineHeightXs));
-        r.style.setProperty('--srh-font-size-sm', toPx(obj.fontSizeSm));
-        r.style.setProperty('--srh-line-height-sm', toPx(obj.lineHeightSm));
-        r.style.setProperty('--srh-font-size-md', toPx(obj.fontSizeMd));
-        r.style.setProperty('--srh-line-height-md', toPx(obj.lineHeightMd));
-        r.style.setProperty('--srh-font-size-lg', toPx(obj.fontSizeLg));
-        r.style.setProperty('--srh-line-height-lg', toPx(obj.lineHeightLg));
-        r.style.setProperty('--srh-font-size-xl', toPx(obj.fontSizeXl));
-        r.style.setProperty('--srh-line-height-xl', toPx(obj.lineHeightXl));
-
-        // card specific sizes
-        r.style.setProperty('--srh-font-size-price', toPx(obj.fontSizePrice));
-        r.style.setProperty('--srh-line-height-price', toPx(obj.lineHeightPrice));
-        r.style.setProperty('--srh-font-size-address', toPx(obj.fontSizeAddress));
-        r.style.setProperty('--srh-line-height-address', toPx(obj.lineHeightAddress));
-        r.style.setProperty('--srh-font-size-inspection', toPx(obj.fontSizeInspection));
-        r.style.setProperty('--srh-line-height-inspection', toPx(obj.lineHeightInspection));
+        let finalValue = String(value);
+        if (allTokenKeys.number.includes(key) && key !== 'imageAspect' && !key.startsWith('fontWeight')) {
+          finalValue = toPx(value);
+        }
+        document.documentElement.style.setProperty(cssVar, finalValue);
       }
 
-      function el(id){ return document.getElementById(id); }
+      // Reads the current theme's CSS variables and populates the `tokens` object and UI controls.
+      function initFromTheme() {
+        const cs = getComputedStyle(document.documentElement);
+        const newTokens = {};
 
-      function updateViews(){
+        for (const key in keyToCssVar) {
+          const cssVar = keyToCssVar[key];
+          let value = (cs.getPropertyValue(cssVar) || '').trim();
+
+          if (allTokenKeys.number.includes(key)) {
+            value = parseFloat(value) || 0;
+          }
+          newTokens[key] = value;
+        }
+        tokens = newTokens;
+        updateUIControls();
+        updateViews();
+      }
+
+      // Updates the input controls on the left panel with current token values.
+      function updateUIControls() {
+        for (const key in tokens) {
+          const input = el(key);
+          if (input) input.value = tokens[key];
+          if (allTokenKeys.color.includes(key)) {
+            const picker = el(`${key}Picker`);
+            if (picker) picker.value = tokens[key];
+          }
+        }
+      }
+
+      // Updates the JSON and SCSS preview areas.
+      function updateViews() {
         el('jsonView').textContent = JSON.stringify(tokens, null, 2);
         el('scssView').textContent = generateScss(tokens);
       }
 
-      function bindInputs(){
-        // colors
-        const pairs = [
-          ['colorTextPrimary', 'colorTextPrimaryPicker'],
-          ['colorTextSecondary', 'colorTextSecondaryPicker'],
-          ['cardBg', 'cardBgPicker']
-        ];
-        for(const [txtId, pickId] of pairs){
-          const txt=el(txtId), pick=el(pickId);
-          txt.value = tokens[txtId];
-          pick.value = tokens[txtId];
-          txt.addEventListener('input', (e)=>{
-            tokens[txtId]=e.target.value; pick.value=tokens[txtId]; applyTokens(tokens); updateViews();
-          });
-          pick.addEventListener('input', (e)=>{
-            tokens[txtId]=e.target.value; txt.value=tokens[txtId]; applyTokens(tokens); updateViews();
-          });
-        }
-        // shadow
-        const shadow = el('shadow');
-        shadow.value = tokens.shadow;
-        shadow.addEventListener('input', (e)=>{ tokens.shadow=e.target.value; applyTokens(tokens); updateViews(); });
+      // Binds event listeners to all input controls.
+      function bindInputs() {
+        for (const key in keyToCssVar) {
+          const input = el(key);
+          if (!input) continue;
 
-        // numbers px group
-        for(const k of numberKeysPx.concat(['imageAspect'])){
-          const input = el(k);
-          input.value = tokens[k];
-          input.addEventListener('input', (e)=>{
-            const n = Number(e.target.value);
-            if(Number.isFinite(n)){ tokens[k] = k==='imageAspect'? n : n; applyTokens(tokens); updateViews(); }
+          const eventType = 'input';
+          input.addEventListener(eventType, (e) => {
+            let value = e.target.value;
+            if (allTokenKeys.number.includes(key)) {
+              value = parseFloat(value) || 0;
+            }
+            tokens[key] = value;
+            applyToken(key, value);
+            updateViews();
+            if (allTokenKeys.color.includes(key)) {
+              const picker = el(`${key}Picker`);
+              if (picker) picker.value = value;
+            }
           });
-        }
 
-        // font families
-        for(const k of fontKeys){
-          const input = el(k);
-          input.value = tokens[k];
-          input.addEventListener('input', (e)=>{
-            tokens[k]=e.target.value; applyTokens(tokens); updateViews();
-          });
-        }
-
-        // weights
-        for(const k of weightKeys){
-          const input = el(k);
-          input.value = tokens[k];
-          input.addEventListener('input', (e)=>{
-            const n = Number(e.target.value);
-            if(Number.isFinite(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
-          });
-        }
-
-        // letter spacing
-        for(const k of letterKeys){
-          const input = el(k);
-          input.value = tokens[k];
-          input.addEventListener('input', (e)=>{
-            const n = Number(e.target.value);
-            if(!Number.isNaN(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
-          });
-        }
-
-        // scale sizes & lines
-        for(const k of scaleSizeKeys.concat(scaleLineKeys)){
-          const input = el(k);
-          input.value = tokens[k];
-          input.addEventListener('input', (e)=>{
-            const n = Number(e.target.value);
-            if(Number.isFinite(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
-          });
-        }
-
-        // card specific type sizes
-        for(const k of ['fontSizePrice','lineHeightPrice','fontSizeAddress','lineHeightAddress','fontSizeInspection','lineHeightInspection']){
-          const input = el(k);
-          input.value = tokens[k];
-          input.addEventListener('input', (e)=>{
-            const n = Number(e.target.value);
-            if(Number.isFinite(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
-          });
+          if (allTokenKeys.color.includes(key)) {
+            const picker = el(`${key}Picker`);
+            if (picker) {
+              picker.addEventListener('input', (e) => {
+                tokens[key] = e.target.value;
+                applyToken(key, e.target.value);
+                updateViews();
+                if (input) input.value = e.target.value;
+              });
+            }
+          }
         }
       }
 
-      function generateScss(vars){
+      // --- SCSS/JSON Generation and Download ---
+      function generateScss(vars) {
         const map = [
-          // colors & surfaces
-          ['colorTextPrimary', '$srh-color-text-primary', v=>v],
-          ['colorTextSecondary', '$srh-color-text-secondary', v=>v],
-          ['cardBg', '$srh-color-card-bg', v=>v],
-          ['shadow', '$srh-shadow-card', v=>v],
-
-          // spacing & radius
-          ['space2xs', '$srh-space-2xs', v=>Number(v)+'px'],
-          ['spaceXs', '$srh-space-xs', v=>Number(v)+'px'],
-          ['spaceSm', '$srh-space-sm', v=>Number(v)+'px'],
-          ['spaceMd', '$srh-space-md', v=>Number(v)+'px'],
-          ['spaceLg', '$srh-space-lg', v=>Number(v)+'px'],
-          ['radiusSm', '$srh-radius-sm', v=>Number(v)+'px'],
-          ['radiusMd', '$srh-radius-md', v=>Number(v)+'px'],
-
-          // meta & controls
-          ['metaIconSize', '$srh-meta-icon-size', v=>Number(v)+'px'],
-          ['metaGap', '$srh-meta-gap', v=>Number(v)+'px'],
-          ['buttonSize', '$srh-button-size', v=>Number(v)+'px'],
-          ['imageAspect', '$srh-image-aspect', v=>String(v)],
-
-          // typography families
-          ['fontFamilyEN', '$srh-font-family-en', v=>v],
-          ['fontFamilyZH', '$srh-font-family-zh', v=>v],
-
-          // weights
-          ['fontWeightRegular', '$srh-font-weight-regular', v=>Number(v)],
-          ['fontWeightMedium', '$srh-font-weight-medium', v=>Number(v)],
-          ['fontWeightSemibold', '$srh-font-weight-semibold', v=>Number(v)],
-          ['fontWeightBold', '$srh-font-weight-bold', v=>Number(v)],
-
-          // letter spacing
-          ['letterSpacingTight', '$srh-letter-spacing-tight', v=>Number(v)+'px'],
-          ['letterSpacingNormal', '$srh-letter-spacing-normal', v=>Number(v)+'px'],
-          ['letterSpacingWide', '$srh-letter-spacing-wide', v=>Number(v)+'px'],
-
-          // scale sizes
-          ['fontSizeXs', '$srh-font-size-xs', v=>Number(v)+'px'],
-          ['lineHeightXs', '$srh-line-height-xs', v=>Number(v)+'px'],
-          ['fontSizeSm', '$srh-font-size-sm', v=>Number(v)+'px'],
-          ['lineHeightSm', '$srh-line-height-sm', v=>Number(v)+'px'],
-          ['fontSizeMd', '$srh-font-size-md', v=>Number(v)+'px'],
-          ['lineHeightMd', '$srh-line-height-md', v=>Number(v)+'px'],
-          ['fontSizeLg', '$srh-font-size-lg', v=>Number(v)+'px'],
-          ['lineHeightLg', '$srh-line-height-lg', v=>Number(v)+'px'],
-          ['fontSizeXl', '$srh-font-size-xl', v=>Number(v)+'px'],
-          ['lineHeightXl', '$srh-line-height-xl', v=>Number(v)+'px'],
-
-          // card specific
-          ['fontSizePrice', '$srh-font-size-price', v=>Number(v)+'px'],
-          ['lineHeightPrice', '$srh-line-height-price', v=>Number(v)+'px'],
-          ['fontSizeAddress', '$srh-font-size-address', v=>Number(v)+'px'],
-          ['lineHeightAddress', '$srh-line-height-address', v=>Number(v)+'px'],
-          ['fontSizeInspection', '$srh-font-size-inspection', v=>Number(v)+'px'],
-          ['lineHeightInspection', '$srh-line-height-inspection', v=>Number(v)+'px']
+          ['colorTextPrimary', '$srh-color-text-primary', v=>v], ['colorTextSecondary', '$srh-color-text-secondary', v=>v],
+          ['cardBg', '$srh-color-card-bg', v=>v], ['shadow', '$srh-shadow-card', v=>v],
+          ['space2xs', '$srh-space-2xs', v=>toPx(v)], ['spaceXs', '$srh-space-xs', v=>toPx(v)],
+          ['spaceSm', '$srh-space-sm', v=>toPx(v)], ['spaceMd', '$srh-space-md', v=>toPx(v)],
+          ['spaceLg', '$srh-space-lg', v=>toPx(v)], ['radiusSm', '$srh-radius-sm', v=>toPx(v)],
+          ['radiusMd', '$srh-radius-md', v=>toPx(v)], ['metaIconSize', '$srh-meta-icon-size', v=>toPx(v)],
+          ['metaGap', '$srh-meta-gap', v=>toPx(v)], ['buttonSize', '$srh-button-size', v=>toPx(v)],
+          ['imageAspect', '$srh-image-aspect', v=>String(v)], ['fontFamilyEN', '$srh-font-family-en', v=>v],
+          ['fontFamilyZH', '$srh-font-family-zh', v=>v], ['fontWeightRegular', '$srh-font-weight-regular', v=>v],
+          ['fontWeightMedium', '$srh-font-weight-medium', v=>v], ['fontWeightSemibold', '$srh-font-weight-semibold', v=>v],
+          ['fontWeightBold', '$srh-font-weight-bold', v=>v], ['letterSpacingTight', '$srh-letter-spacing-tight', v=>toPx(v)],
+          ['letterSpacingNormal', '$srh-letter-spacing-normal', v=>toPx(v)], ['letterSpacingWide', '$srh-letter-spacing-wide', v=>toPx(v)],
+          ['fontSizeXs', '$srh-font-size-xs', v=>toPx(v)], ['lineHeightXs', '$srh-line-height-xs', v=>toPx(v)],
+          ['fontSizeSm', '$srh-font-size-sm', v=>toPx(v)], ['lineHeightSm', '$srh-line-height-sm', v=>toPx(v)],
+          ['fontSizeMd', '$srh-font-size-md', v=>toPx(v)], ['lineHeightMd', '$srh-line-height-md', v=>toPx(v)],
+          ['fontSizeLg', '$srh-font-size-lg', v=>toPx(v)], ['lineHeightLg', '$srh-line-height-lg', v=>toPx(v)],
+          ['fontSizeXl', '$srh-font-size-xl', v=>toPx(v)], ['lineHeightXl', '$srh-line-height-xl', v=>toPx(v)],
+          ['fontSizePrice', '$srh-font-size-price', v=>toPx(v)], ['lineHeightPrice', '$srh-line-height-price', v=>toPx(v)],
+          ['fontSizeAddress', '$srh-font-size-address', v=>toPx(v)], ['lineHeightAddress', '$srh-line-height-address', v=>toPx(v)],
+          ['fontSizeInspection', '$srh-font-size-inspection', v=>toPx(v)], ['lineHeightInspection', '$srh-line-height-inspection', v=>toPx(v)]
         ];
         const lines = ['/* 由 Astro 站点导出，回填到 apps/uni-app/src/uni.scss */'];
-        for(const [k, scss, fmt] of map){
-          if(vars[k]!==undefined) lines.push(`${scss}: ${fmt(vars[k])};`);
+        for (const [k, scss, fmt] of map) {
+          if (vars[k] !== undefined) lines.push(`${scss}: ${fmt(vars[k])};`);
         }
-        return lines.join('\\n');
+        return lines.join('\n');
       }
 
-      function download(filename, text){
+      function download(filename, text) {
         const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.setAttribute('href', url);
-        a.setAttribute('download', filename);
+        a.href = url;
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
       }
 
-      async function copyJSON(){
+      async function copyJSON() {
         const text = JSON.stringify(tokens, null, 2);
         try { await navigator.clipboard.writeText(text); alert('已复制 JSON'); }
         catch { download('srh.tokens.json', text); }
       }
-      async function copySCSS(){
+      async function copySCSS() {
         const text = generateScss(tokens);
         try { await navigator.clipboard.writeText(text); alert('已复制 SCSS'); }
         catch { download('srh.tokens.scss', text); }
       }
-      function reset(){
-        tokens = JSON.parse(JSON.stringify(initialTokens));
-        applyTokens(tokens);
-        bindInputs();
-        updateViews();
-      }
 
+      // --- Initialization and Event Binding ---
+
+      // Reset to current theme values
+      document.getElementById('resetBtn').addEventListener('click', initFromTheme);
       document.getElementById('copyJsonBtn').addEventListener('click', copyJSON);
       document.getElementById('copyScssBtn').addEventListener('click', copySCSS);
-      document.getElementById('resetBtn').addEventListener('click', reset);
 
-      fetch('/tokens/srh.json', { cache: 'no-store' })
-        .then(r=>r.json())
-        .then(data=>{
-          initialTokens = data;
-          tokens = JSON.parse(JSON.stringify(data));
-          applyTokens(tokens);
-          bindInputs();
-          updateViews();
-        })
-        .catch(()=>{
-          const fallback = {
-            colorTextPrimary:'#3d3b40', colorTextSecondary:'#3d3b40', cardBg:'#ffffff',
-            shadow:'0 1px 4px 0 rgba(0,0,0,0.16)',
-            space2xs:4, spaceXs:8, spaceSm:12, spaceMd:16, spaceLg:20,
-            radiusSm:6, radiusMd:8,
-            fontSizePrice:20, lineHeightPrice:28,
-            fontSizeAddress:16, lineHeightAddress:24,
-            fontSizeInspection:14, lineHeightInspection:20,
-            metaIconSize:16, metaGap:8,
-            buttonSize:40, imageAspect:0.75,
+      // Initial load
+      document.addEventListener('DOMContentLoaded', () => {
+        initFromTheme();
+        bindInputs();
 
-            fontFamilyZH:"'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif",
-            fontFamilyEN:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif",
-
-            fontWeightRegular:400, fontWeightMedium:500, fontWeightSemibold:600, fontWeightBold:700,
-            letterSpacingTight:-0.2, letterSpacingNormal:0, letterSpacingWide:0.2,
-
-            fontSizeXs:12, lineHeightXs:18,
-            fontSizeSm:14, lineHeightSm:20,
-            fontSizeMd:16, lineHeightMd:24,
-            fontSizeLg:20, lineHeightLg:28,
-            fontSizeXl:24, lineHeightXl:32
-          };
-          initialTokens = fallback; tokens = JSON.parse(JSON.stringify(fallback));
-          applyTokens(tokens); bindInputs(); updateViews();
+        // Observe theme changes
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+              // Use a timeout to ensure computed styles are updated after the theme switch
+              setTimeout(initFromTheme, 50);
+            }
+          }
         });
+        observer.observe(document.documentElement, { attributes: true });
+      });
     </script>
 
     <script>

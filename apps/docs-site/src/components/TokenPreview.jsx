@@ -80,31 +80,38 @@ export default function TokenPreview() {
   const [tokens, setTokens] = useState(null);
 
   useEffect(() => {
-    // 读取静态初始 tokens
-    fetch('/tokens/srh.json', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((data) => {
-        setInitial(data);
-        setTokens(data);
-      })
-      .catch((e) => {
-        console.error('加载初始 tokens 失败', e);
-        const fallback = {
-          colorTextPrimary: '#3d3b40',
-          colorTextSecondary: '#3d3b40',
-          cardBg: '#ffffff',
-          shadow: '0 1px 4px 0 rgba(0,0,0,0.16)',
-          space2xs: 4, spaceXs: 8, spaceSm: 12, spaceMd: 16, spaceLg: 20,
-          radiusSm: 6, radiusMd: 8,
-          fontSizePrice: 20, lineHeightPrice: 28,
-          fontSizeAddress: 16, lineHeightAddress: 24,
-          fontSizeInspection: 14, lineHeightInspection: 20,
-          metaIconSize: 16, metaGap: 8,
-          buttonSize: 40, imageAspect: 0.75
-        };
-        setInitial(fallback);
-        setTokens(fallback);
-      });
+    const initFromTheme = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const newTokens = {
+        colorTextPrimary: (cs.getPropertyValue('--ifm-font-color-base') || '#3d3b40').trim(),
+        colorTextSecondary: (cs.getPropertyValue('--ifm-color-secondary-darkest') || '#65676B').trim(),
+        cardBg: (cs.getPropertyValue('--ifm-card-background-color') || '#ffffff').trim(),
+        shadow: (cs.getPropertyValue('--ifm-global-shadow-md') || '0 1px 4px 0 rgba(0,0,0,0.16)').trim(),
+        space2xs: 4, spaceXs: 8, spaceSm: 12, spaceMd: 16, spaceLg: 20,
+        radiusSm: 6, radiusMd: 8,
+        fontSizePrice: 20, lineHeightPrice: 28,
+        fontSizeAddress: 16, lineHeightAddress: 24,
+        fontSizeInspection: 14, lineHeightInspection: 20,
+        metaIconSize: 16, metaGap: 8,
+        buttonSize: 40, imageAspect: 0.75
+      };
+      setInitial(newTokens);
+      setTokens(newTokens);
+    };
+
+    initFromTheme();
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+          setTimeout(initFromTheme, 50);
+        }
+      }
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
   }, []);
 
   const styleVars = useMemo(() => {

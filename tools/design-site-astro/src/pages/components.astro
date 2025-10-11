@@ -22,10 +22,10 @@ import '../../../../packages/ui/src/styles/tokens.dark.css';
         --accent: var(--color-primary);
 
         /* SRH variables (will be applied from /tokens/srh.json via JS) */
-        --srh-color-text-primary: #3d3b40;
-        --srh-color-text-secondary: #3d3b40;
-        --srh-card-bg: #ffffff;
-        --srh-shadow-card: 0 1px 4px 0 rgba(0,0,0,0.16);
+        --srh-color-text-primary: var(--color-text-primary);
+        --srh-color-text-secondary: var(--color-text-secondary);
+        --srh-card-bg: var(--color-background-surface);
+        --srh-shadow-card: var(--shadow-md);
 
         --srh-space-md: 16px;
         --srh-radius-md: 8px;
@@ -222,43 +222,7 @@ import '../../../../packages/ui/src/styles/tokens.dark.css';
     </main>
 
     <script>
-      function toPx(v){ const n=Number(v); return Number.isFinite(n)? n+'px': String(v); }
-      function applyTokens(obj){
-        const r = document.documentElement;
-        r.style.setProperty('--srh-color-text-primary', obj.colorTextPrimary);
-        r.style.setProperty('--srh-color-text-secondary', obj.colorTextSecondary);
-        r.style.setProperty('--srh-card-bg', obj.cardBg);
-        r.style.setProperty('--srh-shadow-card', obj.shadow);
-        r.style.setProperty('--srh-space-md', toPx(obj.spaceMd));
-        r.style.setProperty('--srh-radius-md', toPx(obj.radiusMd));
-        r.style.setProperty('--srh-font-size-price', toPx(obj.fontSizePrice));
-        r.style.setProperty('--srh-line-height-price', toPx(obj.lineHeightPrice));
-        r.style.setProperty('--srh-font-size-address', toPx(obj.fontSizeAddress));
-        r.style.setProperty('--srh-line-height-address', toPx(obj.lineHeightAddress));
-        r.style.setProperty('--srh-font-size-inspection', toPx(obj.fontSizeInspection));
-        r.style.setProperty('--srh-line-height-inspection', toPx(obj.lineHeightInspection));
-        r.style.setProperty('--srh-meta-gap', toPx(obj.metaGap));
-        r.style.setProperty('--srh-button-size', toPx(obj.buttonSize));
-        r.style.setProperty('--srh-image-aspect', String(obj.imageAspect));
-
-        // Typography families & weights & letter-spacing
-        r.style.setProperty('--srh-font-family-en', obj.fontFamilyEN);
-        r.style.setProperty('--srh-font-family-zh', obj.fontFamilyZH);
-        r.style.setProperty('--srh-font-family-base', `${obj.fontFamilyEN}, ${obj.fontFamilyZH}`);
-
-        r.style.setProperty('--srh-font-weight-regular', String(obj.fontWeightRegular));
-        r.style.setProperty('--srh-font-weight-medium', String(obj.fontWeightMedium));
-        r.style.setProperty('--srh-font-weight-semibold', String(obj.fontWeightSemibold));
-        r.style.setProperty('--srh-font-weight-bold', String(obj.fontWeightBold));
-
-        r.style.setProperty('--srh-letter-spacing-tight', toPx(obj.letterSpacingTight));
-        r.style.setProperty('--srh-letter-spacing-normal', toPx(obj.letterSpacingNormal));
-        r.style.setProperty('--srh-letter-spacing-wide', toPx(obj.letterSpacingWide));
-      }
-      fetch('/tokens/srh.json', { cache: 'no-store' })
-        .then(r=>r.json())
-        .then(applyTokens)
-        .catch(()=>{});
+      // No longer needed, styles are now inherited from theme via CSS variables.
     </script>
     <script>
       (function() {

@@ -2,15 +2,19 @@
   "color": {
     "semantic": {
       "bg": {
-        "primary": { "value": "{color.gray.800}", "type": "color", "description": "一级背景色，用于页面主内容区域" },
+        "primary": { "value": "#1E1E1E", "type": "color", "description": "一级背景色，用于页面主内容区域" },
         "secondary": { "value": "{color.gray.900}", "type": "color", "description": "二级背景色，用于区分不同区块" },
-        "page": { "value": "{color.black}", "type": "color", "description": "整页背景色" }
+        "page": { "value": "#121212", "type": "color", "description": "整页背景色" }
       },
       "text": {
-        "primary": { "value": "{color.gray.100}", "type": "color", "description": "主要文字颜色" },
-        "secondary": { "value": "{color.gray.400}", "type": "color", "description": "次要文字颜色" },
+        "primary": { "value": "#E3E3E3", "type": "color", "description": "主要文字颜色" },
+        "secondary": { "value": "#B0B3B8", "type": "color", "description": "次要文字颜色" },
         "muted": { "value": "{color.gray.500}", "type": "color", "description": "提示性或置灰文字颜色" },
         "inverse": { "value": "{color.black}", "type": "color", "description": "反色文字，用于浅色背景" }
+      },
+      "icon": {
+        "primary": { "value": "#E3E3E3", "type": "color", "description": "默认图标颜色" },
+        "interactive": { "value": "#409CFF", "type": "color", "description": "可交互图标颜色" }
       },
       "border": {
         "default": { "value": "{color.gray.700}", "type": "color", "description": "默认边框颜色" },
@@ -29,9 +33,6 @@
       "active": { "value": "#CC7E10", "type": "color", "description": "品牌色激活（Dark）" }
     },
     "action": { "primary": { "value": "#409CFF", "type": "color", "description": "主行动色（Action Primary）" } },
-    "success": { "value": "#18D39E", "type": "color", "description": "成功色（CSS变量别名）" },
-    "warning": { "value": "#FFE900", "type": "color", "description": "警告色（CSS变量别名）" },
-    "error": { "value": "#FF4D79", "type": "color", "description": "错误色（CSS变量别名）" },
     "background": {
       "page": { "value": "#121212", "type": "color", "description": "页面最底层背景" },
       "surface": { "value": "#1E1E1E", "type": "color", "description": "卡片、输入框等表面背景" },
@@ -39,15 +40,8 @@
       "disabled": { "value": "#3A3B3C", "type": "color", "description": "禁用状态背景" }
     },
     "text": {
-      "primary": { "value": "#E4E6EB", "type": "color", "description": "主要文字" },
-      "secondary": { "value": "#B0B3B8", "type": "color", "description": "次要文字" },
-      "placeholder": { "value": "#65676B", "type": "color", "description": "占位符文字" },
-      "disabled": { "value": "#65676B", "type": "color", "description": "禁用状态文字" },
-      "on": {
-        "action": { "value": "#FFFFFF", "type": "color", "description": "在行动色背景上的文字" }
-      }
-    },
-    "border": { "value": "#464853", "type": "color", "description": "默认边框" },
-    "border-interactive": { "value": "#65676B", "type": "color", "description": "可交互元素的边框" }
+      "primary": { "value": "#E3E3E3", "type": "color", "description": "主要文字" },
+      "secondary": { "value": "#B0B3B8", "type": "color", "description": "次要文字" }
+    }
   }
 }
