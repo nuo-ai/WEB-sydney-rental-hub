@@ -2,199 +2,173 @@
 
 本文件记录了对 `realestate.com.au` 网站上各原子组件的 CSS 属性分析结果。
 
+## A. 系统级测量项 (System-Level Measurements)
+这些属性应被视为全局 Design Tokens，并应用到所有相关组件中。
+
+### 动效与过渡 (Motion & Transitions)
+
+- **transition-property**: 参与动画的 CSS 属性 (e.g., background-color, transform)。
+- **transition-duration**: 动画标准时长 (e.g., 150ms, 300ms)。
+- **transition-timing-function**: 缓动函数 (e.g., ease-in-out)。
+
+### 焦点状态 (Focus States)
+
+- **outline-style, outline-width, outline-color, outline-offset**: 键盘导航 (:focus-visible) 时的外轮廓样式。
+- **focus-visible-box-shadow**: 一种更美观的、用 box-shadow 模拟的焦点辉光效果。
+
+### 无障碍性属性 (Accessibility Attributes)
+
+- **aria-* 属性**: 测量组件在不同状态下使用的所有 aria- 属性 (e.g., aria-label, aria-checked, aria-invalid)。
+- **role 属性**: 测量非语义化标签（如`<div>`）模拟原生组件时使用的 role 属性。
+
+---
+
 ## B. 组件级测量项 (Component-Level Measurements)
 
 ### I. 输入与操作 (Inputs & Actions)
 
 #### 1. `Button` (按钮)
 
-##### **变体: `primary` (主要按钮 - "Search")**
+- **变体**: `primary`, `secondary`, `tertiary`, `danger`, `icon-only`
+- **状态**: `default`, `hover`, `active`, `disabled`, `loading`
+##### **数据记录**
 
-- **状态: `default`**
-  - **布局与尺寸**:
-    - `padding`: `12px 24px`
-    - `height`: `48px` (实际为 `47.9972px`)
-    - `min-width`: `48px`
-    - `gap`: `normal` (浏览器默认)
-  - **外观**:
-    - `background-color`: `rgb(228, 0, 43)`
-    - `border-style`: `none`
-    - `border-width`: `0px`
-    - `border-color`: `rgb(255, 255, 255)`
-    - `border-radius`: `24px`
-    - `box-shadow`: `none`
-  - **排印**:
-    - `color`: `rgb(255, 255, 255)`
-    - `font-size`: `16px`
-    - `font-weight`: `500`
-  - **交互**:
-    - `transform`: `none`
-    - `cursor`: `pointer`
-  - **无障碍性**:
-    - `aria-label`: (未指定)
-    - `aria-busy`: (未指定)
+**`primary` (主要按钮 - "Search")**
+- **`default`**
+  - **布局与尺寸**: `padding`: `12px 24px`, `height`: `48px`, `min-width`: `48px`
+  - **外观**: `background-color`: `rgb(228, 0, 43)`, `border-style`: `none`, `border-radius`: `24px`, `box-shadow`: `none`
+  - **排印**: `color`: `rgb(255, 255, 255)`, `font-size`: `16px`, `font-weight`: `500`
+  - **交互**: `cursor`: `pointer`
+- **`hover`**
+  - **外观**: `background-color`: `rgb(168, 30, 53)`
+- **`active`**
+  - **外观**: `background-color`: `rgb(128, 25, 43)`
+- **`disabled`**: *待分析*
+- **`loading`**: *待分析*
 
-- **状态: `hover`**
-  - *自动化工具分析受限，待手动测量。*
+**`secondary` (次要按钮 - "Filters")**
+- **`default`**
+  - **布局与尺寸**: `padding`: `11px 23px`, `height`: `48px`, `min-width`: `48px`
+  - **外观**: `background-color`: `transparent`, `border-style`: `solid`, `border-width`: `1px`, `border-color`: `rgb(114, 110, 117)`, `border-radius`: `24px`
+  - **排印**: `color`: `rgb(61, 59, 64)`, `font-size`: `16px`, `font-weight`: `500`
+  - **交互**: `cursor`: `pointer`
+- **`hover` & `active`**
+  - **外观**: `background-color`: `rgb(246, 245, 247)`
 
-- **状态: `active`**
-  - *自动化工具分析受限，待手动测量。*
+**`tertiary` (标签页按钮 - "Rent")**
+- **`default` (active tab)**
+  - **布局与尺寸**: `padding`: `8px 12px`, `height`: `48px`
+  - **外观**: `background-color`: `transparent`
+  - **排印**: `color`: `rgb(61, 59, 64)`, `font-size`: `16px`, `font-weight`: `500`
+  - **交互**: `cursor`: `pointer`
+- **`hover`**
+  - **外观**: `background-color`: `rgb(246, 245, 247)`
 
-- **状态: `disabled`**
-  - *待分析。*
-
-- **状态: `loading`**
-  - *待分析。*
-
----
-
-##### **变体: `secondary` (次要按钮 - "Filters")**
-
-- **状态: `default`**
-  - **布局与尺寸**:
-    - `padding`: `11px 23px`
-    - `height`: `48px` (实际为 `47.9972px`)
-    - `min-width`: `48px`
-    - `gap`: `normal` (浏览器默认, 包含图标)
-  - **外观**:
-    - `background-color`: `transparent` (实际为 `rgba(0, 0, 0, 0)`)
-    - `border-style`: `solid`
-    - `border-width`: `1px` (实际为 `0.909091px`)
-    - `border-color`: `rgb(114, 110, 117)`
-    - `border-radius`: `24px`
-    - `box-shadow`: `none`
-  - **排印**:
-    - `color`: `rgb(61, 59, 64)`
-    - `font-size`: `16px`
-    - `font-weight`: `500`
-  - **交互**:
-    - `transform`: `none`
-    - `cursor`: `pointer`
-
-- **状态: `hover`**
-  - *自动化工具分析受限，待手动测量。*
-
-- **状态: `active`**
-  - *自动化工具分析受限，待手动测量。*
-
----
-
-##### **变体: `tertiary` (标签页按钮 - "Rent")**
-
-- **状态: `default` (active tab)**
-  - **布局与尺寸**:
-    - `padding`: `8px 12px`
-    - `height`: `48px` (实际为 `47.9972px`)
-    - `min-width`: `0px`
-    - `gap`: `normal`
-  - **外观**:
-    - `background-color`: `transparent` (实际为 `rgba(0, 0, 0, 0)`)
-    - `border-style`: `none`
-    - `border-width`: `0px`
-    - `border-color`: `rgb(61, 59, 64)`
-    - `border-radius`: `0px`
-    - `box-shadow`: `none` (Note: a separate element provides the underline)
-  - **排印**:
-    - `color`: `rgb(61, 59, 64)`
-    - `font-size`: `16px`
-    - `font-weight`: `500`
-  - **交互**:
-    - `transform`: `none`
-    - `cursor`: `pointer`
-
-- **状态: `hover`**
-  - *自动化工具分析受限，待手动测量。*
-
----
-
-##### **变体: `icon-only` (图标按钮 - "Save Search")**
-
-- **状态: `default`**
-  - **布局与尺寸**:
-    - `padding`: `8px`
-    - `height`: `40px`
-    - `width`: `40px`
-    - `min-width`: `40px`
-  - **外观**:
-    - `background-color`: `transparent` (实际为 `rgba(0, 0, 0, 0)`)
-    - `border-style`: `none`
-    - `border-width`: `0px`
-    - `border-color`: `rgb(61, 59, 64)`
-    - `border-radius`: `8px`
-    - `box-shadow`: `none`
-  - **排印**:
-    - `color`: `rgb(61, 59, 64)` (This is for the icon SVG)
-  - **交互**:
-    - `cursor`: `pointer`
-
-- **状态: `hover`**
-  - *自动化工具分析受限，待手动测量。*
-
----
-
-### II. 输入与操作 (Inputs & Actions) - Continued
+**`icon-only` (图标按钮 - "Save Search")**
+- **`default`**
+  - **布局与尺寸**: `padding`: `8px`, `height`: `40px`, `width`: `40px`
+  - **外观**: `background-color`: `transparent`, `border-radius`: `8px`
+  - **排印**: `color`: `rgb(61, 59, 64)` (for icon)
+  - **交互**: `cursor`: `pointer`
+- **`hover`**
+  - **外观**: `background-color`: `rgb(246, 245, 247)`
 
 #### 2. `Input` (输入框)
 
-##### **变体: `text` (标准文本输入)**
+- **变体**: `text`, `password`, `search` (带图标)
+- **状态**: `default`, `hover`, `focus`, `disabled`, `error`
+##### **数据记录**
 
-- **状态: `default`**
-  - **布局与尺寸**:
-    - `padding`: `0px`
-    - `height`: `32px` (实际为 `31.9886px`)
-  - **外观**:
-    - `background-color`: `rgb(255, 255, 255)`
-    - `border-style`: `none` (Note: border is handled by a parent container)
-    - `border-width`: `0px`
-    - `border-color`: `rgb(61, 59, 64)`
-    - `border-radius`: `0px`
-  - **排印**:
-    - `color`: `rgb(61, 59, 64)`
-    - `font-size`: `16px`
-    - `placeholder-color`: `rgb(114, 110, 117)`
+**`text` (标准文本输入)**
+- **`default`**
+  - **布局与尺寸**: `padding`: `0px`, `height`: `32px`
+  - **外观**: `background-color`: `rgb(255, 255, 255)`, `border-style`: `none` (*由父容器处理*)
+  - **排印**: `color`: `rgb(61, 59, 64)`, `font-size`: `16px`, `placeholder-color`: `rgb(114, 110, 117)`
+- **`focus`**: *待分析*
+- **`hover`**: *待分析*
+- **`disabled`**: *待分析*
+- **`error`**: *待分析*
 
-- **状态: `focus`**
-  - *自动化工具分析受限，待手动测量。*
+#### 3. `Checkbox` & `Radio Button` (复选框 & 单选按钮)
 
----
+- **状态**: `unchecked`, `checked/selected`, `disabled`, `hover`, `focus`
+##### **数据记录**
 
-#### 3. `Checkbox` (复选框)
+- **`unchecked`**
+  - **容器**: `size`: `16px`, `background-color`: `rgb(255, 255, 255)`, `border-style`: `solid`, `border-width`: `1px`, `border-color`: `rgb(114, 110, 117)`, `border-radius`: `4px`
+- **`checked`**
+  - **容器**: `size`: `16px`, `background-color`: `rgb(61, 59, 64)`, `border-color`: `rgb(61, 59, 64)`
+- **标签**
+  - **排印**: `label-color`: `rgb(61, 59, 64)`, `label-font-size`: `16px`
+- **`disabled`**: *待分析*
+- **`hover`**: *待分析*
+- **`focus`**: *待分析*
 
-##### **变体: `standard`**
+#### 4. `Switch / Toggle` (开关)
 
-- **状态: `checked`**
-  - **容器 (Box)**:
-    - `size`: `16px` (实际为 `15.9943px`)
-    - `background-color`: `rgb(61, 59, 64)`
-    - `border-style`: `solid`
-    - `border-width`: `1px` (实际为 `0.909091px`)
-    - `border-color`: `rgb(61, 59, 64)`
-    - `border-radius`: `4px`
-  - **内部标记 (Checkmark)**:
-    - *Note: Checkmark is an SVG icon, its color is inherited.*
-  - **标签 (Label)**:
-    - *待分析*
+- **状态**: `on`, `off`, `disabled`, `hover`, `focus`
+- **测量属性**:
+  - **轨道 (Track)**: `width`, `height`, `border-radius`, `track-background-color-on`, `track-background-color-off`。
+  - **滑块 (Thumb)**: `size` (宽高), `background-color`, `box-shadow`。
+  - **动效**: `transition` 属性 (用于滑块的平滑移动)。
+  - **无障碍性**: `role="switch"`, `aria-checked`。
 
-- **状态: `unchecked`**
-  - **容器 (Box)**:
-    - `size`: `16px` (实际为 `15.9943px`)
-    - `background-color`: `rgb(255, 255, 255)`
-    - `border-style`: `solid`
-    - `border-width`: `1px` (实际为 `0.909091px`)
-    - `border-color`: `rgb(114, 110, 117)`
-    - `border-radius`: `4px`
+#### 5. `Textarea` (文本域)
+
+- **测量属性**基本同 `Input`，但需额外关注:
+  - **布局与尺寸**: `min-height`, `resize` 属性 (e.g., vertical, none)。
 
 ---
 
-### III. 信息展示 (Data Display)
+### II. 信息展示 (Data Display)
+
+#### 6. `Icon` (图标)
+
+- **测量属性**:
+  - **尺寸**: 定义一套标准尺寸，如 `size-sm: 16px`, `size-md: 20px`, `size-lg: 24px`。
+  - **颜色**: `color` (默认颜色), `color-interactive` (可交互颜色), `color-on-brand` (在品牌色上的颜色)。
+
+#### 7. `Badge / Tag` (徽章 / 标签)
+
+- **变体**: `neutral`, `info`, `success`, `warning`, `danger`
+- **测量属性**: `padding`, `background-color`, `color`, `font-size`, `font-weight`, `border-radius`, `border-width` (for outlined tags)。
+
+#### 8. `Avatar` (头像)
+
+- **变体**: `circle`, `square`; `sm`, `md`, `lg`; `image`, `text`
+- **测量属性**: `size` (宽高), `border-radius`, `font-size` (for text avatar), `background-color` (for text avatar), `group-overlap-margin` (头像组中的重叠边距)。
 
 #### 9. `Divider` (分割线)
 
-- **变体: `standard`**
-  - `height`: `1px` (实际为 `0.909091px`)
-  - `background-color`: `transparent`
-  - `border-width`: `1px 0 0 0` (实际为 `0.909091px 0px 0px`)
-  - `border-color`: `rgb(229, 227, 232)`
-  - `margin`: `32px 0 0 0`
+##### **数据记录**
+
+- **`standard`**
+  - **尺寸**: `height`: `1px`
+  - **外观**: `border-color`: `rgb(229, 227, 232)`
+  - **布局**: `margin`: `32px 0 0 0`
+
+#### 10. `Tooltip` (文字提示)
+
+- **测量属性**: `max-width`, `padding`, `background-color`, `color`, `font-size`, `border-radius`, `box-shadow`, `arrow-size`, `arrow-color`。
 
 ---
+
+### III. 反馈与状态 (Feedback & Status)
+
+#### 11. `Spinner / Loader` (加载指示器)
+
+- **测量属性**: `size`, `color`, `stroke-width` (轨道粗细)。
+
+#### 12. `Progress Bar` (进度条)
+
+- **变体**: `linear`, `circular`
+- **测量属性**: `track-color` (轨道颜色), `progress-color` (进度颜色), `height` (轨道粗细)。
+
+#### 13. `Alert` (警告提示)
+
+- **变体**: `info`, `success`, `warning`, `error`
+- **测量属性**: `padding`, `border-radius`, `background-color` (柔和的背景色), `border-left-width`, `border-left-color`, `icon-color`, `text-color` (标题和正文)。
+
+#### 14. `Skeleton` (骨架屏)
+
+- **测量属性**: `background-color` (占位符底色), `shimmer-animation` (闪烁动画的`background-image`渐变和`animation`属性)。

@@ -2,31 +2,18 @@
 **最后更新**：2025-10-11
 
 ## 当前焦点 (Current Focus)
-- “双色系统”Design Tokens 全面落地并贯通构建与预览：
-  - 品牌色与主行动色角色分离：color.brand.{primary,hover,active}、color.action.primary
-  - 中性色与语义补全：background.{page,surface,hover,disabled}、text.{placeholder,disabled,on.action}、border-interactive
-- 以 Astro 工具站作为本阶段唯一可视化调参与验收环境（暂不启用 Storybook）
+- **逆向工程原子组件样式**: 根据 `docs/task-list.md` 清单，系统性地分析 `realestate.com.au` 网站，抓取原子组件的 CSS 属性，为设计系统提供数据基础。
 
 ## 刚完成的工作 (Latest)
-- 主题与构建
-  - 更新 tokens/themes/{light,dark}.json 为“双色系统”结构；修复 dark 主题 brand 单值导致的 29 个引用缺失
-  - Style Dictionary 输出双作用域 CSS 变量：
-    - :root → packages/ui/src/styles/tokens.css
-    - [data-theme='dark'] → packages/ui/src/styles/tokens.dark.css
-  - 构建通过（Token collisions 警告 3 项，不影响产物）
-- Astro 集成与路径修正
-  - 三页接入：/（导航）、/tokens（调参与导出）、/components（多状态画廊）
-  - 统一导入 tokens.css / tokens.dark.css；实现 data-theme 切换（localStorage + prefers-color-scheme）
-  - 修正相对路径（../../../../packages/ui/src/styles/*）
-- 规范文档
-  - 新增 docs/ui-design-system-v1.0.md（双色系统色彩、字体、间距、断点、集成与维护策略）
+- **清单纠正与数据迁移**:
+  - 发现并废弃了不完整的旧版 `component-analysis-checklist.md`。
+  - 成功将用户提供的、完整的清单模板更新为新的工作基准。
+  - 将所有之前已测量的精确数据 (`Button`, `Input`, `Checkbox`, `Divider`) 成功填充到新清单的正确结构中。
+  - 纠正了关于 `Input` `focus` 状态的错误推断，确保了数据的准确性。
 
 ## 下一步行动 (Next · P0)
-1) 组件层令牌对齐：逐步将组件引用迁移到新语义（brand/action/semantic）并移除旧别名
-2) 构建告警治理：启用 verbose 定位 3 处 Token collisions，统一命名与路径
-3) 可视化完善：/tokens 增加颜色色板、间距标尺、圆角/阴影示例；/components 补充 hover/active/disabled 变体
-4) 导出→回填闭环：提供“导出清单 + 半自动回填 apps/uni-app/src/uni.scss”脚本（先文档化，谨慎自动写）
-5) 小程序真机校验：验证字体回退、字距/行高与深色下对比度
+- **继续数据抓取**: 按照新的、完整的清单，继续系统性地分析 `realestate.com.au` 上的组件。
+- **下一个目标**: 分析 `Switch / Toggle` (开关) 组件的样式。
 
 ## 重要约束 (Constraints)
 - 本阶段以 Astro 为设计系统验证环境；Storybook 暂不启用，避免多环境复杂度

@@ -4,6 +4,16 @@
 
 ## 近期重要里程碑（2025-10）
 
+### 原子组件样式抓取与清单修正 (进行中)
+- **2025-10-11｜清单修正与数据迁移**:
+  - **纠正偏差**: 废弃了不完整的旧版分析清单，并以用户提供的完整模板作为新的工作基准。
+  - **数据迁移**: 将所有已测量的精确数据 (`Button`, `Input`, `Checkbox`, `Divider`) 成功填充到新清单的正确结构中，并纠正了错误推断，确保了数据的准确性。为后续系统化的数据抓取工作奠定了坚实基础。
+- **2025-10-11｜第一轮数据抓取完成**:
+  - **分析对象**: `realestate.com.au` 租房主页。
+  - **覆盖组件**: 成功抓取 `Button` (4个变体), `Input`, `Checkbox` (2个状态), `Divider` 在 `default` 状态下的样式。
+  - **成果**: 所有数据已记录在 `docs/component-analysis-checklist.md`，为 Token 定义阶段提供了基础数据。
+  - **遗留问题**: 因工具限制，`:hover`, `:active` 等交互状态的样式无法自动抓取，需要手动测量。
+
 ### 双色系统 Design Tokens 与 Astro 接入（完成）
 - 主题令牌：color.brand.{primary,hover,active} 与 color.action.primary；中性色/语义补全（background.*、text.*、border-interactive）
 - 构建：Style Dictionary 输出 :root 与 [data-theme='dark'] 两套 CSS 变量（packages/ui/src/styles/tokens*.css），小程序 wxss 同步生成
