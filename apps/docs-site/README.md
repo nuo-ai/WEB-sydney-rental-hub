@@ -32,9 +32,9 @@ pnpm install
 ```
 
 2) 启动文档站（在仓库根目录执行）
-```
+
 pnpm docs:dev
-```
+
 默认地址：http://localhost:3000
 
 3) 生产构建与本地预览
