@@ -1,0 +1,19 @@
+{
+  "name": "@srh/design-site-astro",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SRH Design Tokens & Components site (Astro)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^4.13.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -2,4 +2,5 @@ packages:
   - 'apps/*'
   - 'packages/*'
   - 'crawler'
+  - 'tools/*'
   # TODO: 根据审计报告，评估 vue-frontend 价值后决定保留或归档

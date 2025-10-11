@@ -4,6 +4,13 @@
 
 ## 近期重要里程碑（2025-10）
 
+### 可视化设计 Token 工具站（Astro）
+- **2025-10-11｜Astro 工具站落地与文字系统扩展**:
+  - **站点创建**: 在 `tools/design-site-astro` 新增 Astro 站点，含 `/tokens`（实时调参）、`/components`（多状态画廊）页面。
+  - **文字系统 Token**: 扩展 `public/tokens/srh.json` 与 `apps/uni-app/src/uni.scss`，新增中/英文字体族、字重、字距、文本级别（XS~XL），并在 Astro 页面与 uni-app CSS 变量桥接层同步。
+  - **工作区集成**: `pnpm-workspace.yaml` 纳入 `tools/*`；根 `package.json` 新增 `astro:dev/build/preview` 快捷脚本。
+  - **价值**: 建立“可视化调参→导出→回填”闭环，替代 Storybook，满足“所有 Token 直观渲染”需求。
+
 ### Monorepo 下的 uni-app + uni-ui 接入
 - **2025-10-11｜子应用接入与验证**:
   - **子包创建**: 新建 apps/uni-app（Vite + Vue3 + uni-app 官方模板）。

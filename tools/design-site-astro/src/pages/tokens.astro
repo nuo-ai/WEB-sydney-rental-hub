@@ -1,0 +1,647 @@
+---
+const title = 'Tokens Playground (Astro)';
+const desc = 'SRH Design Tokens Playground';
+
+import '../../../../packages/ui/src/styles/tokens.css';
+import '../../../../packages/ui/src/styles/tokens.dark.css';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <style>
+      :root {
+        --fg: var(--color-text-primary);
+        --muted: var(--color-text-secondary);
+        --border: var(--color-border);
+        --bg: var(--color-background-page);
+        --accent: var(--color-action-primary);
+
+        /* SRH variables (runtime set via JS) */
+        --srh-color-text-primary: #3d3b40;
+        --srh-color-text-secondary: #3d3b40;
+        --srh-card-bg: #ffffff;
+        --srh-shadow-card: 0 1px 4px 0 rgba(0,0,0,0.16);
+
+        --srh-space-2xs: 4px;
+        --srh-space-xs: 8px;
+        --srh-space-sm: 12px;
+        --srh-space-md: 16px;
+        --srh-space-lg: 20px;
+
+        --srh-radius-sm: 6px;
+        --srh-radius-md: 8px;
+
+        --srh-font-size-price: 20px;
+        --srh-line-height-price: 28px;
+
+        --srh-font-size-address: 16px;
+        --srh-line-height-address: 24px;
+
+        --srh-font-size-inspection: 14px;
+        --srh-line-height-inspection: 20px;
+
+        --srh-meta-icon-size: 16px;
+        --srh-meta-gap: 8px;
+
+        --srh-button-size: 40px;
+        --srh-image-aspect: 0.75;
+
+        /* typography */
+        --srh-font-family-zh: 'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif;
+        --srh-font-family-en: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+        --srh-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif;
+
+        --srh-font-weight-regular: 400;
+        --srh-font-weight-medium: 500;
+        --srh-font-weight-semibold: 600;
+        --srh-font-weight-bold: 700;
+
+        --srh-letter-spacing-tight: -0.2px;
+        --srh-letter-spacing-normal: 0px;
+        --srh-letter-spacing-wide: 0.2px;
+
+        --srh-font-size-xs: 12px;
+        --srh-line-height-xs: 18px;
+        --srh-font-size-sm: 14px;
+        --srh-line-height-sm: 20px;
+        --srh-font-size-md: 16px;
+        --srh-line-height-md: 24px;
+        --srh-font-size-lg: 20px;
+        --srh-line-height-lg: 28px;
+        --srh-font-size-xl: 24px;
+        --srh-line-height-xl: 32px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: var(--srh-font-family-base);
+        color: var(--fg);
+        background: var(--bg);
+        letter-spacing: var(--srh-letter-spacing-normal);
+        font-weight: var(--srh-font-weight-regular);
+        font-size: var(--srh-font-size-md);
+        line-height: var(--srh-line-height-md);
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      h1 { margin: 0 0 8px; font-size: 28px; }
+      p.desc { color: var(--muted); margin: 0 0 20px; }
+      .grid {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 16px;
+      }
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        background: var(--color-background-surface);
+      }
+      fieldset { border: none; padding: 0; margin: 0 0 12px; }
+      legend { font-weight: 600; margin-bottom: 8px; }
+      .row {
+        display: flex; align-items: center; gap: 8px; margin: 6px 0;
+      }
+      .label { width: 170px; color: var(--muted); }
+      input[type="number"], input[type="text"] {
+        border: 1px solid #ddd; border-radius: 6px; padding: 6px 8px; height: 34px;
+      }
+      input[type="number"] { width: 120px; }
+      input[type="color"] { width: 42px; height: 28px; padding: 0; border: 1px solid #ccc; }
+      .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+      .btn {
+        display: inline-block; padding: 8px 12px; border-radius: 8px;
+        text-decoration: none; cursor: pointer; border: 1px solid #ddd; background: #fafafa;
+      }
+      .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+      .preview-wrapper {
+        background: #fafafa; border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+      }
+      .card {
+        width: 360px;
+        background: var(--srh-card-bg);
+        padding: var(--srh-space-md);
+        box-shadow: var(--srh-shadow-card);
+        border-radius: var(--srh-radius-md);
+        font-family: var(--srh-font-family-base);
+      }
+      .img {
+        width: 100%; height: 0;
+        padding-top: calc(var(--srh-image-aspect) * 100%);
+        background: #eee; border-radius: 6px; margin-bottom: 12px;
+        position: relative;
+      }
+      .header { display: flex; align-items: center; justify-content: space-between; }
+      .price {
+        font-size: var(--srh-font-size-price);
+        line-height: var(--srh-line-height-price);
+        color: var(--srh-color-text-primary);
+        font-weight: var(--srh-font-weight-semibold);
+        letter-spacing: var(--srh-letter-spacing-tight);
+      }
+      .fav {
+        width: var(--srh-button-size); height: var(--srh-button-size);
+        border-radius: var(--srh-radius-md); background: #f5f5f5; color: #333;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .address {
+        font-size: var(--srh-font-size-address);
+        line-height: var(--srh-line-height-address);
+        color: var(--srh-color-text-primary);
+        letter-spacing: var(--srh-letter-spacing-normal);
+        margin-top: 8px;
+        font-weight: var(--srh-font-weight-regular);
+      }
+      .meta { display: flex; flex-direction: row; margin-top: 4px; }
+      .meta-item { color: var(--srh-color-text-secondary); margin-right: var(--srh-meta-gap); }
+      .meta-item:last-child { margin-right: 0; }
+      .inspection {
+        font-size: var(--srh-font-size-inspection);
+        line-height: var(--srh-line-height-inspection);
+        color: var(--srh-color-text-secondary);
+        margin-top: 6px;
+        letter-spacing: var(--srh-letter-spacing-wide);
+        font-weight: var(--srh-font-weight-medium);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Tokens Playground</h1>
+      <p class="desc">从左侧调整 Token（含字体家族/字重/字距/字号级别），右侧预览卡片将实时更新。可复制 JSON 或 SCSS，回填到小程序/WEB 项目。</p>
+
+      <div style="margin: 12px 0 16px;">
+        <button class="btn primary" id="theme-toggle" type="button">切换暗色</button>
+        <span style="margin-left: 8px; color: var(--muted); font-size: 13px;">当前主题通过 [data-theme] 控制</span>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <fieldset>
+            <legend>颜色</legend>
+            <div class="row">
+              <span class="label">colorTextPrimary</span>
+              <input id="colorTextPrimaryPicker" type="color" />
+              <input id="colorTextPrimary" type="text" />
+            </div>
+            <div class="row">
+              <span class="label">colorTextSecondary</span>
+              <input id="colorTextSecondaryPicker" type="color" />
+              <input id="colorTextSecondary" type="text" />
+            </div>
+            <div class="row">
+              <span class="label">cardBg</span>
+              <input id="cardBgPicker" type="color" />
+              <input id="cardBg" type="text" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>阴影</legend>
+            <div class="row">
+              <span class="label">shadow</span>
+              <input id="shadow" type="text" placeholder="例如：0 2px 8px 0 rgba(0,0,0,.2)" style="flex:1;" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>尺寸（px）</legend>
+            <div class="row"><span class="label">space2xs</span><input id="space2xs" type="number" /></div>
+            <div class="row"><span class="label">spaceXs</span><input id="spaceXs" type="number" /></div>
+            <div class="row"><span class="label">spaceSm</span><input id="spaceSm" type="number" /></div>
+            <div class="row"><span class="label">spaceMd</span><input id="spaceMd" type="number" /></div>
+            <div class="row"><span class="label">spaceLg</span><input id="spaceLg" type="number" /></div>
+            <div class="row"><span class="label">radiusSm</span><input id="radiusSm" type="number" /></div>
+            <div class="row"><span class="label">radiusMd</span><input id="radiusMd" type="number" /></div>
+            <div class="row"><span class="label">metaIconSize</span><input id="metaIconSize" type="number" /></div>
+            <div class="row"><span class="label">metaGap</span><input id="metaGap" type="number" /></div>
+            <div class="row"><span class="label">buttonSize</span><input id="buttonSize" type="number" /></div>
+            <div class="row"><span class="label">imageAspect</span><input id="imageAspect" type="number" step="0.01" /></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Typography · 字体家族</legend>
+            <div class="row">
+              <span class="label">fontFamilyEN（英文）</span>
+              <input id="fontFamilyEN" type="text" style="flex:1;" placeholder="-apple-system, Roboto, ..." />
+            </div>
+            <div class="row">
+              <span class="label">fontFamilyZH（中文）</span>
+              <input id="fontFamilyZH" type="text" style="flex:1;" placeholder="'PingFang SC', 'Source Han Sans SC', ..." />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Typography · 字重与字距</legend>
+            <div class="row"><span class="label">fontWeightRegular</span><input id="fontWeightRegular" type="number" /></div>
+            <div class="row"><span class="label">fontWeightMedium</span><input id="fontWeightMedium" type="number" /></div>
+            <div class="row"><span class="label">fontWeightSemibold</span><input id="fontWeightSemibold" type="number" /></div>
+            <div class="row"><span class="label">fontWeightBold</span><input id="fontWeightBold" type="number" /></div>
+            <div class="row"><span class="label">letterSpacingTight(px)</span><input id="letterSpacingTight" type="number" step="0.1" /></div>
+            <div class="row"><span class="label">letterSpacingNormal(px)</span><input id="letterSpacingNormal" type="number" step="0.1" /></div>
+            <div class="row"><span class="label">letterSpacingWide(px)</span><input id="letterSpacingWide" type="number" step="0.1" /></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Typography · 文本级别（px）</legend>
+            <div class="row"><span class="label">XS size / line</span><input id="fontSizeXs" type="number" /><input id="lineHeightXs" type="number" /></div>
+            <div class="row"><span class="label">SM size / line</span><input id="fontSizeSm" type="number" /><input id="lineHeightSm" type="number" /></div>
+            <div class="row"><span class="label">MD size / line</span><input id="fontSizeMd" type="number" /><input id="lineHeightMd" type="number" /></div>
+            <div class="row"><span class="label">LG size / line</span><input id="fontSizeLg" type="number" /><input id="lineHeightLg" type="number" /></div>
+            <div class="row"><span class="label">XL size / line</span><input id="fontSizeXl" type="number" /><input id="lineHeightXl" type="number" /></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>卡片专用（覆盖通用级别）</legend>
+            <div class="row"><span class="label">price size / line</span><input id="fontSizePrice" type="number" /><input id="lineHeightPrice" type="number" /></div>
+            <div class="row"><span class="label">address size / line</span><input id="fontSizeAddress" type="number" /><input id="lineHeightAddress" type="number" /></div>
+            <div class="row"><span class="label">inspection size / line</span><input id="fontSizeInspection" type="number" /><input id="lineHeightInspection" type="number" /></div>
+          </fieldset>
+
+          <div class="actions">
+            <button id="resetBtn" class="btn">重置</button>
+            <button id="copyJsonBtn" class="btn primary">复制 JSON</button>
+            <button id="copyScssBtn" class="btn">复制 SCSS</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="preview-wrapper">
+            <div class="card">
+              <div class="img" id="img"></div>
+              <div class="header">
+                <div class="price">$800 pw</div>
+                <div class="fav" aria-label="fav" title="Favorite">♥</div>
+              </div>
+              <div class="address">12 Example St, Zetland NSW 2017</div>
+              <div class="meta">
+                <div class="meta-item">2 Bed</div>
+                <div class="meta-item">2 Bath</div>
+                <div class="meta-item">1 Car</div>
+              </div>
+              <div class="inspection">Inspection today 2:15pm</div>
+            </div>
+          </div>
+
+          <details style="margin-top: 16px;">
+            <summary>当前 JSON</summary>
+            <pre id="jsonView" style="background:#f6f8fa; padding:12px; border-radius:8px; overflow:auto;"></pre>
+          </details>
+
+          <details style="margin-top: 12px;">
+            <summary>回填 SCSS（复制到 apps/uni-app/src/uni.scss）</summary>
+            <pre id="scssView" style="background:#f6f8fa; padding:12px; border-radius:8px; overflow:auto;"></pre>
+          </details>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const numberKeysPx = [
+        'space2xs','spaceXs','spaceSm','spaceMd','spaceLg',
+        'radiusSm','radiusMd',
+        'fontSizePrice','lineHeightPrice',
+        'fontSizeAddress','lineHeightAddress',
+        'fontSizeInspection','lineHeightInspection',
+        'metaIconSize','metaGap',
+        'buttonSize'
+      ];
+
+      const colorKeys = ['colorTextPrimary', 'colorTextSecondary', 'cardBg'];
+      const otherKeys = ['shadow', 'imageAspect'];
+
+      const fontKeys = ['fontFamilyEN','fontFamilyZH'];
+      const weightKeys = ['fontWeightRegular','fontWeightMedium','fontWeightSemibold','fontWeightBold'];
+      const letterKeys = ['letterSpacingTight','letterSpacingNormal','letterSpacingWide'];
+      const scaleSizeKeys = ['fontSizeXs','fontSizeSm','fontSizeMd','fontSizeLg','fontSizeXl'];
+      const scaleLineKeys = ['lineHeightXs','lineHeightSm','lineHeightMd','lineHeightLg','lineHeightXl'];
+
+      let initialTokens = null;
+      let tokens = null;
+
+      function toPx(v){ const n=Number(v); return Number.isFinite(n)? n+'px': String(v); }
+
+      function applyTokens(obj){
+        const r = document.documentElement;
+        // colors
+        r.style.setProperty('--srh-color-text-primary', obj.colorTextPrimary);
+        r.style.setProperty('--srh-color-text-secondary', obj.colorTextSecondary);
+        r.style.setProperty('--srh-card-bg', obj.cardBg);
+        r.style.setProperty('--srh-shadow-card', obj.shadow);
+
+        // spacing, radius, meta, button, aspect
+        r.style.setProperty('--srh-space-2xs', toPx(obj.space2xs));
+        r.style.setProperty('--srh-space-xs', toPx(obj.spaceXs));
+        r.style.setProperty('--srh-space-sm', toPx(obj.spaceSm));
+        r.style.setProperty('--srh-space-md', toPx(obj.spaceMd));
+        r.style.setProperty('--srh-space-lg', toPx(obj.spaceLg));
+        r.style.setProperty('--srh-radius-sm', toPx(obj.radiusSm));
+        r.style.setProperty('--srh-radius-md', toPx(obj.radiusMd));
+        r.style.setProperty('--srh-meta-icon-size', toPx(obj.metaIconSize));
+        r.style.setProperty('--srh-meta-gap', toPx(obj.metaGap));
+        r.style.setProperty('--srh-button-size', toPx(obj.buttonSize));
+        r.style.setProperty('--srh-image-aspect', String(obj.imageAspect));
+
+        // typography families (base = EN + , + ZH)
+        r.style.setProperty('--srh-font-family-en', obj.fontFamilyEN);
+        r.style.setProperty('--srh-font-family-zh', obj.fontFamilyZH);
+        r.style.setProperty('--srh-font-family-base', `${obj.fontFamilyEN}, ${obj.fontFamilyZH}`);
+
+        // weights
+        r.style.setProperty('--srh-font-weight-regular', String(obj.fontWeightRegular));
+        r.style.setProperty('--srh-font-weight-medium', String(obj.fontWeightMedium));
+        r.style.setProperty('--srh-font-weight-semibold', String(obj.fontWeightSemibold));
+        r.style.setProperty('--srh-font-weight-bold', String(obj.fontWeightBold));
+
+        // letter spacing (px)
+        r.style.setProperty('--srh-letter-spacing-tight', toPx(obj.letterSpacingTight));
+        r.style.setProperty('--srh-letter-spacing-normal', toPx(obj.letterSpacingNormal));
+        r.style.setProperty('--srh-letter-spacing-wide', toPx(obj.letterSpacingWide));
+
+        // scale sizes
+        r.style.setProperty('--srh-font-size-xs', toPx(obj.fontSizeXs));
+        r.style.setProperty('--srh-line-height-xs', toPx(obj.lineHeightXs));
+        r.style.setProperty('--srh-font-size-sm', toPx(obj.fontSizeSm));
+        r.style.setProperty('--srh-line-height-sm', toPx(obj.lineHeightSm));
+        r.style.setProperty('--srh-font-size-md', toPx(obj.fontSizeMd));
+        r.style.setProperty('--srh-line-height-md', toPx(obj.lineHeightMd));
+        r.style.setProperty('--srh-font-size-lg', toPx(obj.fontSizeLg));
+        r.style.setProperty('--srh-line-height-lg', toPx(obj.lineHeightLg));
+        r.style.setProperty('--srh-font-size-xl', toPx(obj.fontSizeXl));
+        r.style.setProperty('--srh-line-height-xl', toPx(obj.lineHeightXl));
+
+        // card specific sizes
+        r.style.setProperty('--srh-font-size-price', toPx(obj.fontSizePrice));
+        r.style.setProperty('--srh-line-height-price', toPx(obj.lineHeightPrice));
+        r.style.setProperty('--srh-font-size-address', toPx(obj.fontSizeAddress));
+        r.style.setProperty('--srh-line-height-address', toPx(obj.lineHeightAddress));
+        r.style.setProperty('--srh-font-size-inspection', toPx(obj.fontSizeInspection));
+        r.style.setProperty('--srh-line-height-inspection', toPx(obj.lineHeightInspection));
+      }
+
+      function el(id){ return document.getElementById(id); }
+
+      function updateViews(){
+        el('jsonView').textContent = JSON.stringify(tokens, null, 2);
+        el('scssView').textContent = generateScss(tokens);
+      }
+
+      function bindInputs(){
+        // colors
+        const pairs = [
+          ['colorTextPrimary', 'colorTextPrimaryPicker'],
+          ['colorTextSecondary', 'colorTextSecondaryPicker'],
+          ['cardBg', 'cardBgPicker']
+        ];
+        for(const [txtId, pickId] of pairs){
+          const txt=el(txtId), pick=el(pickId);
+          txt.value = tokens[txtId];
+          pick.value = tokens[txtId];
+          txt.addEventListener('input', (e)=>{
+            tokens[txtId]=e.target.value; pick.value=tokens[txtId]; applyTokens(tokens); updateViews();
+          });
+          pick.addEventListener('input', (e)=>{
+            tokens[txtId]=e.target.value; txt.value=tokens[txtId]; applyTokens(tokens); updateViews();
+          });
+        }
+        // shadow
+        const shadow = el('shadow');
+        shadow.value = tokens.shadow;
+        shadow.addEventListener('input', (e)=>{ tokens.shadow=e.target.value; applyTokens(tokens); updateViews(); });
+
+        // numbers px group
+        for(const k of numberKeysPx.concat(['imageAspect'])){
+          const input = el(k);
+          input.value = tokens[k];
+          input.addEventListener('input', (e)=>{
+            const n = Number(e.target.value);
+            if(Number.isFinite(n)){ tokens[k] = k==='imageAspect'? n : n; applyTokens(tokens); updateViews(); }
+          });
+        }
+
+        // font families
+        for(const k of fontKeys){
+          const input = el(k);
+          input.value = tokens[k];
+          input.addEventListener('input', (e)=>{
+            tokens[k]=e.target.value; applyTokens(tokens); updateViews();
+          });
+        }
+
+        // weights
+        for(const k of weightKeys){
+          const input = el(k);
+          input.value = tokens[k];
+          input.addEventListener('input', (e)=>{
+            const n = Number(e.target.value);
+            if(Number.isFinite(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
+          });
+        }
+
+        // letter spacing
+        for(const k of letterKeys){
+          const input = el(k);
+          input.value = tokens[k];
+          input.addEventListener('input', (e)=>{
+            const n = Number(e.target.value);
+            if(!Number.isNaN(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
+          });
+        }
+
+        // scale sizes & lines
+        for(const k of scaleSizeKeys.concat(scaleLineKeys)){
+          const input = el(k);
+          input.value = tokens[k];
+          input.addEventListener('input', (e)=>{
+            const n = Number(e.target.value);
+            if(Number.isFinite(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
+          });
+        }
+
+        // card specific type sizes
+        for(const k of ['fontSizePrice','lineHeightPrice','fontSizeAddress','lineHeightAddress','fontSizeInspection','lineHeightInspection']){
+          const input = el(k);
+          input.value = tokens[k];
+          input.addEventListener('input', (e)=>{
+            const n = Number(e.target.value);
+            if(Number.isFinite(n)){ tokens[k]=n; applyTokens(tokens); updateViews(); }
+          });
+        }
+      }
+
+      function generateScss(vars){
+        const map = [
+          // colors & surfaces
+          ['colorTextPrimary', '$srh-color-text-primary', v=>v],
+          ['colorTextSecondary', '$srh-color-text-secondary', v=>v],
+          ['cardBg', '$srh-color-card-bg', v=>v],
+          ['shadow', '$srh-shadow-card', v=>v],
+
+          // spacing & radius
+          ['space2xs', '$srh-space-2xs', v=>Number(v)+'px'],
+          ['spaceXs', '$srh-space-xs', v=>Number(v)+'px'],
+          ['spaceSm', '$srh-space-sm', v=>Number(v)+'px'],
+          ['spaceMd', '$srh-space-md', v=>Number(v)+'px'],
+          ['spaceLg', '$srh-space-lg', v=>Number(v)+'px'],
+          ['radiusSm', '$srh-radius-sm', v=>Number(v)+'px'],
+          ['radiusMd', '$srh-radius-md', v=>Number(v)+'px'],
+
+          // meta & controls
+          ['metaIconSize', '$srh-meta-icon-size', v=>Number(v)+'px'],
+          ['metaGap', '$srh-meta-gap', v=>Number(v)+'px'],
+          ['buttonSize', '$srh-button-size', v=>Number(v)+'px'],
+          ['imageAspect', '$srh-image-aspect', v=>String(v)],
+
+          // typography families
+          ['fontFamilyEN', '$srh-font-family-en', v=>v],
+          ['fontFamilyZH', '$srh-font-family-zh', v=>v],
+
+          // weights
+          ['fontWeightRegular', '$srh-font-weight-regular', v=>Number(v)],
+          ['fontWeightMedium', '$srh-font-weight-medium', v=>Number(v)],
+          ['fontWeightSemibold', '$srh-font-weight-semibold', v=>Number(v)],
+          ['fontWeightBold', '$srh-font-weight-bold', v=>Number(v)],
+
+          // letter spacing
+          ['letterSpacingTight', '$srh-letter-spacing-tight', v=>Number(v)+'px'],
+          ['letterSpacingNormal', '$srh-letter-spacing-normal', v=>Number(v)+'px'],
+          ['letterSpacingWide', '$srh-letter-spacing-wide', v=>Number(v)+'px'],
+
+          // scale sizes
+          ['fontSizeXs', '$srh-font-size-xs', v=>Number(v)+'px'],
+          ['lineHeightXs', '$srh-line-height-xs', v=>Number(v)+'px'],
+          ['fontSizeSm', '$srh-font-size-sm', v=>Number(v)+'px'],
+          ['lineHeightSm', '$srh-line-height-sm', v=>Number(v)+'px'],
+          ['fontSizeMd', '$srh-font-size-md', v=>Number(v)+'px'],
+          ['lineHeightMd', '$srh-line-height-md', v=>Number(v)+'px'],
+          ['fontSizeLg', '$srh-font-size-lg', v=>Number(v)+'px'],
+          ['lineHeightLg', '$srh-line-height-lg', v=>Number(v)+'px'],
+          ['fontSizeXl', '$srh-font-size-xl', v=>Number(v)+'px'],
+          ['lineHeightXl', '$srh-line-height-xl', v=>Number(v)+'px'],
+
+          // card specific
+          ['fontSizePrice', '$srh-font-size-price', v=>Number(v)+'px'],
+          ['lineHeightPrice', '$srh-line-height-price', v=>Number(v)+'px'],
+          ['fontSizeAddress', '$srh-font-size-address', v=>Number(v)+'px'],
+          ['lineHeightAddress', '$srh-line-height-address', v=>Number(v)+'px'],
+          ['fontSizeInspection', '$srh-font-size-inspection', v=>Number(v)+'px'],
+          ['lineHeightInspection', '$srh-line-height-inspection', v=>Number(v)+'px']
+        ];
+        const lines = ['/* 由 Astro 站点导出，回填到 apps/uni-app/src/uni.scss */'];
+        for(const [k, scss, fmt] of map){
+          if(vars[k]!==undefined) lines.push(`${scss}: ${fmt(vars[k])};`);
+        }
+        return lines.join('\\n');
+      }
+
+      function download(filename, text){
+        const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', filename);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function copyJSON(){
+        const text = JSON.stringify(tokens, null, 2);
+        try { await navigator.clipboard.writeText(text); alert('已复制 JSON'); }
+        catch { download('srh.tokens.json', text); }
+      }
+      async function copySCSS(){
+        const text = generateScss(tokens);
+        try { await navigator.clipboard.writeText(text); alert('已复制 SCSS'); }
+        catch { download('srh.tokens.scss', text); }
+      }
+      function reset(){
+        tokens = JSON.parse(JSON.stringify(initialTokens));
+        applyTokens(tokens);
+        bindInputs();
+        updateViews();
+      }
+
+      document.getElementById('copyJsonBtn').addEventListener('click', copyJSON);
+      document.getElementById('copyScssBtn').addEventListener('click', copySCSS);
+      document.getElementById('resetBtn').addEventListener('click', reset);
+
+      fetch('/tokens/srh.json', { cache: 'no-store' })
+        .then(r=>r.json())
+        .then(data=>{
+          initialTokens = data;
+          tokens = JSON.parse(JSON.stringify(data));
+          applyTokens(tokens);
+          bindInputs();
+          updateViews();
+        })
+        .catch(()=>{
+          const fallback = {
+            colorTextPrimary:'#3d3b40', colorTextSecondary:'#3d3b40', cardBg:'#ffffff',
+            shadow:'0 1px 4px 0 rgba(0,0,0,0.16)',
+            space2xs:4, spaceXs:8, spaceSm:12, spaceMd:16, spaceLg:20,
+            radiusSm:6, radiusMd:8,
+            fontSizePrice:20, lineHeightPrice:28,
+            fontSizeAddress:16, lineHeightAddress:24,
+            fontSizeInspection:14, lineHeightInspection:20,
+            metaIconSize:16, metaGap:8,
+            buttonSize:40, imageAspect:0.75,
+
+            fontFamilyZH:"'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif",
+            fontFamilyEN:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif",
+
+            fontWeightRegular:400, fontWeightMedium:500, fontWeightSemibold:600, fontWeightBold:700,
+            letterSpacingTight:-0.2, letterSpacingNormal:0, letterSpacingWide:0.2,
+
+            fontSizeXs:12, lineHeightXs:18,
+            fontSizeSm:14, lineHeightSm:20,
+            fontSizeMd:16, lineHeightMd:24,
+            fontSizeLg:20, lineHeightLg:28,
+            fontSizeXl:24, lineHeightXl:32
+          };
+          initialTokens = fallback; tokens = JSON.parse(JSON.stringify(fallback));
+          applyTokens(tokens); bindInputs(); updateViews();
+        });
+    </script>
+
+    <script>
+      (function() {
+        const root = document.documentElement;
+        const key = 'srh-theme';
+        const apply = (t) => {
+          if (t === 'dark') root.setAttribute('data-theme', 'dark');
+          else root.removeAttribute('data-theme');
+          try { localStorage.setItem(key, t); } catch (e) {}
+        };
+        try {
+          const saved = localStorage.getItem(key);
+          if (saved) apply(saved);
+          else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) apply('dark');
+        } catch(e) {}
+        const btn = document.getElementById('theme-toggle');
+        if (btn) {
+          const syncLabel = () => {
+            const isDark = root.getAttribute('data-theme') === 'dark';
+            btn.textContent = isDark ? '切换浅色' : '切换暗色';
+          };
+          btn.addEventListener('click', () => {
+            const isDark = root.getAttribute('data-theme') === 'dark';
+            apply(isDark ? 'light' : 'dark');
+            syncLabel();
+          });
+          syncLabel();
+        }
+      })();
+    </script>
+  </body>
+</html>

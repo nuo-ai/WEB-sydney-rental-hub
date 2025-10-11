@@ -5,6 +5,12 @@
 			"style": {
 				"navigationBarTitleText": "uni-app"
 			}
+		},
+		{
+			"path": "pages/tokens/preview",
+			"style": {
+				"navigationBarTitleText": "SRH Tokens Preview"
+			}
 		}
 	],
 	"easycom": {

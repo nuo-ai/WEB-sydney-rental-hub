@@ -1,0 +1,30 @@
+{
+  "colorTextPrimary": "#3d3b40",
+  "colorTextSecondary": "#3d3b40",
+  "cardBg": "#ffffff",
+  "shadow": "0 1px 4px 0 rgba(0,0,0,0.16)",
+
+  "space2xs": 4,
+  "spaceXs": 8,
+  "spaceSm": 12,
+  "spaceMd": 16,
+  "spaceLg": 20,
+
+  "radiusSm": 6,
+  "radiusMd": 8,
+
+  "fontSizePrice": 20,
+  "lineHeightPrice": 28,
+
+  "fontSizeAddress": 16,
+  "lineHeightAddress": 24,
+
+  "fontSizeInspection": 14,
+  "lineHeightInspection": 20,
+
+  "metaIconSize": 16,
+  "metaGap": 8,
+
+  "buttonSize": 40,
+  "imageAspect": 0.75
+}

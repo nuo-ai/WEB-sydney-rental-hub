@@ -1,0 +1,23 @@
+{
+  "name": "@srh/docs-site",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sydney Rental Hub Design Tokens & Components site (Docusaurus)",
+  "license": "MIT",
+  "scripts": {
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve",
+    "clear": "docusaurus clear"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.6.3",
+    "@docusaurus/preset-classic": "^3.6.3",
+    "clsx": "^2.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -74,3 +74,183 @@ $uni-color-subtitle: #555; // 二级标题颜色
 $uni-font-size-subtitle: 18px;
 $uni-color-paragraph: #3f536e; // 文章段落颜色
 $uni-font-size-paragraph: 15px;
+
+/* ======================================================================
+   SRH · Mobile 设计原子 Token（对齐 realestate 房源卡片测量值）
+   说明：
+   - 来源：chrome-mcp 抓取 realestate.com.au（移动端）带 “Inspection today” 的房源卡片
+   - 典型卡片测量（首屏样本）：
+     - 卡片阴影：rgba(0,0,0,0.16) 0 1px 4px 0
+     - 卡片内边距：16px
+     - 图片高度：331px（容器宽度 441px，约 4:3）
+     - 价格文字：20px/28px，字重 600，颜色 rgb(61,59,64)
+     - 地址文字：16px/24px，字重 400，颜色 rgb(61,59,64)
+     - 元信息图标：16px，间距 8px
+     - 收藏按钮：40px × 40px，圆角 8px
+     - Inspection today：14px/20px，颜色 rgb(61,59,64)
+   - 注意：以下为 SCSS 变量，仅作为主题来源；组件内通过变量引用，便于“手动调参 → 一处全局生效”
+   ====================================================================== */
+
+/* 颜色（依据测量） */
+$srh-color-text-primary: #3d3b40; // rgb(61,59,64)
+$srh-color-text-secondary: #3d3b40; // 与主文本一致（如需区分，可手动下调明度）
+$srh-color-card-bg: #ffffff;
+$srh-color-shadow: rgba(0, 0, 0, 0.16);
+
+/* 尺寸与间距（px） */
+$srh-space-2xs: 4px;
+$srh-space-xs: 8px;
+$srh-space-sm: 12px;
+$srh-space-md: 16px;  // 卡片内边距
+$srh-space-lg: 20px;
+
+/* 圆角与阴影 */
+$srh-radius-sm: 6px;
+$srh-radius-md: 8px;  // 收藏按钮
+$srh-shadow-card: 0 1px 4px 0 $srh-color-shadow;
+
+/* 字号与行高（px） */
+$srh-font-size-price: 20px;
+$srh-line-height-price: 28px;
+
+$srh-font-size-address: 16px;
+$srh-line-height-address: 24px;
+
+$srh-font-size-inspection: 14px;
+$srh-line-height-inspection: 20px;
+
+/* 元信息（bed/bath/car 等） */
+$srh-meta-icon-size: 16px;
+$srh-meta-gap: 8px;
+
+/* 控件尺寸 */
+$srh-button-size: 40px;   // 收藏按钮
+$srh-image-aspect: 0.75;  // 约 4:3（h = w * 0.75），用于计算时参考
+
+/* 语义别名（组件层引用建议） */
+$srh-card-padding: $srh-space-md;
+$srh-card-bg: $srh-color-card-bg;
+$srh-card-shadow: $srh-shadow-card;
+
+$srh-text-primary: $srh-color-text-primary;
+$srh-text-secondary: $srh-color-text-secondary;
+
+$srh-inspection-font-size: $srh-font-size-inspection;
+$srh-inspection-line-height: $srh-line-height-inspection;
+
+/* 使用示例（组件内）
+.card {
+  background: $srh-card-bg;
+  padding: $srh-card-padding;
+  box-shadow: $srh-card-shadow;
+  .price { font-size: $srh-font-size-price; line-height: $srh-line-height-price; color: $srh-text-primary; font-weight: 600; }
+  .address { font-size: $srh-font-size-address; line-height: $srh-line-height-address; color: $srh-text-primary; }
+  .meta { gap: $srh-meta-gap; .icon { width: $srh-meta-icon-size; height: $srh-meta-icon-size; } }
+  .fav-btn { width: $srh-button-size; height: $srh-button-size; border-radius: $srh-radius-md; }
+  .inspection { font-size: $srh-inspection-font-size; line-height: $srh-inspection-line-height; color: $srh-text-secondary; }
+}
+*/
+
+/* ======================================================================
+   SRH · Mobile · Typography 文字 Token（中/英文字体、字重、字距、通用字号级别）
+   说明：
+   - 中文（ZH）默认：苹方 / 思源黑体（Source Han Sans SC）等常见中文系统字体
+   - 英文（EN）默认：与主流移动端站点一致的系统字体栈（-apple-system / Segoe UI / Roboto / Helvetica Neue / Arial / Noto Sans）
+   - 若需进一步对齐 realestate 的精确字体栈，可在此处调整 $srh-font-family-en
+   ====================================================================== */
+
+/* 字体家族（中文/英文） */
+$srh-font-family-zh: 'PingFang SC', 'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', 'Heiti SC', sans-serif;
+$srh-font-family-en: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+
+/* 字重（常见级别） */
+$srh-font-weight-regular: 400;
+$srh-font-weight-medium: 500;
+$srh-font-weight-semibold: 600;
+$srh-font-weight-bold: 700;
+
+/* 字距（px） */
+$srh-letter-spacing-tight: -0.2px;
+$srh-letter-spacing-normal: 0px;
+$srh-letter-spacing-wide: 0.2px;
+
+/* 通用字号/行高级别（px） */
+$srh-font-size-xs: 12px; $srh-line-height-xs: 18px;
+$srh-font-size-sm: 14px; $srh-line-height-sm: 20px;
+$srh-font-size-md: 16px; $srh-line-height-md: 24px;
+$srh-font-size-lg: 20px; $srh-line-height-lg: 28px;
+$srh-font-size-xl: 24px; $srh-line-height-xl: 32px;
+
+/* ======================================================================
+   SRH · Mobile → CSS 变量桥接层（H5 可动态微调；小程序端静态生效）
+   说明：
+   - 目的：将 SCSS Token 暴露成 CSS Variables，便于运行时（H5）通过 JS 调整，快速看到视觉变化
+   - 做法：:root 定义 --srh-*，值来源对应的 $srh-* 变量
+   - 使用：document.documentElement.style.setProperty('--srh-space-md', '18px')
+   ====================================================================== */
+:root {
+  /* 颜色 */
+  --srh-color-text-primary: #{$srh-color-text-primary};
+  --srh-color-text-secondary: #{$srh-color-text-secondary};
+  --srh-color-card-bg: #{$srh-color-card-bg};
+  --srh-color-shadow: #{$srh-color-shadow};
+
+  /* 尺寸与间距 */
+  --srh-space-2xs: #{$srh-space-2xs};
+  --srh-space-xs: #{$srh-space-xs};
+  --srh-space-sm: #{$srh-space-sm};
+  --srh-space-md: #{$srh-space-md};
+  --srh-space-lg: #{$srh-space-lg};
+
+  /* 圆角与阴影 */
+  --srh-radius-sm: #{$srh-radius-sm};
+  --srh-radius-md: #{$srh-radius-md};
+  --srh-shadow-card: #{$srh-shadow-card};
+
+  /* 字号与行高 */
+  --srh-font-size-price: #{$srh-font-size-price};
+  --srh-line-height-price: #{$srh-line-height-price};
+  --srh-font-size-address: #{$srh-font-size-address};
+  --srh-line-height-address: #{$srh-line-height-address};
+  --srh-font-size-inspection: #{$srh-font-size-inspection};
+  --srh-line-height-inspection: #{$srh-line-height-inspection};
+
+  /* 元信息与控件 */
+  --srh-meta-icon-size: #{$srh-meta-icon-size};
+  --srh-meta-gap: #{$srh-meta-gap};
+  --srh-button-size: #{$srh-button-size};
+  --srh-image-aspect: #{$srh-image-aspect};
+
+  /* 语义别名 */
+  --srh-card-padding: #{$srh-card-padding};
+  --srh-card-bg: #{$srh-card-bg};
+  --srh-card-shadow: #{$srh-card-shadow};
+  --srh-text-primary: #{$srh-text-primary};
+  --srh-text-secondary: #{$srh-text-secondary};
+  --srh-inspection-font-size: #{$srh-inspection-font-size};
+  --srh-inspection-line-height: #{$srh-inspection-line-height};
+
+  /* Typography · 文字（中/英文字体、字重、字距、级别） */
+  --srh-font-family-zh: #{$srh-font-family-zh};
+  --srh-font-family-en: #{$srh-font-family-en};
+
+  --srh-font-weight-regular: #{$srh-font-weight-regular};
+  --srh-font-weight-medium: #{$srh-font-weight-medium};
+  --srh-font-weight-semibold: #{$srh-font-weight-semibold};
+  --srh-font-weight-bold: #{$srh-font-weight-bold};
+
+  --srh-letter-spacing-tight: #{$srh-letter-spacing-tight};
+  --srh-letter-spacing-normal: #{$srh-letter-spacing-normal};
+  --srh-letter-spacing-wide: #{$srh-letter-spacing-wide};
+
+  --srh-font-size-xs: #{$srh-font-size-xs};
+  --srh-line-height-xs: #{$srh-line-height-xs};
+  --srh-font-size-sm: #{$srh-font-size-sm};
+  --srh-line-height-sm: #{$srh-line-height-sm};
+  --srh-font-size-md: #{$srh-font-size-md};
+  --srh-line-height-md: #{$srh-line-height-md};
+  --srh-font-size-lg: #{$srh-font-size-lg};
+  --srh-line-height-lg: #{$srh-line-height-lg};
+  --srh-font-size-xl: #{$srh-font-size-xl};
+  --srh-line-height-xl: #{$srh-line-height-xl};
+}

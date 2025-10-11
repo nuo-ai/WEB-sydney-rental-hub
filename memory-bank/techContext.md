@@ -10,6 +10,7 @@
 - **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia + lucide-vue-next（图标）
 - **小程序/H5 子应用**: uni-app（Vite+Vue3）+ 官方 uni-ui（apps/uni-app 子包，已接入验证）
 - **小程序计划**: 评估 TorUI 组件库（Taro/小程序生态）并验证 VS Code 下主题与 token 扩展的可行性
+- **设计 Token 工具站**: Astro（`tools/design-site-astro`），用于可视化调参、预览与导出 JSON/SCSS
 - **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
 - **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL）
 - **地图**: Google Maps JavaScript/Static Map（前端）+ Google Directions（后端，生产）；当前无 Haversine 回退
@@ -25,8 +26,9 @@
   - `apps/*`: 存放各个独立的应用程序（前端、后端等）。
   - `packages/*`: 存放共享的库和包，例如设计系统。
     - `@sydney-rental-hub/ui`: 设计系统的核心包，包含可复用的UI组件和样式令牌。
+  - `tools/*`: 存放开发辅助工具/站点（如 Astro 设计 Token 工具站）。
 - **配置**:
-  - `pnpm-workspace.yaml`: 定义工作区范围（`apps/*`, `packages/*` 等）。
+  - `pnpm-workspace.yaml`: 定义工作区范围（`apps/*`, `packages/*`, `tools/*` 等）。
   - `turbo.json`: 统一任务编排与缓存策略。
   - 根 `package.json`: 提供顶层命令 (`dev`, `build`, `lint` 等)。
 
@@ -88,7 +90,10 @@ pnpm dev
 # 3. 构建设计系统产物 (Tokens)
 pnpm build:tokens
 
-# 4. 独立运行设计系统开发环境 (Storybook)
+# 4. 启动设计 Token 工具站 (Astro)
+pnpm astro:dev
+
+# 5. 独立运行设计系统开发环境 (Storybook)
 # 注意：由于 pnpm workspace 的依赖链接问题，请使用以下命令直接调用二进制文件
 ./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook
 

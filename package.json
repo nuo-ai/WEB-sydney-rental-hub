@@ -17,7 +17,13 @@
     "test:visual": "loki test",
     "test:visual:approve": "loki approve",
     "test:visual:update": "loki update",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "docs:dev": "pnpm --filter @srh/docs-site start",
+    "docs:build": "pnpm --filter @srh/docs-site build",
+    "docs:serve": "pnpm --filter @srh/docs-site serve",
+    "astro:dev": "pnpm --filter @srh/design-site-astro dev",
+    "astro:build": "pnpm --filter @srh/design-site-astro build",
+    "astro:preview": "pnpm --filter @srh/design-site-astro preview"
   },
   "pnpm": {
     "overrides": {
@@ -55,6 +61,7 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
+    "@astrouxds/tokens": "^1.14.0",
     "uni-app-x-mcp": "^0.0.5"
   }
 }

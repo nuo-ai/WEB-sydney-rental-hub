@@ -2,12 +2,12 @@
  * Do not edit directly, this file was auto-generated.
  */
 
-:root {
+[data-theme='dark'] {
   --color-white: #ffffff;
   --color-black: #000000;
-  --color-brand-primary: #f28c00;
-  --color-brand-hover: #f29e2e;
-  --color-brand-active: #cc6e00;
+  --color-brand-primary: #f29e2e;
+  --color-brand-hover: #f2b24a;
+  --color-brand-active: #cc7e10;
   --color-gray-50: #f9fafb;
   --color-gray-75: #f4f7f9;
   --color-gray-100: #f3f4f6;
@@ -23,25 +23,21 @@
   --color-semantic-feedback-warning: #f59e0b;
   --color-semantic-feedback-error: #ef4444;
   --color-semantic-feedback-info: #3b82f6;
-  --color-semantic-feedback-success-soft-bg: #f0fdf4;
-  --color-semantic-feedback-warning-soft-bg: #fffbeb;
-  --color-semantic-feedback-danger-soft-bg: #fef2f2;
-  --color-semantic-feedback-info-soft-bg: #eff6ff;
-  --color-action-primary: #0066ff;
-  --color-success: #0f8a07;
-  --color-warning: #f2bd00;
-  --color-error: #ed1245;
-  --color-background-page: #f7f7f8;
-  --color-background-surface: #ffffff;
-  --color-background-hover: #f2f2f3;
-  --color-background-disabled: #edeef0;
-  --color-text-primary: #1d2129;
-  --color-text-secondary: #65676b;
-  --color-text-placeholder: #a0a3a8;
-  --color-text-disabled: #a0a3a8;
+  --color-action-primary: #409cff;
+  --color-success: #18d39e;
+  --color-warning: #ffe900;
+  --color-error: #ff4d79;
+  --color-background-page: #121212;
+  --color-background-surface: #1e1e1e;
+  --color-background-hover: #2c2c2c;
+  --color-background-disabled: #3a3b3c;
+  --color-text-primary: #e4e6eb;
+  --color-text-secondary: #b0b3b8;
+  --color-text-placeholder: #65676b;
+  --color-text-disabled: #65676b;
   --color-text-on-action: #ffffff;
-  --color-border: #d8d8d9;
-  --color-border-interactive: #a0a3a8;
+  --color-border: #464853;
+  --color-border-interactive: #65676b;
   --font-family-base: Inter, sans-serif;
   --font-family-mono: monospace;
   --font-size-xs: 12px;
@@ -104,19 +100,15 @@
   --component-toggle-sm-thumb-size: 16px;
   --component-toggle-sm-padding: 2px;
   --component-toggle-transition: all 150ms ease-in-out;
-  --color-semantic-bg-primary: var(--color-white);
-  --color-semantic-bg-secondary: var(--color-gray-50);
-  --color-semantic-bg-page: var(--color-gray-75);
-  --color-semantic-text-primary: var(--color-gray-800);
-  --color-semantic-text-secondary: var(--color-gray-500);
-  --color-semantic-text-muted: var(--color-gray-400);
-  --color-semantic-text-inverse: var(--color-white);
-  --color-semantic-border-default: var(--color-gray-300);
-  --color-semantic-border-subtle: var(--color-gray-200);
-  --color-semantic-feedback-success-border: var(--color-semantic-feedback-success);
-  --color-semantic-feedback-warning-border: var(--color-semantic-feedback-warning);
-  --color-semantic-feedback-danger-border: var(--color-semantic-feedback-error);
-  --color-semantic-feedback-info-border: var(--color-semantic-feedback-info);
+  --color-semantic-bg-primary: var(--color-gray-800);
+  --color-semantic-bg-secondary: var(--color-gray-900);
+  --color-semantic-bg-page: var(--color-black);
+  --color-semantic-text-primary: var(--color-gray-100);
+  --color-semantic-text-secondary: var(--color-gray-400);
+  --color-semantic-text-muted: var(--color-gray-500);
+  --color-semantic-text-inverse: var(--color-black);
+  --color-semantic-border-default: var(--color-gray-700);
+  --color-semantic-border-subtle: var(--color-gray-800);
   --layout-container-padding: var(--space-3xl);
   --component-button-primary-bg: var(--color-brand-primary);
   --component-button-primary-color: var(--color-white);

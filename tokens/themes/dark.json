@@ -22,6 +22,32 @@
         "error": { "value": "#ef4444", "type": "color", "description": "错误状态" },
         "info": { "value": "#3b82f6", "type": "color", "description": "信息状态" }
       }
-    }
+    },
+    "brand": {
+      "primary": { "value": "#F29E2E", "type": "color", "description": "品牌主色（Identity · Dark）" },
+      "hover": { "value": "#F2B24A", "type": "color", "description": "品牌色悬停（Dark）" },
+      "active": { "value": "#CC7E10", "type": "color", "description": "品牌色激活（Dark）" }
+    },
+    "action": { "primary": { "value": "#409CFF", "type": "color", "description": "主行动色（Action Primary）" } },
+    "success": { "value": "#18D39E", "type": "color", "description": "成功色（CSS变量别名）" },
+    "warning": { "value": "#FFE900", "type": "color", "description": "警告色（CSS变量别名）" },
+    "error": { "value": "#FF4D79", "type": "color", "description": "错误色（CSS变量别名）" },
+    "background": {
+      "page": { "value": "#121212", "type": "color", "description": "页面最底层背景" },
+      "surface": { "value": "#1E1E1E", "type": "color", "description": "卡片、输入框等表面背景" },
+      "hover": { "value": "#2C2C2C", "type": "color", "description": "列表项等悬停背景" },
+      "disabled": { "value": "#3A3B3C", "type": "color", "description": "禁用状态背景" }
+    },
+    "text": {
+      "primary": { "value": "#E4E6EB", "type": "color", "description": "主要文字" },
+      "secondary": { "value": "#B0B3B8", "type": "color", "description": "次要文字" },
+      "placeholder": { "value": "#65676B", "type": "color", "description": "占位符文字" },
+      "disabled": { "value": "#65676B", "type": "color", "description": "禁用状态文字" },
+      "on": {
+        "action": { "value": "#FFFFFF", "type": "color", "description": "在行动色背景上的文字" }
+      }
+    },
+    "border": { "value": "#464853", "type": "color", "description": "默认边框" },
+    "border-interactive": { "value": "#65676B", "type": "color", "description": "可交互元素的边框" }
   }
 }

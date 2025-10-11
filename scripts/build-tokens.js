@@ -132,11 +132,11 @@ function getStyleDictionaryConfig(theme) {
         "transforms": ['attribute/cti', 'name/kebab', 'color/css'],
         "buildPath": `packages/ui/src/styles/`,
         "files": [{
-          "destination": `tokens.css`,
+          "destination": theme === 'light' ? `tokens.css` : `tokens.dark.css`,
           "format": "css/variables",
           "options": {
             "outputReferences": true,
-            "selector": `:root`
+            "selector": theme === 'light' ? `:root` : `[data-theme='dark']`
           }
         }]
       },
