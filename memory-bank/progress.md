@@ -4,6 +4,13 @@
 
 ## 近期重要里程碑（2025-10）
 
+### 双色系统 Design Tokens 与 Astro 接入（完成）
+- 主题令牌：color.brand.{primary,hover,active} 与 color.action.primary；中性色/语义补全（background.*、text.*、border-interactive）
+- 构建：Style Dictionary 输出 :root 与 [data-theme='dark'] 两套 CSS 变量（packages/ui/src/styles/tokens*.css），小程序 wxss 同步生成
+- 工具站：三页统一引入 tokens.css/tokens.dark.css，提供 data-theme 暗色切换（localStorage + prefers-color-scheme）
+- 文档：新增 docs/ui-design-system-v1.0.md，可直接对外分享
+- 备注：构建有 Token collisions 警告 3 项，不影响产物，后续清零
+
 ### 可视化设计 Token 工具站（Astro）
 - **2025-10-11｜Astro 工具站落地与文字系统扩展**:
   - **站点创建**: 在 `tools/design-site-astro` 新增 Astro 站点，含 `/tokens`（实时调参）、`/components`（多状态画廊）页面。

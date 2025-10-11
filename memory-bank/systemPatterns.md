@@ -2,6 +2,12 @@
 
 ---
 
+## 双色系统与主题输出（新增）
+- 角色分离：品牌色与主行动色分离（color.brand.{primary,hover,active}、color.action.primary）
+- 双作用域输出：Style Dictionary 生成 :root 与 [data-theme='dark'] 两套 CSS 变量；组件仅消费语义/组件令牌以自然适配主题
+- Astro 策略：页面顶部统一引入 tokens.css 与 tokens.dark.css，通过 data-theme 切换（localStorage + prefers-color-scheme）；本阶段不启 Storybook
+- 反模式：组件直接消费原始色值/硬编码；在组件内定义主题差异与颜色值
+
 ## 核心架构原则
 
 ### Monorepo 架构

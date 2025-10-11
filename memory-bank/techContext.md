@@ -146,16 +146,25 @@ npx playwright test -g "URL 幂等与仅写非空键"
 
 ### 1. 设计令牌 (Design Tokens)
 
-- **分层架构**: 遵循“原始 → 语义 → 组件”三层架构。
-- **单一事实来源**: 原始令牌定义在 `tokens/base/*.json`，遵循 W3C Design Tokens 规范。
-- **自动化流程**: 使用 `Style Dictionary` 工具链 (`pnpm build:tokens`) 将 JSON 令牌自动转换为 `packages/ui/dist/tokens.css`。
-- **消费与主题化**:
-  - **Web 应用**: 在 `apps/web/src/styles/design-tokens.css` 中定义语义与组件令牌，并引用 `tokens.css` 的原始值。
-  - **暗色主题**: `apps/web/src/styles/theme-dark.css` 仅覆盖语义层令牌，通过 `.dark` 类作用域激活。
-  - **强调色**: 系统强调色已统一为“蓝宝石钢蓝” (`--accent-primary: #6699cc`)，并映射覆盖了外部设计系统（cursor-starter）的强调色。
-- **文字系统**:
-  - **颜色**: 必须使用 `--text-contrast-strong/medium/weak` 控制视觉层级。
-  - **行高**: 必须使用 `--line-height-title/body/ui` 确保垂直节律。
+- 分层架构：原始 → 语义 → 组件；原始定义位于 `tokens/base/*.json`
+- 自动化流程：Style Dictionary（`pnpm build:tokens`）从 `tokens/**/*.json` 生成多平台产物
+- 双作用域输出（现行）：
+  - `packages/ui/src/styles/tokens.css`（选择器 `:root`）
+  - `packages/ui/src/styles/tokens.dark.css`（选择器 `[data-theme='dark']`）
+  - 小程序 wxss：`apps/mini-program/src/styles/generated/{light,dark}.wxss`
+- 双色系统（现行）：
+  - 主题键：`color.brand.{primary,hover,active}`、`color.action.primary`
+  - 中性色/语义：`background.{page,surface,hover,disabled}`、`text.{placeholder,disabled,on.action}`、`border-interactive`
+- 消费与主题化：
+  - 组件仅消费语义/组件层令牌，禁止硬编码与直接消费原始值
+  - 主题覆盖在 `[data-theme='dark']` 作用域内完成
+>>>>>>> 
+- Astro 引入方式（本阶段唯一验证环境）：
+  - 在 `tools/design-site-astro/src/pages/*.astro` 顶部统一导入：
+    - `import '../../../../packages/ui/src/styles/tokens.css'`
+    - `import '../../../../packages/ui/src/styles/tokens.dark.css'`
+  - 通过 `document.documentElement` 切换 `data-theme` 并持久化（localStorage + prefers-color-scheme）
+- Storybook：阶段内不启用，避免多环境复杂度；后续成熟后再接入
 
 ### 2. 组件开发 (Component Development)
 
