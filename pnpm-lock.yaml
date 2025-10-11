@@ -7,17 +7,17 @@ settings:
 overrides:
   storybook: 8.6.14
   '@storybook/cli': 8.6.14
-  '@storybook/core-server': 8.6.14
   '@storybook/vue3': 8.6.14
   '@storybook/vue3-vite': 8.6.14
   '@storybook/addon-essentials': 8.6.14
   '@storybook/addon-interactions': 8.6.14
   '@storybook/addon-links': 8.6.14
+  '@storybook/addon-onboarding': 8.6.14
   '@storybook/addon-a11y': 8.6.14
   '@storybook/addon-docs': 8.6.14
   '@storybook/addon-viewport': 8.6.14
   '@storybook/blocks': 8.6.14
-  '@chromatic-com/storybook': 1.8.0
+  '@chromatic-com/storybook': 4.1.1
   vite: ^5.0.0
   vitest: ^1.0.0
   '@vitest/browser': ^1.0.0
@@ -251,8 +251,8 @@ importers:
         version: 4.5.1(vue@3.5.22(typescript@5.9.3))
     devDependencies:
       '@chromatic-com/storybook':
-        specifier: 1.8.0
-        version: 1.8.0(react@18.3.1)
+        specifier: 4.1.1
+        version: 4.1.1(storybook@8.6.14(prettier@3.6.2))
       '@eslint/js':
         specifier: ^9.31.0
         version: 9.37.0
@@ -266,8 +266,8 @@ importers:
         specifier: 8.6.14
         version: 8.6.14(@types/react@19.2.2)(storybook@8.6.14(prettier@3.6.2))
       '@storybook/addon-onboarding':
-        specifier: ^9.1.10
-        version: 9.1.10(storybook@8.6.14(prettier@3.6.2))
+        specifier: 8.6.14
+        version: 8.6.14(storybook@8.6.14(prettier@3.6.2))
       '@storybook/vue3-vite':
         specifier: 8.6.14
         version: 8.6.14(storybook@8.6.14(prettier@3.6.2))(vite@5.4.20(@types/node@20.19.20)(sass@1.93.2)(terser@5.44.0))(vue@3.5.22(typescript@5.9.3))
@@ -326,8 +326,8 @@ importers:
   packages/ui:
     devDependencies:
       '@chromatic-com/storybook':
-        specifier: 1.8.0
-        version: 1.8.0(react@18.3.1)
+        specifier: 4.1.1
+        version: 4.1.1(storybook@8.6.14(prettier@3.6.2))
       '@storybook/addon-a11y':
         specifier: 8.6.14
         version: 8.6.14(storybook@8.6.14(prettier@3.6.2))
@@ -1231,9 +1231,11 @@ packages:
   '@cacheable/utils@2.1.0':
     resolution: {integrity: sha512-ZdxfOiaarMqMj+H7qwlt5EBKWaeGihSYVHdQv5lUsbn8MJJOTW82OIwirQ39U5tMZkNvy3bQE+ryzC+xTAb9/g==}
 
-  '@chromatic-com/storybook@1.8.0':
-    resolution: {integrity: sha512-vkB9dPVmM2Yvqc/0DJ4MYwOGY1MOjd/KbB9TXTMGN+qshaEyiZtSOgbz9u0ExFALEgDKLmtUnWyUtoGb0pCzUg==}
-    engines: {node: '>=16.0.0', yarn: '>=1.22.18'}
+  '@chromatic-com/storybook@4.1.1':
+    resolution: {integrity: sha512-+Ib4cHtEjKl/Do+4LyU0U1FhLPbIU2Q/zgbOKHBCV+dTC4T3/vGzPqiGsgkdnZyTsK/zXg96LMPSPC4jjOiapg==}
+    engines: {node: '>=20.0.0', yarn: '>=1.22.18'}
+    peerDependencies:
+      storybook: 8.6.14
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -2890,6 +2892,9 @@ packages:
     resolution: {integrity: sha512-kOQ4+fHuT4KbR2iq2IjeV32HiihueuOf1vJkq18z08CLZ1UQrTc8BXJpVfxZkq45+inLLD+D4xx4nBjUelJa4Q==}
     engines: {node: '>=18'}
 
+  '@neoconfetti/react@1.0.0':
+    resolution: {integrity: sha512-klcSooChXXOzIm+SE5IISIAn3bYzYfPjbX7D7HoqZL84oAfgREeSg5vSIaSFH+DaGzzvImTyWe1OyrJ67vik4A==}
+
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -3226,8 +3231,8 @@ packages:
     peerDependencies:
       storybook: 8.6.14
 
-  '@storybook/addon-onboarding@9.1.10':
-    resolution: {integrity: sha512-PWexWszC5KhEwKNw/5lhlsRf1V+vfzsIQok93qLmiInnzOpnrszMgrg0+8F7r5lb4wWmZx19pYx+KjYA8P9EdQ==}
+  '@storybook/addon-onboarding@8.6.14':
+    resolution: {integrity: sha512-bHdHiGJFigVcSzMIsNLHY5IODZHr+nKwyz5/QOZLMkLcGH2IaUbOJfm4RyGOaTTPsUtAKbdsVXNEG3Otf+qO9A==}
     peerDependencies:
       storybook: 8.6.14
 
@@ -4571,8 +4576,8 @@ packages:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
 
-  chromatic@11.29.0:
-    resolution: {integrity: sha512-yisBlntp9hHVj19lIQdpTlcYIXuU9H/DbFuu6tyWHmj6hWT2EtukCCcxYXL78XdQt1vm2GfIrtgtKpj/Rzmo4A==}
+  chromatic@12.2.0:
+    resolution: {integrity: sha512-GswmBW9ZptAoTns1BMyjbm55Z7EsIJnUvYKdQqXIBZIKbGErmpA+p4c0BYA+nzw5B0M+rb3Iqp1IaH8TFwIQew==}
     hasBin: true
     peerDependencies:
       '@chromatic-com/cypress': ^0.*.* || ^1.0.0
@@ -8774,12 +8779,6 @@ packages:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
 
-  react-confetti@6.4.0:
-    resolution: {integrity: sha512-5MdGUcqxrTU26I2EU7ltkWPwxvucQTuqMm8dUz72z2YMqTD6s9vMcDUysk7n9jnC+lXuCPeJJ7Knf98VEYE9Rg==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      react: ^16.3.0 || ^17.0.1 || ^18.0.0 || ^19.0.0
-
   react-devtools-core@4.28.5:
     resolution: {integrity: sha512-cq/o30z9W2Wb4rzBefjv5fBalHU0rJGZCHAkf/RHSBWSSYwh8PlQTqqOJmgIIbBtpj27T6FIPXeomIjZtCNVqA==}
 
@@ -9817,9 +9816,6 @@ packages:
   turbo@2.5.8:
     resolution: {integrity: sha512-5c9Fdsr9qfpT3hA0EyYSFRZj1dVVsb6KIWubA9JBYZ/9ZEAijgUEae0BBR/Xl/wekt4w65/lYLTFaP3JmwSO8w==}
     hasBin: true
-
-  tween-functions@1.2.0:
-    resolution: {integrity: sha512-PZBtLYcCLtEcjL14Fzb1gSxPBeL7nWvGhO5ZFPGqziCcr8uvHp0NDmdjBchp6KHL+tExcg0m3NISmKxhU394dA==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -11714,17 +11710,17 @@ snapshots:
     dependencies:
       keyv: 5.5.3
 
-  '@chromatic-com/storybook@1.8.0(react@18.3.1)':
+  '@chromatic-com/storybook@4.1.1(storybook@8.6.14(prettier@3.6.2))':
     dependencies:
-      chromatic: 11.29.0
+      '@neoconfetti/react': 1.0.0
+      chromatic: 12.2.0
       filesize: 10.1.6
       jsonfile: 6.2.0
-      react-confetti: 6.4.0(react@18.3.1)
+      storybook: 8.6.14(prettier@3.6.2)
       strip-ansi: 7.1.2
     transitivePeerDependencies:
       - '@chromatic-com/cypress'
       - '@chromatic-com/playwright'
-      - react
 
   '@colors/colors@1.5.0':
     optional: true
@@ -14597,6 +14593,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@neoconfetti/react@1.0.0': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -14880,7 +14878,7 @@ snapshots:
       '@storybook/global': 5.0.0
       storybook: 8.6.14(prettier@3.6.2)
 
-  '@storybook/addon-onboarding@9.1.10(storybook@8.6.14(prettier@3.6.2))':
+  '@storybook/addon-onboarding@8.6.14(storybook@8.6.14(prettier@3.6.2))':
     dependencies:
       storybook: 8.6.14(prettier@3.6.2)
 
@@ -16723,7 +16721,7 @@ snapshots:
 
   chownr@2.0.0: {}
 
-  chromatic@11.29.0: {}
+  chromatic@12.2.0: {}
 
   chrome-launcher@0.15.2:
     dependencies:
@@ -21729,11 +21727,6 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-confetti@6.4.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      tween-functions: 1.2.0
-
   react-devtools-core@4.28.5:
     dependencies:
       shell-quote: 1.8.3
@@ -23008,8 +23001,6 @@ snapshots:
       turbo-linux-arm64: 2.5.8
       turbo-windows-64: 2.5.8
       turbo-windows-arm64: 2.5.8
-
-  tween-functions@1.2.0: {}
 
   type-check@0.4.0:
     dependencies:

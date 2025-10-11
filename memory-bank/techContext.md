@@ -1,267 +1,93 @@
 # 技术上下文 (Technical Context)
 
-**文档状态**: 生存文档 (Living Document)
-**最后更新**: 2025-09-15
+**文档状态**: 生存文档 (Living Document)  
+**最后更新**: 2025-02-14
 
 ---
 
 ## 当前技术栈
 
-- **前端**: Vue 3 (Composition API) + Vite + Element Plus + Pinia + lucide-vue-next（图标）
-- **小程序/H5 子应用**: uni-app（Vite+Vue3）+ 官方 uni-ui（apps/uni-app 子包，已接入验证）
-- **小程序计划**: 评估 TorUI 组件库（Taro/小程序生态）并验证 VS Code 下主题与 token 扩展的可行性
-- **设计 Token 工具站**: Astro（`tools/design-site-astro`），用于可视化调参、预览与导出 JSON/SCSS
-- **后端**: Python FastAPI + Strawberry GraphQL + Supabase (AWS悉尼区域)
-- **数据库**: PostgreSQL (Supabase) + Redis缓存（默认 15 分钟 TTL）
-- **地图**: Google Maps JavaScript/Static Map（前端）+ Google Directions（后端，生产）；当前无 Haversine 回退
+- **前端主站 (`apps/web`)**: Vue 3 (Composition API) + Vite 7 + Pinia + Vue Router + Element Plus。Storybook 8.6.x 作为组件开发与演示环境，Chromatic 用于可视化回归。
+- **设计系统 (`packages/ui`)**: Vue 组件库与样式令牌的单一事实来源。依赖 Style Dictionary 生成跨端 Token 产物，并通过 Storybook 8.6.x 提供组件/基础样式文档。
+- **设计 Token 工具站 (`tools/design-site-astro`)**: Astro 驱动的浏览与调参与演示站点，消费 `packages/ui` 导出的 CSS 变量。 
+- **后端 (`apps/backend`)**: Python FastAPI + SQLAlchemy，默认运行在 Uvicorn，提供 REST/GraphQL 服务及 Celery 任务队列。 
+- **文档站 (`apps/docs-site`)**: Docusaurus 站点，汇总设计与产品文档。 
+- **小程序实验**: `apps/uni-app` (uni-app Vite 模板) 与 `apps/mini-program` 保留用于探索跨端实现。 
+- **包管理与任务编排**: pnpm@9.1.0 + Turborepo；Node.js 建议版本 >= 20。 
+- **测试**: Vitest 3.x 用于单元测试，Playwright 用于端到端与视觉回归校验。
 
 ---
 
 ## 项目架构概览
 
-### 项目结构
+### 仓库结构
 
-- **Monorepo**: 采用 `pnpm` + `Turborepo` 结构。
-- **工作区**:
-  - `apps/*`: 存放各个独立的应用程序（前端、后端等）。
-  - `packages/*`: 存放共享的库和包，例如设计系统。
-    - `@sydney-rental-hub/ui`: 设计系统的核心包，包含可复用的UI组件和样式令牌。
-  - `tools/*`: 存放开发辅助工具/站点（如 Astro 设计 Token 工具站）。
-- **配置**:
-  - `pnpm-workspace.yaml`: 定义工作区范围（`apps/*`, `packages/*`, `tools/*` 等）。
-  - `turbo.json`: 统一任务编排与缓存策略。
-  - 根 `package.json`: 提供顶层命令 (`dev`, `build`, `lint` 等)。
+- `apps/*` — 独立运行的应用或服务（前端、后端、文档、实验应用等）。
+- `packages/*` — 可复用的内部包（UI 组件、工具库等）。
+- `tools/*` — 辅助开发/演示工具，如设计 Token 站点与脚本。 
+- `tokens/` — Style Dictionary 的源数据，定义原始/语义/组件层级令牌。
+- `docs/` — 设计、产品与技术文档。
 
-### Uni-app 子应用（apps/uni-app）
+### 关键配置
 
-- 位置：`apps/uni-app`（uni-app 官方 Vite+Vue3 模板）
-- 组件库：`@dcloudio/uni-ui`（通过 pages.json easycom 规则自动引入）
-- easycom 规则：
-  - `^uni-(.*)`: `@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue`
-- 常用命令（pnpm workspace）：
-  - 开发（H5）：`pnpm --filter ./apps/uni-app run dev:h5`
-  - 微信小程序（示例）：`pnpm --filter ./apps/uni-app run dev:mp-weixin`
-- 安装注意：
-  - 若遇 EPERM/锁问题：删除根 node_modules → `pnpm install` → 再在子包安装依赖
-  - Sass 警告属信息提示（legacy JS API），不影响开发
-
-### API集成架构
-
-- **代理配置**: 默认将 `/api`转发到 `http://localhost:8000`
-- **响应格式**: 统一 `{status, data, pagination, error}`结构
-- **失败策略**: 快速失败并抛错，便于监控定位
+- `pnpm-workspace.yaml` — 声明工作区范围。
+- `turbo.json` — 定义跨包任务的执行顺序与缓存策略。
+- 根 `package.json` — 聚合常用脚本（dev/build/lint/test/storybook 等）并声明强制依赖版本。
 
 ---
 
-## 筛选系统技术约定
+## 组件与样式流程
 
-### URL 幂等与状态同步
+### Design Tokens
 
-- **实现文件**: `apps/web/src/utils/query.js`（sanitizeQueryParams、isSameQuery）
-- **落地点**: FilterPanel 统一面板、五个分面、HomeView.sort
-- **前端表现**: 应用后 URL 可直链/刷新恢复，不写空键，地址栏不抖动
+1. 在 `tokens/` 下编辑 JSON 源数据（按原始 → 语义 → 组件分层）。
+2. 执行 `pnpm build:tokens` 运行 Style Dictionary，生成：
+   - `packages/ui/src/styles/tokens.css` (`:root`)
+   - `packages/ui/src/styles/tokens.dark.css` (`[data-theme='dark']`)
+   - 其他目标平台产物（如 mini-program WXSS）。
+3. 组件仅消费语义层/组件层变量；严禁硬编码数值或直接消费原始令牌。
 
-### 预估计数统一
+### Storybook 8.6.x 工作流
 
-- **composable**: useFilterPreviewCount 统一"应用（N）"口径
-- **特性**: 并发序号守卫、300ms 防抖、组件卸载清理
-- **降级**: 计数失败返回 null，按钮退回"应用/确定"
+- **启动设计系统 Storybook**: `pnpm --filter @sydney-rental-hub/ui storybook`
+- **启动业务应用 Storybook**: `pnpm --filter @web-sydney/web storybook`
+- **构建静态站点**: 使用相应包内的 `storybook build` 脚本，产物输出到 `storybook-static/`。
+- **Chromatic 集成**: 统一使用 `@chromatic-com/storybook@^4.1.1`，在 CI 中运行 `pnpm chromatic`（详见 `.github/workflows/`）。
 
-### 分组边界隔离
+### Astro 设计站
 
-- **API**: `applyFilters(filters, { sections })`
-- **分组**: area/price/bedrooms/availability/more
-- **原则**: 仅删除指定分组旧键再合并，避免跨面板覆盖
-
----
-
-## 开发环境
-
-### 本地运行
-
-项目已迁移至 `pnpm` + `Turborepo` 工作流，请在**项目根目录**执行所有命令。
-
-# 1. 安装所有依赖 (首次或依赖更新后)
-pnpm install
-
-# 2. 启动所有服务 (推荐，并行启动前后端)
-pnpm dev
-
-# 3. 构建设计系统产物 (Tokens)
-pnpm build:tokens
-
-# 4. 启动设计 Token 工具站 (Astro)
-pnpm astro:dev
-
-# 5. 独立运行设计系统开发环境 (Storybook)
-# 注意：由于 pnpm workspace 的依赖链接问题，请使用以下命令直接调用二进制文件
-./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook
-
-# --- 或单独启动 ---
-
-# 只启动 Vue 前端 (@web-sydney/web)
-pnpm --filter @web-sydney/web dev
-
-# 只启动 FastAPI 后端 (@web-sydney/backend)
-pnpm --filter @web-sydney/backend dev
-
-### E2E 测试
-
-```bash
-# 安装依赖（如首次）
-npx playwright install
-
-# 运行 URL 幂等冒烟测试
-npx playwright test -g "URL 幂等与仅写非空键"
-```
-
-### 当前运行状态
-
-- ✅ Vue前端: 正常运行 (localhost:5173)
-- ✅ Python后端: 正常运行 (localhost:8000)
-- ✅ 数据库连接: 正常 (Supabase PostgreSQL)
-
-### Vite 与 Storybook 启动问题排查
-
-- **Storybook 启动失败 (2025-10-11)**:
-  - **问题**: `pnpm storybook` 命令失败，提示 `Cannot find module 'storybook/bin/index.cjs'`。
-  - **原因**: `pnpm` 在 Monorepo 环境下的依赖提升 (hoisting) 策略与 Storybook 的脚本查找机制存在冲突。
-  - **解决方案**:
-    1.  **（已尝试，无效）** 在 `packages/ui` 中手动添加 `@storybook/cli` 作为开发依赖。
-    2.  **（最终方案）** 绕过 `pnpm` 脚本，在项目根目录直接调用 Storybook 的二进制文件，并使用 `-c` 参数指定配置文件目录：`./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook`。
-
-- **Vite 启动问题 (2025-10-10)**:
-  - **问题1**: Storybook v8 与 `@storybook/addon-vitest` (v9) 版本不兼容，导致 `import` 失败。
-    - **解决方案**: 在 `vite.config.js` 中改为异步和条件导入 `addon-vitest`，仅在 `isStorybook` 环境下加载。
-  - **问题2**: `vite-plugin-vue-devtools` 内部依赖的 `vite-plugin-inspect` 与 Vite 7+ 不兼容，因 `server.environments` 属性被移除而崩溃。
-    - **解决方案**: 添加一个自定义的 `viteInspectCompatPatch` 插件，在 `configureServer` 钩子中为 `server.environments` 提供一个空对象 `{}` 作为 polyfill，确保插件能正常运行。
-  - **问题3**: 端口被占用。
-    - **解决方案**: 使用 `taskkill /F /IM node.exe` 强制终止所有 Node.js 进程，或在启动时使用 `-p` 参数指定一个新端口。
-- ✅ 认证系统: JWT + 邮箱验证框架
-- ✅ 通勤计算: Google Directions（生产）；无 Haversine 回退
+- **启动**: `pnpm --filter @srh/design-site-astro dev`
+- **用途**: 快速预览 tokens、验证暗色模式和组件示例，不替代 Storybook，而是补充令牌调参体验。
 
 ---
 
-## 设计系统与工具链
+## 本地开发流程
 
-### 1. 设计令牌 (Design Tokens)
-
-- 分层架构：原始 → 语义 → 组件；原始定义位于 `tokens/base/*.json`
-- 自动化流程：Style Dictionary（`pnpm build:tokens`）从 `tokens/**/*.json` 生成多平台产物
-- 双作用域输出（现行）：
-  - `packages/ui/src/styles/tokens.css`（选择器 `:root`）
-  - `packages/ui/src/styles/tokens.dark.css`（选择器 `[data-theme='dark']`）
-  - 小程序 wxss：`apps/mini-program/src/styles/generated/{light,dark}.wxss`
-- 双色系统（现行）：
-  - 主题键：`color.brand.{primary,hover,active}`、`color.action.primary`
-  - 中性色/语义：`background.{page,surface,hover,disabled}`、`text.{placeholder,disabled,on.action}`、`border-interactive`
-- 消费与主题化：
-  - 组件仅消费语义/组件层令牌，禁止硬编码与直接消费原始值
-  - 主题覆盖在 `[data-theme='dark']` 作用域内完成
->>>>>>> 
-- Astro 引入方式（本阶段唯一验证环境）：
-  - 在 `tools/design-site-astro/src/pages/*.astro` 顶部统一导入：
-    - `import '../../../../packages/ui/src/styles/tokens.css'`
-    - `import '../../../../packages/ui/src/styles/tokens.dark.css'`
-  - 通过 `document.documentElement` 切换 `data-theme` 并持久化（localStorage + prefers-color-scheme）
-- Storybook：阶段内不启用，避免多环境复杂度；后续成熟后再接入
-
-### 2. 组件开发 (Component Development)
-
-- **核心包**: `@sydney-rental-hub/ui` 是所有可复用UI组件的家。
-- **开发环境**: **Storybook** 是组件开发的**唯一事实来源**。所有新组件的开发和现有组件的迭代都应在此环境中进行。
-  - **启动命令**: 在项目根目录运行 `./node_modules/.bin/storybook dev -p 6008 -c packages/ui/.storybook`
-  - **目的**: 在隔离的环境中开发、测试和可视化组件，确保其通用性、健壮性，并与设计规范保持一致。
-- **组件规范**:
-  - 组件应**完全基于 Design Tokens** 构建，不包含任何硬编码样式值。
-  - 优先从 `apps/web/src/components/base/` 中提炼和迁移现有基础组件。
-
-### 3. 图标系统
-
-- **标准**: 全站使用 `lucide-vue-next` SVG 图标库。
-- **导入**: `import { IconName } from 'lucide-vue-next'`
-- **颜色**: `stroke: currentColor`，由外层文字颜色 (`color`) 控制。
-
-### 2025-10-07 平台战略更新
-
-- **平台先后**: 小程序 → App → Android，所有设计规范以小程序实现为基线，再向其他端扩散。
-- **组件框架策略**: 引入 TorUI 组件库验证 VS Code 下的主题/Token 配置能力，必要时封装补充原子组件以覆盖空缺。
-- **Design Token 统一**: 借鉴 Polaris Migrator 的自动迁移手法，为颜色、字体、图标、标签、间距建立跨端 token 映射与校验脚本。
-- **MVP 功能聚焦**: 先交付房源筛选、排序、搜索-查看-收藏-客服下单流程；后续迭代再扩展地铁/火车站点筛选、帖子发布、付费通知等高级能力。
+1. 安装依赖：`pnpm install`
+2. 启动主要前端与后端：`pnpm dev`（依赖 Turborepo 在各包执行 `dev` 脚本）
+3. 独立运行：
+   - Web 前端：`pnpm --filter @web-sydney/web dev`
+   - 后端 API：`pnpm --filter @web-sydney/backend dev`
+   - Celery Worker：`pnpm --filter @web-sydney/backend worker`
+4. 代码质量：
+   - Lint：`pnpm lint`
+   - 单测：`pnpm test`
+   - Type Check：`pnpm typecheck`
+   - Playwright：`pnpm --filter @web-sydney/web exec npx playwright test`
 
 ---
 
-## 性能优化成果
+## 已知注意事项
 
-1. **虚拟滚动优化**: DOM节点减少99.8%，列表加载提升83%
-2. **API响应加速**: 服务端响应从8-10秒降至0.4-0.5秒，提升20倍
-3. **数据库索引**: 筛选查询从2.2秒降至0.59秒，提升3.7倍
-4. **缓存策略**: 15分钟客户端缓存 + Redis降级到内存缓存
-
----
-
-## 部署配置
-
-### Netlify 部署
-
-- **配置文件**: netlify.toml
-- **构建设置**: base="apps/web", command="pnpm --filter @web-sydney/web build", publish="dist"
-- **SPA 重写**: `/*` → `/index.html` (status=200)
-
-### 本地运维（PowerShell）
-
-```powershell
-# 进入项目根目录
-Set-Location 'C:\Users\nuoai\Desktop\WEB-sydney-rental-hub'
-
-# 跑 ETL
-& 'C:\Python313\python.exe' 'scripts\automated_data_update_with_notifications.py' --run-once
-
-# 清缓存
-Invoke-WebRequest -UseBasicParsing -Method POST -Uri 'http://localhost:8000/api/cache/invalidate?invalidate_all=true' | Out-Null
-```
+- pnpm 使用严格的依赖去重策略，Storybook 8.6.x 需要在根 `pnpm.overrides` 中钉住版本以避免旧版包混入。升级 Storybook 相关依赖时务必同步更新根 overrides 与子包 `package.json`。
+- Storybook 与 Vite 插件生态差异较大，遇到编译报错时优先检查 `apps/web/vite.config.ts` 与 `packages/ui/.storybook/main.ts` 的兼容性配置。 
+- FastAPI 服务使用 `.env` 中的凭据，运行本地后端前确保环境变量齐备。 
+- Playwright 安装浏览器依赖需要执行 `pnpm --filter @web-sydney/web exec npx playwright install`。
 
 ---
 
-## MCP (Model Context Protocol) 服务器管理
+## 近期变更日志
 
-### 添加新的 MCP 服务器
-
-有两种方法可以添加新的 MCP 服务器，**推荐使用方法一**。
-
-#### 方法一：直接修改 Cline 配置文件 (推荐)
-
-这是最直接、最不容易出错的方法。它直接利用 `npx` 从 npm 拉取并运行最新的服务器，无需在本地克隆或管理依赖。
-
-1. **找到配置文件**:
-   打开位于以下路径的 Cline 全局设置文件：
-   `C:\Users\nuoai\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`
-2. **添加服务器配置**:
-   在 `mcpServers` 对象中，添加一个新的条目。以 `mermaid-mcp-server` 为例，配置如下：
-
-   ```json
-   "mermaid-mcp-server": {
-     "autoApprove": [],
-     "disabled": false,
-     "timeout": 60,
-     "type": "stdio",
-     "command": "cmd",
-     "args": [
-       "/c",
-       "npx",
-       "-y",
-       "@peng-shawn/mermaid-mcp-server@latest"
-     ]
-   }
-   ```
-3. **重新加载 VS Code**:
-   为了让 Cline 识别到新的服务器配置，你**必须**重新加载 VS Code 窗口。
-
-   - 打开命令面板 (Ctrl+Shift+P 或 Cmd+Shift+P)。
-   - 输入并选择 "Developer: Reload Window"。
-
-#### 方法二：在本地项目中克隆和构建 (不推荐)
-
-此方法涉及将服务器仓库克隆到本地项目（例如 `apps/` 目录），然后安装依赖并构建。
-
-**注意**: 在像本项目这样的 monorepo 环境中，直接在子目录运行 `pnpm install` 可能会因为根目录的依赖版本冲突而失败。因此，**强烈建议使用方法一**以避免此类问题。
+- **2025-02-14**: 完成 Storybook 8.6.x 版本统一，移除 npm 锁文件与过时原型 HTML，确保 pnpm + Turborepo 为唯一依赖来源。
+- **2025-01**: 引入 Vitest 3.x 与 Playwright 1.55 作为统一测试栈，并在 `apps/web` 中扩展样式 Lint 规则。 
+- **2024 Q4**: 完成设计 Token 分层重构，将 CSS 变量输出迁移到 `packages/ui`，Astro 设计站改为直接消费该包。

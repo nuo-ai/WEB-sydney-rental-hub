@@ -1,25 +1,26 @@
 # 当前上下文与焦点
-**最后更新**：2025-10-11
+**最后更新**：2025-02-14
 
 ## 当前焦点 (Current Focus)
-- **逆向工程原子组件样式**: 根据 `docs/task-list.md` 清单，系统性地分析 `realestate.com.au` 网站，抓取原子组件的 CSS 属性，为设计系统提供数据基础。
+- 巩固设计系统基础设施：统一 Storybook 8.6.x 依赖、保持 `packages/ui` 与 `apps/web` 的组件规范一致。
+- 确保仓库以 pnpm + Turborepo 为唯一事实来源，杜绝遗留的 npm/原型文件引入的歧义。 
 
 ## 刚完成的工作 (Latest)
-- **清单纠正与数据迁移**:
-  - 发现并废弃了不完整的旧版 `component-analysis-checklist.md`。
-  - 成功将用户提供的、完整的清单模板更新为新的工作基准。
-  - 将所有之前已测量的精确数据 (`Button`, `Input`, `Checkbox`, `Divider`) 成功填充到新清单的正确结构中。
-  - 纠正了关于 `Input` `focus` 状态的错误推断，确保了数据的准确性。
+- 移除过时的 `package-lock.json` 及静态原型 HTML，清理空目录，恢复精简的仓库视图。 
+- 在根工作区与子包中统一 Storybook 版本到 8.6.14，消除跨包冲突。
+- 更新技术记忆库（techContext、systemPatterns）以反映最新工具链与工作流。 
 
 ## 下一步行动 (Next · P0)
-- **继续数据抓取**: 按照新的、完整的清单，继续系统性地分析 `realestate.com.au` 上的组件。
-- **下一个目标**: 分析 `Switch / Toggle` (开关) 组件的样式。
+- 验证 Storybook 8.6.x 在 `@sydney-rental-hub/ui` 与 `@web-sydney/web` 中均可正常启动并通过 Chromatic。
+- 持续梳理文档站与设计 Token 输出，确保 Astro 站与 Storybook 说明一致。 
 
 ## 重要约束 (Constraints)
-- 本阶段以 Astro 为设计系统验证环境；Storybook 暂不启用，避免多环境复杂度
-- 小程序不支持运行时 setProperty，统一采用静态构建；H5 端支持 --srh-* 运行时调参
+- 设计系统的任何组件/令牌改动必须先在 Storybook 中通过评审，Chromatic 可视化差异通过后才可合并。 
+- Turborepo 任务依赖 pnpm workspace 名称，新增包需更新 `turbo.json` 与 `pnpm-workspace.yaml`。 
 
 ## 相关命令 (Ops)
-- 构建 Tokens：pnpm run build:tokens
-- 启动 Astro 工具站：pnpm --filter @srh/design-site-astro dev（端口占用自动切换）
-- 访问：/、/tokens、/components（按钮“切换暗色”验证主题）
+- 安装依赖：`pnpm install`
+- 启动前端/后端：`pnpm dev`
+- 启动 UI Storybook：`pnpm --filter @sydney-rental-hub/ui storybook`
+- 启动 Web Storybook：`pnpm --filter @web-sydney/web storybook`
+- 构建设计 Tokens：`pnpm build:tokens`
