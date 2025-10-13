@@ -1,0 +1,1346 @@
+<!DOCTYPE html><html><head>
+<title>designsystem.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*
+
+Arduino® Light Theme - Stefania Mellai <s.mellai@arduino.cc>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #FFFFFF;
+}
+
+.hljs,
+.hljs-subst {
+  color: #434f54;
+}
+
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-doctag,
+.hljs-name {
+  color: #00979D;
+}
+
+.hljs-built_in,
+.hljs-literal,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #D35400;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #00979D;
+}
+
+.hljs-type,
+.hljs-string,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #005C5F;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+  font-weight: bold;
+}
+
+.hljs-comment {
+  color: rgba(149,165,166,.8);
+}
+
+.hljs-meta-keyword {
+  color: #728E00;
+}
+
+.hljs-meta {
+  color: #434f54;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-function {
+  color: #728E00;
+}
+
+.hljs-number {
+  color: #8A7B52;  
+}
+
+</style>
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family:   "HelveticaNeue-Light", sans-serif, "宋体","Segoe WPC", "Segoe UI", "SFUIText-Light","Droid Sans Fallback";
+	font-size: 18px;
+	padding: 0 12px;
+	line-height: 1.6;
+	word-wrap: break-word;
+	color: #333333;
+}
+
+.content-wrapper{
+	max-width: 860px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom: 1px solid #eee;
+}
+
+
+h2{
+	padding-bottom: .3em;
+    font-size: 2em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+
+h3{
+	font-size: 1.75em;
+    line-height: 1.225;
+}
+
+h1, h2, h3 {
+	font-weight: bold;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+.table-of-contents li{
+	list-style-type: initial;
+}
+</style>
+
+<style>
+@font-face{font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff"),url(fonts/KaTeX_AMS-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Caligraphic-Bold.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Bold.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Caligraphic-Regular.woff2) format("woff2"),url(fonts/KaTeX_Caligraphic-Regular.woff) format("woff"),url(fonts/KaTeX_Caligraphic-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Fraktur-Bold.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Bold.woff) format("woff"),url(fonts/KaTeX_Fraktur-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Fraktur-Regular.woff2) format("woff2"),url(fonts/KaTeX_Fraktur-Regular.woff) format("woff"),url(fonts/KaTeX_Fraktur-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(fonts/KaTeX_Main-Bold.woff2) format("woff2"),url(fonts/KaTeX_Main-Bold.woff) format("woff"),url(fonts/KaTeX_Main-Bold.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Main-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Main-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Main-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Main-Italic.woff2) format("woff2"),url(fonts/KaTeX_Main-Italic.woff) format("woff"),url(fonts/KaTeX_Main-Italic.ttf) format("truetype")}@font-face{font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Main-Regular.woff2) format("woff2"),url(fonts/KaTeX_Main-Regular.woff) format("woff"),url(fonts/KaTeX_Main-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(fonts/KaTeX_Math-BoldItalic.woff2) format("woff2"),url(fonts/KaTeX_Math-BoldItalic.woff) format("woff"),url(fonts/KaTeX_Math-BoldItalic.ttf) format("truetype")}@font-face{font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(fonts/KaTeX_Math-Italic.woff2) format("woff2"),url(fonts/KaTeX_Math-Italic.woff) format("woff"),url(fonts/KaTeX_Math-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(fonts/KaTeX_SansSerif-Bold.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Bold.woff) format("woff"),url(fonts/KaTeX_SansSerif-Bold.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(fonts/KaTeX_SansSerif-Italic.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Italic.woff) format("woff"),url(fonts/KaTeX_SansSerif-Italic.ttf) format("truetype")}@font-face{font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(fonts/KaTeX_SansSerif-Regular.woff2) format("woff2"),url(fonts/KaTeX_SansSerif-Regular.woff) format("woff"),url(fonts/KaTeX_SansSerif-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Script-Regular.woff2) format("woff2"),url(fonts/KaTeX_Script-Regular.woff) format("woff"),url(fonts/KaTeX_Script-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size1-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size1-Regular.woff) format("woff"),url(fonts/KaTeX_Size1-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size2-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size2-Regular.woff) format("woff"),url(fonts/KaTeX_Size2-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size3-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size3-Regular.woff) format("woff"),url(fonts/KaTeX_Size3-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Size4-Regular.woff2) format("woff2"),url(fonts/KaTeX_Size4-Regular.woff) format("woff"),url(fonts/KaTeX_Size4-Regular.ttf) format("truetype")}@font-face{font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(fonts/KaTeX_Typewriter-Regular.woff2) format("woff2"),url(fonts/KaTeX_Typewriter-Regular.woff) format("woff"),url(fonts/KaTeX_Typewriter-Regular.ttf) format("truetype")}.katex{text-rendering:auto;font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.2"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.27777778em;margin-right:-.55555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.83333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.16666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.66666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.45666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.14666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.85714286em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.46857143em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.96285714em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.55428571em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.66666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.77777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.88888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.30444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.76444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.58333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.66666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72833333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.07333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.41666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.48611111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.55555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.44027778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.72777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.28935185em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.34722222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.40509259em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.46296296em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.52083333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20023148em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.43981481em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.24108004em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.28929605em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.33751205em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.38572806em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.43394407em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48216008em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57859209em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69431051em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.83317261em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.19961427em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.20096463em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.24115756em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.28135048em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.32154341em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.36173633em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.40192926em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.48231511em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.57877814em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.69453376em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.83360129em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+
+</style>
+
+</head>
+<body>
+    <div class="content-wrapper">
+        <h1 id="%E9%AB%98%E7%AB%AF%E6%9A%97%E8%89%B2%E8%AE%BE%E8%AE%A1%E7%B3%BB%E7%BB%9F" tabindex="-1">高端暗色设计系统</h1>
+<h2 id="%E7%9B%AE%E5%BD%95" tabindex="-1">目录</h2>
+<ol>
+<li><a href="#%E6%A6%82%E8%BF%B0">概述</a></li>
+<li><a href="#%E5%93%81%E7%89%8C%E5%93%B2%E5%AD%A6">品牌哲学</a></li>
+<li><a href="#%E8%A7%86%E8%A7%89%E8%AF%86%E5%88%AB">视觉识别</a></li>
+<li><a href="#%E8%89%B2%E5%BD%A9%E7%B3%BB%E7%BB%9F">色彩系统</a></li>
+<li><a href="#%E6%8E%92%E7%89%88">排版</a></li>
+<li><a href="#%E7%BB%84%E4%BB%B6%E6%9E%B6%E6%9E%84">组件架构</a></li>
+<li><a href="#%E5%B8%83%E5%B1%80%E5%8E%9F%E5%88%99">布局原则</a></li>
+<li><a href="#ui-%E7%BB%84%E4%BB%B6">UI 组件</a></li>
+<li><a href="#%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">设计模式</a></li>
+<li><a href="#%E5%8A%A8%E7%94%BB%E4%B8%8E%E5%8A%A8%E6%95%88">动画与动效</a></li>
+<li><a href="#%E5%AE%9E%E6%96%BD%E6%8C%87%E5%8D%97">实施指南</a></li>
+</ol>
+<h2 id="%E6%A6%82%E8%BF%B0" tabindex="-1">概述</h2>
+<p>这个高端暗色设计系统旨在创造一种极致奢华的数字体验，体现了曼哈顿私人俱乐部的专属感和高端金融机构的精致感。它采用暗黑模式优先的方法构建，提供了一个面向那些重视实质、隐私和卓越品质的挑剔专业人士的界面。</p>
+<h3 id="%E6%A0%B8%E5%BF%83%E5%8E%9F%E5%88%99" tabindex="-1">核心原则</h3>
+<ul>
+<li><strong>暗黑模式优先</strong>：主要体验针对暗色环境进行优化</li>
+<li><strong>框架无关</strong>：可适应任何前端技术</li>
+<li><strong>奢华材质</strong>：数字世界中的铂金、黑曜石和水晶</li>
+<li><strong>极简复杂性</strong>：通过克制实现最大影响力</li>
+<li><strong>专属感觉</strong>：私人会员俱乐部的审美</li>
+</ul>
+<h2 id="%E5%93%81%E7%89%8C%E5%93%B2%E5%AD%A6" tabindex="-1">品牌哲学</h2>
+<h3 id="%E6%84%BF%E6%99%AF" tabindex="-1">愿景</h3>
+<p>创造一个数字圣殿，让优质内容与无可挑剔的设计相遇——一个感觉像是数字领域中的私人会员俱乐部空间，每一次互动都散发着品质和专属感。</p>
+<h3 id="%E5%93%81%E7%89%8C%E4%B8%AA%E6%80%A7" tabindex="-1">品牌个性</h3>
+<ul>
+<li><strong>奢华</strong>：高级材质，卓越工艺</li>
+<li><strong>专属</strong>：会员制感觉，精心策划的体验</li>
+<li><strong>精致</strong>：优雅的品味，有教养的视角</li>
+<li><strong>审慎</strong>：低调的优雅，安静的自信</li>
+<li><strong>创新</strong>：前沿而永恒</li>
+</ul>
+<h2 id="%E8%A7%86%E8%A7%89%E8%AF%86%E5%88%AB" tabindex="-1">视觉识别</h2>
+<h3 id="logo-%E5%A4%84%E7%90%86" tabindex="-1">Logo 处理</h3>
+<ul>
+<li><strong>概念</strong>：极简执行，搭配高级间距</li>
+<li><strong>字重</strong>：仅使用极细到细的字重</li>
+<li><strong>间距</strong>：宽裕的字母间距（最小 0.1em）</li>
+<li><strong>饰面</strong>：
+<ul>
+<li>特殊应用场景下的铂金箔效果</li>
+<li>数字环境下的微妙发光处理</li>
+<li>适用时的浮雕/凹雕效果</li>
+</ul>
+</li>
+</ul>
+<h3 id="%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99" tabindex="-1">设计原则</h3>
+<ul>
+<li>极致简约，最大化影响力</li>
+<li>以宽裕的负空间作为奢华元素</li>
+<li>完美的对称性和数学般的精确性</li>
+<li>高级饰面和微妙的纹理</li>
+<li>对微交互的执着</li>
+</ul>
+<h2 id="%E8%89%B2%E5%BD%A9%E7%B3%BB%E7%BB%9F" tabindex="-1">色彩系统</h2>
+<h3 id="%E4%B8%BB%E8%89%B2%E6%9D%BF---%E2%80%9C%E5%8D%88%E5%A4%9C%E6%9B%BC%E5%93%88%E9%A1%BF%E2%80%9D" tabindex="-1">主色板 - “午夜曼哈顿”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 核心颜色 */</span>
+<span class="hljs-attr">--obsidian-black</span>: <span class="hljs-number">#0A0A0A</span>;     <span class="hljs-comment">/* rgb(10, 10, 10) - 主背景 */</span>
+<span class="hljs-attr">--deep-charcoal</span>: <span class="hljs-number">#1A1A1A</span>;      <span class="hljs-comment">/* rgb(26, 26, 26) - 上层表面 */</span>
+<span class="hljs-attr">--platinum</span>: <span class="hljs-number">#E5E5E5</span>;           <span class="hljs-comment">/* rgb(229, 229, 229) - 主文本 */</span>
+<span class="hljs-attr">--pure-white</span>: <span class="hljs-number">#FFFFFF</span>;         <span class="hljs-comment">/* rgb(255, 255, 255) - 最大对比度 */</span>
+<span class="hljs-attr">--smoke</span>: <span class="hljs-number">#2A2A2A</span>;              <span class="hljs-comment">/* rgb(42, 42, 42) - 次级表面 */</span>
+</div></code></pre>
+<h3 id="%E5%BC%BA%E8%B0%83%E8%89%B2---%E2%80%9C%E9%A1%B6%E5%B1%82%E5%85%AC%E5%AF%93%E7%B3%BB%E5%88%97%E2%80%9D" tabindex="-1">强调色 - “顶层公寓系列”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 奢华强调色 */</span>
+<span class="hljs-attr">--champagne-gold</span>: <span class="hljs-number">#D4AF37</span>;     <span class="hljs-comment">/* rgb(212, 175, 55) - 高级高光 */</span>
+<span class="hljs-attr">--manhattan-blue</span>: <span class="hljs-number">#1E3A5F</span>;     <span class="hljs-comment">/* rgb(30, 58, 95) - 信任，深度 */</span>
+<span class="hljs-attr">--burgundy</span>: <span class="hljs-number">#722F37</span>;           <span class="hljs-comment">/* rgb(114, 47, 55) - 浓郁的强调色 */</span>
+<span class="hljs-attr">--pearl-gray</span>: <span class="hljs-number">#B8B8B8</span>;        <span class="hljs-comment">/* rgb(184, 184, 184) - 柔和的元素 */</span>
+<span class="hljs-attr">--midnight-navy</span>: <span class="hljs-number">#0F1419</span>;      <span class="hljs-comment">/* rgb(15, 20, 25) - 最深的背景 */</span>
+</div></code></pre>
+<h3 id="%E5%8A%9F%E8%83%BD%E6%80%A7%E9%A2%9C%E8%89%B2" tabindex="-1">功能性颜色</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 系统状态 */</span>
+<span class="hljs-attr">--success</span>: <span class="hljs-number">#22C55E</span>;            <span class="hljs-comment">/* rgb(34, 197, 94) - 成功状态 */</span>
+<span class="hljs-attr">--warning</span>: <span class="hljs-number">#F59E0B</span>;            <span class="hljs-comment">/* rgb(245, 158, 11) - 警告状态 */</span>
+<span class="hljs-attr">--error</span>: <span class="hljs-number">#EF4444</span>;              <span class="hljs-comment">/* rgb(239, 68, 68) - 错误状态 */</span>
+<span class="hljs-attr">--info</span>: <span class="hljs-number">#3B82F6</span>;               <span class="hljs-comment">/* rgb(59, 130, 246) - 信息 */</span>
+</div></code></pre>
+<h3 id="%E4%B8%8D%E9%80%8F%E6%98%8E%E5%BA%A6%E7%AD%89%E7%BA%A7" tabindex="-1">不透明度等级</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 精致的透明度 */</span>
+<span class="hljs-attr">--opacity-ghost</span>: <span class="hljs-number">0.05</span>;         <span class="hljs-comment">/* 几乎不可见的叠加层 */</span>
+<span class="hljs-attr">--opacity-whisper</span>: <span class="hljs-number">0.10</span>;       <span class="hljs-comment">/* 微妙的背景 */</span>
+<span class="hljs-attr">--opacity-breath</span>: <span class="hljs-number">0.15</span>;        <span class="hljs-comment">/* 轻触感 */</span>
+<span class="hljs-attr">--opacity-presence</span>: <span class="hljs-number">0.25</span>;      <span class="hljs-comment">/* 可察觉但柔和 */</span>
+<span class="hljs-attr">--opacity-statement</span>: <span class="hljs-number">0.40</span>;     <span class="hljs-comment">/* 清晰而精致 */</span>
+<span class="hljs-attr">--opacity-bold</span>: <span class="hljs-number">0.60</span>;          <span class="hljs-comment">/* 强烈的存在感 */</span>
+</div></code></pre>
+<h2 id="%E6%8E%92%E7%89%88" tabindex="-1">排版</h2>
+<h3 id="%E5%AD%97%E4%BD%93%E9%80%89%E6%8B%A9" tabindex="-1">字体选择</h3>
+<p><strong>主字体</strong>：为奢华感优化的系统字体</p>
+<pre class="hljs"><code><div><span class="hljs-attribute">font-family</span>: 
+  <span class="hljs-string">"SF Pro Display"</span>,           <span class="hljs-comment">/* macOS */</span>
+  <span class="hljs-string">"Segoe UI Variable"</span>,        <span class="hljs-comment">/* Windows 11 */</span>
+  <span class="hljs-string">"Inter"</span>,                    <span class="hljs-comment">/* 备用 */</span>
+  system-ui,
+  -apple-system,
+  sans-serif;
+</div></code></pre>
+<p><strong>次字体</strong>：用于技术内容的等宽字体</p>
+<pre class="hljs"><code><div><span class="hljs-attribute">font-family</span>:
+  <span class="hljs-string">"SF Mono"</span>,                  <span class="hljs-comment">/* macOS */</span>
+  <span class="hljs-string">"Consolas"</span>,                 <span class="hljs-comment">/* Windows */</span>
+  <span class="hljs-string">"Monaco"</span>,                   <span class="hljs-comment">/* 备用 */</span>
+  monospace;
+</div></code></pre>
+<h3 id="%E5%AD%97%E5%8F%B7%E5%B1%82%E7%BA%A7---%E2%80%9C%E9%93%82%E9%87%91%E5%B1%82%E7%BA%A7%E2%80%9D" tabindex="-1">字号层级 - “铂金层级”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 展示型排版 */</span>
+<span class="hljs-selector-class">.display-xl</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">4.5rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">100</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.02em</span>; }
+<span class="hljs-selector-class">.display-lg</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">3.75rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">100</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.02em</span>; }
+<span class="hljs-selector-class">.display-md</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">3rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">200</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.01em</span>; }
+<span class="hljs-selector-class">.display-sm</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">2.25rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">200</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.01em</span>; }
+
+<span class="hljs-comment">/* 标题排版 */</span>
+<span class="hljs-selector-class">.heading-xl</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.875rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.01em</span>; }
+<span class="hljs-selector-class">.heading-lg</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.5rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.005em</span>; }
+<span class="hljs-selector-class">.heading-md</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.25rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0</span>; }
+<span class="hljs-selector-class">.heading-sm</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.125rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0</span>; }
+<span class="hljs-selector-class">.heading-xs</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.01em</span>; }
+
+<span class="hljs-comment">/* 正文排版 */</span>
+<span class="hljs-selector-class">.body-xl</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.25rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.6</span>; }
+<span class="hljs-selector-class">.body-lg</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.125rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.6</span>; }
+<span class="hljs-selector-class">.body-md</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.5</span>; }
+<span class="hljs-selector-class">.body-sm</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.875rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.4</span>; }
+<span class="hljs-selector-class">.body-xs</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.3</span>; }
+
+<span class="hljs-comment">/* 特殊排版 */</span>
+<span class="hljs-selector-class">.label</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.05em</span>; <span class="hljs-attribute">text-transform</span>: uppercase; }
+<span class="hljs-selector-class">.caption</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.6875rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.02em</span>; }
+<span class="hljs-selector-class">.overline</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.625rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">600</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.1em</span>; <span class="hljs-attribute">text-transform</span>: uppercase; }
+</div></code></pre>
+<h2 id="%E7%BB%84%E4%BB%B6%E6%9E%B6%E6%9E%84" tabindex="-1">组件架构</h2>
+<h3 id="%E6%B5%B7%E6%8B%94%E7%B3%BB%E7%BB%9F%EF%BC%88elevation-system%EF%BC%89" tabindex="-1">海拔系统（Elevation System）</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 阴影层 - 高级深度感 */</span>
+<span class="hljs-attr">--shadow-whisper</span>: <span class="hljs-number">0</span> <span class="hljs-number">1px</span> <span class="hljs-number">2px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.3</span>);
+<span class="hljs-attr">--shadow-subtle</span>: <span class="hljs-number">0</span> <span class="hljs-number">2px</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.4</span>);
+<span class="hljs-attr">--shadow-gentle</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>);
+<span class="hljs-attr">--shadow-moderate</span>: <span class="hljs-number">0</span> <span class="hljs-number">8px</span> <span class="hljs-number">16px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.6</span>);
+<span class="hljs-attr">--shadow-pronounced</span>: <span class="hljs-number">0</span> <span class="hljs-number">16px</span> <span class="hljs-number">32px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.7</span>);
+<span class="hljs-attr">--shadow-dramatic</span>: <span class="hljs-number">0</span> <span class="hljs-number">24px</span> <span class="hljs-number">48px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.8</span>);
+</div></code></pre>
+<h3 id="%E8%A1%A8%E9%9D%A2%E5%B1%82%E7%BA%A7" tabindex="-1">表面层级</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 背景层 */</span>
+<span class="hljs-attr">--surface-base</span>: <span class="hljs-built_in">var</span>(--obsidian-black);      <span class="hljs-comment">/* 主背景 */</span>
+<span class="hljs-attr">--surface-raised</span>: <span class="hljs-built_in">var</span>(--deep-charcoal);     <span class="hljs-comment">/* 卡片、模态框 */</span>
+<span class="hljs-attr">--surface-elevated</span>: <span class="hljs-built_in">var</span>(--smoke);           <span class="hljs-comment">/* 下拉菜单、工具提示 */</span>
+<span class="hljs-attr">--surface-overlay</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">26</span>, <span class="hljs-number">26</span>, <span class="hljs-number">26</span>, <span class="hljs-number">0.95</span>);  <span class="hljs-comment">/* 模态框背景 */</span>
+</div></code></pre>
+<h3 id="%E8%BE%B9%E6%A1%86%E7%B3%BB%E7%BB%9F" tabindex="-1">边框系统</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 精致的边框 */</span>
+<span class="hljs-attr">--border-ghost</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.05</span>);  <span class="hljs-comment">/* 几乎不可见 */</span>
+<span class="hljs-attr">--border-subtle</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.10</span>); <span class="hljs-comment">/* 卡片轮廓 */</span>
+<span class="hljs-attr">--border-gentle</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.15</span>); <span class="hljs-comment">/* 表单元素 */</span>
+<span class="hljs-attr">--border-defined</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.25</span>); <span class="hljs-comment">/* 激活状态 */</span>
+<span class="hljs-attr">--border-prominent</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.40</span>); <span class="hljs-comment">/* 焦点状态 */</span>
+</div></code></pre>
+<h2 id="%E5%B8%83%E5%B1%80%E5%8E%9F%E5%88%99" tabindex="-1">布局原则</h2>
+<h3 id="%E9%97%B4%E8%B7%9D%E7%AD%89%E7%BA%A7---%E2%80%9C%E9%BB%84%E9%87%91%E6%AF%94%E4%BE%8B%E2%80%9D" tabindex="-1">间距等级 - “黄金比例”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 高级间距系统 */</span>
+<span class="hljs-attr">--space-1</span>: <span class="hljs-number">0.25rem</span>;   <span class="hljs-comment">/* 4px - 微调 */</span>
+<span class="hljs-attr">--space-2</span>: <span class="hljs-number">0.5rem</span>;    <span class="hljs-comment">/* 8px - 小间隙 */</span>
+<span class="hljs-attr">--space-3</span>: <span class="hljs-number">0.75rem</span>;   <span class="hljs-comment">/* 12px - 组件内边距 */</span>
+<span class="hljs-attr">--space-4</span>: <span class="hljs-number">1rem</span>;      <span class="hljs-comment">/* 16px - 标准间距 */</span>
+<span class="hljs-attr">--space-5</span>: <span class="hljs-number">1.25rem</span>;   <span class="hljs-comment">/* 20px - 区块间距 */</span>
+<span class="hljs-attr">--space-6</span>: <span class="hljs-number">1.5rem</span>;    <span class="hljs-comment">/* 24px - 大间距 */</span>
+<span class="hljs-attr">--space-8</span>: <span class="hljs-number">2rem</span>;      <span class="hljs-comment">/* 32px - 主要区块 */</span>
+<span class="hljs-attr">--space-10</span>: <span class="hljs-number">2.5rem</span>;   <span class="hljs-comment">/* 40px - 页面区块 */</span>
+<span class="hljs-attr">--space-12</span>: <span class="hljs-number">3rem</span>;     <span class="hljs-comment">/* 48px - 英雄区域间距 */</span>
+<span class="hljs-attr">--space-16</span>: <span class="hljs-number">4rem</span>;     <span class="hljs-comment">/* 64px - 布局间距 */</span>
+<span class="hljs-attr">--space-20</span>: <span class="hljs-number">5rem</span>;     <span class="hljs-comment">/* 80px - 主要布局 */</span>
+<span class="hljs-attr">--space-24</span>: <span class="hljs-number">6rem</span>;     <span class="hljs-comment">/* 96px - 建筑级间距 */</span>
+</div></code></pre>
+<h3 id="%E7%BD%91%E6%A0%BC%E7%B3%BB%E7%BB%9F" tabindex="-1">网格系统</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 奢华网格 - 12 列系统 */</span>
+<span class="hljs-selector-class">.container</span> {
+  <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1440px</span>;
+  <span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0</span> <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">6</span>);
+}
+
+<span class="hljs-comment">/* 响应式容器 */</span>
+<span class="hljs-selector-class">.container-xs</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">480px</span>; }   <span class="hljs-comment">/* 移动设备 */</span>
+<span class="hljs-selector-class">.container-sm</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">640px</span>; }   <span class="hljs-comment">/* 小型平板 */</span>
+<span class="hljs-selector-class">.container-md</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">768px</span>; }   <span class="hljs-comment">/* 平板 */</span>
+<span class="hljs-selector-class">.container-lg</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1024px</span>; }  <span class="hljs-comment">/* 桌面 */</span>
+<span class="hljs-selector-class">.container-xl</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1280px</span>; }  <span class="hljs-comment">/* 大型桌面 */</span>
+<span class="hljs-selector-class">.container-2xl</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1440px</span>; } <span class="hljs-comment">/* 超大桌面 */</span>
+</div></code></pre>
+<h2 id="ui-%E7%BB%84%E4%BB%B6" tabindex="-1">UI 组件</h2>
+<h3 id="%E6%8C%89%E9%92%AE---%E2%80%9C%E8%A1%8C%E6%94%BF%E6%93%8D%E4%BD%9C%E2%80%9D" tabindex="-1">按钮 - “行政操作”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 主按钮 - 香槟金 */</span>
+<span class="hljs-selector-class">.btn-primary</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--obsidian-black);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.01em</span>;
+}
+
+<span class="hljs-comment">/* 次按钮 - 铂金描边 */</span>
+<span class="hljs-selector-class">.btn-secondary</span> {
+  <span class="hljs-attribute">background</span>: transparent;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-defined);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>;
+}
+
+<span class="hljs-comment">/* 第三级按钮 - 极简 */</span>
+<span class="hljs-selector-class">.btn-tertiary</span> {
+  <span class="hljs-attribute">background</span>: transparent;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">border</span>: none;
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>;
+}
+
+<span class="hljs-comment">/* 幽灵按钮 - 微妙的存在感 */</span>
+<span class="hljs-selector-class">.btn-ghost</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.05</span>);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-ghost);
+}
+</div></code></pre>
+<h3 id="%E5%8D%A1%E7%89%87---%E2%80%9C%E9%AB%98%E7%BA%A7%E8%A1%A8%E9%9D%A2%E2%80%9D" tabindex="-1">卡片 - “高级表面”</h3>
+<pre class="hljs"><code><div><span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-subtle);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">8px</span>;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-gentle);
+  <span class="hljs-attribute">overflow</span>: hidden;
+}
+
+<span class="hljs-selector-class">.card-elevated</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-elevated);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-moderate);
+}
+
+<span class="hljs-selector-class">.card-floating</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-elevated);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-pronounced);
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">2px</span>);
+}
+</div></code></pre>
+<h3 id="%E8%A1%A8%E5%8D%95---%E2%80%9C%E7%B2%BE%E8%87%B4%E8%BE%93%E5%85%A5%E2%80%9D" tabindex="-1">表单 - “精致输入”</h3>
+<pre class="hljs"><code><div><span class="hljs-selector-class">.input</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-gentle);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">6px</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">3</span>) <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">4</span>);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>;
+}
+
+<span class="hljs-selector-class">.input</span><span class="hljs-selector-pseudo">:focus</span> {
+  <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">3px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.1</span>);
+  <span class="hljs-attribute">outline</span>: none;
+}
+
+<span class="hljs-selector-class">.input</span><span class="hljs-selector-pseudo">::placeholder</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>;
+}
+</div></code></pre>
+<h2 id="%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F" tabindex="-1">设计模式</h2>
+<h3 id="%E5%AF%BC%E8%88%AA---%E2%80%9C%E7%A7%81%E4%BA%BA%E4%BF%B1%E4%B9%90%E9%83%A8%E5%AF%BC%E5%BC%95%E2%80%9D" tabindex="-1">导航 - “私人俱乐部导引”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 顶部导航 */</span>
+<span class="hljs-selector-class">.nav-primary</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>, <span class="hljs-number">0.95</span>);
+  <span class="hljs-attribute">backdrop-filter</span>: <span class="hljs-built_in">blur</span>(<span class="hljs-number">20px</span>);
+  <span class="hljs-attribute">border-bottom</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-ghost);
+}
+
+<span class="hljs-comment">/* 侧边栏导航 */</span>
+<span class="hljs-selector-class">.nav-sidebar</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">border-right</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-subtle);
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">280px</span>;
+}
+
+<span class="hljs-comment">/* 导航项 */</span>
+<span class="hljs-selector-class">.nav-item</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.01em</span>;
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">200ms</span> ease;
+}
+
+<span class="hljs-selector-class">.nav-item</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.05</span>);
+}
+
+<span class="hljs-selector-class">.nav-item</span><span class="hljs-selector-class">.active</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.1</span>);
+}
+</div></code></pre>
+<h3 id="%E6%95%B0%E6%8D%AE%E5%B1%95%E7%A4%BA---%E2%80%9C%E4%BF%A1%E6%81%AF%E5%B1%82%E7%BA%A7%E2%80%9D" tabindex="-1">数据展示 - “信息层级”</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 表格 */</span>
+<span class="hljs-selector-class">.table</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-base);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-subtle);
+}
+
+<span class="hljs-selector-class">.table-header</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.02em</span>;
+  <span class="hljs-attribute">text-transform</span>: uppercase;
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>;
+}
+
+<span class="hljs-selector-class">.table-row</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.03</span>);
+}
+
+<span class="hljs-selector-class">.table-row</span><span class="hljs-selector-pseudo">:nth-child</span>(even) {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.01</span>);
+}
+</div></code></pre>
+<h2 id="%E5%8A%A8%E7%94%BB%E4%B8%8E%E5%8A%A8%E6%95%88" tabindex="-1">动画与动效</h2>
+<h3 id="%E8%BF%87%E6%B8%A1%E7%B3%BB%E7%BB%9F" tabindex="-1">过渡系统</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 高级缓动函数 */</span>
+<span class="hljs-attr">--ease-luxury</span>: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.25</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">1</span>);     <span class="hljs-comment">/* 平滑的奢华感 */</span>
+<span class="hljs-attr">--ease-elegant</span>: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.2</span>, <span class="hljs-number">1</span>);        <span class="hljs-comment">/* 材质般的优雅 */</span>
+<span class="hljs-attr">--ease-refined</span>: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.65</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.35</span>, <span class="hljs-number">1</span>);      <span class="hljs-comment">/* 精致的动效 */</span>
+
+<span class="hljs-comment">/* 持续时间等级 */</span>
+<span class="hljs-attr">--duration-instant</span>: <span class="hljs-number">100ms</span>;   <span class="hljs-comment">/* 微交互 */</span>
+<span class="hljs-attr">--duration-quick</span>: <span class="hljs-number">200ms</span>;     <span class="hljs-comment">/* 标准过渡 */</span>
+<span class="hljs-attr">--duration-smooth</span>: <span class="hljs-number">300ms</span>;    <span class="hljs-comment">/* 组件动画 */</span>
+<span class="hljs-attr">--duration-gentle</span>: <span class="hljs-number">500ms</span>;    <span class="hljs-comment">/* 布局变化 */</span>
+<span class="hljs-attr">--duration-luxurious</span>: <span class="hljs-number">800ms</span>; <span class="hljs-comment">/* 英雄区域动画 */</span>
+</div></code></pre>
+<h3 id="%E5%BE%AE%E4%BA%A4%E4%BA%92" tabindex="-1">微交互</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 悬停提升效果 */</span>
+<span class="hljs-selector-class">.hover-lift</span> {
+  <span class="hljs-attribute">transition</span>: transform <span class="hljs-built_in">var</span>(--duration-quick) <span class="hljs-built_in">var</span>(--ease-elegant),
+              box-shadow <span class="hljs-built_in">var</span>(--duration-quick) <span class="hljs-built_in">var</span>(--ease-elegant);
+}
+
+<span class="hljs-selector-class">.hover-lift</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">1px</span>);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-moderate);
+}
+
+<span class="hljs-comment">/* 焦点状态 */</span>
+<span class="hljs-selector-class">.focus-ring</span><span class="hljs-selector-pseudo">:focus</span> {
+  <span class="hljs-attribute">outline</span>: none;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">3px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.15</span>);
+}
+
+<span class="hljs-comment">/* 加载状态 */</span>
+<span class="hljs-selector-class">.loading-shimmer</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">linear-gradient</span>(
+    <span class="hljs-number">90deg</span>,
+    <span class="hljs-built_in">var</span>(--surface-raised) <span class="hljs-number">0%</span>,
+    <span class="hljs-built_in">var</span>(--surface-elevated) <span class="hljs-number">50%</span>,
+    <span class="hljs-built_in">var</span>(--surface-raised) <span class="hljs-number">100%</span>
+  );
+  <span class="hljs-attribute">background-size</span>: <span class="hljs-number">200%</span> <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">animation</span>: shimmer <span class="hljs-number">1.5s</span> infinite <span class="hljs-built_in">var</span>(--ease-luxury);
+}
+
+<span class="hljs-keyword">@keyframes</span> shimmer {
+  <span class="hljs-number">0%</span> { <span class="hljs-attribute">background-position</span>: -<span class="hljs-number">200%</span> <span class="hljs-number">0</span>; }
+  <span class="hljs-number">100%</span> { <span class="hljs-attribute">background-position</span>: <span class="hljs-number">200%</span> <span class="hljs-number">0</span>; }
+}
+</div></code></pre>
+<h2 id="%E5%AE%9E%E6%96%BD%E6%8C%87%E5%8D%97" tabindex="-1">实施指南</h2>
+<h3 id="%E6%A1%86%E6%9E%B6%E6%97%A0%E5%85%B3%E5%8E%9F%E5%88%99" tabindex="-1">框架无关原则</h3>
+<h4 id="css-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7" tabindex="-1">CSS 自定义属性</h4>
+<p>所有设计令牌都应实现为 CSS 自定义属性，以便任何框架都能使用它们：</p>
+<pre class="hljs"><code><div><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-comment">/* 颜色 */</span>
+  <span class="hljs-attr">--obsidian-black</span>: <span class="hljs-number">#0A0A0A</span>;
+  <span class="hljs-attr">--platinum</span>: <span class="hljs-number">#E5E5E5</span>;
+  
+  <span class="hljs-comment">/* 排版 */</span>
+  <span class="hljs-attr">--font-display</span>: <span class="hljs-string">"SF Pro Display"</span>, system-ui, sans-serif;
+  <span class="hljs-attr">--font-body</span>: <span class="hljs-string">"SF Pro Text"</span>, system-ui, sans-serif;
+  
+  <span class="hljs-comment">/* 间距 */</span>
+  <span class="hljs-attr">--space-4</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attr">--space-8</span>: <span class="hljs-number">2rem</span>;
+  
+  <span class="hljs-comment">/* 阴影 */</span>
+  <span class="hljs-attr">--shadow-gentle</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>);
+}
+</div></code></pre>
+<h4 id="%E7%BB%84%E4%BB%B6%E7%BB%93%E6%9E%84" tabindex="-1">组件结构</h4>
+<p>设计具有清晰层级的组件，以便可以在任何框架中实现：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">&lt;!-- 按钮组件结构 --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn btn-primary btn-lg"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn-icon"</span>&gt;</span><span class="hljs-comment">&lt;!-- 图标 --&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn-text"</span>&gt;</span>按钮文本<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+</div></code></pre>
+<h4 id="%E5%B7%A5%E5%85%B7%E7%B1%BB" tabindex="-1">工具类</h4>
+<p>为常用模式提供原子化的工具类：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 间距工具类 */</span>
+<span class="hljs-selector-class">.p-4</span> { <span class="hljs-attribute">padding</span>: <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">4</span>); }
+<span class="hljs-selector-class">.m-8</span> { <span class="hljs-attribute">margin</span>: <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">8</span>); }
+
+<span class="hljs-comment">/* 排版工具类 */</span>
+<span class="hljs-selector-class">.text-platinum</span> { <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum); }
+<span class="hljs-selector-class">.text-champagne</span> { <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--champagne-gold); }
+
+<span class="hljs-comment">/* 表面工具类 */</span>
+<span class="hljs-selector-class">.surface-raised</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised); }
+<span class="hljs-selector-class">.surface-elevated</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-elevated); }
+</div></code></pre>
+<h3 id="%E6%9A%97%E9%BB%91%E6%A8%A1%E5%BC%8F%E4%BC%98%E5%8C%96" tabindex="-1">暗黑模式优化</h3>
+<h4 id="%E5%AF%B9%E6%AF%94%E5%BA%A6%E8%A6%81%E6%B1%82" tabindex="-1">对比度要求</h4>
+<ul>
+<li>正常文本最小对比度：4.5:1</li>
+<li>大号文本最小对比度：3:1</li>
+<li>高级体验：尽可能达到 7:1+</li>
+</ul>
+<h4 id="%E5%87%8F%E8%BD%BB%E7%9C%BC%E9%83%A8%E7%96%B2%E5%8A%B3" tabindex="-1">减轻眼部疲劳</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 减少蓝光 */</span>
+<span class="hljs-selector-class">.reduced-blue</span> {
+  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">hue-rotate</span>(<span class="hljs-number">15deg</span>) <span class="hljs-built_in">saturate</span>(<span class="hljs-number">0.9</span>);
+}
+
+<span class="hljs-comment">/* 夜间模式下的暖色温 */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">prefers-color-scheme</span>: dark) <span class="hljs-keyword">and</span> (<span class="hljs-attribute">max-height</span>: <span class="hljs-number">800px</span>) {
+  <span class="hljs-selector-pseudo">:root</span> {
+    <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">sepia</span>(<span class="hljs-number">0.1</span>) <span class="hljs-built_in">hue-rotate</span>(<span class="hljs-number">15deg</span>);
+  }
+}
+</div></code></pre>
+<h3 id="%E5%8F%AF%E8%AE%BF%E9%97%AE%E6%80%A7%E6%A0%87%E5%87%86" tabindex="-1">可访问性标准</h3>
+<h4 id="%E7%84%A6%E7%82%B9%E7%AE%A1%E7%90%86" tabindex="-1">焦点管理</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 增强的焦点指示器 */</span>
+<span class="hljs-selector-class">.focus-visible</span><span class="hljs-selector-pseudo">:focus-visible</span> {
+  <span class="hljs-attribute">outline</span>: <span class="hljs-number">2px</span> solid <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">outline-offset</span>: <span class="hljs-number">2px</span>;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.2</span>);
+}
+</div></code></pre>
+<h4 id="%E5%B1%8F%E5%B9%95%E9%98%85%E8%AF%BB%E5%99%A8%E6%94%AF%E6%8C%81" tabindex="-1">屏幕阅读器支持</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* 仅屏幕阅读器可见内容 */</span>
+<span class="hljs-selector-class">.sr-only</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0</span>;
+  <span class="hljs-attribute">margin</span>: -<span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">overflow</span>: hidden;
+  <span class="hljs-attribute">clip</span>: <span class="hljs-built_in">rect</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>该设计系统为创建高端暗黑模式体验提供了全面的基础，可以在任何技术栈中实施，同时保持奢华的美学和卓越的用户体验标准。</p>
+<hr>
+<h1 id="premium-dark-design-system" tabindex="-1">Premium Dark Design System</h1>
+<h2 id="table-of-contents" tabindex="-1">Table of Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#brand-philosophy">Brand Philosophy</a></li>
+<li><a href="#visual-identity">Visual Identity</a></li>
+<li><a href="#color-system">Color System</a></li>
+<li><a href="#typography">Typography</a></li>
+<li><a href="#component-architecture">Component Architecture</a></li>
+<li><a href="#layout-principles">Layout Principles</a></li>
+<li><a href="#ui-components">UI Components</a></li>
+<li><a href="#design-patterns">Design Patterns</a></li>
+<li><a href="#animation--motion">Animation &amp; Motion</a></li>
+<li><a href="#implementation-guidelines">Implementation Guidelines</a></li>
+</ol>
+<h2 id="overview" tabindex="-1">Overview</h2>
+<p>This premium dark design system creates an ultra-luxury digital experience that embodies the exclusivity of Manhattan's private clubs and the sophistication of high-end financial institutions. Built with a dark-mode-first approach, it delivers an interface that speaks to discerning professionals who value substance, privacy, and exceptional quality.</p>
+<h3 id="core-principles" tabindex="-1">Core Principles</h3>
+<ul>
+<li><strong>Dark-mode first</strong>: Primary experience optimized for dark environments</li>
+<li><strong>Framework agnostic</strong>: Adaptable to any frontend technology</li>
+<li><strong>Luxury materials</strong>: Digital equivalent of platinum, obsidian, and crystal</li>
+<li><strong>Minimal complexity</strong>: Maximum impact through restraint</li>
+<li><strong>Exclusive feel</strong>: Private members' club aesthetic</li>
+</ul>
+<h2 id="brand-philosophy" tabindex="-1">Brand Philosophy</h2>
+<h3 id="vision" tabindex="-1">Vision</h3>
+<p>Create a digital sanctuary where premium content meets impeccable design - a space that feels like a private members' club in the digital realm, where every interaction exudes quality and exclusivity.</p>
+<h3 id="brand-personality" tabindex="-1">Brand Personality</h3>
+<ul>
+<li><strong>Luxurious</strong>: Premium materials, exceptional craftsmanship</li>
+<li><strong>Exclusive</strong>: Members-only feel, curated experiences</li>
+<li><strong>Sophisticated</strong>: Refined taste, cultured perspective</li>
+<li><strong>Discreet</strong>: Understated elegance, quiet confidence</li>
+<li><strong>Innovative</strong>: Cutting-edge while timeless</li>
+</ul>
+<h2 id="visual-identity" tabindex="-1">Visual Identity</h2>
+<h3 id="logo-treatment" tabindex="-1">Logo Treatment</h3>
+<ul>
+<li><strong>Concept</strong>: Minimalist execution with premium spacing</li>
+<li><strong>Weight</strong>: Ultra-thin to light weights only</li>
+<li><strong>Spacing</strong>: Generous letter-spacing (0.1em minimum)</li>
+<li><strong>Finishes</strong>:
+<ul>
+<li>Platinum foil effect for special applications</li>
+<li>Subtle glow treatments for digital</li>
+<li>Embossed/debossed when applicable</li>
+</ul>
+</li>
+</ul>
+<h3 id="design-principles" tabindex="-1">Design Principles</h3>
+<ul>
+<li>Extreme minimalism with maximum impact</li>
+<li>Generous negative space as luxury element</li>
+<li>Perfect symmetry and mathematical precision</li>
+<li>Premium finishes and subtle textures</li>
+<li>Obsession with micro-interactions</li>
+</ul>
+<h2 id="color-system" tabindex="-1">Color System</h2>
+<h3 id="primary-palette---%22midnight-manhattan%22" tabindex="-1">Primary Palette - "Midnight Manhattan"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Core Colors */</span>
+<span class="hljs-attr">--obsidian-black</span>: <span class="hljs-number">#0A0A0A</span>;     <span class="hljs-comment">/* rgb(10, 10, 10) - Primary background */</span>
+<span class="hljs-attr">--deep-charcoal</span>: <span class="hljs-number">#1A1A1A</span>;      <span class="hljs-comment">/* rgb(26, 26, 26) - Elevated surfaces */</span>
+<span class="hljs-attr">--platinum</span>: <span class="hljs-number">#E5E5E5</span>;           <span class="hljs-comment">/* rgb(229, 229, 229) - Primary text */</span>
+<span class="hljs-attr">--pure-white</span>: <span class="hljs-number">#FFFFFF</span>;         <span class="hljs-comment">/* rgb(255, 255, 255) - Maximum contrast */</span>
+<span class="hljs-attr">--smoke</span>: <span class="hljs-number">#2A2A2A</span>;              <span class="hljs-comment">/* rgb(42, 42, 42) - Secondary surfaces */</span>
+</div></code></pre>
+<h3 id="accent-colors---%22penthouse-collection%22" tabindex="-1">Accent Colors - "Penthouse Collection"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Luxury Accents */</span>
+<span class="hljs-attr">--champagne-gold</span>: <span class="hljs-number">#D4AF37</span>;     <span class="hljs-comment">/* rgb(212, 175, 55) - Premium highlights */</span>
+<span class="hljs-attr">--manhattan-blue</span>: <span class="hljs-number">#1E3A5F</span>;     <span class="hljs-comment">/* rgb(30, 58, 95) - Trust, depth */</span>
+<span class="hljs-attr">--burgundy</span>: <span class="hljs-number">#722F37</span>;           <span class="hljs-comment">/* rgb(114, 47, 55) - Rich accent */</span>
+<span class="hljs-attr">--pearl-gray</span>: <span class="hljs-number">#B8B8B8</span>;        <span class="hljs-comment">/* rgb(184, 184, 184) - Muted elements */</span>
+<span class="hljs-attr">--midnight-navy</span>: <span class="hljs-number">#0F1419</span>;      <span class="hljs-comment">/* rgb(15, 20, 25) - Deepest backgrounds */</span>
+</div></code></pre>
+<h3 id="functional-colors" tabindex="-1">Functional Colors</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* System States */</span>
+<span class="hljs-attr">--success</span>: <span class="hljs-number">#22C55E</span>;            <span class="hljs-comment">/* rgb(34, 197, 94) - Success states */</span>
+<span class="hljs-attr">--warning</span>: <span class="hljs-number">#F59E0B</span>;            <span class="hljs-comment">/* rgb(245, 158, 11) - Warning states */</span>
+<span class="hljs-attr">--error</span>: <span class="hljs-number">#EF4444</span>;              <span class="hljs-comment">/* rgb(239, 68, 68) - Error states */</span>
+<span class="hljs-attr">--info</span>: <span class="hljs-number">#3B82F6</span>;               <span class="hljs-comment">/* rgb(59, 130, 246) - Information */</span>
+</div></code></pre>
+<h3 id="opacity-scale" tabindex="-1">Opacity Scale</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Refined Transparency */</span>
+<span class="hljs-attr">--opacity-ghost</span>: <span class="hljs-number">0.05</span>;         <span class="hljs-comment">/* Barely visible overlays */</span>
+<span class="hljs-attr">--opacity-whisper</span>: <span class="hljs-number">0.10</span>;       <span class="hljs-comment">/* Subtle backgrounds */</span>
+<span class="hljs-attr">--opacity-breath</span>: <span class="hljs-number">0.15</span>;        <span class="hljs-comment">/* Light touches */</span>
+<span class="hljs-attr">--opacity-presence</span>: <span class="hljs-number">0.25</span>;      <span class="hljs-comment">/* Noticeable but gentle */</span>
+<span class="hljs-attr">--opacity-statement</span>: <span class="hljs-number">0.40</span>;     <span class="hljs-comment">/* Clear but refined */</span>
+<span class="hljs-attr">--opacity-bold</span>: <span class="hljs-number">0.60</span>;          <span class="hljs-comment">/* Strong presence */</span>
+</div></code></pre>
+<h2 id="typography" tabindex="-1">Typography</h2>
+<h3 id="font-selection" tabindex="-1">Font Selection</h3>
+<p><strong>Primary</strong>: System fonts optimized for luxury</p>
+<pre class="hljs"><code><div><span class="hljs-attribute">font-family</span>: 
+  <span class="hljs-string">"SF Pro Display"</span>,           <span class="hljs-comment">/* macOS */</span>
+  <span class="hljs-string">"Segoe UI Variable"</span>,        <span class="hljs-comment">/* Windows 11 */</span>
+  <span class="hljs-string">"Inter"</span>,                    <span class="hljs-comment">/* Fallback */</span>
+  system-ui,
+  -apple-system,
+  sans-serif;
+</div></code></pre>
+<p><strong>Secondary</strong>: Monospace for technical content</p>
+<pre class="hljs"><code><div><span class="hljs-attribute">font-family</span>:
+  <span class="hljs-string">"SF Mono"</span>,                  <span class="hljs-comment">/* macOS */</span>
+  <span class="hljs-string">"Consolas"</span>,                 <span class="hljs-comment">/* Windows */</span>
+  <span class="hljs-string">"Monaco"</span>,                   <span class="hljs-comment">/* Fallback */</span>
+  monospace;
+</div></code></pre>
+<h3 id="type-scale---%22platinum-hierarchy%22" tabindex="-1">Type Scale - "Platinum Hierarchy"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Display Typography */</span>
+<span class="hljs-selector-class">.display-xl</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">4.5rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">100</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.02em</span>; }
+<span class="hljs-selector-class">.display-lg</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">3.75rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">100</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.02em</span>; }
+<span class="hljs-selector-class">.display-md</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">3rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">200</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.01em</span>; }
+<span class="hljs-selector-class">.display-sm</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">2.25rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">200</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.01em</span>; }
+
+<span class="hljs-comment">/* Heading Typography */</span>
+<span class="hljs-selector-class">.heading-xl</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.875rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.01em</span>; }
+<span class="hljs-selector-class">.heading-lg</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.5rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">letter-spacing</span>: -<span class="hljs-number">0.005em</span>; }
+<span class="hljs-selector-class">.heading-md</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.25rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0</span>; }
+<span class="hljs-selector-class">.heading-sm</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.125rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0</span>; }
+<span class="hljs-selector-class">.heading-xs</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.01em</span>; }
+
+<span class="hljs-comment">/* Body Typography */</span>
+<span class="hljs-selector-class">.body-xl</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.25rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.6</span>; }
+<span class="hljs-selector-class">.body-lg</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.125rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.6</span>; }
+<span class="hljs-selector-class">.body-md</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.5</span>; }
+<span class="hljs-selector-class">.body-sm</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.875rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.4</span>; }
+<span class="hljs-selector-class">.body-xs</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1.3</span>; }
+
+<span class="hljs-comment">/* Specialized Typography */</span>
+<span class="hljs-selector-class">.label</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.05em</span>; <span class="hljs-attribute">text-transform</span>: uppercase; }
+<span class="hljs-selector-class">.caption</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.6875rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.02em</span>; }
+<span class="hljs-selector-class">.overline</span> { <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.625rem</span>; <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">600</span>; <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.1em</span>; <span class="hljs-attribute">text-transform</span>: uppercase; }
+</div></code></pre>
+<h2 id="component-architecture" tabindex="-1">Component Architecture</h2>
+<h3 id="elevation-system" tabindex="-1">Elevation System</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Shadow Layers - Premium Depth */</span>
+<span class="hljs-attr">--shadow-whisper</span>: <span class="hljs-number">0</span> <span class="hljs-number">1px</span> <span class="hljs-number">2px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.3</span>);
+<span class="hljs-attr">--shadow-subtle</span>: <span class="hljs-number">0</span> <span class="hljs-number">2px</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.4</span>);
+<span class="hljs-attr">--shadow-gentle</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>);
+<span class="hljs-attr">--shadow-moderate</span>: <span class="hljs-number">0</span> <span class="hljs-number">8px</span> <span class="hljs-number">16px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.6</span>);
+<span class="hljs-attr">--shadow-pronounced</span>: <span class="hljs-number">0</span> <span class="hljs-number">16px</span> <span class="hljs-number">32px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.7</span>);
+<span class="hljs-attr">--shadow-dramatic</span>: <span class="hljs-number">0</span> <span class="hljs-number">24px</span> <span class="hljs-number">48px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.8</span>);
+</div></code></pre>
+<h3 id="surface-hierarchy" tabindex="-1">Surface Hierarchy</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Background Layers */</span>
+<span class="hljs-attr">--surface-base</span>: <span class="hljs-built_in">var</span>(--obsidian-black);      <span class="hljs-comment">/* Primary background */</span>
+<span class="hljs-attr">--surface-raised</span>: <span class="hljs-built_in">var</span>(--deep-charcoal);     <span class="hljs-comment">/* Cards, modals */</span>
+<span class="hljs-attr">--surface-elevated</span>: <span class="hljs-built_in">var</span>(--smoke);           <span class="hljs-comment">/* Dropdowns, tooltips */</span>
+<span class="hljs-attr">--surface-overlay</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">26</span>, <span class="hljs-number">26</span>, <span class="hljs-number">26</span>, <span class="hljs-number">0.95</span>);  <span class="hljs-comment">/* Modal backgrounds */</span>
+</div></code></pre>
+<h3 id="border-system" tabindex="-1">Border System</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Refined Borders */</span>
+<span class="hljs-attr">--border-ghost</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.05</span>);  <span class="hljs-comment">/* Barely visible */</span>
+<span class="hljs-attr">--border-subtle</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.10</span>); <span class="hljs-comment">/* Card outlines */</span>
+<span class="hljs-attr">--border-gentle</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.15</span>); <span class="hljs-comment">/* Form elements */</span>
+<span class="hljs-attr">--border-defined</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.25</span>); <span class="hljs-comment">/* Active states */</span>
+<span class="hljs-attr">--border-prominent</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.40</span>); <span class="hljs-comment">/* Focus states */</span>
+</div></code></pre>
+<h2 id="layout-principles" tabindex="-1">Layout Principles</h2>
+<h3 id="spacing-scale---%22golden-proportions%22" tabindex="-1">Spacing Scale - "Golden Proportions"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Premium Spacing System */</span>
+<span class="hljs-attr">--space-1</span>: <span class="hljs-number">0.25rem</span>;   <span class="hljs-comment">/* 4px - Micro adjustments */</span>
+<span class="hljs-attr">--space-2</span>: <span class="hljs-number">0.5rem</span>;    <span class="hljs-comment">/* 8px - Small gaps */</span>
+<span class="hljs-attr">--space-3</span>: <span class="hljs-number">0.75rem</span>;   <span class="hljs-comment">/* 12px - Component padding */</span>
+<span class="hljs-attr">--space-4</span>: <span class="hljs-number">1rem</span>;      <span class="hljs-comment">/* 16px - Standard spacing */</span>
+<span class="hljs-attr">--space-5</span>: <span class="hljs-number">1.25rem</span>;   <span class="hljs-comment">/* 20px - Section spacing */</span>
+<span class="hljs-attr">--space-6</span>: <span class="hljs-number">1.5rem</span>;    <span class="hljs-comment">/* 24px - Large spacing */</span>
+<span class="hljs-attr">--space-8</span>: <span class="hljs-number">2rem</span>;      <span class="hljs-comment">/* 32px - Major sections */</span>
+<span class="hljs-attr">--space-10</span>: <span class="hljs-number">2.5rem</span>;   <span class="hljs-comment">/* 40px - Page sections */</span>
+<span class="hljs-attr">--space-12</span>: <span class="hljs-number">3rem</span>;     <span class="hljs-comment">/* 48px - Hero spacing */</span>
+<span class="hljs-attr">--space-16</span>: <span class="hljs-number">4rem</span>;     <span class="hljs-comment">/* 64px - Layout spacing */</span>
+<span class="hljs-attr">--space-20</span>: <span class="hljs-number">5rem</span>;     <span class="hljs-comment">/* 80px - Major layout */</span>
+<span class="hljs-attr">--space-24</span>: <span class="hljs-number">6rem</span>;     <span class="hljs-comment">/* 96px - Architectural spacing */</span>
+</div></code></pre>
+<h3 id="grid-system" tabindex="-1">Grid System</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Luxury Grid - 12 Column System */</span>
+<span class="hljs-selector-class">.container</span> {
+  <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1440px</span>;
+  <span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0</span> <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">6</span>);
+}
+
+<span class="hljs-comment">/* Responsive Containers */</span>
+<span class="hljs-selector-class">.container-xs</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">480px</span>; }   <span class="hljs-comment">/* Mobile */</span>
+<span class="hljs-selector-class">.container-sm</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">640px</span>; }   <span class="hljs-comment">/* Small tablet */</span>
+<span class="hljs-selector-class">.container-md</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">768px</span>; }   <span class="hljs-comment">/* Tablet */</span>
+<span class="hljs-selector-class">.container-lg</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1024px</span>; }  <span class="hljs-comment">/* Desktop */</span>
+<span class="hljs-selector-class">.container-xl</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1280px</span>; }  <span class="hljs-comment">/* Large desktop */</span>
+<span class="hljs-selector-class">.container-2xl</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">1440px</span>; } <span class="hljs-comment">/* Extra large */</span>
+</div></code></pre>
+<h2 id="ui-components" tabindex="-1">UI Components</h2>
+<h3 id="buttons---%22executive-actions%22" tabindex="-1">Buttons - "Executive Actions"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Primary Button - Champagne Gold */</span>
+<span class="hljs-selector-class">.btn-primary</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--obsidian-black);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.01em</span>;
+}
+
+<span class="hljs-comment">/* Secondary Button - Platinum Outline */</span>
+<span class="hljs-selector-class">.btn-secondary</span> {
+  <span class="hljs-attribute">background</span>: transparent;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-defined);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>;
+}
+
+<span class="hljs-comment">/* Tertiary Button - Minimal */</span>
+<span class="hljs-selector-class">.btn-tertiary</span> {
+  <span class="hljs-attribute">background</span>: transparent;
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">border</span>: none;
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">400</span>;
+}
+
+<span class="hljs-comment">/* Ghost Button - Subtle Presence */</span>
+<span class="hljs-selector-class">.btn-ghost</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.05</span>);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-ghost);
+}
+</div></code></pre>
+<h3 id="cards---%22premium-surfaces%22" tabindex="-1">Cards - "Premium Surfaces"</h3>
+<pre class="hljs"><code><div><span class="hljs-selector-class">.card</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-subtle);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">8px</span>;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-gentle);
+  <span class="hljs-attribute">overflow</span>: hidden;
+}
+
+<span class="hljs-selector-class">.card-elevated</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-elevated);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-moderate);
+}
+
+<span class="hljs-selector-class">.card-floating</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-elevated);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-pronounced);
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">2px</span>);
+}
+</div></code></pre>
+<h3 id="forms---%22refined-inputs%22" tabindex="-1">Forms - "Refined Inputs"</h3>
+<pre class="hljs"><code><div><span class="hljs-selector-class">.input</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-gentle);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">6px</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">3</span>) <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">4</span>);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>;
+}
+
+<span class="hljs-selector-class">.input</span><span class="hljs-selector-pseudo">:focus</span> {
+  <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">3px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.1</span>);
+  <span class="hljs-attribute">outline</span>: none;
+}
+
+<span class="hljs-selector-class">.input</span><span class="hljs-selector-pseudo">::placeholder</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>;
+}
+</div></code></pre>
+<h2 id="design-patterns" tabindex="-1">Design Patterns</h2>
+<h3 id="navigation---%22private-club-wayfinding%22" tabindex="-1">Navigation - "Private Club Wayfinding"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Top Navigation */</span>
+<span class="hljs-selector-class">.nav-primary</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>, <span class="hljs-number">10</span>, <span class="hljs-number">0.95</span>);
+  <span class="hljs-attribute">backdrop-filter</span>: <span class="hljs-built_in">blur</span>(<span class="hljs-number">20px</span>);
+  <span class="hljs-attribute">border-bottom</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-ghost);
+}
+
+<span class="hljs-comment">/* Sidebar Navigation */</span>
+<span class="hljs-selector-class">.nav-sidebar</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">border-right</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-subtle);
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">280px</span>;
+}
+
+<span class="hljs-comment">/* Navigation Items */</span>
+<span class="hljs-selector-class">.nav-item</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">300</span>;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.01em</span>;
+  <span class="hljs-attribute">transition</span>: all <span class="hljs-number">200ms</span> ease;
+}
+
+<span class="hljs-selector-class">.nav-item</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum);
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.05</span>);
+}
+
+<span class="hljs-selector-class">.nav-item</span><span class="hljs-selector-class">.active</span> {
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.1</span>);
+}
+</div></code></pre>
+<h3 id="data-display---%22information-hierarchy%22" tabindex="-1">Data Display - "Information Hierarchy"</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Tables */</span>
+<span class="hljs-selector-class">.table</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-base);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--border-subtle);
+}
+
+<span class="hljs-selector-class">.table-header</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--pearl-gray);
+  <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">500</span>;
+  <span class="hljs-attribute">letter-spacing</span>: <span class="hljs-number">0.02em</span>;
+  <span class="hljs-attribute">text-transform</span>: uppercase;
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">0.75rem</span>;
+}
+
+<span class="hljs-selector-class">.table-row</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.03</span>);
+}
+
+<span class="hljs-selector-class">.table-row</span><span class="hljs-selector-pseudo">:nth-child</span>(even) {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">229</span>, <span class="hljs-number">0.01</span>);
+}
+</div></code></pre>
+<h2 id="animation-%26-motion" tabindex="-1">Animation &amp; Motion</h2>
+<h3 id="transition-system" tabindex="-1">Transition System</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Premium Easing Functions */</span>
+<span class="hljs-attr">--ease-luxury</span>: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.25</span>, <span class="hljs-number">0.1</span>, <span class="hljs-number">0.25</span>, <span class="hljs-number">1</span>);     <span class="hljs-comment">/* Smooth luxury feel */</span>
+<span class="hljs-attr">--ease-elegant</span>: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.4</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.2</span>, <span class="hljs-number">1</span>);        <span class="hljs-comment">/* Material elegance */</span>
+<span class="hljs-attr">--ease-refined</span>: <span class="hljs-built_in">cubic-bezier</span>(<span class="hljs-number">0.65</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.35</span>, <span class="hljs-number">1</span>);      <span class="hljs-comment">/* Sophisticated motion */</span>
+
+<span class="hljs-comment">/* Duration Scale */</span>
+<span class="hljs-attr">--duration-instant</span>: <span class="hljs-number">100ms</span>;   <span class="hljs-comment">/* Micro-interactions */</span>
+<span class="hljs-attr">--duration-quick</span>: <span class="hljs-number">200ms</span>;     <span class="hljs-comment">/* Standard transitions */</span>
+<span class="hljs-attr">--duration-smooth</span>: <span class="hljs-number">300ms</span>;    <span class="hljs-comment">/* Component animations */</span>
+<span class="hljs-attr">--duration-gentle</span>: <span class="hljs-number">500ms</span>;    <span class="hljs-comment">/* Layout changes */</span>
+<span class="hljs-attr">--duration-luxurious</span>: <span class="hljs-number">800ms</span>; <span class="hljs-comment">/* Hero animations */</span>
+</div></code></pre>
+<h3 id="micro-interactions" tabindex="-1">Micro-Interactions</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Hover Elevations */</span>
+<span class="hljs-selector-class">.hover-lift</span> {
+  <span class="hljs-attribute">transition</span>: transform <span class="hljs-built_in">var</span>(--duration-quick) <span class="hljs-built_in">var</span>(--ease-elegant),
+              box-shadow <span class="hljs-built_in">var</span>(--duration-quick) <span class="hljs-built_in">var</span>(--ease-elegant);
+}
+
+<span class="hljs-selector-class">.hover-lift</span><span class="hljs-selector-pseudo">:hover</span> {
+  <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">1px</span>);
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-built_in">var</span>(--shadow-moderate);
+}
+
+<span class="hljs-comment">/* Focus States */</span>
+<span class="hljs-selector-class">.focus-ring</span><span class="hljs-selector-pseudo">:focus</span> {
+  <span class="hljs-attribute">outline</span>: none;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">3px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.15</span>);
+}
+
+<span class="hljs-comment">/* Loading States */</span>
+<span class="hljs-selector-class">.loading-shimmer</span> {
+  <span class="hljs-attribute">background</span>: <span class="hljs-built_in">linear-gradient</span>(
+    <span class="hljs-number">90deg</span>,
+    <span class="hljs-built_in">var</span>(--surface-raised) <span class="hljs-number">0%</span>,
+    <span class="hljs-built_in">var</span>(--surface-elevated) <span class="hljs-number">50%</span>,
+    <span class="hljs-built_in">var</span>(--surface-raised) <span class="hljs-number">100%</span>
+  );
+  <span class="hljs-attribute">background-size</span>: <span class="hljs-number">200%</span> <span class="hljs-number">100%</span>;
+  <span class="hljs-attribute">animation</span>: shimmer <span class="hljs-number">1.5s</span> infinite <span class="hljs-built_in">var</span>(--ease-luxury);
+}
+
+<span class="hljs-keyword">@keyframes</span> shimmer {
+  <span class="hljs-number">0%</span> { <span class="hljs-attribute">background-position</span>: -<span class="hljs-number">200%</span> <span class="hljs-number">0</span>; }
+  <span class="hljs-number">100%</span> { <span class="hljs-attribute">background-position</span>: <span class="hljs-number">200%</span> <span class="hljs-number">0</span>; }
+}
+</div></code></pre>
+<h2 id="implementation-guidelines" tabindex="-1">Implementation Guidelines</h2>
+<h3 id="framework-agnostic-principles" tabindex="-1">Framework Agnostic Principles</h3>
+<h4 id="css-custom-properties" tabindex="-1">CSS Custom Properties</h4>
+<p>All design tokens should be implemented as CSS custom properties, allowing any framework to consume them:</p>
+<pre class="hljs"><code><div><span class="hljs-selector-pseudo">:root</span> {
+  <span class="hljs-comment">/* Colors */</span>
+  <span class="hljs-attr">--obsidian-black</span>: <span class="hljs-number">#0A0A0A</span>;
+  <span class="hljs-attr">--platinum</span>: <span class="hljs-number">#E5E5E5</span>;
+  
+  <span class="hljs-comment">/* Typography */</span>
+  <span class="hljs-attr">--font-display</span>: <span class="hljs-string">"SF Pro Display"</span>, system-ui, sans-serif;
+  <span class="hljs-attr">--font-body</span>: <span class="hljs-string">"SF Pro Text"</span>, system-ui, sans-serif;
+  
+  <span class="hljs-comment">/* Spacing */</span>
+  <span class="hljs-attr">--space-4</span>: <span class="hljs-number">1rem</span>;
+  <span class="hljs-attr">--space-8</span>: <span class="hljs-number">2rem</span>;
+  
+  <span class="hljs-comment">/* Shadows */</span>
+  <span class="hljs-attr">--shadow-gentle</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0.5</span>);
+}
+</div></code></pre>
+<h4 id="component-structure" tabindex="-1">Component Structure</h4>
+<p>Design components with clear hierarchies that can be implemented in any framework:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">&lt;!-- Button Component Structure --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn btn-primary btn-lg"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn-icon"</span>&gt;</span><span class="hljs-comment">&lt;!-- Icon --&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"btn-text"</span>&gt;</span>Button Text<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+</div></code></pre>
+<h4 id="utility-classes" tabindex="-1">Utility Classes</h4>
+<p>Provide atomic utility classes for common patterns:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Spacing Utilities */</span>
+<span class="hljs-selector-class">.p-4</span> { <span class="hljs-attribute">padding</span>: <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">4</span>); }
+<span class="hljs-selector-class">.m-8</span> { <span class="hljs-attribute">margin</span>: <span class="hljs-built_in">var</span>(--space-<span class="hljs-number">8</span>); }
+
+<span class="hljs-comment">/* Typography Utilities */</span>
+<span class="hljs-selector-class">.text-platinum</span> { <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--platinum); }
+<span class="hljs-selector-class">.text-champagne</span> { <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--champagne-gold); }
+
+<span class="hljs-comment">/* Surface Utilities */</span>
+<span class="hljs-selector-class">.surface-raised</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-raised); }
+<span class="hljs-selector-class">.surface-elevated</span> { <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--surface-elevated); }
+</div></code></pre>
+<h3 id="dark-mode-optimization" tabindex="-1">Dark Mode Optimization</h3>
+<h4 id="contrast-requirements" tabindex="-1">Contrast Requirements</h4>
+<ul>
+<li>Minimum contrast ratio: 4.5:1 for normal text</li>
+<li>Minimum contrast ratio: 3:1 for large text</li>
+<li>Premium experience: Target 7:1+ wherever possible</li>
+</ul>
+<h4 id="eye-strain-reduction" tabindex="-1">Eye Strain Reduction</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Reduced Blue Light */</span>
+<span class="hljs-selector-class">.reduced-blue</span> {
+  <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">hue-rotate</span>(<span class="hljs-number">15deg</span>) <span class="hljs-built_in">saturate</span>(<span class="hljs-number">0.9</span>);
+}
+
+<span class="hljs-comment">/* Warm Temperature for Late Hours */</span>
+<span class="hljs-keyword">@media</span> (<span class="hljs-attribute">prefers-color-scheme</span>: dark) <span class="hljs-keyword">and</span> (<span class="hljs-attribute">max-height</span>: <span class="hljs-number">800px</span>) {
+  <span class="hljs-selector-pseudo">:root</span> {
+    <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">sepia</span>(<span class="hljs-number">0.1</span>) <span class="hljs-built_in">hue-rotate</span>(<span class="hljs-number">15deg</span>);
+  }
+}
+</div></code></pre>
+<h3 id="accessibility-standards" tabindex="-1">Accessibility Standards</h3>
+<h4 id="focus-management" tabindex="-1">Focus Management</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Enhanced Focus Indicators */</span>
+<span class="hljs-selector-class">.focus-visible</span><span class="hljs-selector-pseudo">:focus-visible</span> {
+  <span class="hljs-attribute">outline</span>: <span class="hljs-number">2px</span> solid <span class="hljs-built_in">var</span>(--champagne-gold);
+  <span class="hljs-attribute">outline-offset</span>: <span class="hljs-number">2px</span>;
+  <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">212</span>, <span class="hljs-number">175</span>, <span class="hljs-number">55</span>, <span class="hljs-number">0.2</span>);
+}
+</div></code></pre>
+<h4 id="screen-reader-support" tabindex="-1">Screen Reader Support</h4>
+<pre class="hljs"><code><div><span class="hljs-comment">/* Screen Reader Only Content */</span>
+<span class="hljs-selector-class">.sr-only</span> {
+  <span class="hljs-attribute">position</span>: absolute;
+  <span class="hljs-attribute">width</span>: <span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">height</span>: <span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">padding</span>: <span class="hljs-number">0</span>;
+  <span class="hljs-attribute">margin</span>: -<span class="hljs-number">1px</span>;
+  <span class="hljs-attribute">overflow</span>: hidden;
+  <span class="hljs-attribute">clip</span>: <span class="hljs-built_in">rect</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);
+  <span class="hljs-attribute">border</span>: <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+<p>This design system provides a comprehensive foundation for creating premium dark-mode experiences that can be implemented across any technology stack while maintaining the luxury aesthetic and exceptional user experience standards.</p>
+
+    </div>
+
+
+</body></html>

@@ -1,3 +1,10 @@
+/* SRH Design Tokens - Web (Vue3)
+ - 本文件为自动生成（Style Dictionary），请勿手动修改
+ - 用法：在 Web/Vue3 项目中引入本文件，使用 var(--token-name)
+ - 主题切换：浅色使用 :root，深色使用 [data-theme='dark']
+ - 平台说明：源 Token 平台无关，构建时输出为 Web CSS 变量
+*/
+
 /**
  * Do not edit directly, this file was auto-generated.
  */
@@ -65,16 +72,11 @@
   --space-xl: 20px;
   --space-xxl: 24px;
   --space-3xl: 32px;
-  --component-button-primary-height: 40px;
-  --component-button-secondary-height: 40px;
+  --component-button-transition: all 0.2s ease-in-out;
+  --component-button-focus-ring-color: rgba(107, 114, 128, 0.1);
+  --component-button-focus-ring-width: 3px;
   --component-button-ghost-bg: rgba(0, 0, 0, 0);
-  --component-button-ghost-border: none;
-  --component-button-ghost-height: 40px;
-  --component-button-ghost-disabled-background-color: transparent;
-  --component-button-danger-bg-hover: #d93737;
-  --component-button-danger-border-hover: #d93737;
-  --component-button-danger-height: 40px;
-  --component-button-danger-active-background-color: #c53030;
+  --component-button-ghost-border: rgba(0, 0, 0, 0);
   --component-card-hover-transform: translateY(-2px);
   --component-card-active-transform: translateY(0);
   --component-chip-transition: all 0.2s ease-in-out;
@@ -104,60 +106,46 @@
   --color-semantic-border-default: var(--color-gray-700);
   --color-semantic-border-subtle: var(--color-gray-800);
   --layout-container-padding: var(--space-3xl);
+  --component-button-gap: var(--space-xs);
+  --component-button-icon-gap: var(--space-xs);
+  --component-button-radius: var(--radius-md);
+  --component-button-font-weight: var(--font-weight-medium);
+  --component-button-size-sm-font-size: var(--font-size-sm);
+  --component-button-size-sm-padding-x: var(--space-md);
+  --component-button-size-sm-padding-y: var(--space-xs);
+  --component-button-size-md-font-size: var(--font-size-md);
+  --component-button-size-md-padding-x: var(--space-lg);
+  --component-button-size-md-padding-y: var(--space-sm);
+  --component-button-size-lg-font-size: var(--font-size-lg);
+  --component-button-size-lg-padding-x: var(--space-xl);
+  --component-button-size-lg-padding-y: var(--space-md);
   --component-button-primary-bg: var(--color-brand-primary);
-  --component-button-primary-color: var(--color-white);
+  --component-button-primary-text: var(--color-white);
   --component-button-primary-border: var(--color-brand-primary);
-  --component-button-primary-bg-hover: var(--color-brand-hover);
-  --component-button-primary-border-hover: var(--color-brand-hover);
-  --component-button-primary-border-radius: var(--radius-sm);
-  --component-button-primary-padding-horizontal: var(--space-md);
-  --component-button-primary-font-size: var(--font-size-md);
-  --component-button-primary-font-weight: var(--font-weight-medium);
-  --component-button-primary-line-height: var(--font-line-height-md);
-  --component-button-primary-active-background-color: var(--color-brand-active);
-  --component-button-primary-focus-outline: 2px solid var(--color-brand-primary);
-  --component-button-primary-disabled-background-color: var(--color-gray-200);
-  --component-button-primary-disabled-color: var(--color-gray-400);
+  --component-button-primary-hover-bg: var(--color-brand-hover);
+  --component-button-primary-active-bg: var(--color-brand-active);
+  --component-button-primary-disabled-bg: var(--color-gray-200);
+  --component-button-primary-disabled-text: var(--color-gray-500);
   --component-button-primary-disabled-border: var(--color-gray-200);
   --component-button-secondary-bg: var(--color-white);
-  --component-button-secondary-color: var(--color-semantic-text-primary);
-  --component-button-secondary-color-hover: var(--color-brand-primary);
-  --component-button-secondary-border-hover: var(--color-brand-primary);
-  --component-button-secondary-border-radius: var(--radius-sm);
-  --component-button-secondary-padding-horizontal: var(--space-md);
-  --component-button-secondary-font-size: var(--font-size-md);
-  --component-button-secondary-font-weight: var(--font-weight-medium);
-  --component-button-secondary-line-height: var(--font-line-height-md);
-  --component-button-secondary-active-background-color: var(--color-gray-100);
-  --component-button-secondary-focus-outline: 2px solid var(--color-brand-primary);
-  --component-button-secondary-disabled-background-color: var(--color-gray-50);
-  --component-button-secondary-disabled-color: var(--color-gray-400);
+  --component-button-secondary-text: var(--color-gray-700);
+  --component-button-secondary-border: var(--color-gray-300);
+  --component-button-secondary-hover-bg: var(--color-gray-100);
+  --component-button-secondary-hover-border: var(--color-gray-400);
+  --component-button-secondary-hover-text: var(--color-gray-800);
+  --component-button-secondary-active-bg: var(--color-gray-200);
+  --component-button-secondary-disabled-bg: var(--color-gray-100);
+  --component-button-secondary-disabled-text: var(--color-gray-400);
   --component-button-secondary-disabled-border: var(--color-gray-200);
-  --component-button-ghost-color: var(--color-semantic-text-secondary);
-  --component-button-ghost-color-hover: var(--color-semantic-text-primary);
-  --component-button-ghost-background-color: var(--component-button-ghost-bg);
-  --component-button-ghost-border-radius: var(--radius-sm);
-  --component-button-ghost-padding-horizontal: var(--space-md);
-  --component-button-ghost-font-size: var(--font-size-md);
-  --component-button-ghost-font-weight: var(--font-weight-medium);
-  --component-button-ghost-line-height: var(--font-line-height-md);
-  --component-button-ghost-active-background-color: var(--color-gray-100);
-  --component-button-ghost-focus-outline: 2px solid var(--color-gray-400);
-  --component-button-ghost-disabled-color: var(--color-gray-400);
-  --component-button-danger-bg: var(--color-semantic-feedback-error);
-  --component-button-danger-color: var(--color-white);
-  --component-button-danger-border: var(--color-semantic-feedback-error);
-  --component-button-danger-border-radius: var(--radius-sm);
-  --component-button-danger-padding-horizontal: var(--space-md);
-  --component-button-danger-font-size: var(--font-size-md);
-  --component-button-danger-font-weight: var(--font-weight-medium);
-  --component-button-danger-line-height: var(--font-line-height-md);
-  --component-button-danger-hover-background-color: var(--component-button-danger-bg-hover);
-  --component-button-danger-hover-border: var(--component-button-danger-border-hover);
-  --component-button-danger-focus-outline: 2px solid var(--color-semantic-feedback-error);
-  --component-button-danger-disabled-background-color: var(--color-gray-200);
-  --component-button-danger-disabled-color: var(--color-gray-400);
-  --component-button-danger-disabled-border: var(--color-gray-200);
+  --component-button-ghost-text: var(--color-gray-700);
+  --component-button-ghost-hover-bg: var(--color-gray-100);
+  --component-button-ghost-hover-text: var(--color-gray-800);
+  --component-button-ghost-active-bg: var(--color-gray-200);
+  --component-button-ghost-disabled-text: var(--color-gray-400);
+  --component-button-link-text: var(--color-brand-primary);
+  --component-button-link-hover-text: var(--color-brand-hover);
+  --component-button-link-active-text: var(--color-brand-active);
+  --component-button-link-disabled-text: var(--color-gray-400);
   --component-card-background-color: var(--color-semantic-bg-primary);
   --component-card-border-radius: var(--radius-md);
   --component-card-padding: var(--space-lg);
@@ -266,17 +254,6 @@
   --component-toggle-text-font-size: var(--font-size-xs);
   --component-toggle-text-font-weight: var(--font-weight-medium);
   --component-toggle-focus-outline: var(--color-brand-primary);
-  --component-button-primary-background-color: var(--component-button-primary-bg);
-  --component-button-primary-hover-background-color: var(--component-button-primary-bg-hover);
-  --component-button-primary-hover-border: var(--component-button-primary-border-hover);
-  --component-button-secondary-border: var(--color-semantic-border-default);
-  --component-button-secondary-bg-hover: var(--color-semantic-bg-secondary);
-  --component-button-secondary-background-color: var(--component-button-secondary-bg);
-  --component-button-secondary-hover-color: var(--component-button-secondary-color-hover);
-  --component-button-secondary-hover-border: var(--component-button-secondary-border-hover);
-  --component-button-ghost-bg-hover: var(--color-semantic-bg-secondary);
-  --component-button-ghost-hover-color: var(--component-button-ghost-color-hover);
-  --component-button-danger-background-color: var(--component-button-danger-bg);
   --component-card-border: 1px solid var(--color-semantic-border-default);
   --component-card-loading-background-color: var(--color-semantic-bg-secondary);
   --component-card-header-border-bottom: 1px solid var(--color-semantic-border-subtle);
@@ -296,6 +273,4 @@
   --component-search-input-hover-border: var(--color-semantic-border-default);
   --component-search-input-icon-color: var(--color-semantic-text-muted);
   --component-search-input-clear-btn-hover-bg: var(--color-semantic-bg-secondary);
-  --component-button-secondary-hover-background-color: var(--component-button-secondary-bg-hover);
-  --component-button-ghost-hover-background-color: var(--component-button-ghost-bg-hover);
 }

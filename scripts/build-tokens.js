@@ -5,11 +5,17 @@ const path = require('path');
 console.log(`Build started at: ${new Date().toISOString()}`);
 console.log('\\n==============================================');
 
-// Register custom format for wxss files with single-line comments
+/** 更新：为 WXSS 产物增加清晰的文件头部注释，便于新成员理解使用方式 */
+// Register custom format for wxss files with informative header
 StyleDictionary.registerFormat({
   name: 'wxss/variables',
   format: function({ dictionary, options }) {
-    const header = '/* Do not edit directly, this file was auto-generated. */\n\n';
+    const header = '/* SRH Design Tokens - Mini Program (WXSS)\n' +
+                   ' - 本文件为自动生成（Style Dictionary），请勿手动修改\n' +
+                   ' - 用法：在小程序中引入本 WXSS，并在根节点添加 .light-theme 或 .dark-theme 类\n' +
+                   " - 变量使用：var(--token-name)；尺寸类已由 px 自动转换为 rpx（dimension/sizing/spacing/borderRadius/fontSizes）\n" +
+                   ' - 平台说明：源 Token 平台无关，构建时输出为小程序用 WXSS\n' +
+                   '*/\n\n';
     const selector = options.selector || ':root';
     
     let output = header;
@@ -94,6 +100,26 @@ StyleDictionary.registerTransform({
     }
   }
 });
+
+
+/** 为 Web CSS 产物追加头部说明（不影响内置 css/variables 的内容） */
+const CSS_HEADER = `/* SRH Design Tokens - Web (Vue3)
+ - 本文件为自动生成（Style Dictionary），请勿手动修改
+ - 用法：在 Web/Vue3 项目中引入本文件，使用 var(--token-name)
+ - 主题切换：浅色使用 :root，深色使用 [data-theme='dark']
+ - 平台说明：源 Token 平台无关，构建时输出为 Web CSS 变量
+*/\n\n`;
+
+function prependHeaderIfMissing(filePath, header) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    if (!content.startsWith(header)) {
+      fs.writeFileSync(filePath, header + content, 'utf8');
+    }
+  } catch (e) {
+    console.warn('Could not prepend header to', filePath, e.message);
+  }
+}
 
 // 添加增量构建检查
 function getSourceFileHashes() {
@@ -191,6 +217,10 @@ async function buildTokens() {
   const sdDark = new StyleDictionary(getStyleDictionaryConfig('dark'));
   await sdDark.buildAllPlatforms();
   results.dark = ['dark.wxss'];
+
+  // 为 Web 侧生成的 CSS 变量文件添加说明性注释头（新成员快速上手）
+  prependHeaderIfMissing(path.join('packages/ui/src/styles', 'tokens.css'), CSS_HEADER);
+  prependHeaderIfMissing(path.join('packages/ui/src/styles', 'tokens.dark.css'), CSS_HEADER);
 
   generateBuildReport(startTime, results);
 }

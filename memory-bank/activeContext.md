@@ -1,26 +1,33 @@
 # 当前上下文与焦点
-**最后更新**：2025-02-14
+最后更新：2025-10-13
 
-## 当前焦点 (Current Focus)
-- 巩固设计系统基础设施：统一 Storybook 8.6.x 依赖、保持 `packages/ui` 与 `apps/web` 的组件规范一致。
-- 确保仓库以 pnpm + Turborepo 为唯一事实来源，杜绝遗留的 npm/原型文件引入的歧义。 
+## 当前焦点（P0）
+- 组件层 Design Token 落地与“按钮 Button”对齐（component.button.*）。
+- 清理 Token 命名冲突（Token collisions=3），准备 Storybook 文档与灰度接入。
 
-## 刚完成的工作 (Latest)
-- 移除过时的 `package-lock.json` 及静态原型 HTML，清理空目录，恢复精简的仓库视图。 
-- 在根工作区与子包中统一 Storybook 版本到 8.6.14，消除跨包冲突。
-- 更新技术记忆库（techContext、systemPatterns）以反映最新工具链与工作流。 
+## 刚完成
+- 新增 tokens/components/button.json：
+  - 变体：primary / secondary / ghost / link
+  - 尺寸：sm / md / lg（含 font-size / padding-x / padding-y）
+  - 状态：default / hover / active / disabled
+  - 通用：gap / icon-gap / radius / font-weight / transition / focus.ring-{color|width}
+  - 全部引用基础 Token（{color.*}{font.*}{space.*}{radius.*}）
+- 运行构建（Style Dictionary）：生成 Web CSS 变量（:root / [data-theme='dark']）与小程序 WXSS；tokens.css 内已包含 --component-button-*。
+- packages/ui/BaseButton.vue 改为消费组件层 Token：
+  - 全量替换为 --component-button-* 变量（主/次/幽灵/文本、尺寸、焦点环、过渡）
+  - 新增 link 文本按钮；移除 danger 变体
 
-## 下一步行动 (Next · P0)
-- 验证 Storybook 8.6.x 在 `@sydney-rental-hub/ui` 与 `@web-sydney/web` 中均可正常启动并通过 Chromatic。
-- 持续梳理文档站与设计 Token 输出，确保 Astro 站与 Storybook 说明一致。 
+## 下一步（P0）
+- 为尺寸新增高度 Token：component.button.size.{sm|md|lg}.height，去除硬编码 32/40/48px。
+- 清零 Token collisions（3）：使用 Style Dictionary verbose 定位并统一命名。
+- 更新 BaseButton stories：补充 link 变体与尺寸演示；写迁移说明（旧变量→新变量）。
+- apps/web 小范围灰度替换旧按钮，验证暗色主题与可访问性（focus-visible/对比度）。
 
-## 重要约束 (Constraints)
-- 设计系统的任何组件/令牌改动必须先在 Storybook 中通过评审，Chromatic 可视化差异通过后才可合并。 
-- Turborepo 任务依赖 pnpm workspace 名称，新增包需更新 `turbo.json` 与 `pnpm-workspace.yaml`。 
+## 重要约束
+- 业务代码与组件仅消费“语义层/组件层”Token，禁止硬编码与直接使用原始层。
+- 组件改动需先通过 Storybook 评审与 Chromatic 可视化回归后再合并。
 
-## 相关命令 (Ops)
-- 安装依赖：`pnpm install`
-- 启动前端/后端：`pnpm dev`
-- 启动 UI Storybook：`pnpm --filter @sydney-rental-hub/ui storybook`
-- 启动 Web Storybook：`pnpm --filter @web-sydney/web storybook`
-- 构建设计 Tokens：`pnpm build:tokens`
+## 常用命令
+- 构建设计 Tokens：node scripts/build-tokens.js（或 pnpm build:tokens）
+- 启动 UI Storybook：pnpm --filter @sydney-rental-hub/ui storybook
+- 启动 Web：pnpm --filter @web-sydney/web dev

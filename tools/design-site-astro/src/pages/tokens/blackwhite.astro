@@ -1,0 +1,589 @@
+---
+/**
+ * 高端暗色设计系统 Token 展示页面（Black & White Design System）
+ * 路由: /tokens/blackwhite
+ * 说明：
+ * - 页面内部定义了 designsystem.md 中列出的 CSS 自定义属性（Design Tokens）
+ * - 并以可视化卡片方式展示颜色、透明度、间距、阴影、表面、边框等
+ * - 便于前端开发复制变量名并直接应用
+ */
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>Black & White Design Tokens</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* ============== 设计 Token 定义（来自 designsystem.md） ============== */
+      :root {
+        /* 核心颜色 Core Colors */
+        --obsidian-black: #0A0A0A; /* 主背景 */
+        --deep-charcoal: #1A1A1A;  /* 上层表面 */
+        --platinum: #E5E5E5;       /* 主文本 */
+        --pure-white: #FFFFFF;     /* 最高对比度 */
+        --smoke: #2A2A2A;          /* 次级表面 */
+
+        /* 奢华强调色 Luxury Accents */
+        --champagne-gold: #D4AF37; /* 高级高光（香槟金） */
+        --manhattan-blue: #1E3A5F; /* 信任、深度 */
+        --burgundy: #722F37;       /* 浓郁的强调色 */
+        --pearl-gray: #B8B8B8;     /* 柔和元素 */
+        --midnight-navy: #0F1419;  /* 最深背景 */
+
+        /* 功能色 Functional Colors */
+        --success: #22C55E;
+        --warning: #F59E0B;
+        --error: #EF4444;
+        --info: #3B82F6;
+
+        /* 不透明度 Opacity Scale */
+        --opacity-ghost: 0.05;
+        --opacity-whisper: 0.10;
+        --opacity-breath: 0.15;
+        --opacity-presence: 0.25;
+        --opacity-statement: 0.40;
+        --opacity-bold: 0.60;
+
+        /* 字体（展示） Typography (demo only) */
+        --font-display: "SF Pro Display", "Segoe UI Variable", "Inter", system-ui, -apple-system, sans-serif;
+        --font-mono: "SF Mono", "Consolas", "Monaco", monospace;
+
+        /* 间距 Spacing Scale */
+        --space-1: 0.25rem;  /* 4px */
+        --space-2: 0.5rem;   /* 8px */
+        --space-3: 0.75rem;  /* 12px */
+        --space-4: 1rem;     /* 16px */
+        --space-5: 1.25rem;  /* 20px */
+        --space-6: 1.5rem;   /* 24px */
+        --space-8: 2rem;     /* 32px */
+        --space-10: 2.5rem;  /* 40px */
+        --space-12: 3rem;    /* 48px */
+        --space-16: 4rem;    /* 64px */
+        --space-20: 5rem;    /* 80px */
+        --space-24: 6rem;    /* 96px */
+
+        /* 阴影 Shadow Layers */
+        --shadow-whisper: 0 1px 2px rgba(0,0,0,0.3);
+        --shadow-subtle: 0 2px 4px rgba(0,0,0,0.4);
+        --shadow-gentle: 0 4px 8px rgba(0,0,0,0.5);
+        --shadow-moderate: 0 8px 16px rgba(0,0,0,0.6);
+        --shadow-pronounced: 0 16px 32px rgba(0,0,0,0.7);
+        --shadow-dramatic: 0 24px 48px rgba(0,0,0,0.8);
+
+        /* 表面 Surface Hierarchy */
+        --surface-base: var(--obsidian-black);
+        --surface-raised: var(--deep-charcoal);
+        --surface-elevated: var(--smoke);
+        --surface-overlay: rgba(26, 26, 26, 0.95);
+
+        /* 边框 Border System（使用铂金色的透明度） */
+        --border-ghost: rgba(229, 229, 229, 0.05);
+        --border-subtle: rgba(229, 229, 229, 0.10);
+        --border-gentle: rgba(229, 229, 229, 0.15);
+        --border-defined: rgba(229, 229, 229, 0.25);
+        --border-prominent: rgba(229, 229, 229, 0.40);
+
+        /* 动效 Easing & Duration（用于示例） */
+        --ease-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
+        --ease-elegant: cubic-bezier(0.4, 0, 0.2, 1);
+        --duration-quick: 200ms;
+      }
+
+      /* ============== 页面基础样式 ============== */
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        background: var(--surface-base);
+        color: var(--platinum);
+        font-family: var(--font-display);
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: var(--space-8) var(--space-6);
+      }
+
+      h1, h2, h3 {
+        letter-spacing: 0.01em;
+        margin: 0 0 var(--space-4) 0;
+      }
+
+      h1 {
+        font-weight: 200;
+        font-size: 2.25rem;
+      }
+
+      h2 {
+        font-weight: 300;
+        font-size: 1.5rem;
+        margin-top: var(--space-10);
+        border-bottom: 1px solid var(--border-ghost);
+        padding-bottom: var(--space-3);
+      }
+
+      p.desc {
+        color: var(--pearl-gray);
+        font-weight: 300;
+        margin: 0 0 var(--space-6) 0;
+      }
+
+      .grid {
+        display: grid;
+        gap: var(--space-4);
+      }
+
+      .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+      @media (max-width: 1024px) {
+        .grid.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 640px) {
+        .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; }
+      }
+
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+        padding: var(--space-4);
+        box-shadow: var(--shadow-gentle);
+      }
+
+      .swatch {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-ghost);
+      }
+
+      .swatch .tone {
+        height: 84px;
+        border-bottom: 1px solid var(--border-ghost);
+      }
+
+      .swatch .meta {
+        padding: var(--space-3);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--pearl-gray);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--platinum);
+        border: 1px solid var(--border-ghost);
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(229,229,229,0.03);
+      }
+
+      .demo-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+      }
+
+      .shadow-box {
+        width: 220px;
+        height: 84px;
+        border-radius: 10px;
+        background: var(--surface-elevated);
+        border: 1px solid var(--border-gentle);
+      }
+
+      .surface-box, .border-box {
+        height: 64px;
+        border-radius: 10px;
+      }
+
+      .border-box {
+        background: var(--surface-raised);
+      }
+
+      .opacity-cell {
+        height: 60px;
+        border-radius: 8px;
+        border: 1px solid var(--border-ghost);
+        background:
+          linear-gradient(45deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+          var(--surface-raised);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .opacity-cell::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--overlay-color, rgba(229,229,229,0.1));
+      }
+
+      .spacing-bar {
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--champagne-gold), rgba(212,175,55,0.2));
+        box-shadow: var(--shadow-whisper);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-3);
+      }
+
+      .kbd {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--platinum);
+        background: rgba(229,229,229,0.06);
+        border: 1px solid var(--border-ghost);
+        padding: 0 8px;
+        border-radius: 6px;
+      }
+
+      a.back {
+        color: var(--pearl-gray);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--border-defined);
+        padding-bottom: 2px;
+        transition: color var(--duration-quick) var(--ease-elegant);
+      }
+      a.back:hover { color: var(--platinum); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="section-header">
+        <h1>Black & White Design Tokens</h1>
+        <span class="tag">暗黑模式优先</span>
+        <span class="tag">框架无关</span>
+      </div>
+      <p class="desc">
+        本页从 cursor-starter/blackwhitedesingsystem/designsystem.md 提炼核心 Design Tokens，
+        并以可视化方式展示，支持直接复制 CSS 自定义属性名（变量名以 -- 开头）。
+      </p>
+
+      <!-- 颜色：核心色板 -->
+      <h2>核心色板 Core Colors</h2>
+      <div class="grid cols-5">
+        <!-- obsidian-black -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--obsidian-black)"></div>
+          <div class="meta">
+            <div><b>--obsidian-black</b>（黑曜石黑，主背景）</div>
+            <div class="demo-row">
+              <span class="tag">#0A0A0A</span>
+              <span class="tag">背景 Background</span>
+            </div>
+          </div>
+        </div>
+        <!-- deep-charcoal -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--deep-charcoal)"></div>
+          <div class="meta">
+            <div><b>--deep-charcoal</b>（深木炭，提升表面）</div>
+            <div class="demo-row">
+              <span class="tag">#1A1A1A</span>
+              <span class="tag">表面 Surface</span>
+            </div>
+          </div>
+        </div>
+        <!-- platinum -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--platinum)"></div>
+          <div class="meta">
+            <div><b>--platinum</b>（铂金，主文本）</div>
+            <div class="demo-row">
+              <span class="tag">#E5E5E5</span>
+              <span class="tag">文本 Text</span>
+            </div>
+          </div>
+        </div>
+        <!-- pure-white -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--pure-white)"></div>
+          <div class="meta">
+            <div><b>--pure-white</b>（纯白，最高对比度）</div>
+            <div class="demo-row">
+              <span class="tag">#FFFFFF</span>
+              <span class="tag">对比 Contrast</span>
+            </div>
+          </div>
+        </div>
+        <!-- smoke -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--smoke)"></div>
+          <div class="meta">
+            <div><b>--smoke</b>（烟灰，次级表面）</div>
+            <div class="demo-row">
+              <span class="tag">#2A2A2A</span>
+              <span class="tag">次级表面 Secondary</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 颜色：强调色 -->
+      <h2>强调色 Accent Colors</h2>
+      <div class="grid cols-5">
+        <!-- champagne-gold -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--champagne-gold)"></div>
+          <div class="meta">
+            <div><b>--champagne-gold</b>（香槟金，高级高光）</div>
+            <div class="demo-row">
+              <span class="tag">#D4AF37</span>
+              <span class="tag">高亮 Highlight</span>
+            </div>
+          </div>
+        </div>
+        <!-- manhattan-blue -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--manhattan-blue)"></div>
+          <div class="meta">
+            <div><b>--manhattan-blue</b>（曼哈顿蓝，信任/深度）</div>
+            <div class="demo-row">
+              <span class="tag">#1E3A5F</span>
+              <span class="tag">品牌 Brand</span>
+            </div>
+          </div>
+        </div>
+        <!-- burgundy -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--burgundy)"></div>
+          <div class="meta">
+            <div><b>--burgundy</b>（勃艮第红，浓郁强调）</div>
+            <div class="demo-row">
+              <span class="tag">#722F37</span>
+              <span class="tag">强调 Accent</span>
+            </div>
+          </div>
+        </div>
+        <!-- pearl-gray -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--pearl-gray)"></div>
+          <div class="meta">
+            <div><b>--pearl-gray</b>（珍珠灰，柔和元素）</div>
+            <div class="demo-row">
+              <span class="tag">#B8B8B8</span>
+              <span class="tag">中性 Muted</span>
+            </div>
+          </div>
+        </div>
+        <!-- midnight-navy -->
+        <div class="swatch">
+          <div class="tone" style="background: var(--midnight-navy)"></div>
+          <div class="meta">
+            <div><b>--midnight-navy</b>（午夜海军蓝，最深背景）</div>
+            <div class="demo-row">
+              <span class="tag">#0F1419</span>
+              <span class="tag">深背景 Deep</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 功能色 -->
+      <h2>功能色 Functional</h2>
+      <div class="grid cols-4">
+        <div class="swatch">
+          <div class="tone" style="background: var(--success)"></div>
+          <div class="meta"><b>--success</b> <span class="tag">#22C55E</span></div>
+        </div>
+        <div class="swatch">
+          <div class="tone" style="background: var(--warning)"></div>
+          <div class="meta"><b>--warning</b> <span class="tag">#F59E0B</span></div>
+        </div>
+        <div class="swatch">
+          <div class="tone" style="background: var(--error)"></div>
+          <div class="meta"><b>--error</b> <span class="tag">#EF4444</span></div>
+        </div>
+        <div class="swatch">
+          <div class="tone" style="background: var(--info)"></div>
+          <div class="meta"><b>--info</b> <span class="tag">#3B82F6</span></div>
+        </div>
+      </div>
+
+      <!-- 不透明度 -->
+      <h2>不透明度 Opacity</h2>
+      <div class="grid cols-4">
+        <div class="card">
+          <div class="opacity-cell" style="--overlay-color: rgba(229,229,229,var(--opacity-ghost));"></div>
+          <div class="meta"><b>--opacity-ghost</b> <span class="tag">0.05</span></div>
+        </div>
+        <div class="card">
+          <div class="opacity-cell" style="--overlay-color: rgba(229,229,229,var(--opacity-whisper));"></div>
+          <div class="meta"><b>--opacity-whisper</b> <span class="tag">0.10</span></div>
+        </div>
+        <div class="card">
+          <div class="opacity-cell" style="--overlay-color: rgba(229,229,229,var(--opacity-breath));"></div>
+          <div class="meta"><b>--opacity-breath</b> <span class="tag">0.15</span></div>
+        </div>
+        <div class="card">
+          <div class="opacity-cell" style="--overlay-color: rgba(229,229,229,var(--opacity-presence));"></div>
+          <div class="meta"><b>--opacity-presence</b> <span class="tag">0.25</span></div>
+        </div>
+        <div class="card">
+          <div class="opacity-cell" style="--overlay-color: rgba(229,229,229,var(--opacity-statement));"></div>
+          <div class="meta"><b>--opacity-statement</b> <span class="tag">0.40</span></div>
+        </div>
+        <div class="card">
+          <div class="opacity-cell" style="--overlay-color: rgba(229,229,229,var(--opacity-bold));"></div>
+          <div class="meta"><b>--opacity-bold</b> <span class="tag">0.60</span></div>
+        </div>
+      </div>
+
+      <!-- 间距 -->
+      <h2>间距 Spacing</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-1)"></div>
+          <div class="meta"><b>--space-1</b> <span class="tag">0.25rem (4px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-2)"></div>
+          <div class="meta"><b>--space-2</b> <span class="tag">0.5rem (8px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-3)"></div>
+          <div class="meta"><b>--space-3</b> <span class="tag">0.75rem (12px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-4)"></div>
+          <div class="meta"><b>--space-4</b> <span class="tag">1rem (16px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-5)"></div>
+          <div class="meta"><b>--space-5</b> <span class="tag">1.25rem (20px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-6)"></div>
+          <div class="meta"><b>--space-6</b> <span class="tag">1.5rem (24px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-8)"></div>
+          <div class="meta"><b>--space-8</b> <span class="tag">2rem (32px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-10)"></div>
+          <div class="meta"><b>--space-10</b> <span class="tag">2.5rem (40px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-12)"></div>
+          <div class="meta"><b>--space-12</b> <span class="tag">3rem (48px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-16)"></div>
+          <div class="meta"><b>--space-16</b> <span class="tag">4rem (64px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-20)"></div>
+          <div class="meta"><b>--space-20</b> <span class="tag">5rem (80px)</span></div>
+        </div>
+        <div class="card">
+          <div class="spacing-bar" style="width: var(--space-24)"></div>
+          <div class="meta"><b>--space-24</b> <span class="tag">6rem (96px)</span></div>
+        </div>
+      </div>
+
+      <!-- 阴影 -->
+      <h2>阴影 Shadows</h2>
+      <div class="demo-row">
+        <div>
+          <div class="shadow-box" style="box-shadow: var(--shadow-whisper)"></div>
+          <div class="meta"><b>--shadow-whisper</b></div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow: var(--shadow-subtle)"></div>
+          <div class="meta"><b>--shadow-subtle</b></div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow: var(--shadow-gentle)"></div>
+          <div class="meta"><b>--shadow-gentle</b></div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow: var(--shadow-moderate)"></div>
+          <div class="meta"><b>--shadow-moderate</b></div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow: var(--shadow-pronounced)"></div>
+          <div class="meta"><b>--shadow-pronounced</b></div>
+        </div>
+        <div>
+          <div class="shadow-box" style="box-shadow: var(--shadow-dramatic)"></div>
+          <div class="meta"><b>--shadow-dramatic</b></div>
+        </div>
+      </div>
+
+      <!-- 表面 -->
+      <h2>表面 Surfaces</h2>
+      <div class="grid cols-4">
+        <div class="card">
+          <div class="surface-box" style="background: var(--surface-base); border: 1px solid var(--border-subtle)"></div>
+          <div class="meta"><b>--surface-base</b></div>
+        </div>
+        <div class="card">
+          <div class="surface-box" style="background: var(--surface-raised); border: 1px solid var(--border-subtle)"></div>
+          <div class="meta"><b>--surface-raised</b></div>
+        </div>
+        <div class="card">
+          <div class="surface-box" style="background: var(--surface-elevated); border: 1px solid var(--border-subtle)"></div>
+          <div class="meta"><b>--surface-elevated</b></div>
+        </div>
+        <div class="card">
+          <div class="surface-box" style="background: var(--surface-overlay); border: 1px solid var(--border-subtle)"></div>
+          <div class="meta"><b>--surface-overlay</b></div>
+        </div>
+      </div>
+
+      <!-- 边框 -->
+      <h2>边框 Borders</h2>
+      <div class="grid cols-4">
+        <div class="card">
+          <div class="border-box" style="border: 2px solid var(--border-ghost)"></div>
+          <div class="meta"><b>--border-ghost</b></div>
+        </div>
+        <div class="card">
+          <div class="border-box" style="border: 2px solid var(--border-subtle)"></div>
+          <div class="meta"><b>--border-subtle</b></div>
+        </div>
+        <div class="card">
+          <div class="border-box" style="border: 2px solid var(--border-gentle)"></div>
+          <div class="meta"><b>--border-gentle</b></div>
+        </div>
+        <div class="card">
+          <div class="border-box" style="border: 2px solid var(--border-defined)"></div>
+          <div class="meta"><b>--border-defined</b></div>
+        </div>
+        <div class="card">
+          <div class="border-box" style="border: 2px solid var(--border-prominent)"></div>
+          <div class="meta"><b>--border-prominent</b></div>
+        </div>
+      </div>
+
+      <p class="desc" style="margin-top: var(--space-10);">
+        使用方式示例：<span class="kbd">background: var(--surface-raised);</span>
+        <span class="kbd">color: var(--platinum);</span>
+        <span class="kbd">box-shadow: var(--shadow-gentle);</span>
+      </p>
+
+      <p style="margin-top: var(--space-8);">
+        <a class="back" href="/tokens">返回 Tokens 索引</a>
+      </p>
+    </div>
+  </body>
+</html>

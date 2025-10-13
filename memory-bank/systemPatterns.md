@@ -6,6 +6,8 @@
 
 - **双色主题**: Style Dictionary 输出 `:root` 与 `[data-theme='dark']` 两套变量，组件通过语义层 Token 自动适配主题。 
 - **令牌分层**: 坚持“原始 → 语义 → 组件”三级结构；业务代码只允许消费语义层或组件层。 
+  - 组件层命名示例：component.button.*（variants: primary/secondary/ghost/link；sizes: sm/md/lg；states: default/hover/active/disabled）
+  - 组件只在组件层取值；页面可用语义层
 - **Storybook 为事实来源**: 设计规范与组件使用说明全部记录在 Storybook 8.6.x 内的 MDX 与 stories 中。任何组件改动必须同时更新 Storybook。
 - **Astro 站角色**: 设计 Token 工具站用于预览与调参，不承载组件开发职责。
 
@@ -23,6 +25,7 @@
 
 - **提取流程**: 在业务应用中发现的基础 UI 优先抽离到 `packages/ui`，补充 Storybook stories 与单元测试，再通过工作区引用。 
 - **样式约束**: 
+  - 组件仅消费组件层 Token（component.*），页面可用语义层；禁止直接消费原始层 
   - 禁止硬编码颜色/间距/字号等数值；必须使用 Design Token。 
   - CSS 自定义属性不得提供 `var(--token, #fff)` 形式的兜底值，以防止绕过暗色主题。 
 - **可访问性**: 使用 `@storybook/addon-a11y` 校验组件无障碍问题，并在业务代码中继承同样的语义标签/ARIA 属性。

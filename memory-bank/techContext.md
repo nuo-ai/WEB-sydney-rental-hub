@@ -47,6 +47,10 @@
    - 其他目标平台产物（如 mini-program WXSS）。
 3. 组件仅消费语义层/组件层变量；严禁硬编码数值或直接消费原始令牌。
 
+#### 构建与排错
+- Token collisions：执行 `node scripts/build-tokens.js` 若出现“Token collisions”，使用更高日志级别定位重复命名并统一（建议：将 Style Dictionary 日志设为 verbose，或在脚本内打印冲突路径）。
+- 输出位置：Web 变量输出到 `packages/ui/src/styles/tokens*.css`（暴露如 `--component-button-*`）；小程序 WXSS 输出到 `apps/mini-program/src/styles/generated/*.wxss`。
+
 ### Storybook 8.6.x 工作流
 
 - **启动设计系统 Storybook**: `pnpm --filter @sydney-rental-hub/ui storybook`
@@ -88,6 +92,7 @@
 
 ## 近期变更日志
 
+- **2025-10-13**: 新增 `component.button.*`（primary/secondary/ghost/link；sm/md/lg；含状态与通用项），构建产物包含 `--component-button-*`；`BaseButton.vue` 改为消费组件层 Token；记录 Token collisions(3) 待清理。
 - **2025-02-14**: 完成 Storybook 8.6.x 版本统一，移除 npm 锁文件与过时原型 HTML，确保 pnpm + Turborepo 为唯一依赖来源。
 - **2025-01**: 引入 Vitest 3.x 与 Playwright 1.55 作为统一测试栈，并在 `apps/web` 中扩展样式 Lint 规则。 
 - **2024 Q4**: 完成设计 Token 分层重构，将 CSS 变量输出迁移到 `packages/ui`，Astro 设计站改为直接消费该包。

@@ -35,6 +35,8 @@ apps/backend/venv/
 
 database/sydney-suburbs-name.json
 
+cursor-starter
+
 # ===================================================================
 # By default, all other files are INCLUDED.
 # This ensures that memory-bank/, apps/web/, apps/backend/ source,

@@ -64,7 +64,7 @@ defineProps({
   variant: {
     type: String,
     default: 'secondary',
-    validator: (value) => ['primary', 'secondary', 'ghost', 'danger'].includes(value),
+  validator: (value) => ['primary', 'secondary', 'ghost', 'link'].includes(value),
   },
 
   // 按钮尺寸：small（小）、medium（中）、large（大）
@@ -114,15 +114,15 @@ const handleClick = (event) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--button-gap);
-  padding: var(--button-padding-y) var(--button-padding-x);
-  font-size: var(--button-font-size);
-  font-weight: var(--button-font-weight);
+  gap: var(--component-button-gap);
+  padding: var(--component-button-size-md-padding-y) var(--component-button-size-md-padding-x);
+  font-size: var(--component-button-size-md-font-size);
+  font-weight: var(--component-button-font-weight);
   line-height: var(--line-height-normal);
-  border-radius: var(--button-radius);
+  border-radius: var(--component-button-radius);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: var(--component-button-transition);
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
@@ -153,13 +153,13 @@ const handleClick = (event) => {
 /* 主要按钮 */
 .base-button--primary {
   background-color: var(--component-button-primary-bg);
-  color: var(--component-button-primary-color);
+  color: var(--component-button-primary-text);
   border-color: var(--component-button-primary-border);
 }
 
 .base-button--primary:hover:not(:disabled) {
-  background-color: var(--component-button-primary-bg-hover);
-  border-color: var(--component-button-primary-border-hover);
+  background-color: var(--component-button-primary-hover-bg);
+  border-color: var(--component-button-primary-border);
 }
 
 .base-button--primary:active:not(:disabled) {
@@ -169,14 +169,14 @@ const handleClick = (event) => {
 /* 次要按钮 */
 .base-button--secondary {
   background-color: var(--component-button-secondary-bg);
-  color: var(--component-button-secondary-color);
+  color: var(--component-button-secondary-text);
   border-color: var(--component-button-secondary-border);
 }
 
 .base-button--secondary:hover:not(:disabled) {
-  background-color: var(--component-button-secondary-bg-hover);
-  color: var(--component-button-secondary-color-hover);
-  border-color: var(--component-button-secondary-border-hover);
+  background-color: var(--component-button-secondary-hover-bg);
+  color: var(--component-button-secondary-hover-text);
+  border-color: var(--component-button-secondary-hover-border);
 }
 
 .base-button--secondary:active:not(:disabled) {
@@ -186,33 +186,37 @@ const handleClick = (event) => {
 /* 幽灵按钮 */
 .base-button--ghost {
   background-color: var(--component-button-ghost-bg);
-  color: var(--component-button-ghost-color);
+  color: var(--component-button-ghost-text);
   border-color: transparent;
 }
 
 .base-button--ghost:hover:not(:disabled) {
-  background-color: var(--component-button-ghost-bg-hover);
-  color: var(--component-button-ghost-color-hover);
+  background-color: var(--component-button-ghost-hover-bg);
+  color: var(--component-button-ghost-hover-text);
 }
 
-/* 危险按钮 */
-.base-button--danger {
-  background-color: var(--component-button-danger-bg);
-  color: var(--component-button-danger-color);
-  border-color: var(--component-button-danger-border);
+/* 文本按钮 */
+.base-button--link {
+  background-color: transparent;
+  color: var(--component-button-link-text);
+  border-color: transparent;
+}
+.base-button--link:hover:not(:disabled) {
+  color: var(--component-button-link-hover-text);
+  text-decoration: underline;
+}
+.base-button--link:active:not(:disabled) {
+  color: var(--component-button-link-active-text);
 }
 
-.base-button--danger:hover:not(:disabled) {
-  background-color: var(--component-button-danger-bg-hover);
-  border-color: var(--component-button-danger-border-hover);
-}
+
 
 /* 按钮尺寸 */
 
 .base-button--small {
-  padding: var(--space-xs) var(--space-md);
-  font-size: var(--font-size-sm);
-  gap: var(--space-xs);
+  padding: var(--component-button-size-sm-padding-y) var(--component-button-size-sm-padding-x);
+  font-size: var(--component-button-size-sm-font-size);
+  gap: var(--component-button-gap);
   /* TODO: Replace with token */
   height: 32px; 
 }
@@ -223,17 +227,17 @@ const handleClick = (event) => {
 }
 
 .base-button--medium {
-  padding: var(--space-sm) var(--space-lg);
-  font-size: var(--font-size-md);
-  gap: var(--space-sm);
+  padding: var(--component-button-size-md-padding-y) var(--component-button-size-md-padding-x);
+  font-size: var(--component-button-size-md-font-size);
+  gap: var(--component-button-gap);
   /* TODO: Replace with token */
   height: 40px;
 }
 
 .base-button--large {
-  padding: var(--space-lg) var(--space-xl);
-  font-size: var(--font-size-lg);
-  gap: var(--space-md);
+  padding: var(--component-button-size-lg-padding-y) var(--component-button-size-lg-padding-x);
+  font-size: var(--component-button-size-lg-font-size);
+  gap: var(--component-button-gap);
   /* TODO: Replace with token */
   height: 48px;
 }
@@ -267,7 +271,7 @@ const handleClick = (event) => {
 
 /* 焦点样式 */
 .base-button:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: var(--component-button-focus-ring-width) solid var(--component-button-focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -285,8 +289,8 @@ const handleClick = (event) => {
 /* 响应式调整 */
 @media (width <= 767px) {
   .base-button {
-    padding: calc(var(--button-padding-y) + 2px) var(--button-padding-x);
-    font-size: var(--font-size-md);
+    padding: calc(var(--component-button-size-md-padding-y) + 2px) var(--component-button-size-md-padding-x);
+    font-size: var(--component-button-size-md-font-size);
   }
 
   .base-button--small {

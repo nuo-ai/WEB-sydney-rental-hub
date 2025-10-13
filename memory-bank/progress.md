@@ -4,6 +4,11 @@
 
 ## 近期重要里程碑（2025-10）
 
+### Button 组件令牌化与接入（完成）
+- **2025-10-13｜组件层 Token 与组件对齐**:
+  - 完成 component.button.* 定义与构建（Web CSS + WXSS）；BaseButton 改为消费 --component-button-*；新增 link，移除 danger；支持 sm/md/lg。
+  - 待办：新增 size.{sm|md|lg}.height Token；清零 Style Dictionary “Token collisions(3)”（verbose 定位）。
+
 ### 原子组件样式抓取与清单修正 (进行中)
 - **2025-10-11｜清单修正与数据迁移**:
   - **纠正偏差**: 废弃了不完整的旧版分析清单，并以用户提供的完整模板作为新的工作基准。
