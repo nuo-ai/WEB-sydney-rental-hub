@@ -7,8 +7,8 @@
 
 ## 当前技术栈
 
-- **前端主站 (`apps/web`)**: Vue 3 (Composition API) + Vite 7 + Pinia + Vue Router + Element Plus + Tailwind v4（`@tailwindcss/postcss`，preflight=false，darkMode: `['class','[data-theme="dark"]']`，核心 HSL 变量）。通过 `src/styles/el-theme-bridge.css` 将核心变量映射到 Element Plus 变量；Storybook 8.6.x 作为组件开发与演示环境，Chromatic 用于可视化回归。
-- **设计系统 (`packages/ui`)**: Vue 组件库与样式令牌的单一事实来源。依赖 Style Dictionary 生成跨端 Token 产物，并通过 Storybook 8.6.x 提供组件/基础样式文档。
+- **前端主站 (`apps/web`)**：Vue 3 (Composition API) + Vite 7 + Pinia + Vue Router + Element Plus + Tailwind v4（`@tailwindcss/postcss`，`preflight=false`，`darkMode: ['class','[data-theme="dark"]']`，核心 HSL 变量集中在 `src/styles/theme.css`）。`main.js` 先加载 UI 包 tokens，再加载 `design-tokens.css`、`theme.css`、Element Plus 桥接与 Tailwind；`vite.config.js` 将开发服务器固定在 5174 并启用 `strictPort`；Storybook 8.6.x（脚本端口 6007）作为业务组件与主题演示环境，Chromatic 通过 `@chromatic-com/storybook` 集成视觉回归。
+- **设计系统 (`packages/ui`)**：Vue 组件库与样式令牌的单一事实来源。Style Dictionary 将 CSS 变量输出到 `src/styles/tokens.css` / `tokens.dark.css`（通过 `exports['./dist/tokens.css']` 暴露给消费方），并生成 `dist/style-dictionary/json/tokens.json` 与 `dist/tokens.mjs`；Storybook 8.6.x（脚本端口 6006）承载基础组件文档。
 - **设计 Token 工具站 (`tools/design-site-astro`)**: Astro 驱动的浏览与调参与演示站点，消费 `packages/ui` 导出的 CSS 变量。 
 - **后端 (`apps/backend`)**: Python FastAPI + SQLAlchemy，默认运行在 Uvicorn，提供 REST/GraphQL 服务及 Celery 任务队列。 
 - **文档站 (`apps/docs-site`)**: Docusaurus 站点，汇总设计与产品文档。 
@@ -51,6 +51,7 @@
 #### 构建与排错
 - Token collisions：执行 `node scripts/build-tokens.js` 若出现“Token collisions”，使用更高日志级别定位重复命名并统一（建议：将 Style Dictionary 日志设为 verbose，或在脚本内打印冲突路径）。
 - 输出位置：Web 变量输出到 `packages/ui/src/styles/tokens*.css`（暴露如 `--component-button-*`）；小程序 WXSS 输出到 `apps/mini-program/src/styles/generated/*.wxss`。
+- 品牌配色差异：`tokens/themes/light.json` 仍输出桔色 `color.brand.*`，而 apps/web 主题已切换为蓝色 `theme.css`；统一品牌色后需重新运行 `pnpm build:tokens` 并发布 UI 包。
 
 ### Storybook 8.6.x 工作流
 
@@ -93,7 +94,7 @@
 
 ## 近期变更日志
 
-- **2025-10-14**: apps/web 引入 Tailwind v4（`@tailwindcss/postcss`，preflight=false），新增 `src/styles/theme.css`（核心 HSL 变量）与 `src/styles/el-theme-bridge.css`（EP 变量映射），`darkMode` 同时支持 `.dark` 与 `[data-theme="dark"]`；/globals-demo 与 /cards-demo 验证统一视觉与可访问性（focus-visible 由 `--ring` 驱动）；修复 /cards-demo → 详情页 404（store 预注入 + fetch guard）；DevServer 使用 5199/strictPort。
+- **2025-10-14**: apps/web 引入 Tailwind v4（`@tailwindcss/postcss`，preflight=false），新增 `src/styles/theme.css`（核心 HSL 变量）与 `src/styles/el-theme-bridge.css`（EP 变量映射），`darkMode` 同时支持 `.dark` 与 `[data-theme="dark"]`；/globals-demo 与 /cards-demo 验证统一视觉与可访问性（focus-visible 由 `--ring` 驱动）；修复 /cards-demo → 详情页 404（store 预注入 + fetch guard）；DevServer 使用 5174/`strictPort: true`。
 - **2025-10-13**: 新增 `component.button.*`（primary/secondary/ghost/link；sm/md/lg；含状态与通用项），构建产物包含 `--component-button-*`；`BaseButton.vue` 改为消费组件层 Token；记录 Token collisions(3) 待清理。
 - **2025-02-14**: 完成 Storybook 8.6.x 版本统一，移除 npm 锁文件与过时原型 HTML，确保 pnpm + Turborepo 为唯一依赖来源。
 - **2025-01**: 引入 Vitest 3.x 与 Playwright 1.55 作为统一测试栈，并在 `apps/web` 中扩展样式 Lint 规则。 

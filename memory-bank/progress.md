@@ -9,7 +9,7 @@
   - 引入 Tailwind v4（@tailwindcss/postcss，preflight=false），新增核心 HSL 变量 theme.css 与 Element Plus 桥接 el-theme-bridge.css。
   - darkMode 支持 .dark 与 [data-theme="dark"]；/globals-demo 与 /cards-demo 验证统一视觉与可访问性（focus-visible 使用 --ring）。
   - 修复从 /cards-demo 跳转详情 404：CardsDemo 预注入 store.currentProperty，详情页 onMounted fetch guard。
-  - DevServer 使用 5199/strictPort，避免端口冲突。
+  - DevServer 固定在 5174 并开启 strictPort，避免 Google Maps Host 限制与端口漂移。
 - **后续计划**: P0 变量收敛（卡片/详情命中项），P1 密度统一（Tailwind 间距/字号量表），P2 试点 shadcn-vue（保留 EP 复杂组件）。
 
 ### Button 组件令牌化与接入（完成）
