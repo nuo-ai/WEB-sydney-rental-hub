@@ -1,20 +1,26 @@
 <template>
   <div id="app" class="app-container">
-    <!-- 导航组件 -->
-    <Navigation :isHidden="isNavHidden" />
-
-    <!-- 主要内容区域 -->
-    <router-view class="main-view" @updateNavVisibility="handleNavVisibility" />
-
-    <!-- 对比工具栏 -->
-    <CompareToolbar />
+    <!-- Conditional layout rendering -->
+    <template v-if="isShadcnLayout">
+      <router-view />
+    </template>
+    <template v-else>
+      <!-- Default layout -->
+      <Navigation :isHidden="isNavHidden" />
+      <router-view class="main-view" @updateNavVisibility="handleNavVisibility" />
+      <CompareToolbar />
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Navigation from '@/components/Navigation.vue'
 import CompareToolbar from '@/components/CompareToolbar.vue'
+
+const route = useRoute()
+const isShadcnLayout = computed(() => route.meta.layout === 'shadcn')
 
 // 导航栏显示状态
 const isNavHidden = ref(false)

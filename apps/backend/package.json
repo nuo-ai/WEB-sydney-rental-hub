@@ -3,8 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "python -m uvicorn main:app --reload --port 8000 --env-file ../../.env",
-    "worker": "celery -A celery_worker.celery_app worker -l info",
+    "dev": ".venv/bin/python -m uvicorn main:app --reload --port ${PORT:-8000} --env-file ./.env",
+    "worker": ".venv/bin/celery -A celery_worker.celery_app worker -l info",
     "test": "pytest .",
     "build": "python -m compileall .",
     "typecheck": "python -m compileall ."

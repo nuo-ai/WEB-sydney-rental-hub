@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桔屋找房 - 首页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #06C7C4; /* Teal color from screenshots */
+            --text-primary: #1d293f;
+            --text-secondary: #6c757d;
+            --border-color: #e0e0e0;
+            --background-panel: #f8f9fa;
+            --background-selected: #f0f2f5;
+            --background-light: #ffffff;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .app-wrapper { display: flex; justify-content: center; }
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--background-light);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Page Content --- */
+        .page-content { display: none; flex-direction: column; flex-grow: 1; overflow-y: auto; background-color: #fff; }
+        .page-content.active { display: flex; }
+        
+        /* --- Header & Find Property Page --- */
+        .app-header { padding: 10px 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; background-color: #fff; z-index: 10; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .location-selector { font-size: 18px; font-weight: 500; color: var(--text-primary); text-decoration: none; cursor: pointer; }
+        .rent-buy-toggle { display: flex; background-color: var(--background-panel); border-radius: 8px; padding: 4px; }
+        .rent-buy-toggle button { border: none; background-color: transparent; padding: 6px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .rent-buy-toggle button.active { background-color: var(--primary-color); color: white; }
+        .filter-bar { display: flex; justify-content: space-around; align-items: center; }
+        .filter-button { background: none; border: none; font-size: 16px; color: var(--text-primary); cursor: pointer; padding: 0;}
+        #find-property-page .page-body { padding: 16px; overflow-y: auto; flex-grow: 1;}
+        .property-card { background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card-image-container { position: relative; }
+        .card-image-container img { width: 100%; height: auto; display: block; }
+        .card-content { padding: 16px; }
+        .price-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .price-wrapper { display: flex; align-items: baseline; }
+        .price { font-size: 24px; font-weight: bold; color: var(--text-primary); }
+        .period { font-size: 14px; color: var(--text-secondary); margin-left: 6px; }
+        .actions i { font-size: 18px; color: var(--text-secondary); margin-left: 16px; cursor: pointer; }
+        .address { font-size: 16px; color: #344054; line-height: 1.4; margin: 0 0 16px 0; }
+        .specs { display: flex; gap: 24px; margin-bottom: 16px; color: #344054; }
+        .spec-item { display: flex; align-items: center; font-size: 16px; }
+        .spec-item i { margin-right: 8px; font-size: 18px; color: var(--text-secondary); }
+        .availability { font-size: 14px; margin: 0; }
+        
+        .tab-bar { display: flex; justify-content: space-around; padding: 8px 0; background-color: #fff; border-top: 1px solid var(--border-color); flex-shrink: 0; z-index: 10; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: var(--text-secondary); cursor: pointer; text-decoration: none; }
+        .tab-item i { font-size: 22px; margin-bottom: 4px; }
+        .tab-item.active { color: var(--primary-color); }
+
+        /* --- My Account Page --- */
+        #my-account-page { background-color: var(--background-panel); }
+        .profile-header { display: flex; align-items: center; padding: 24px 16px; background-color: #fff; }
+        .avatar { width: 64px; height: 64px; border-radius: 50%; margin-right: 16px; object-fit: cover; }
+        .user-info .name { font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
+        .user-info .points { font-size: 14px; color: var(--text-secondary); }
+        .menu-list { margin-top: 12px; background-color: #fff; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border-color); font-size: 16px; color: var(--text-primary); cursor: pointer; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item .fa-chevron-right { color: var(--text-secondary); }
+
+        /* --- Modal Styles --- */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .bottom-sheet-modal { position: absolute; bottom: 0; left: 0; width: 100%; background-color: #fff; border-top-left-radius: 12px; border-top-right-radius: 12px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); transform: translateY(100%); transition: transform 0.3s ease-out; display: flex; flex-direction: column; }
+        .modal-overlay.active .bottom-sheet-modal { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; flex-shrink: 0; }
+        .modal-header .title { font-size: 16px; color: var(--text-primary); font-weight: 500;}
+        .modal-header .clear-button { font-size: 14px; color: var(--text-secondary); background: none; border: none; cursor: pointer; }
+        .modal-content { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .modal-footer { padding: 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; background-color: #fff; }
+        .confirm-button { width: 100%; padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        /* --- Location Filter Modal Specifics --- */
+        #location-modal-overlay .bottom-sheet-modal { height: 75%; }
+        .district-selection-container { position: relative; flex-grow: 1; display: flex; overflow: hidden; }
+        .district-panels { flex-grow: 1; overflow-y: auto; padding: 0 16px; }
+        .district-list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 4px; cursor: pointer; border-bottom: 1px solid var(--border-color);}
+        .district-group .district-list-item:last-child { border-bottom: none; }
+        .checkmark { color: var(--primary-color); font-size: 16px; visibility: hidden; }
+        .district-list-item.selected .checkmark { visibility: visible; }
+        
+        .selected-districts-display { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 10px; }
+        .selected-district-tag { background-color: #e6f9f9; color: var(--primary-color); padding: 6px 10px; border-radius: 4px; font-size: 14px; display: flex; align-items: center; margin-bottom: 10px; }
+        .remove-tag-btn { margin-left: 8px; cursor: pointer; font-style: normal; font-weight: bold; }
+
+        .hot-districts-section { padding: 16px 0; }
+        .hot-districts-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+        .hot-districts-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .hot-district-tag { padding: 6px 12px; background-color: var(--background-panel); border-radius: 4px; font-size: 14px; cursor: pointer; border: 1px solid var(--background-panel); }
+        .hot-district-tag.selected { background-color: #e6f9f9; color: var(--primary-color); border-color: var(--primary-color); }
+
+        .district-group-header { padding: 12px 4px; font-size: 16px; font-weight: 500; color: var(--text-primary); background-color: var(--background-light); }
+        .alphabetical-index { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; padding: 8px 4px; }
+        .index-letter { font-size: 12px; color: var(--text-secondary); padding: 2px; cursor: pointer; text-decoration: none; }
+        .badge { background-color: var(--primary-color); color: white; padding: 2px 6px; border-radius: 10px; font-size: 12px; margin-left: 6px; }
+
+        /* --- Sort Modal --- */
+        #sort-modal-overlay .bottom-sheet-modal { height: auto; }
+        #sort-modal-overlay .modal-content { overflow-y: auto; }
+        .sort-options-list { padding: 0 16px 16px; }
+        .sort-option { padding: 16px 8px; font-size: 16px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .sort-option:last-child { border-bottom: none; }
+        .sort-option.selected { color: var(--primary-color); font-weight: 500; }
+
+        /* --- Filter Modal --- */
+        #filter-modal-overlay .bottom-sheet-modal { height: 85%; }
+        #filter-modal-overlay .modal-content { padding: 0 16px; overflow-y: auto;}
+        .filter-section { margin-bottom: 24px; }
+        .filter-section-title { font-size: 16px; font-weight: 500; margin-bottom: 12px; color: var(--text-primary); }
+        .tag-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .filter-tag { padding: 12px 16px; background-color: var(--background-panel); border-radius: 6px; font-size: 14px; cursor: pointer; border: 1px solid transparent; transition: background-color 0.2s, color 0.2s; text-align: left;}
+        .filter-tag.selected { background-color: #e6f9f9; color: var(--primary-color); border-color: var(--primary-color); }
+        .price-inputs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+        .price-inputs input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; text-align: center; box-sizing: border-box; }
+        .price-inputs span { color: var(--text-secondary); }
+        .tag-group.single-column { grid-template-columns: 1fr; }
+        .tag-group.two-columns { grid-template-columns: repeat(2, 1fr); }
+
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <div class="app-container">
+            
+            <main id="find-property-page" class="page-content active">
+                <header class="app-header">
+                    <div class="top-nav">
+                        <div class="location-selector"><i class="fa-solid fa-location-dot"></i> <span>上海</span></div>
+                    </div>
+                    <div class="filter-bar">
+                        <button class="filter-button" id="location-filter-btn">位置</button>
+                        <button class="filter-button" id="sort-filter-btn">排序</button>
+                        <button class="filter-button" id="filter-filter-btn">筛选</button>
+                    </div>
+                </header>
+                <div class="page-body">
+                    <div class="property-card">
+                        <div class="card-image-container"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto-format&fit=crop" alt="房源图片"></div>
+                        <div class="card-content">
+                            <div class="price-actions">
+                                <div class="price-wrapper"><span class="price">$500</span><span class="period">每周</span></div>
+                                <div class="actions"><i class="fa-regular fa-star"></i><i class="fa-solid fa-ellipsis"></i></div>
+                            </div>
+                            <p class="address">5/37 South Parade,<br>CAMPSIE NSW 2194</p>
+                            <div class="specs">
+                                <div class="spec-item"><i class="fa-solid fa-bed"></i><span>2</span></div>
+                                <div class="spec-item"><i class="fa-solid fa-bath"></i><span>1</span></div>
+                                <div class="spec-item"><i class="fa-solid fa-car"></i><span>1</span></div>
+                            </div>
+                            <p class="availability"><span class="label">空出日期:</span> <span>立即入住</span></p>
+                        </div>
+                    </div>
+                    <div class="property-card">
+                         <div class="card-image-container"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" alt="房源图片"></div>
+                         <div class="card-content">
+                             <div class="price-actions">
+                                <div class="price-wrapper"><span class="price">$850</span><span class="period">每周</span></div>
+                                 <div class="actions"><i class="fa-regular fa-star"></i><i class="fa-solid fa-ellipsis"></i></div>
+                             </div>
+                             <p class="address">12A Pitt Street,<br>SYDNEY NSW 2000</p>
+                             <div class="specs">
+                                 <div class="spec-item"><i class="fa-solid fa-bed"></i><span>3</span></div>
+                                 <div class="spec-item"><i class="fa-solid fa-bath"></i><span>2</span></div>
+                                 <div class="spec-item"><i class="fa-solid fa-car"></i><span>1</span></div>
+                             </div>
+                             <p class="availability"><span class="label">空出日期:</span> <span>11月1日</span></p>
+                         </div>
+                    </div>
+                </div>
+            </main>
+
+            <main id="my-account-page" class="page-content">
+                <div class="profile-header">
+                    <img src="https://images.unsplash.com/photo-1570295999918-56ceb5ecca61?q=80&w=2080&auto=format&fit=crop" alt="User Avatar" class="avatar">
+                    <div class="user-info">
+                        <p class="name">Michael</p>
+                        <p class="points">积分 55</p>
+                    </div>
+                </div>
+                <div class="menu-list">
+                    <div class="menu-item"><span>我的收藏</span><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="menu-item"><span>历史浏览</span><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="menu-item"><span>搜索历史</span><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+                 <div class="menu-list">
+                    <div class="menu-item"><span>我的动态</span><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="menu-item"><span>我的房源</span><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="menu-item"><span>访客记录</span><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </main>
+            
+            <footer class="tab-bar">
+                <a href="#" class="tab-item" data-page="home-page"><i class="fa-solid fa-house"></i><span>首页</span></a>
+                <a href="#" class="tab-item" data-page="discover-page"><i class="fa-regular fa-compass"></i><span>发现</span></a>
+                <a href="#" class="tab-item active" data-page="find-property-page"><i class="fa-solid fa-magnifying-glass"></i><span>找房</span></a>
+                <a href="#" class="tab-item" data-page="messages-page"><i class="fa-regular fa-comment-dots"></i><span>消息</span></a>
+                <a href="#" class="tab-item" data-page="my-account-page"><i class="fa-regular fa-user"></i><span>我的</span></a>
+            </footer>
+
+            <!-- Location Modal -->
+            <div class="modal-overlay" id="location-modal-overlay">
+                <div class="bottom-sheet-modal">
+                    <div class="modal-header">
+                        <span class="title">按照位置搜索：<span class="badge" id="district-counter" style="display: none;">0</span></span>
+                        <button class="clear-button">清除条件</button>
+                    </div>
+                    <div class="modal-content">
+                        <div id="selected-districts-display" style="display: none;"></div>
+                        <div class="district-selection-container">
+                            <div class="district-panels" id="district-panels">
+                                <!-- Hot districts and alphabetical list will be injected here -->
+                            </div>
+                             <div class="alphabetical-index" id="alphabetical-index">
+                                <!-- A-Z index will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer"><button class="confirm-button">确定</button></div>
+                </div>
+            </div>
+
+            <!-- Sort Modal -->
+            <div class="modal-overlay" id="sort-modal-overlay">
+                <div class="bottom-sheet-modal">
+                    <div class="modal-header">
+                        <span class="title">选择排序方式：</span>
+                        <button class="clear-button">默认排序</button>
+                    </div>
+                    <div class="modal-content">
+                        <div class="sort-options-list">
+                            <div class="sort-option selected">最新上架</div>
+                            <div class="sort-option">最新发布</div>
+                            <div class="sort-option">离我最近</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Modal -->
+            <div class="modal-overlay" id="filter-modal-overlay">
+                <div class="bottom-sheet-modal">
+                    <div class="modal-header">
+                        <span class="title">筛选条件：</span>
+                        <button class="clear-button">清除条件</button>
+                    </div>
+                    <div class="modal-content">
+                        <div class="filter-section" id="price-filter-section">
+                            <h3 class="filter-section-title">租金 (AUD/周) (1k=1000 aud):</h3>
+                            <div class="tag-group" data-selection-mode="single">
+                                <div class="filter-tag">500 以下</div>
+                                <div class="filter-tag">500-1000</div>
+                                <div class="filter-tag">1000-1500</div>
+                                <div class="filter-tag">1500-2000</div>
+                                <div class="filter-tag">2000-2500</div>
+                                <div class="filter-tag">2500 以上</div>
+                            </div>
+                        </div>
+                         <div class="filter-section">
+                            <div class="price-inputs">
+                                <input type="number" placeholder="最低" id="min-price-input">
+                                <span>-</span>
+                                <input type="number" placeholder="最高" id="max-price-input">
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <h3 class="filter-section-title">出租方式：</h3>
+                            <div class="tag-group two-columns" data-selection-mode="multiple">
+                                <div class="filter-tag">整租</div>
+                                <div class="filter-tag">合租</div>
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <h3 class="filter-section-title">户型：</h3>
+                            <div class="tag-group" data-selection-mode="multiple">
+                                <div class="filter-tag">1室</div>
+                                <div class="filter-tag">2室</div>
+                                <div class="filter-tag">3室</div>
+                                <div class="filter-tag">4室</div>
+                                <div class="filter-tag">5室及以上</div>
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <h3 class="filter-section-title">配套设施：</h3>
+                            <div class="tag-group single-column" data-selection-mode="multiple">
+                                <div class="filter-tag">带家具</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="confirm-button">确定</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const appContainer = document.querySelector('.app-container');
+            const pages = appContainer.querySelectorAll('.page-content');
+            const tabItems = appContainer.querySelectorAll('.tab-bar .tab-item');
+
+            // --- Page Switching Logic ---
+            tabItems.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = tab.dataset.page;
+                    const targetPage = document.getElementById(pageId);
+                    
+                    if (!targetPage) {
+                         e.stopImmediatePropagation();
+                        return;
+                    }
+                    
+                    tabItems.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    pages.forEach(page => page.classList.remove('active'));
+                    targetPage.classList.add('active');
+                });
+            });
+
+            // --- Initial Page Setup ---
+            const initialActiveTab = appContainer.querySelector('.tab-bar .tab-item.active');
+            if (initialActiveTab) {
+                const initialPageId = initialActiveTab.dataset.page;
+                const initialPage = document.getElementById(initialPageId);
+                if (initialPage) {
+                    pages.forEach(p => p.classList.remove('active'));
+                    initialPage.classList.add('active');
+                }
+            } else if (pages.length > 0) {
+                 pages[0].classList.add('active');
+                 if(tabItems.length > 0) tabItems[0].classList.add('active');
+            }
+
+            // --- Modal Setup ---
+            const setupModal = (buttonId, overlayId) => {
+                const button = document.getElementById(buttonId);
+                const overlay = document.getElementById(overlayId);
+                if (!button || !overlay) return;
+
+                const openModal = () => overlay.classList.add('active');
+                const closeModal = () => overlay.classList.remove('active');
+
+                button.addEventListener('click', openModal);
+                overlay.addEventListener('click', (event) => {
+                    if (event.target === overlay) closeModal();
+                });
+                
+                const confirmBtn = overlay.querySelector('.confirm-button');
+                if(confirmBtn) confirmBtn.addEventListener('click', closeModal);
+
+                const closeElements = overlay.querySelectorAll('.sort-option');
+                 closeElements.forEach(el => el.addEventListener('click', closeModal));
+            };
+
+            setupModal('location-filter-btn', 'location-modal-overlay');
+            setupModal('sort-filter-btn', 'sort-modal-overlay');
+            setupModal('filter-filter-btn', 'filter-modal-overlay');
+            
+            // --- Location Modal Logic ---
+            const locationModal = document.getElementById('location-modal-overlay');
+            if(locationModal) {
+                const sydneyDistrictsRaw = [
+                    "Alexandria", "Ashfield", "Barangaroo", "Beaconsfield", "Bondi", "Bondi Junction", "Burwood--热", "Camperdown",
+                    "Campsie", "Carlingford", "Centennial Park", "Chatswood", "Chippendale--热", "Coogee", "Darlinghurst", "Darlington",
+                    "Dawes Point", "Double Bay", "Eastgardens", "Eastlakes", "Eastwood", "Elizabeth Bay", "Epping", "Erskineville",
+                    "Forest Lodge", "Gladesville", "Glebe", "Haymarket--热", "Hurstville", "Kensington--热", "Kingsford", "Lane Cove",
+                    "Macquarie Park--热", "Maroubra", "Marrickville", "Marsfield", "Mascot--热", "Meadowbank", "Millers Point", "Mosman",
+                    "Newtown", "North Rocks", "North Ryde", "Paddington", "Parramatta", "Petersham", "Potts Point", "Pyrmont", "Randwick",
+                    "Redfern", "Rhodes", "Rockdale", "Rosebery--热", "Ryde", "St Leonards", "Stanmore", "Surry Hills", "Sydney--热",
+                    "Sydney Olympic Park", "The Rocks", "Ultimo--热", "Waterloo--热", "Wolli Creek--热", "Woolloomooloo", "Zetland--热"
+                ];
+
+                const selectedDistricts = new Set();
+                const hotDistricts = sydneyDistrictsRaw.filter(d => d.includes('--热')).map(d => d.replace('--热', ''));
+                const regularDistricts = sydneyDistrictsRaw.map(d => d.replace('--热', '')).sort();
+                
+                const districtGroups = regularDistricts.reduce((acc, district) => {
+                    const firstLetter = district.charAt(0).toUpperCase();
+                    if (!acc[firstLetter]) acc[firstLetter] = [];
+                    acc[firstLetter].push(district);
+                    return acc;
+                }, {});
+
+                const panelsContainer = document.getElementById('district-panels');
+                const indexContainer = document.getElementById('alphabetical-index');
+                const counterBadge = document.getElementById('district-counter');
+                const selectedDisplay = document.getElementById('selected-districts-display');
+
+                const updateCounter = () => {
+                    const count = selectedDistricts.size;
+                    if (count > 0) {
+                        counterBadge.textContent = count;
+                        counterBadge.style.display = 'inline-block';
+                    } else {
+                        counterBadge.style.display = 'none';
+                    }
+                };
+
+                const renderSelectedDistricts = () => {
+                    selectedDisplay.innerHTML = '';
+                    if (selectedDistricts.size > 0) {
+                        selectedDisplay.style.display = 'flex';
+                        selectedDistricts.forEach(district => {
+                            const tag = document.createElement('div');
+                            tag.className = 'selected-district-tag';
+                            tag.textContent = district;
+                            const removeBtn = document.createElement('i');
+                            removeBtn.className = 'remove-tag-btn';
+                            removeBtn.textContent = '×';
+                            removeBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                toggleSelection(district);
+                            };
+                            tag.appendChild(removeBtn);
+                            selectedDisplay.appendChild(tag);
+                        });
+                    } else {
+                        selectedDisplay.style.display = 'none';
+                    }
+                };
+                
+                const toggleSelection = (districtName) => {
+                    const elements = document.querySelectorAll(`[data-district-name="${districtName}"]`);
+                    if (selectedDistricts.has(districtName)) {
+                        selectedDistricts.delete(districtName);
+                        elements.forEach(el => el.classList.remove('selected'));
+                    } else {
+                        selectedDistricts.add(districtName);
+                        elements.forEach(el => el.classList.add('selected'));
+                    }
+                    updateCounter();
+                    renderSelectedDistricts();
+                };
+
+                let hotDistrictsHTML = `<div class="hot-districts-section"><h3 class="hot-districts-title">热门区域</h3><div class="hot-districts-tags">`;
+                hotDistricts.forEach(district => {
+                    hotDistrictsHTML += `<div class="hot-district-tag" data-district-name="${district}">${district}</div>`;
+                });
+                hotDistrictsHTML += `</div></div>`;
+                
+                let alphabeticalListHTML = '';
+                const sortedKeys = Object.keys(districtGroups).sort();
+                sortedKeys.forEach(letter => {
+                    alphabeticalListHTML += `<div class="district-group" id="district-group-${letter}"><h4 class="district-group-header">${letter}</h4>`;
+                    districtGroups[letter].forEach(district => {
+                        alphabeticalListHTML += `<div class="district-list-item" data-district-name="${district}"><span>${district}</span><i class="fa-solid fa-check checkmark"></i></div>`;
+                    });
+                    alphabeticalListHTML += `</div>`;
+                });
+                panelsContainer.innerHTML = hotDistrictsHTML + alphabeticalListHTML;
+
+                let indexHTML = '';
+                sortedKeys.forEach(letter => {
+                    indexHTML += `<a href="#district-group-${letter}" class="index-letter">${letter}</a>`;
+                });
+                indexContainer.innerHTML = indexHTML;
+
+                document.querySelectorAll('.hot-district-tag, .district-list-item').forEach(el => {
+                    el.addEventListener('click', () => toggleSelection(el.dataset.districtName));
+                });
+                
+                document.querySelectorAll('.index-letter').forEach(letterEl => {
+                    letterEl.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(letterEl.getAttribute('href'));
+                        if (targetElement) panelsContainer.scrollTop = targetElement.offsetTop - panelsContainer.offsetTop;
+                    });
+                });
+                
+                locationModal.querySelector('.clear-button').addEventListener('click', () => {
+                    selectedDistricts.clear();
+                    document.querySelectorAll('.hot-district-tag, .district-list-item').forEach(el => el.classList.remove('selected'));
+                    updateCounter();
+                    renderSelectedDistricts();
+                });
+            }
+
+
+            // --- Sort Modal Interactivity ---
+            const sortModal = document.getElementById('sort-modal-overlay');
+            if(sortModal){
+                const sortOptions = sortModal.querySelectorAll('.sort-option');
+                sortOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        sortOptions.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                    });
+                });
+                const defaultSortBtn = sortModal.querySelector('.clear-button');
+                if (defaultSortBtn) {
+                    defaultSortBtn.addEventListener('click', () => {
+                         sortOptions.forEach(opt => opt.classList.remove('selected'));
+                         if (sortOptions.length > 0) {
+                            sortOptions[0].classList.add('selected');
+                         }
+                    });
+                }
+            }
+
+            // --- Filter Modal Interactivity ---
+            const filterModal = document.getElementById('filter-modal-overlay');
+            if (filterModal) {
+                 const tagGroups = filterModal.querySelectorAll('.tag-group');
+                tagGroups.forEach(group => {
+                    const tags = group.querySelectorAll('.filter-tag');
+                    const selectionMode = group.dataset.selectionMode;
+
+                    tags.forEach(tag => {
+                        tag.addEventListener('click', () => {
+                            if (selectionMode === 'single') {
+                                const isAlreadySelected = tag.classList.contains('selected');
+                                tags.forEach(t => t.classList.remove('selected'));
+                                if (!isAlreadySelected) tag.classList.add('selected');
+                            } else {
+                                tag.classList.toggle('selected');
+                            }
+                        });
+                    });
+                });
+                
+                const priceSection = document.getElementById('price-filter-section');
+                const minPriceInput = document.getElementById('min-price-input');
+                const maxPriceInput = document.getElementById('max-price-input');
+
+                if (priceSection && minPriceInput && maxPriceInput) {
+                    const priceTags = priceSection.querySelectorAll('.filter-tag');
+
+                    priceTags.forEach(tag => {
+                        tag.addEventListener('click', () => {
+                            if (tag.classList.contains('selected')) {
+                                const text = tag.textContent.trim();
+                                let min = '', max = '';
+                                if (text.includes('以下')) max = text.split(' ')[0];
+                                else if (text.includes('以上')) min = text.split(' ')[0];
+                                else if (text.includes('-')) [min, max] = text.split('-');
+                                minPriceInput.value = min;
+                                maxPriceInput.value = max;
+                            } else {
+                                minPriceInput.value = '';
+                                maxPriceInput.value = '';
+                            }
+                        });
+                    });
+
+                    const onPriceInputChange = () => priceTags.forEach(tag => tag.classList.remove('selected'));
+                    minPriceInput.addEventListener('input', onPriceInputChange);
+                    maxPriceInput.addEventListener('input', onPriceInputChange);
+                }
+
+
+                const clearFilterBtn = filterModal.querySelector('.clear-button');
+                if (clearFilterBtn) {
+                    clearFilterBtn.addEventListener('click', () => {
+                        filterModal.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('selected'));
+                        filterModal.querySelectorAll('.price-inputs input').forEach(input => input.value = '');
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+

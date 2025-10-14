@@ -4,6 +4,14 @@
 
 ## 近期重要里程碑（2025-10）
 
+### 新应用 web-shadcn + PropertyDetail MVP（完成）
+- **2025-10-15｜新建 apps/web-shadcn（Vite+Vue3+TS+Tailwind v4+shadcn-vue，基色 Zinc）**  
+  - 通过 CLI 安装并接入：Button / Card / Avatar / Badge / Input / Textarea / Separator / Alert / Skeleton / Dialog / Carousel / Sonner  
+  - 安装通用依赖：lucide-vue-next（图标）、markdown-it（Markdown）  
+  - 落地 PropertyDetail.vue，并将 Hero 区替换为 Carousel（与 legacy 完全解耦，纯净技术栈）
+- **后续（P0）**：接入 Sonner/Spinner 提示、Skeleton/Alert 占位、Dialog 大图预览  
+  **P1**：Markdown 渲染描述、地图与 Add-to-calendar 能力
+
 ### Web 主题层重构：Tailwind v4 + EP 桥接（完成）
 - **2025-10-14｜apps/web 统一主题**:
   - 引入 Tailwind v4（@tailwindcss/postcss，preflight=false），新增核心 HSL 变量 theme.css 与 Element Plus 桥接 el-theme-bridge.css。

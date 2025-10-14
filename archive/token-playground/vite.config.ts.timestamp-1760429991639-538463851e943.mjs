@@ -1,0 +1,22 @@
+// vite.config.ts
+import { defineConfig } from "file:///home/nuoai/dev/WEB-sydney-rental-hub/node_modules/vite/dist/node/index.js";
+import vue from "file:///home/nuoai/dev/WEB-sydney-rental-hub/node_modules/@vitejs/plugin-vue/dist/index.js";
+import path from "node:path";
+var __vite_injected_original_dirname = "/home/nuoai/dev/WEB-sydney-rental-hub/tools/token-playground";
+var vite_config_default = defineConfig({
+  plugins: [vue()],
+  server: {
+    fs: {
+      allow: [
+        // 允许访问上层工作区根目录
+        path.resolve(__vite_injected_original_dirname, "..", ".."),
+        // 明确允许访问 vue-frontend（共享样式与生成 tokens）
+        path.resolve(__vite_injected_original_dirname, "..", "..", "vue-frontend")
+      ]
+    }
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCIvaG9tZS9udW9haS9kZXYvV0VCLXN5ZG5leS1yZW50YWwtaHViL3Rvb2xzL3Rva2VuLXBsYXlncm91bmRcIjtjb25zdCBfX3ZpdGVfaW5qZWN0ZWRfb3JpZ2luYWxfZmlsZW5hbWUgPSBcIi9ob21lL251b2FpL2Rldi9XRUItc3lkbmV5LXJlbnRhbC1odWIvdG9vbHMvdG9rZW4tcGxheWdyb3VuZC92aXRlLmNvbmZpZy50c1wiO2NvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9pbXBvcnRfbWV0YV91cmwgPSBcImZpbGU6Ly8vaG9tZS9udW9haS9kZXYvV0VCLXN5ZG5leS1yZW50YWwtaHViL3Rvb2xzL3Rva2VuLXBsYXlncm91bmQvdml0ZS5jb25maWcudHNcIjsvLy8gPHJlZmVyZW5jZSBwYXRoPVwiLi9zcmMvZW52LmQudHNcIiAvPlxuLy8gQHRzLW5vY2hlY2tcbmltcG9ydCB7IGRlZmluZUNvbmZpZyB9IGZyb20gJ3ZpdGUnXG5pbXBvcnQgdnVlIGZyb20gJ0B2aXRlanMvcGx1Z2luLXZ1ZSdcbmltcG9ydCBwYXRoIGZyb20gJ25vZGU6cGF0aCdcblxuLy8gaHR0cHM6Ly92aXRlanMuZGV2L2NvbmZpZy9cbmV4cG9ydCBkZWZhdWx0IGRlZmluZUNvbmZpZyh7XG4gIHBsdWdpbnM6IFt2dWUoKV0sXG4gIHNlcnZlcjoge1xuICAgIGZzOiB7XG4gICAgICBhbGxvdzogW1xuICAgICAgICAvLyBcdTUxNDFcdThCQjhcdThCQkZcdTk1RUVcdTRFMEFcdTVDNDJcdTVERTVcdTRGNUNcdTUzM0FcdTY4MzlcdTc2RUVcdTVGNTVcbiAgICAgICAgcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgJy4uJywgJy4uJyksXG4gICAgICAgIC8vIFx1NjYwRVx1Nzg2RVx1NTE0MVx1OEJCOFx1OEJCRlx1OTVFRSB2dWUtZnJvbnRlbmRcdUZGMDhcdTUxNzFcdTRFQUJcdTY4MzdcdTVGMEZcdTRFMEVcdTc1MUZcdTYyMTAgdG9rZW5zXHVGRjA5XG4gICAgICAgIHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuLicsICcuLicsICd2dWUtZnJvbnRlbmQnKSxcbiAgICAgIF0sXG4gICAgfSxcbiAgfSxcbn0pXG4iXSwKICAibWFwcGluZ3MiOiAiO0FBRUEsU0FBUyxvQkFBb0I7QUFDN0IsT0FBTyxTQUFTO0FBQ2hCLE9BQU8sVUFBVTtBQUpqQixJQUFNLG1DQUFtQztBQU96QyxJQUFPLHNCQUFRLGFBQWE7QUFBQSxFQUMxQixTQUFTLENBQUMsSUFBSSxDQUFDO0FBQUEsRUFDZixRQUFRO0FBQUEsSUFDTixJQUFJO0FBQUEsTUFDRixPQUFPO0FBQUE7QUFBQSxRQUVMLEtBQUssUUFBUSxrQ0FBVyxNQUFNLElBQUk7QUFBQTtBQUFBLFFBRWxDLEtBQUssUUFBUSxrQ0FBVyxNQUFNLE1BQU0sY0FBYztBQUFBLE1BQ3BEO0FBQUEsSUFDRjtBQUFBLEVBQ0Y7QUFDRixDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=

@@ -22,6 +22,13 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/property-detail-v3/:id',
+      name: 'PropertyDetailV3',
+      component: () => import('../views/PropertyDetailV3.vue'),
+      props: true,
+      meta: { layout: 'shadcn' },
+    },
+    {
       path: '/favorites',
       name: 'favorites',
       component: () => import('../views/Favorites.vue'),

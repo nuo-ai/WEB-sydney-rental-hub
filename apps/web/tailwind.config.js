@@ -1,9 +1,6 @@
-/** Tailwind config for apps/web
- * 注意：
- * - 关闭 preflight，避免重置样式干扰 Element Plus
- * - 支持暗色触发：class 与 [data-theme="dark"]（与现有切换逻辑兼容）
- * - 布局/排版刻度（spacing/fontSize/screens）可按需扩展
- */
+import animate from 'tailwindcss-animate'
+
+/** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class', '[data-theme="dark"]'],
   corePlugins: {
@@ -14,37 +11,72 @@ export default {
     './src/**/*.{js,ts,vue,jsx,tsx}'
   ],
   theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px',
+      },
+    },
     extend: {
       colors: {
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        primary: 'hsl(var(--primary))',
-        secondary: 'hsl(var(--secondary))',
-        muted: 'hsl(var(--muted))',
-        accent: 'hsl(var(--accent))',
-        destructive: 'hsl(var(--destructive))',
-        border: 'hsl(var(--border))',
-        ring: 'hsl(var(--ring))'
-      },
-      fontFamily: {
-        sans: 'var(--font-sans)'
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
       },
       borderRadius: {
-        DEFAULT: 'var(--radius)',
-        lg: 'calc(var(--radius) + 2px)',
-        md: 'var(--radius)',
-        sm: 'calc(var(--radius) - 2px)'
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
-      // 可按需扩展：spacing / fontSize / boxShadow / zIndex / container 等
-      spacing: {
-        '1': '4px',
-        '2': '8px',
-        '3': '12px',
-        '4': '16px',
-        '5': '20px',
-        '6': '24px'
-      }
-    }
+      fontFamily: {
+        sans: 'var(--font-sans)',
+      },
+      keyframes: {
+        'accordion-down': {
+          from: { height: 0 },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: 0 },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+      },
+    },
   },
-  plugins: []
+  plugins: [animate],
 }
