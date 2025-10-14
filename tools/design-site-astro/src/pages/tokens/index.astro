@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Tokens · Index" showBackbar={false}>
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <span>Tokens</span>
+  </Fragment>
+
+  <section>
+    <h1 style="margin:0 0 12px 0; font-size:20px;">Tokens · Index</h1>
+    <p style="margin:0 0 16px 0; color: rgba(0,0,0,0.6);">
+      这里是 Design Tokens 相关页面索引。
+    </p>
+    <ul style="padding-left: 20px; line-height: 1.8;">
+      <li><a href="/tokens/colors">Colors（品牌色、灰阶、语义文本/背景/边框、反馈、Icon）</a></li>
+      <li><a href="/tokens/typography">Typography（字体家族、字号、行高、字重）</a></li>
+      <li><a href="/tokens/spacing">Spacing（全局间距刻度）</a></li>
+      <li><a href="/tokens/radius">Radius（圆角刻度）</a></li>
+      <li><a href="/tokens/shadows">Shadows（阴影 sm/md/lg）</a></li>
+      <li><a href="/tokens/blackwhite">Black & White Design Tokens（示范色板/表面/阴影/间距）</a></li>
+    </ul>
+  </section>
+
+  <section style="margin-top:24px;">
+    <h2 style="font-size:16px; margin:0 0 12px 0;">参考 · 组件演示</h2>
+    <ul style="padding-left: 20px; line-height: 1.8;">
+      <li><a href="/components/">Components 索引</a>（如：/components/button 基于 --component-button-* 变量）</li>
+    </ul>
+  </section>
+</BaseLayout>

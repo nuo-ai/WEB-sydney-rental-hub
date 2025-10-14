@@ -1,140 +1,55 @@
 ---
-const title = 'SRH Design (Astro)';
-const desc = 'Design Tokens & Components Playground';
-
-import '../../../../packages/ui/src/styles/tokens.css';
-import '../../../../packages/ui/src/styles/tokens.dark.css';
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={desc} />
-    <style>
-      :root {
-        /* 映射页面用到的局部变量到 Design Tokens 变量 */
-        --fg: var(--color-text-primary);
-        --muted: var(--color-text-secondary);
-        --border: var(--color-border);
-        --bg: var(--color-background-page);
-        --accent: var(--color-action-primary);
-      }
-      body {
-        margin: 0;
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-        color: var(--fg);
-        background: var(--bg);
-      }
-      .container {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 24px 16px;
-      }
-      .header h1 {
-        margin: 0;
-        font-size: 28px;
-      }
-      .header p {
-        margin: 6px 0 0;
-        color: var(--muted);
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 16px;
-        margin-top: 24px;
-      }
-      .card {
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 16px;
-        background: var(--color-background-surface);
-      }
-      .card h3 {
-        margin: 0;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 6px 0 12px;
-        color: var(--muted);
-      }
-      .btn {
-        display: inline-block;
-        padding: 8px 12px;
-        border-radius: 8px;
-        color: #fff;
-        background: var(--accent);
-        text-decoration: none;
-        font-size: 14px;
-      }
-    </style>
-  </head>
-  <body>
-    <main class="container">
-      <div class="header">
-        <h1>SRH Design（Astro）</h1>
-        <p>使用 Astro 搭建的 Tokens & Components 预览站点，用于快速调参、导出与对齐小程序/WEB 风格。</p>
-      </div>
+<BaseLayout title="SRH Design Site · 首页" showBackbar={false}>
+  <Fragment slot="breadcrumb">
+    <span>首页</span>
+  </Fragment>
 
-      <div style="margin-top: 16px;">
-        <button class="btn" id="theme-toggle" type="button">切换暗色</button>
-        <span style="margin-left: 8px; color: var(--muted); font-size: 13px;">当前主题通过[data-theme]控制</span>
-      </div>
+  <style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
 
-      <div class="grid">
-        <div class="card">
-          <h3>Tokens Playground</h3>
-          <p>实时调整 Token（颜色、阴影、字号/行高、间距等），导出 JSON/SCSS。</p>
-          <a class="btn" href="/tokens">打开</a>
-        </div>
-        <div class="card">
-          <h3>Components</h3>
-          <p>多状态卡片对照（badges、meta 组合、长地址/价格）用于适配性检查。</p>
-          <a class="btn" href="/components">打开</a>
-        </div>
-      </div>
+    .card {
+      border: 1px solid var(--component-button-secondary-border, #e5e7eb);
+      border-radius: var(--component-button-radius, 8px);
+      background: var(--component-button-secondary-bg, #fff);
+      color: var(--component-button-secondary-text, #222);
+      padding: 16px;
+      text-decoration: none;
+      display: block;
+      transition: var(--component-button-transition, all 0.2s ease-in-out);
+    }
+    .card:hover {
+      background: var(--component-button-secondary-hover-bg, #f3f4f6);
+      color: var(--component-button-secondary-hover-text, #111);
+      border-color: var(--component-button-secondary-hover-border, #d1d5db);
+    }
+    .card h2 { margin: 0 0 6px 0; font-size: 16px; }
+    .card p { margin: 0; opacity: 0.8; line-height: 1.6; }
+    .section { margin-top: 24px; }
+    .section h1 { margin: 0 0 12px 0; font-size: 20px; }
+    .desc { margin: 0 0 16px 0; color: rgba(0,0,0,0.6); }
+    html[data-theme='dark'] .desc { color: rgba(255,255,255,0.7); }
+  </style>
 
-      <section style="margin-top: 28px; color: var(--muted); font-size: 14px;">
-        <p>说明：</p>
-        <ul>
-          <li>本 Astro 站点位于 tools/design-site-astro（工具站点，非产品应用）。</li>
-          <li>@astrouxds/tokens 是“RUX 设计系统的 Token 包”，不是 Astro 框架；若需使用，请在该工作区内安装。</li>
-        </ul>
-      </section>
-    </main>
-    <script>
-      (function() {
-        const root = document.documentElement;
-        const key = 'srh-theme';
-        const apply = (t) => {
-          if (t === 'dark') root.setAttribute('data-theme', 'dark');
-          else root.removeAttribute('data-theme');
-          try { localStorage.setItem(key, t); } catch (e) {}
-        };
-        // init 首次加载：优先本地存储，其次系统偏好
-        try {
-          const saved = localStorage.getItem(key);
-          if (saved) apply(saved);
-          else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) apply('dark');
-        } catch(e) {}
-        // 绑定按钮
-        const btn = document.getElementById('theme-toggle');
-        if (btn) {
-          const syncLabel = () => {
-            const isDark = root.getAttribute('data-theme') === 'dark';
-            btn.textContent = isDark ? '切换浅色' : '切换暗色';
-          };
-          btn.addEventListener('click', () => {
-            const isDark = root.getAttribute('data-theme') === 'dark';
-            apply(isDark ? 'light' : 'dark');
-            syncLabel();
-          });
-          syncLabel();
-        }
-      })();
-    </script>
-  </body>
-</html>
+  <section class="section">
+    <h1>SRH Design Site</h1>
+    <p class="desc">设计 Token 与组件演示站。可切换顶部“暗色”按钮验证主题。</p>
+    <div class="grid">
+      <a class="card" href="/tokens/">
+        <h2>Tokens</h2>
+        <p>Design Tokens 索引与演示（如 Black & White 色板、间距、阴影等）。</p>
+      </a>
+      <a class="card" href="/components/">
+        <h2>Components</h2>
+        <p>组件演示索引（如 Button：primary/secondary/ghost/link × sm/md/lg）。</p>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

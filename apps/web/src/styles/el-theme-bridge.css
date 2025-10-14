@@ -1,0 +1,62 @@
+/* 将核心主题变量（theme.css）桥接到 Element Plus 的 CSS 变量
+   - 目标：不改组件代码，仅通过变量统一外观
+   - 覆盖范围：主色、文本色、边框色、背景、圆角、字体
+   - 兼容暗色：既支持 [data-theme="dark"]，也兼容 .dark（EP 官方暗色触发）
+*/
+
+/* 浅色（默认） */
+:root {
+  /* 品牌主色系 */
+  --el-color-primary: hsl(var(--primary));
+  /* 可按需扩展：success/warning/danger/info 的品牌语义色 */
+  --el-color-success: hsl(142 71% 45%);
+  --el-color-warning: hsl(38 92% 50%);
+  --el-color-danger: hsl(0 72% 51%);
+  --el-color-info: hsl(215 20% 50%);
+
+  /* 文本与背景（最小集，必要时细化 regular/secondary/placeholder） */
+  --el-text-color-primary: hsl(var(--foreground));
+  --el-bg-color: hsl(var(--background));
+
+  /* 边框与圆角/字体 */
+  --el-border-color: hsl(var(--border));
+  --el-border-radius-base: var(--radius);
+  --el-font-family: var(--font-sans);
+}
+
+/* 暗色（与 data-theme 属性联动） */
+[data-theme="dark"] {
+  --el-color-primary: hsl(var(--primary));
+  --el-color-success: hsl(142 71% 50%);
+  --el-color-warning: hsl(38 95% 55%);
+  --el-color-danger: hsl(0 72% 56%);
+  --el-color-info: hsl(215 20% 70%);
+
+  --el-text-color-primary: hsl(var(--foreground));
+  --el-bg-color: hsl(var(--background));
+  --el-border-color: hsl(var(--border));
+  --el-border-radius-base: var(--radius);
+  --el-font-family: var(--font-sans);
+}
+
+/* 暗色（兼容 Element Plus 的 .dark 触发方式）
+   - 如果你在切换时给 html/body 加了 .dark，则这段会生效
+*/
+.dark {
+  --el-color-primary: hsl(var(--primary));
+  --el-color-success: hsl(142 71% 50%);
+  --el-color-warning: hsl(38 95% 55%);
+  --el-color-danger: hsl(0 72% 56%);
+  --el-color-info: hsl(215 20% 70%);
+
+  --el-text-color-primary: hsl(var(--foreground));
+  --el-bg-color: hsl(var(--background));
+  --el-border-color: hsl(var(--border));
+  --el-border-radius-base: var(--radius);
+  --el-font-family: var(--font-sans);
+}
+
+/* 进阶（按需）：
+   - 若需更细粒度地控制 EP 的色阶（如 --el-color-primary-light-3/5/7），可在此计算并覆盖；
+     简化方案：先仅设置 --el-color-primary，保留 EP 默认的浅色阶。
+*/

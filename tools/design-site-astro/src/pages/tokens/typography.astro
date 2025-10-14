@@ -1,0 +1,134 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const fontFamilies = [
+  "--font-family-base",
+  "--font-family-mono"
+];
+
+const fontSizes = [
+  "--font-size-xs",
+  "--font-size-sm",
+  "--font-size-md",
+  "--font-size-lg",
+  "--font-size-xl"
+];
+
+const lineHeights = [
+  "--font-line-height-xs",
+  "--font-line-height-sm",
+  "--font-line-height-md",
+  "--font-line-height-lg"
+];
+
+const fontWeights = [
+  "--font-weight-regular",
+  "--font-weight-medium",
+  "--font-weight-semibold",
+  "--font-weight-bold"
+];
+---
+
+<BaseLayout title="Tokens · Typography">
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <a href="/tokens/">Tokens</a> › <span>Typography</span>
+  </Fragment>
+
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 64px; }
+    h1 { margin: 0 0 12px 0; font-size: 20px; }
+    .desc { margin: 0 0 16px 0; color: rgba(0,0,0,0.6); }
+    html[data-theme='dark'] .desc { color: rgba(255,255,255,0.75); }
+
+    .section { margin-top: 28px; }
+    .section h2 { margin: 0 0 12px 0; font-size: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid var(--color-semantic-border-subtle);
+      border-radius: 10px;
+      background: var(--color-semantic-bg-primary);
+      color: var(--color-semantic-text-primary);
+      padding: 14px;
+    }
+    .meta {
+      font-family: monospace; font-size: 12px; color: var(--color-semantic-text-secondary);
+      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .tag {
+      display: inline-block; border: 1px dashed var(--color-semantic-border-subtle);
+      padding: 2px 8px; border-radius: 999px; user-select: all; font-family: monospace; font-size: 12px;
+      color: var(--color-semantic-text-secondary);
+    }
+
+    .sample {
+      background: var(--color-semantic-bg-secondary);
+      border: 1px dashed var(--color-semantic-border-subtle);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .mono { font-family: var(--font-family-mono); }
+  </style>
+
+  <div class="container">
+    <h1>Typography</h1>
+    <p class="desc">展示字体家族、字号、行高、字重等；变量名可复制。</p>
+
+    <div class="section">
+      <h2>字体家族 Font Families</h2>
+      <div class="grid">
+        {fontFamilies.map((v) => (
+          <div class="card">
+            <div class="sample" style={`font-family: var(${v});`}>
+              The quick brown fox jumps over the lazy dog. 迅捷的棕色狐狸越过了懒狗。
+            </div>
+            <div class="meta"><span class="tag">{v}</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>字号 Font Sizes</h2>
+      <div class="grid">
+        {fontSizes.map((v) => (
+          <div class="card">
+            <div class="sample" style={`font-size: var(${v});`}>
+              字号示例 Sample size ({v})
+            </div>
+            <div class="meta"><span class="tag">{v}</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>行高 Line Heights</h2>
+      <div class="grid">
+        {lineHeights.map((v) => (
+          <div class="card">
+            <div class="sample" style={`line-height: var(${v}); max-width: 62ch;`}>
+              行高示例（Line height sample）: The quick brown fox jumps over the lazy dog. 迅捷的棕色狐狸越过了懒狗。连续多行文字用于观察段落阅读性。
+            </div>
+            <div class="meta"><span class="tag">{v}</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>字重 Font Weights</h2>
+      <div class="grid">
+        {fontWeights.map((v) => (
+          <div class="card">
+            <div class="sample" style={`font-weight: var(${v});`}>
+              字重示例（Font weight sample）→ {v}
+            </div>
+            <div class="meta"><span class="tag">{v}</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

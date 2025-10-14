@@ -1,0 +1,43 @@
+/* SRH Design Tokens Overrides (Dark Mode)
+   目的：
+   - 不修改自动生成的 tokens.css / tokens.dark.css
+   - 通过后置覆盖仅在暗色模式下统一组件层（component-*) 变量，使导航/卡片/secondary 等风格与暗色语义背景一致
+   - 覆盖范围尽量聚焦在现有站点用到的变量，避免过度影响
+*/
+
+/* 仅暗色模式覆盖 */
+[data-theme='dark'] {
+  /* Secondary 按钮/导航/卡片当前复用的变量：
+     BaseLayout 与 components/index 等处使用了以下变量作为“卡片/导航”视觉基底
+     - background: var(--component-button-secondary-bg)
+     - color: var(--component-button-secondary-text)
+     - border: 1px solid var(--component-button-secondary-border)
+     暗色下将其统一映射到语义背景与边框，避免出现白底突兀问题。
+  */
+  --component-button-secondary-bg: var(--color-semantic-bg-primary);
+  --component-button-secondary-text: var(--color-text-primary);
+  --component-button-secondary-border: var(--color-semantic-border-default);
+
+  /* 悬停/激活态使用暗色语义/背景悬停色，保持层次变化但不过度跳跃 */
+  --component-button-secondary-hover-bg: var(--color-background-hover);
+  --component-button-secondary-hover-text: var(--color-text-primary);
+  --component-button-secondary-hover-border: var(--color-semantic-border-default);
+  --component-button-secondary-active-bg: var(--color-background-hover);
+
+  /* Ghost/Link 类按需微调（尽量不改变既有交互语义，仅确保暗色可读）
+     可根据后续视觉验收进一步细化
+  */
+  --component-button-ghost-text: var(--color-text-secondary);
+  --component-button-ghost-hover-bg: rgba(255, 255, 255, 0.04);
+  --component-button-ghost-hover-text: var(--color-text-primary);
+
+  /* 若有卡片直接使用 component-card-* 变量，可保持默认（tokens.dark.css 已提供）
+     这里仅补充一条与 secondary 变量一致的边界策略，减少不同页面的观感差异。
+  */
+  --component-card-border: 1px solid var(--color-semantic-border-default);
+}
+
+/* 说明：
+   - 所有覆盖均为“变量级”而非“选择器级”样式，确保现有页面 CSS 不需大改即可收敛为一致风格
+   - 如后续发现个别组件仍不协调，可在此文件继续按变量精调
+*/

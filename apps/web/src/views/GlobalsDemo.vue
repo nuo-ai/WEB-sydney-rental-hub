@@ -57,6 +57,14 @@ greet('Sydney')</code></pre>
     <div style="height: 120px; overflow: auto; border: 1px solid var(--color-border); padding: var(--space-3); border-radius: var(--radius-base); background: var(--color-gray-50);">
       <p v-for="i in 12" :key="i">滚动内容行 {{ i }}</p>
     </div>
+
+    <h2>Tailwind + Element Plus 统一主题验证</h2>
+    <div class="p-4 bg-background text-foreground border border-border rounded-md flex items-center gap-3">
+      <input class="px-3 py-2 border border-border rounded-md bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="Tailwind 输入" />
+      <button class="px-3 py-2 rounded-md bg-primary text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Tailwind 按钮</button>
+      <el-input style="width: 220px" placeholder="Element Plus 输入" />
+      <el-button type="primary">Element Plus 按钮</el-button>
+    </div>
   </div>
 </template>
 

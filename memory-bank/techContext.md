@@ -1,13 +1,13 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)  
-**最后更新**: 2025-02-14
+**最后更新**: 2025-10-14
 
 ---
 
 ## 当前技术栈
 
-- **前端主站 (`apps/web`)**: Vue 3 (Composition API) + Vite 7 + Pinia + Vue Router + Element Plus。Storybook 8.6.x 作为组件开发与演示环境，Chromatic 用于可视化回归。
+- **前端主站 (`apps/web`)**: Vue 3 (Composition API) + Vite 7 + Pinia + Vue Router + Element Plus + Tailwind v4（`@tailwindcss/postcss`，preflight=false，darkMode: `['class','[data-theme="dark"]']`，核心 HSL 变量）。通过 `src/styles/el-theme-bridge.css` 将核心变量映射到 Element Plus 变量；Storybook 8.6.x 作为组件开发与演示环境，Chromatic 用于可视化回归。
 - **设计系统 (`packages/ui`)**: Vue 组件库与样式令牌的单一事实来源。依赖 Style Dictionary 生成跨端 Token 产物，并通过 Storybook 8.6.x 提供组件/基础样式文档。
 - **设计 Token 工具站 (`tools/design-site-astro`)**: Astro 驱动的浏览与调参与演示站点，消费 `packages/ui` 导出的 CSS 变量。 
 - **后端 (`apps/backend`)**: Python FastAPI + SQLAlchemy，默认运行在 Uvicorn，提供 REST/GraphQL 服务及 Celery 任务队列。 
@@ -45,6 +45,7 @@
    - `packages/ui/src/styles/tokens.css` (`:root`)
    - `packages/ui/src/styles/tokens.dark.css` (`[data-theme='dark']`)
    - 其他目标平台产物（如 mini-program WXSS）。
+   - apps/web 主题层：`src/styles/theme.css`（核心 HSL 变量）与 `src/styles/el-theme-bridge.css`（EP 桥接）；Tailwind v4 使用 `@tailwindcss/postcss` 并禁用 `preflight`。
 3. 组件仅消费语义层/组件层变量；严禁硬编码数值或直接消费原始令牌。
 
 #### 构建与排错
@@ -92,6 +93,7 @@
 
 ## 近期变更日志
 
+- **2025-10-14**: apps/web 引入 Tailwind v4（`@tailwindcss/postcss`，preflight=false），新增 `src/styles/theme.css`（核心 HSL 变量）与 `src/styles/el-theme-bridge.css`（EP 变量映射），`darkMode` 同时支持 `.dark` 与 `[data-theme="dark"]`；/globals-demo 与 /cards-demo 验证统一视觉与可访问性（focus-visible 由 `--ring` 驱动）；修复 /cards-demo → 详情页 404（store 预注入 + fetch guard）；DevServer 使用 5199/strictPort。
 - **2025-10-13**: 新增 `component.button.*`（primary/secondary/ghost/link；sm/md/lg；含状态与通用项），构建产物包含 `--component-button-*`；`BaseButton.vue` 改为消费组件层 Token；记录 Token collisions(3) 待清理。
 - **2025-02-14**: 完成 Storybook 8.6.x 版本统一，移除 npm 锁文件与过时原型 HTML，确保 pnpm + Turborepo 为唯一依赖来源。
 - **2025-01**: 引入 Vitest 3.x 与 Playwright 1.55 作为统一测试栈，并在 `apps/web` 中扩展样式 Lint 规则。 

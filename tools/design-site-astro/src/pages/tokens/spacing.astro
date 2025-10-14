@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const spacings = [
+  "--space-xs",
+  "--space-sm",
+  "--space-md",
+  "--space-lg",
+  "--space-xl",
+  "--space-xxl",
+  "--space-3xl"
+];
+---
+
+<BaseLayout title="Tokens · Spacing">
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <a href="/tokens/">Tokens</a> › <span>Spacing</span>
+  </Fragment>
+
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 64px; }
+
+    h1 { margin: 0 0 12px 0; font-size: 20px; }
+    .desc { margin: 0 0 16px 0; color: rgba(0,0,0,0.6); }
+    html[data-theme='dark'] .desc { color: rgba(255,255,255,0.75); }
+
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid var(--color-semantic-border-subtle);
+      border-radius: 10px;
+      background: var(--color-semantic-bg-primary);
+      color: var(--color-semantic-text-primary);
+      padding: 14px;
+    }
+
+    .bar {
+      height: 12px;
+      background: linear-gradient(90deg, var(--color-brand-primary), rgba(242, 158, 46, 0.25));
+      border-radius: 999px;
+      box-shadow: var(--shadow-sm);
+      margin: 2px 0 10px 0;
+    }
+
+    .meta {
+      font-family: monospace; font-size: 12px; color: var(--color-semantic-text-secondary);
+      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .tag {
+      display: inline-block; border: 1px dashed var(--color-semantic-border-subtle);
+      padding: 2px 8px; border-radius: 999px; user-select: all; font-family: monospace; font-size: 12px;
+      color: var(--color-semantic-text-secondary);
+    }
+  </style>
+
+  <div class="container">
+    <h1>Spacing</h1>
+    <p class="desc">展示全局间距刻度，变量名可复制。条形图长度即为变量值（px/rpx/百分比按变量定义）。</p>
+
+    <div class="grid">
+      {spacings.map((v) => (
+        <div class="card">
+          <div class="bar" style={`width: var(${v});`}></div>
+          <div class="meta"><span class="tag">{v}</span></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

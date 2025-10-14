@@ -57,6 +57,11 @@ const router = createRouter({
       name: 'GlobalsDemo',
       component: () => import('../views/GlobalsDemo.vue'),
     },
+    {
+      path: '/cards-demo',
+      name: 'CardsDemo',
+      component: () => import('../views/CardsDemo.vue'),
+    },
   ],
 })
 

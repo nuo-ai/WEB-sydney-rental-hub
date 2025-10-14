@@ -1,0 +1,152 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Components · Button">
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <a href="/components/">Components</a> › <span>Button</span>
+  </Fragment>
+
+  <style>
+    /* 使用组件层 Token（由 BaseLayout 已全站引入 tokens.css / tokens.dark.css） */
+    .section { margin-top: 24px; }
+    .section h2 { font-size: 16px; margin: 0 0 12px 0; }
+    .desc { margin: 0 0 16px 0; color: rgba(0,0,0,0.6); }
+    html[data-theme='dark'] .desc { color: rgba(255,255,255,0.7); }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* Button (纯 CSS 变量消费) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--component-button-gap);
+      border-radius: var(--component-button-radius);
+      font-weight: var(--component-button-font-weight);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: var(--component-button-transition);
+      outline: none;
+    }
+    .btn:focus-visible {
+      outline: var(--component-button-focus-ring-width) solid var(--component-button-focus-ring-color);
+      outline-offset: 2px;
+    }
+
+    /* sizes */
+    .btn--sm {
+      font-size: var(--component-button-size-sm-font-size);
+      padding: var(--component-button-size-sm-padding-y) var(--component-button-size-sm-padding-x);
+    }
+    .btn--md {
+      font-size: var(--component-button-size-md-font-size);
+      padding: var(--component-button-size-md-padding-y) var(--component-button-size-md-padding-x);
+    }
+    .btn--lg {
+      font-size: var(--component-button-size-lg-font-size);
+      padding: var(--component-button-size-lg-padding-y) var(--component-button-size-lg-padding-x);
+    }
+
+    /* variants */
+    .btn--primary {
+      background: var(--component-button-primary-bg);
+      color: var(--component-button-primary-text);
+      border-color: var(--component-button-primary-border);
+    }
+    .btn--primary:hover {
+      background: var(--component-button-primary-hover-bg);
+      border-color: var(--component-button-primary-border);
+    }
+
+    .btn--secondary {
+      background: var(--component-button-secondary-bg);
+      color: var(--component-button-secondary-text);
+      border-color: var(--component-button-secondary-border);
+    }
+    .btn--secondary:hover {
+      background: var(--component-button-secondary-hover-bg);
+      color: var(--component-button-secondary-hover-text);
+      border-color: var(--component-button-secondary-hover-border);
+    }
+
+    .btn--ghost {
+      background: var(--component-button-ghost-bg);
+      color: var(--component-button-ghost-text);
+      border-color: transparent;
+    }
+    .btn--ghost:hover {
+      background: var(--component-button-ghost-hover-bg);
+      color: var(--component-button-ghost-hover-text);
+    }
+
+    .btn--link {
+      background: transparent;
+      color: var(--component-button-link-text);
+      border-color: transparent;
+    }
+    .btn--link:hover {
+      color: var(--component-button-link-hover-text);
+      text-decoration: underline;
+    }
+    .btn--link:active {
+      color: var(--component-button-link-active-text);
+    }
+
+    /* states */
+    .btn[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  </style>
+
+  <p class="desc">该页面为纯 HTML/CSS 演示，直接消费 --component-button-* 变量（视觉与组件一致）。</p>
+
+  <div class="section">
+    <h2>primary</h2>
+    <div class="row">
+      <a class="btn btn--primary btn--sm">Primary sm</a>
+      <a class="btn btn--primary btn--md">Primary md</a>
+      <a class="btn btn--primary btn--lg">Primary lg</a>
+      <a class="btn btn--primary btn--md" disabled>Disabled</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>secondary</h2>
+    <div class="row">
+      <a class="btn btn--secondary btn--sm">Secondary sm</a>
+      <a class="btn btn--secondary btn--md">Secondary md</a>
+      <a class="btn btn--secondary btn--lg">Secondary lg</a>
+      <a class="btn btn--secondary btn--md" disabled>Disabled</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>ghost</h2>
+    <div class="row">
+      <a class="btn btn--ghost btn--sm">Ghost sm</a>
+      <a class="btn btn--ghost btn--md">Ghost md</a>
+      <a class="btn btn--ghost btn--lg">Ghost lg</a>
+      <a class="btn btn--ghost btn--md" disabled>Disabled</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>link</h2>
+    <div class="row">
+      <a class="btn btn--link btn--sm">Link sm</a>
+      <a class="btn btn--link btn--md">Link md</a>
+      <a class="btn btn--link btn--lg">Link lg</a>
+      <a class="btn btn--link btn--md" disabled>Disabled</a>
+    </div>
+  </div>
+</BaseLayout>

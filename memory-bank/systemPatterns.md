@@ -10,6 +10,9 @@
   - 组件只在组件层取值；页面可用语义层
 - **Storybook 为事实来源**: 设计规范与组件使用说明全部记录在 Storybook 8.6.x 内的 MDX 与 stories 中。任何组件改动必须同时更新 Storybook。
 - **Astro 站角色**: 设计 Token 工具站用于预览与调参，不承载组件开发职责。
+- **Tailwind v4 约束**: 使用 `@tailwindcss/postcss`，禁用 `preflight`；`darkMode` 采用 `['class','[data-theme="dark"]']`；`colors/font/radius/spacing` 映射到核心变量（`hsl(var(--…))`、`var(--font-sans)`、`var(--radius)`）。
+- **Element Plus 桥接模式**: 通过 `el-theme-bridge.css` 将核心变量映射到 `--el-color-primary`、`--el-text-color-*`、`--el-bg-color`、`--el-border-color`、`--el-border-radius-base`、`--el-font-family` 等；优先让 EP 继承统一视觉，减少逐组件覆写。
+- **可访问性焦点环**: 统一使用 `--ring` 驱动的 `focus-visible` 外观（Tailwind `ring-*` 与 CSS `hsl(var(--ring) / α)` 组合），确保亮/暗模式对比度满足 WCAG AA。
 
 ---
 

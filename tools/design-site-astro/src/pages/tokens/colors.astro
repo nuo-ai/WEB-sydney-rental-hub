@@ -1,0 +1,227 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// 颜色变量清单（与 tokens.css / tokens.dark.css 保持一致）
+const brandColors = [
+  "--color-brand-primary",
+  "--color-brand-hover",
+  "--color-brand-active",
+  "--color-action-primary"
+];
+
+const grayScale = [
+  "--color-white",
+  "--color-black",
+  "--color-gray-50",
+  "--color-gray-75",
+  "--color-gray-100",
+  "--color-gray-200",
+  "--color-gray-300",
+  "--color-gray-400",
+  "--color-gray-500",
+  "--color-gray-600",
+  "--color-gray-700",
+  "--color-gray-800",
+  "--color-gray-900"
+];
+
+const semanticText = [
+  "--color-semantic-text-primary",
+  "--color-semantic-text-secondary",
+  "--color-semantic-text-muted",
+  "--color-semantic-text-inverse"
+];
+
+const semanticBg = [
+  "--color-semantic-bg-primary",
+  "--color-semantic-bg-secondary",
+  "--color-semantic-bg-page",
+  "--color-background-page",
+  "--color-background-surface",
+  "--color-background-hover",
+  "--color-background-disabled"
+];
+
+const semanticBorder = [
+  "--color-semantic-border-default",
+  "--color-semantic-border-subtle"
+];
+
+const feedback = [
+  "--color-semantic-feedback-success",
+  "--color-semantic-feedback-warning",
+  "--color-semantic-feedback-error",
+  "--color-semantic-feedback-info"
+];
+
+const icon = [
+  "--color-semantic-icon-primary",
+  "--color-semantic-icon-interactive"
+];
+---
+
+<BaseLayout title="Tokens · Colors">
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <a href="/tokens/">Tokens</a> › <span>Colors</span>
+  </Fragment>
+
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 64px; }
+
+    h1 { margin: 0 0 12px 0; font-size: 20px; }
+    .desc { margin: 0 0 16px 0; color: rgba(0,0,0,0.6); }
+    html[data-theme='dark'] .desc { color: rgba(255,255,255,0.75); }
+
+    .section { margin-top: 28px; }
+    .section h2 { margin: 0 0 12px 0; font-size: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 920px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    .swatch {
+      border: 1px solid var(--color-semantic-border-subtle);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--color-semantic-bg-primary);
+    }
+    .tone { height: 72px; border-bottom: 1px solid var(--color-semantic-border-subtle); }
+    .meta { padding: 10px; font-size: 12px; font-family: monospace; color: var(--color-semantic-text-secondary); }
+    .meta b { font-family: monospace; color: var(--color-semantic-text-primary); }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+    .tag {
+      display: inline-block;
+      border: 1px dashed var(--color-semantic-border-subtle);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--color-semantic-text-secondary);
+      font-family: monospace;
+      font-size: 12px;
+      user-select: all;
+    }
+  </style>
+
+  <div class="container">
+    <h1>Colors</h1>
+    <p class="desc">本页展示基础色板、语义色与反馈色等，支持直接复制 CSS 变量名称。</p>
+
+    <div class="section">
+      <h2>品牌 Brand / 行为 Action</h2>
+      <div class="grid">
+        {brandColors.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v})`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>灰阶 Gray Scale</h2>
+      <div class="grid">
+        {grayScale.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v})`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>语义 · 文本 Semantic · Text</h2>
+      <div class="grid">
+        {semanticText.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v});`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>语义 · 背景 Semantic · Background</h2>
+      <div class="grid">
+        {semanticBg.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v});`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>语义 · 边框 Semantic · Border</h2>
+      <div class="grid">
+        {semanticBorder.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v});`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>反馈 Feedback</h2>
+      <div class="grid">
+        {feedback.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v});`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>图标 Icon</h2>
+      <div class="grid">
+        {icon.map((v) => (
+          <div class="swatch">
+            <div class="tone" style={`background: var(${v});`}></div>
+            <div class="meta">
+              <b>{v}</b>
+              <div class="row">
+                <span class="tag">{v}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

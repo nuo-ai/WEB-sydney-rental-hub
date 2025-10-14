@@ -1,5 +1,5 @@
 <template>
-  <div class="property-card fade-in">
+  <div class="property-card fade-in bg-background text-foreground border border-border rounded-[var(--radius)] shadow-sm hover:shadow-lg transition-all duration-200">
     <!-- 图片轮播区域 -->
     <div class="property-image-container">
       <el-carousel
@@ -54,7 +54,7 @@
         <div class="property-actions">
           <!-- 收藏按钮 -->
           <button
-            class="action-btn favorite-btn"
+            class="action-btn favorite-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             :class="{ 'is-favorite': isFavorite }"
             @click.stop="toggleFavorite"
             :title="$t('propertyCard.save')"
@@ -63,7 +63,7 @@
           </button>
           <!-- 更多选项按钮 -->
           <el-dropdown trigger="click" @command="handleMoreAction">
-            <button class="action-btn more-btn" @click.stop>
+            <button class="action-btn more-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" @click.stop>
               <MoreHorizontal class="spec-icon" />
             </button>
             <template #dropdown>
@@ -322,9 +322,9 @@ const handleMoreAction = (command) => {
 .property-card {
   width: 100%;
   max-width: 580px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
-  border-radius: 6px;
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
@@ -475,7 +475,7 @@ const handleMoreAction = (command) => {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: var(--brand-primary); /* 中文注释：改为品牌蓝，符合“新上线”品牌语义；可统一全站主题 */
+  background: hsl(var(--primary)); /* 统一走核心主色变量 */
   color: var(--color-text-inverse); /* 中文注释：文本走反色令牌，确保可读性与高对比模式 */
   padding: 4px 10px;
   border-radius: 4px;
@@ -566,7 +566,7 @@ const handleMoreAction = (command) => {
 
 /* 底部信息区域 */
 .property-footer {
-  border-top: 1px solid var(--color-border-default);
+  border-top: 1px solid hsl(var(--border));
   margin-top: 8px;
   padding-top: 8px;
   margin-bottom: 0;

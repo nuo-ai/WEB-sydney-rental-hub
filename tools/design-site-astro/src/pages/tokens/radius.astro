@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const radii = [
+  "--radius-sm",
+  "--radius-md",
+  "--radius-lg",
+  "--radius-full"
+];
+---
+
+<BaseLayout title="Tokens · Radius">
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <a href="/tokens/">Tokens</a> › <span>Radius</span>
+  </Fragment>
+
+  <style>
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 64px; }
+
+    h1 { margin: 0 0 12px 0; font-size: 20px; }
+    .desc { margin: 0 0 16px 0; color: rgba(0,0,0,0.6); }
+    html[data-theme='dark'] .desc { color: rgba(255,255,255,0.75); }
+
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid var(--color-semantic-border-subtle);
+      border-radius: 10px;
+      background: var(--color-semantic-bg-primary);
+      color: var(--color-semantic-text-primary);
+      padding: 14px;
+    }
+
+    .box {
+      height: 64px;
+      background: var(--color-semantic-bg-secondary);
+      border: 1px dashed var(--color-semantic-border-subtle);
+      margin-bottom: 10px;
+    }
+
+    .meta {
+      font-family: monospace; font-size: 12px; color: var(--color-semantic-text-secondary);
+      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .tag {
+      display: inline-block; border: 1px dashed var(--color-semantic-border-subtle);
+      padding: 2px 8px; border-radius: 999px; user-select: all; font-family: monospace; font-size: 12px;
+      color: var(--color-semantic-text-secondary);
+    }
+  </style>
+
+  <div class="container">
+    <h1>Radius</h1>
+    <p class="desc">展示圆角刻度。方块使用对应圆角变量，可复制变量名。</p>
+
+    <div class="grid">
+      {radii.map((v) => (
+        <div class="card">
+          <div class="box" style={`border-radius: var(${v});`}></div>
+          <div class="meta"><span class="tag">{v}</span></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

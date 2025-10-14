@@ -31,18 +31,18 @@
           </div>
 
           <!-- 返回按钮 - 左上角 -->
-          <button @click="goBack" class="back-btn">
+          <button @click="goBack" class="back-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
             <el-icon :size="20"><ArrowLeft /></el-icon>
           </button>
 
           <!-- Share和Save按钮 - 右上角 -->
           <div class="image-actions">
-            <button @click="shareProperty" class="image-action-btn">
+            <button @click="shareProperty" class="image-action-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <el-icon :size="20"><Share /></el-icon>
               <span>{{ $t('propertyCard.share') }}</span>
             </button>
             <div class="action-divider"></div>
-            <button @click="toggleFavorite" :class="['image-action-btn', { 'fav-active': isFavorite }]">
+            <button @click="toggleFavorite" class="image-action-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" :class="{ 'fav-active': isFavorite }">
               <Star class="spec-icon" :size="20" aria-hidden="true" />
               <span>{{ $t('propertyCard.save') }}</span>
             </button>
@@ -739,10 +739,17 @@ const preloadNextImage = () => {
 }
 
 onMounted(async () => {
-  // 开始加载数据
-  await propertiesStore.fetchPropertyDetail(propertyId)
+  // 若由列表/演示页预先注入 currentProperty 且与路由 ID 匹配，则跳过接口请求，避免 404
+  const prefetched =
+    propertiesStore.currentProperty &&
+    String(propertiesStore.currentProperty.listing_id) === String(propertyId)
 
-  // 预加载下一张图片
+  if (!prefetched) {
+    // 正常加载数据
+    await propertiesStore.fetchPropertyDetail(propertyId)
+  }
+
+  // 预加载下一张图片 / 写入历史
   if (property.value) {
     preloadNextImage()
     propertiesStore.addHistory(property.value)
@@ -760,12 +767,12 @@ onBeforeRouteLeave(() => {
 /* Domain.com.au 像素级还原样式 - 基于Figma精确设计 */
 .property-detail-page {
   min-height: 100vh;
-  background-color: var(--color-bg-page); /* 页面背景用页灰，卡片区域用 --color-bg-card */
+  background: hsl(var(--background)); /* 页面背景统一走核心变量 */
 
   /* 新增：统一字体栈（含中文优先级） */
   --font-ui: inter, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 
-  font-family: var(--font-ui);
+  font-family: var(--font-sans);
 }
 
 /* 加载和错误状态 */
@@ -781,7 +788,7 @@ onBeforeRouteLeave(() => {
   position: fixed;
   top: 80px;
   right: 16px;
-  background: var(--color-bg-card);
+  background: hsl(var(--background));
   padding: 8px 16px;
   border-radius: 20px;
   box-shadow: var(--shadow-sm);
@@ -845,7 +852,7 @@ onBeforeRouteLeave(() => {
   right: 16px;
   display: flex;
   background: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  border: 1px solid hsl(var(--border));
   border-radius: 4px;
   overflow: hidden;
   z-index: 10;
@@ -867,7 +874,7 @@ onBeforeRouteLeave(() => {
 }
 
 .image-action-btn:hover {
-  background: var(--bg-hover);
+  background: hsl(var(--background));
 }
 
 .image-action-btn span {
@@ -899,8 +906,8 @@ onBeforeRouteLeave(() => {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -925,7 +932,7 @@ onBeforeRouteLeave(() => {
   min-width: 118px;
   height: 40px;
   padding: 0 14px;
-  background: var(--color-bg-card);
+  background: hsl(var(--background));
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
@@ -1151,7 +1158,7 @@ onBeforeRouteLeave(() => {
   min-height: 180px;
   box-shadow: none;
   border-radius: 0;
-  border-bottom: 1px solid var(--color-border-default);
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 /* PC端信息卡片 - 巨大变化 */
@@ -1160,7 +1167,7 @@ onBeforeRouteLeave(() => {
     width: 100%;
     margin: 0;
     padding: 32px; /* 统一左右 32，与容器对齐 */
-    background: var(--color-bg-card);
+    background: hsl(var(--background));
     box-shadow: none;
     border-radius: 0;
     position: relative;
@@ -1329,8 +1336,8 @@ onBeforeRouteLeave(() => {
   width: 100%;
   padding: var(--space-3-5) var(--space-4);
   margin-top: var(--space-4);
-  background: var(--bg-base);
-  border: 1px solid var(--color-border-default);
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -1391,7 +1398,7 @@ onBeforeRouteLeave(() => {
 /* 位置部分 */
 .location-section {
   padding: 24px 16px;
-  background: var(--color-bg-card);
+  background: hsl(var(--background));
   margin: 0;
   border-radius: 0;
   box-shadow: none;
@@ -1824,7 +1831,7 @@ onBeforeRouteLeave(() => {
   right: 0;
   padding: 12px 16px;
   background: var(--color-bg-card);
-  border-top: 1px solid var(--color-border-default);
+  border-top: 1px solid hsl(var(--border));
   display: flex;
   gap: 12px;
   z-index: 100;
@@ -1851,7 +1858,7 @@ onBeforeRouteLeave(() => {
 
 .enquire-btn {
   /* 试点：主 CTA 改用系统强调色 */
-  background: var(--accent-primary);
+  background: hsl(var(--primary));
   color: var(--accent-contrast-on);
 }
 
@@ -1863,7 +1870,7 @@ onBeforeRouteLeave(() => {
 }
 
 .inspect-btn {
-  background: var(--juwo-primary); /* 统一 CTA 使用品牌主色 */
+  background: hsl(var(--primary)); /* 统一 CTA 使用品牌主色 */
   color: var(--color-text-inverse);
 }
 
@@ -1970,7 +1977,7 @@ onBeforeRouteLeave(() => {
 /* 单张白卡一体化容器：由父容器统一承载白底与分隔线 */
 .content-card {
   background: var(--color-bg-card);
-  border: 1px solid var(--color-border-default);
+  border: 1px solid hsl(var(--border));
   border-radius: 0; /* 移动端无圆角 */
   overflow: hidden; /* 防止子元素溢出破坏边界 */
   box-shadow: none;

@@ -1,0 +1,51 @@
+/* 运行时主题变量（light/dark）
+   - 这组变量由全站组件与样式消费（Tailwind/Element Plus/自有样式）
+   - 颜色使用 HSL 分量值，消费端通过 hsl(var(--xxx)) 渲染
+   - 仅此处改值即可全站联动（含暗色切换）
+*/
+:root {
+  /* 语义色板 */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --primary: 221 83% 53%;
+  --secondary: 240 4.8% 95.9%;
+  --muted: 240 4.8% 95.9%;
+  --accent: 221 83% 60%;
+  --destructive: 0 84% 60%;
+  --border: 240 5.9% 90%;
+  --ring: 221 83% 53%;
+
+  /* 外观 */
+  --radius: 8px;
+  --font-sans: "Inter", "PingFang SC", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Microsoft YaHei", "Noto Sans", "Hiragino Sans GB", "Helvetica Neue", sans-serif;
+}
+
+/* 暗色主题：与 html[data-theme="dark"] 对齐 */
+[data-theme="dark"] {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --primary: 221 83% 60%;
+  --secondary: 240 3.7% 15%;
+  --muted: 240 3.7% 15%;
+  --accent: 221 83% 65%;
+  --destructive: 0 72% 51%;
+  --border: 240 3.7% 15%;
+  --ring: 221 83% 60%;
+
+  --radius: 8px;
+}
+
+/* 暗色主题：兼容 .dark（与 Element Plus 默认触发一致） */
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --primary: 221 83% 60%;
+  --secondary: 240 3.7% 15%;
+  --muted: 240 3.7% 15%;
+  --accent: 221 83% 65%;
+  --destructive: 0 72% 51%;
+  --border: 240 3.7% 15%;
+  --ring: 221 83% 60%;
+
+  --radius: 8px;
+}

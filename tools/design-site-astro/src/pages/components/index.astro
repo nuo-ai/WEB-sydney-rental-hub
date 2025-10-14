@@ -1,0 +1,105 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Components · Index" showBackbar={false}>
+  <Fragment slot="breadcrumb">
+    <a href="/">首页</a> › <span>Components</span>
+  </Fragment>
+
+  <style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      border: 1px solid var(--color-semantic-border-default);
+      border-radius: var(--component-button-radius, 8px);
+      background: var(--color-semantic-bg-primary);
+      color: var(--color-text-primary);
+      padding: 16px;
+      text-decoration: none;
+      display: block;
+      transition: var(--component-button-transition, all 0.2s ease-in-out);
+    }
+    .card:hover {
+      background: var(--color-background-hover);
+      color: var(--color-text-primary);
+      border-color: var(--color-semantic-border-default);
+    }
+    .card h2 { margin: 0 0 6px 0; font-size: 16px; }
+    .card p { margin: 0 0 10px 0; opacity: 0.8; line-height: 1.6; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    /* Mini preview buttons (纯 CSS 变量消费) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--component-button-gap);
+      border-radius: var(--component-button-radius);
+      font-weight: var(--component-button-font-weight);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: var(--component-button-transition);
+      outline: none;
+    }
+    .btn--sm {
+      font-size: var(--component-button-size-sm-font-size);
+      padding: var(--component-button-size-sm-padding-y) var(--component-button-size-sm-padding-x);
+    }
+    .btn--primary {
+      background: var(--component-button-primary-bg);
+      color: var(--component-button-primary-text);
+      border-color: var(--component-button-primary-border);
+    }
+    .btn--secondary {
+      background: var(--component-button-secondary-bg);
+      color: var(--component-button-secondary-text);
+      border-color: var(--component-button-secondary-border);
+    }
+    .btn--ghost {
+      background: var(--component-button-ghost-bg);
+      color: var(--component-button-ghost-text);
+      border-color: transparent;
+    }
+    .btn--link {
+      background: transparent;
+      color: var(--component-button-link-text);
+      border-color: transparent;
+    }
+  </style>
+
+  <section>
+    <h1 style="margin:0 0 12px 0; font-size:20px;">Components · Index</h1>
+    <p style="margin:0 0 16px 0; color: rgba(0,0,0,0.6);">
+      这里是组件演示页面索引。点击卡片可进入对应演示页。
+    </p>
+
+    <div class="grid">
+      <a class="card" href="/components/button">
+        <h2>Button</h2>
+        <p>基于 --component-button-* 变量的视觉演示（primary / secondary / ghost / link × sm/md/lg）。</p>
+        <div class="row" aria-label="预览">
+          <span class="btn btn--primary btn--sm">Primary</span>
+          <span class="btn btn--secondary btn--sm">Secondary</span>
+          <span class="btn btn--ghost btn--sm">Ghost</span>
+          <span class="btn btn--link btn--sm">Link</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section style="margin-top:24px;">
+    <h2 style="font-size:16px; margin:0 0 12px 0;">参考 · Tokens</h2>
+    <ul style="padding-left: 20px; line-height: 1.8;">
+      <li><a href="/tokens/">Tokens 索引</a></li>
+      <li><a href="/tokens/blackwhite">Black & White Design Tokens</a></li>
+    </ul>
+  </section>
+</BaseLayout>

@@ -1,0 +1,228 @@
+---
+/**
+ * Base layout for the Astro design site
+ * - Provides global nav (/, /tokens, /components)
+ * - Handles theme toggle via html[data-theme]
+ * - Imports UI tokens (light/dark) once for all pages
+ * Usage:
+ * ---
+ * import BaseLayout from '../layouts/BaseLayout.astro';
+ * ---
+ * <BaseLayout title="Page Title">
+ *   <Fragment slot="breadcrumb">
+ *     <a href="/">首页</a> › <a href="/components">Components</a> › <span>Button</span>
+ *   </Fragment>
+ *   <!-- page content here -->
+ * </BaseLayout>
+ */
+const { title = 'SRH Design Site', showBackbar = true } = Astro.props;
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* 引入组件层 Token（浅色/暗色）一次性生效到全站 */
+      @import url('../styles/tokens.css');
+      @import url('../styles/tokens.dark.css');
+      @import url('../styles/tokens.overrides.css');
+
+      :root { color-scheme: light; }
+      html[data-theme='dark'] { color-scheme: dark; }
+
+      :root {
+        --layout-max-w: 1040px;
+        --layout-pad-x: 16px;
+        --nav-h: 56px;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, "PingFang SC", "Noto Sans SC", sans-serif;
+        background: #f7f7f8;
+        color: #222;
+      }
+      html[data-theme='dark'] body {
+        background: #171717;
+        color: #f5f5f5;
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        background: var(--component-button-secondary-bg, #fff);
+        color: var(--component-button-secondary-text, #222);
+        border-bottom: 1px solid var(--component-button-secondary-border, #e5e7eb);
+      }
+      .nav__inner {
+        max-width: var(--layout-max-w);
+        margin: 0 auto;
+        width: 100%;
+        padding: 0 var(--layout-pad-x);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .nav__links {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      .nav a {
+        color: var(--component-button-secondary-text, #222);
+        text-decoration: none;
+        padding: 6px 10px;
+        border-radius: var(--component-button-radius, 8px);
+        border: 1px solid transparent;
+      }
+      .nav a:hover {
+        background: var(--component-button-secondary-hover-bg, #f3f4f6);
+        color: var(--component-button-secondary-hover-text, #111);
+        border-color: var(--component-button-secondary-hover-border, #d1d5db);
+      }
+      /* 可访问性：聚焦可视化（导航链接/主题按钮/返回按钮） */
+      .nav a:focus-visible,
+      .theme-toggle:focus-visible,
+      .back-btn:focus-visible {
+        outline: var(--component-button-focus-ring-width, 3px) solid var(--component-button-focus-ring-color, rgba(107, 114, 128, 0.1));
+        outline-offset: 2px;
+      }
+      .theme-toggle {
+        padding: 6px 10px;
+        border: 1px solid var(--component-button-secondary-border, #e5e7eb);
+        border-radius: var(--component-button-radius, 8px);
+        background: var(--component-button-secondary-bg, #fff);
+        color: var(--component-button-secondary-text, #222);
+        cursor: pointer;
+      }
+      .theme-toggle:hover {
+        background: var(--component-button-secondary-hover-bg, #f3f4f6);
+        color: var(--component-button-secondary-hover-text, #111);
+        border-color: var(--component-button-secondary-hover-border, #d1d5db);
+      }
+
+      .wrap {
+        max-width: var(--layout-max-w);
+        margin: 0 auto;
+        width: 100%;
+        padding: 20px var(--layout-pad-x) 64px;
+      }
+
+      .breadcrumb {
+        font-size: 14px;
+        margin: 6px 0 16px 0;
+        color: rgba(0,0,0,0.55);
+      }
+      html[data-theme='dark'] .breadcrumb {
+        color: rgba(255,255,255,0.7);
+      }
+      .breadcrumb a {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px dashed currentColor;
+      }
+      .breadcrumb a:hover {
+        text-decoration: underline;
+      }
+      .backbar {
+        margin: 8px 0 16px 0;
+      }
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--component-button-gap, 8px);
+        padding: var(--component-button-size-sm-padding-y, 6px) var(--component-button-size-sm-padding-x, 12px);
+        font-size: var(--component-button-size-sm-font-size, 13px);
+        border-radius: var(--component-button-radius, 8px);
+        border: 1px solid var(--component-button-secondary-border, #e5e7eb);
+        background: var(--component-button-secondary-bg, #fff);
+        color: var(--component-button-secondary-text, #222);
+        cursor: pointer;
+        transition: var(--component-button-transition, all 0.2s ease-in-out);
+      }
+      .back-btn:hover {
+        background: var(--component-button-secondary-hover-bg, #f3f4f6);
+        color: var(--component-button-secondary-hover-text, #111);
+        border-color: var(--component-button-secondary-hover-border, #d1d5db);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav__inner">
+        <div class="nav__links">
+          <a href="/">首页</a>
+          <a href="/tokens/">Tokens</a>
+          <a href="/components/">Components</a>
+        </div>
+        <button class="theme-toggle" id="toggleTheme">切换暗色</button>
+      </div>
+    </nav>
+
+    <main class="wrap">
+      <div class="breadcrumb">
+        <slot name="breadcrumb" />
+      </div>
+      {showBackbar && (
+        <div class="backbar">
+          <button class="back-btn" id="goBack">返回上一页</button>
+          <button class="back-btn" id="goHome">返回首页</button>
+        </div>
+      )}
+      <slot />
+    </main>
+
+    <script>
+      // 主题切换：切换 html[data-theme="dark"]
+      const btn = document.getElementById('toggleTheme');
+      const root = document.documentElement;
+      function setTheme(mode) {
+        if (mode === 'dark') {
+          root.setAttribute('data-theme', 'dark');
+          if (btn) btn.textContent = '切换浅色';
+        } else {
+          root.removeAttribute('data-theme');
+          if (btn) btn.textContent = '切换暗色';
+        }
+        localStorage.setItem('astro-theme', mode);
+      }
+      const saved = localStorage.getItem('astro-theme');
+      setTheme(saved === 'dark' ? 'dark' : 'light');
+      btn?.addEventListener('click', () => {
+        const isDark = root.getAttribute('data-theme') === 'dark';
+        setTheme(isDark ? 'light' : 'dark');
+      });
+
+      const backBtn = document.getElementById('goBack');
+      backBtn?.addEventListener('click', () => {
+        if (history.length > 1) {
+          history.back();
+        } else {
+          // 优先回到上级索引页，否则回到首页
+          const ref = document.referrer;
+          if (ref) {
+            location.href = ref;
+          } else {
+            const path = location.pathname;
+            if (path.startsWith('/components/')) location.href = '/components/';
+            else if (path.startsWith('/tokens/')) location.href = '/tokens/';
+            else location.href = '/';
+          }
+        }
+      });
+
+      const homeBtn = document.getElementById('goHome');
+      homeBtn?.addEventListener('click', () => {
+        location.href = '/';
+      });
+    </script>
+  </body>
+</html>
