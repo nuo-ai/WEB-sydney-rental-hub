@@ -1,18 +1,18 @@
 # 当前上下文与焦点
-最后更新：2025-10-14
+最后更新：2025-10-14（根据当前代码同步修订）
 
 ## 当前焦点（P0）
-- apps/web 主题层重构：Tailwind v4 + 核心 HSL 变量 + Element Plus 桥接，确保“Tailwind + EP”统一视觉与可访问性（A11y）。
-- 变量收敛：将遗留自定义变量统一映射到核心/语义变量，优先覆盖 PropertyCard.vue、PropertyDetail.vue。
-- 暗色模式：同时支持 .dark 与 [data-theme="dark"]，两者视觉一致。
+- 主题链路核实：apps/web 现已同时加载 `theme.css`、`design-tokens.css` 与 Element Plus 桥接层，确保 Tailwind v4、业务样式与组件库共用同一套 HSL 变量。
+- 变量收敛：梳理 PropertyCard.vue、PropertyDetail.vue 等历史样式，替换掉仍直接引用 `--color-*` 或硬编码的遗留值。
+- 品牌一致性：`tokens/themes/light.json` 仍输出桔色 `#F28C00`，而前端主题已切换为蓝色；需要在 tokens 层更新 brand.*，重新构建并回填 UI 包产物。
 
 ## 刚完成
-- 引入 Tailwind v4（@tailwindcss/postcss；preflight=false），新增 theme.css（~10–15 个核心 HSL 变量）与 el-theme-bridge.css（映射 --el-color-*、--el-bg-color、--el-text-color-*、--el-border-* 等）。
-- tailwind.config.js：darkMode ['class','[data-theme="dark"]']；colors/font/radius/spacing 映射到变量；禁用 preflight。
-- main.js 全局引入 theme.css / el-theme-bridge.css / tailwind.css。
-- 路由与演示：/globals-demo、/cards-demo；PropertyCard/PropertyDetail 改为消费核心变量并加入 focus-visible ring（--ring）。
-- 细节修复：从 /cards-demo 跳详情 404 → 通过在 CardsDemo 预注入 store.currentProperty + 详情页 onMounted fetch guard 解决。
-- DevServer：vite --port 5199 --strictPort，避免端口冲突。
+- 引入 Tailwind v4（@tailwindcss/postcss；preflight=false），新增 `theme.css`（核心 HSL 变量）与 `el-theme-bridge.css`（映射 `--el-color-*`、`--el-bg-color`、`--el-text-color-*`、`--el-border-*` 等）。
+- `tailwind.config.js`：`darkMode` 同时支持 `class` 与 `[data-theme="dark"]`，扩展颜色/字体/圆角/间距并禁用 preflight；`tailwind.css` 作为唯一入口。
+- `main.js` 全局引入 UI 包 tokens、`design-tokens.css`、`theme.css`、Element Plus 桥接与 Tailwind，维持 cursor 调试链路。
+- 路由与演示：`/globals-demo`、`/cards-demo` 对齐主题变量；PropertyCard/PropertyDetail 聚焦 `focus-visible` 与 `--ring` 联动。
+- 细节修复：从 `/cards-demo` 跳详情 404 → 通过在 CardsDemo 预注入 `store.currentProperty` + 详情页 `onMounted` fetch guard 解决。
+- DevServer：`vite` 默认跑在 **5174** 且 `strictPort: true`，与当前 `package.json`、`vite.config.js` 设置一致。
 
 ## 下一步
 - P0：变量收敛（卡片/详情命中项替换）。必要时在 theme.css 添加“临时别名区”兜底，完成后删除。
