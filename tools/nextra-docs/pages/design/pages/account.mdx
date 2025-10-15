@@ -1,0 +1,31 @@
+---
+title: My Account（我的页）
+description: 账户与个人中心信息架构、登录/验证口径与实时预览
+---
+
+import dynamic from 'next/dynamic'
+export const LivePreview = dynamic(() => import('../../../components/LivePreview'), { ssr: false })
+
+# My Account（我的页）
+
+## 为什么（目标与背景）
+- 将登录、资料、收藏/消息等“与我相关”的交互集中在一个入口，降低导航复杂度。
+- 在文档中说明“口径与约束”，通过 iframe 实时预览 Vue 路由页面，做到设计/实现同屏对照。
+
+## 业务规则（口径）
+- 身份校验：未登录访问需要权限的子页，应跳转到登录/提示入口；邮箱未验证时，登录接口返回 `AUTHORIZATION_ERROR`（安全策略，见后端单测）。
+- 参数约束：仅接受白名单参数；未知查询键返回 400（保障前后端口径一致）。
+- 导航一致性：底部 TabBar 中“我的”入口固定在右侧，图标使用 `lucide-vue-next`，与其余 Tab 保持视觉一致。
+
+> 注：接口口径以 apps/backend/API_ENDPOINTS.md 为准；本页描述为前端视角的行为约束。
+
+## 权衡（实现取舍）
+- 短期以 Tailwind 等价 UI 实现账户页面骨架，保证推进速度；待 shadcn-vue CLI 初始化稳定后，再替换为标准组件（Button/Input/Card/Sheet/Tabs 等）。
+- 文档站采用 iframe 直连本地服务，具备“所见即所得”，但无法跨域读取内部状态；提供连通性兜底与“新窗口打开”。
+
+## 实时预览
+
+- 前提：在 monorepo 中启动 `vue-juwo`（默认 http://localhost:5173）
+- 当前路由：若 `my-account` 尚未就绪，可先作为占位路由或跳转至品牌页
+
+<LivePreview url="http://localhost:5174/my-account" height={900} />

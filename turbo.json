@@ -5,6 +5,16 @@
       "outputs": ["dist/**", "build/**"],
       "dependsOn": ["^build"]
     },
+    "@web-sydney/backend#build": {
+      "outputs": ["**/*.pyc"]
+    },
+    "@sydney-rental-hub/ui#build": {
+      "dependsOn": ["sydney-rental-hub-token-builder#build"],
+      "outputs": ["dist/**"]
+    },
+    "sydney-rental-hub-token-builder#build": {
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true
@@ -21,4 +31,3 @@
     }
   }
 }
-

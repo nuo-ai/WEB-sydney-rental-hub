@@ -6,10 +6,16 @@ console.log('Build started...');
 console.log('==============================================');
 
 // Clean previous build
-const buildPath = path.join(__dirname, '../../vue-frontend/src/generated-tokens');
-if (fs.existsSync(buildPath)) {
-  console.log(`\nCleaning old build files in ${buildPath}`);
-  fs.rmSync(buildPath, { recursive: true, force: true });
+const srcBuildPath = path.join(__dirname, '../../packages/ui/src/styles');
+const distBuildPath = path.join(__dirname, '../../packages/ui/dist');
+
+if (fs.existsSync(srcBuildPath)) {
+  console.log(`\nCleaning old build files in ${srcBuildPath}`);
+  fs.emptyDirSync(srcBuildPath);
+}
+if (fs.existsSync(distBuildPath)) {
+    console.log(`\nCleaning old build files in ${distBuildPath}`);
+    fs.emptyDirSync(distBuildPath);
 }
 
 // Get Style Dictionary Config

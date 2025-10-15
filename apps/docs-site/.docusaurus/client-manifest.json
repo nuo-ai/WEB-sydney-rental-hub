@@ -1,0 +1,111 @@
+{
+  "entrypoints": [
+    "main"
+  ],
+  "origins": {
+    "614": [
+      614
+    ],
+    "main": [
+      354,
+      869,
+      792
+    ],
+    "runtime~main": [
+      792,
+      869,
+      354
+    ],
+    "9dd8a0d2": [
+      617
+    ],
+    "a7456010": [
+      235
+    ],
+    "b971733d": [
+      279
+    ],
+    "cbad882a": [
+      516
+    ],
+    "styles": [
+      354,
+      792,
+      869
+    ]
+  },
+  "assets": {
+    "235": {
+      "js": [
+        {
+          "file": "assets/js/a7456010.468837c6.js",
+          "hash": "3b1245f736920e1a",
+          "publicPath": "/en/assets/js/a7456010.468837c6.js"
+        }
+      ]
+    },
+    "279": {
+      "js": [
+        {
+          "file": "assets/js/b971733d.31fcb848.js",
+          "hash": "2600f3339011257a",
+          "publicPath": "/en/assets/js/b971733d.31fcb848.js"
+        }
+      ]
+    },
+    "354": {
+      "js": [
+        {
+          "file": "assets/js/runtime~main.58728ee4.js",
+          "hash": "d3f4b1b80bcb770a",
+          "publicPath": "/en/assets/js/runtime~main.58728ee4.js"
+        }
+      ]
+    },
+    "516": {
+      "js": [
+        {
+          "file": "assets/js/cbad882a.8074a6a5.js",
+          "hash": "561c30175a92691d",
+          "publicPath": "/en/assets/js/cbad882a.8074a6a5.js"
+        }
+      ]
+    },
+    "614": {
+      "js": [
+        {
+          "file": "assets/js/614.c82432a4.js",
+          "hash": "35572bd7be5c88d7",
+          "publicPath": "/en/assets/js/614.c82432a4.js"
+        }
+      ]
+    },
+    "617": {
+      "js": [
+        {
+          "file": "assets/js/9dd8a0d2.faf0fc8f.js",
+          "hash": "342deb32ab4997ea",
+          "publicPath": "/en/assets/js/9dd8a0d2.faf0fc8f.js"
+        }
+      ]
+    },
+    "792": {
+      "js": [
+        {
+          "file": "assets/js/main.1e0c0a96.js",
+          "hash": "b33cf55daeb03ad2",
+          "publicPath": "/en/assets/js/main.1e0c0a96.js"
+        }
+      ]
+    },
+    "869": {
+      "css": [
+        {
+          "file": "assets/css/styles.bdb07d17.css",
+          "hash": "41beb3431eb88f34",
+          "publicPath": "/en/assets/css/styles.bdb07d17.css"
+        }
+      ]
+    }
+  }
+}

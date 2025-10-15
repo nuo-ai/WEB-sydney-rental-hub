@@ -7,7 +7,7 @@ export default {
   "title": "SRH Design",
   "tagline": "Design Tokens & Components",
   "url": "https://srh.local",
-  "baseUrl": "/",
+  "baseUrl": "/en/",
   "organizationName": "srh",
   "projectName": "docs-site",
   "onBrokenLinks": "throw",

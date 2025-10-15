@@ -37,11 +37,8 @@ def test_auth_system():
         # Initialize auth tables
         print("\n2. Initializing authentication tables...")
         success = AuthCRUD.init_auth_tables(db_conn)
-        if success:
-            print("Authentication tables initialized")
-        else:
-            print("Failed to initialize auth tables")
-            return False
+        assert success, "Failed to initialize auth tables"
+        print("Authentication tables initialized")
         
         # Test user registration
         print("\n3. Testing user registration...")
@@ -57,41 +54,29 @@ def test_auth_system():
             db_conn.commit()
         
         user = AuthCRUD.create_user(db_conn, test_user)
-        if user:
-            print(f"User registration successful: {user.email}")
-            user_id = user.id
-            verification_token = user.verification_token
-        else:
-            print("User registration failed")
-            return False
+        assert user, "User registration failed"
+        print(f"User registration successful: {user.email}")
+        user_id = user.id
+        verification_token = user.verification_token
         
         # Test password verification
         print("\n4. Testing password verification...")
         retrieved_user = AuthCRUD.get_user_by_email(db_conn, test_user.email)
-        if retrieved_user and AuthCRUD.verify_password(test_user.password, retrieved_user.hashed_password):
-            print("Password verification successful")
-        else:
-            print("Password verification failed")
-            return False
+        assert retrieved_user and AuthCRUD.verify_password(test_user.password, retrieved_user.hashed_password), "Password verification failed"
+        print("Password verification successful")
         
         # Test email verification
         print("\n5. Testing email verification...")
         verification_success = AuthCRUD.verify_user_email(db_conn, verification_token)
-        if verification_success:
-            print("Email verification successful")
-        else:
-            print("Email verification failed")
-            return False
+        assert verification_success, "Email verification failed"
+        print("Email verification successful")
         
         # Test refresh token
         print("\n6. Testing refresh token...")
         refresh_token = AuthCRUD.generate_refresh_token()
         token_update = AuthCRUD.update_refresh_token(db_conn, user_id, refresh_token)
-        if token_update:
-            print("Refresh token update successful")
-        else:
-            print("Refresh token update failed")
-            return False
+        assert token_update, "Refresh token update failed"
+        print("Refresh token update successful")
         
         # Test user address functionality
         print("\n7. Testing user address functionality...")
@@ -121,11 +106,9 @@ def test_auth_system():
                 else:
                     print("Address deletion failed")
             else:
-                print("Address retrieval failed")
-                return False
+                assert False, "Address retrieval failed"
         else:
-            print("Address creation failed")
-            return False
+            assert False, "Address creation failed"
         
         # Cleanup
         print("\n8. Cleaning up test data...")
@@ -141,12 +124,12 @@ def test_auth_system():
         print("All authentication tests passed!")
         print("Authentication system is ready for production use")
         
-        return True
+        assert True
         
     except Exception as e:
         logger.error(f"Test failed: {e}", exc_info=True)
         print(f"\nTest failed with error: {e}")
-        return False
+        raise e
 
 if __name__ == "__main__":
     test_auth_system()

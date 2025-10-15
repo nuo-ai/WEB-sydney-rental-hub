@@ -1,0 +1,33 @@
+---
+title: Find（找房页）
+description: 业务口径（排序白名单、Bedrooms 下限、Available Now 包含规则）与实时预览
+---
+
+import dynamic from 'next/dynamic'
+export const LivePreview = dynamic(() => import('../../../components/LivePreview'), { ssr: false })
+
+# Find（找房页）
+
+## 为什么（目标与背景）
+- 统一“找房”交互与口径，让设计评审与前端实现对齐，避免口径歧义导致的功能返工。
+- 文档站只做信息架构与说明，通过 iframe 实时预览正在运行的 Vue 页面（避免在 React/Nextra 里重复实现 Vue 逻辑）。
+
+## 业务规则（口径）
+- 排序白名单：仅允许后端约定的固定列表（示例：`recent`, `price_asc`, ...）。拒绝任意字段动态排序，保障可维护性与性能。
+- 参数校验：未知查询键返回 400。原因：确保前后端口径严格一致，避免出现“静默忽略”带来的误判。
+- Bedrooms：支持 CSV + 下限语义（示例：`2,3,4+`），`4+` 表示 4 及以上。
+- Available now（可立即入住）：当筛选区间 `date_from <= today` 时，包含 `available_date IS NULL`；未来区间不包含 NULL，避免误导。
+
+> 注：以上规则需与后端 API 契约保持一致（见 apps/backend/API_ENDPOINTS.md）；文档中的示例仅为口径说明。
+
+## 权衡（实现取舍）
+- 先用 Tailwind 等价 UI 方案以保证进度；后续在 shadcn-vue CLI 初始化稳定后，再逐步替换为 shadcn/vue 组件（Button/Card/Sheet 等）。
+- iframe 预览的优点：解耦、所见即所得；限制：无法跨域读取内部状态，本页提供连通性兜底提示与“新窗口打开”。
+
+## 实时预览
+
+- 前提：在 monorepo 中启动 vue-juwo（默认 http://localhost:5173）
+- 当前可用路由：`/listings`（临时承载“找房页”的主要模块）
+- TODO：待路由整理后，预览地址切换为 `/find`
+
+<LivePreview url="http://localhost:5174/listings" height={900} />
