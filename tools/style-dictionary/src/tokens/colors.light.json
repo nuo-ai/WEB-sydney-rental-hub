@@ -1,0 +1,39 @@
+{
+  "color": {
+    "brand": {
+      "primary": { "value": "#E95420" }
+    },
+    "success": {
+      "primary": { "value": "#008013" },
+      "hover":   { "value": "#00670F" },
+      "active":  { "value": "#008013" },
+      "on":      { "value": "#FFFFFF" }
+    },
+    "link": {
+      "primary": { "value": "#6699CC" },
+      "on":      { "value": "#262626" }
+    },
+    "bg": {
+      "base": { "value": "#FFFFFF" }
+    },
+    "surface": {
+      "base": { "value": "#F5F5F5" }
+    },
+    "text": {
+      "primary":   { "value": "#262626" },
+      "secondary": { "value": "#707070" },
+      "tertiary":  { "value": "#939393" },
+      "subtitle":  { "value": "{color.link.primary.value}" }
+    },
+    "border": {
+      "subtle": { "value": "rgba(0,0,0,0.1)" },
+      "strong": { "value": "rgba(0,0,0,0.3)" }
+    },
+    "overlay": {
+      "scrim-40":     { "value": "rgba(0,0,0,0.4)" },
+      "scrim-85":     { "value": "rgba(0,0,0,0.85)" },
+      "highlight-10": { "value": "rgba(255,255,255,0.1)" },
+      "highlight-30": { "value": "rgba(255,255,255,0.3)" }
+    }
+  }
+}

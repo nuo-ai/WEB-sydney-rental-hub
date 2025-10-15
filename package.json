@@ -23,7 +23,9 @@
     "docs:serve": "pnpm --filter @srh/docs-site serve",
     "astro:dev": "pnpm --filter @srh/design-site-astro dev",
     "astro:build": "pnpm --filter @srh/design-site-astro build",
-    "astro:preview": "pnpm --filter @srh/design-site-astro preview"
+    "astro:preview": "pnpm --filter @srh/design-site-astro preview",
+    "bp:all": "node scripts/blueprint/backfill-c.js --url https://www.domain.com.au/8-1-defries-avenue-zetland-nsw-2017-17803938 --slug 8-1-defries-avenue-zetland-nsw-2017-17803938 --bp 1440 --wait 1500 && node scripts/blueprint/backfill-c.js --bp 1024 --wait 1500 && node scripts/blueprint/backfill-c.js --bp 390 --wait 2000",
+    "bp:core": "node scripts/blueprint/backfill-c.js --url https://www.domain.com.au/8-1-defries-avenue-zetland-nsw-2017-17803938 --slug 8-1-defries-avenue-zetland-nsw-2017-17803938 --bp 1440 --wait 1500 && node scripts/blueprint/backfill-c.js --bp 1024 --wait 1500"
   },
   "pnpm": {
     "overrides": {
@@ -62,6 +64,12 @@
   },
   "dependencies": {
     "@astrouxds/tokens": "^1.14.0",
+    "@shikijs/core": "^3.13.0",
+    "next-themes": "^0.4.6",
+    "oniguruma-parser": "^0.12.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "shiki": "^3.13.0",
     "uni-app-x-mcp": "^0.0.5"
   }
 }

@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "module": "description",
+    "url": "https://www.domain.com.au/8-1-defries-avenue-zetland-nsw-2017-17803938",
+    "slug": "8-1-defries-avenue-zetland-nsw-2017-17803938",
+    "generatedAt": "2025-10-15T09:14:59+11:00",
+    "notes": [
+      "来源：采用 Level 1 极快占位策略（三断点元素截图 + 可验证 rect + 选择器登记），其余字段置 null 待回填。",
+      "description 主容器通过 data-testid 命中，headline/read-more 选择器补充为后续半自动回填入口。",
+      "截图默认保存在系统 Downloads。后续需人工移动到 docs/blueprints/.../modules/description/ 并将下方路径调整为相对路径（见 file-system-rules）。"
+    ]
+  },
+  "parameters": {
+    "breakpoints": [
+      1440,
+      1024,
+      390
+    ],
+    "dpr": 2,
+    "stabilizationDelayMs": 1500,
+    "ignoreSelectors": [
+      "video",
+      "iframe"
+    ]
+  },
+  "selectors": {
+    "hint": [
+      "[data-testid*=\"description\"]",
+      "article",
+      "[class*=\"description\" i]"
+    ],
+    "detected": [
+      "[data-testid=\"listing-details__description\"]",
+      "[data-testid=\"listing-details__description-headline\"]",
+      "[data-testid=\"listing-details__description-button\"]"
+    ],
+    "primaryContainer": "[data-testid=\"listing-details__description\"]",
+    "titleSelector": "[data-testid=\"listing-details__description-headline\"]",
+    "readMoreSelector": "[data-testid=\"listing-details__description-button\"]"
+  },
+  "screenshots": {
+    "390": {
+      "status": "saved_element_png",
+      "saved": true,
+      "path": "/home/nuoai/Downloads/domain-pdp-description-390_2025-10-14T22-14-55-364Z.png",
+      "type": "element",
+      "selector": "[data-testid=\"listing-details__description\"]"
+    },
+    "1024": {
+      "status": "saved_element_png",
+      "saved": true,
+      "path": "/home/nuoai/Downloads/domain-pdp-description-1024_2025-10-14T22-14-02-873Z.png",
+      "type": "element",
+      "selector": "[data-testid=\"listing-details__description\"]"
+    },
+    "1440": {
+      "status": "saved_element_png",
+      "saved": true,
+      "path": "/home/nuoai/Downloads/domain-pdp-description-1440_2025-10-14T22-12-36-490Z.png",
+      "type": "element",
+      "selector": "[data-testid=\"listing-details__description\"]"
+    }
+  },
+  "measurements": {
+    "container": {
+      "width": 659,
+      "height": 235,
+      "padding_x": null,
+      "padding_y": null
+    },
+    "typography": {
+      "title": {
+        "fontSize": 16,
+        "lineHeight": 24,
+        "fontWeight": "700",
+        "letterSpacing": null,
+        "margin_bottom": 18
+      },
+      "body": {
+        "fontSize": 16,
+        "lineHeight": 24,
+        "color": "rgb(60, 71, 91)",
+        "paragraph_spacing": null,
+        "list_item_spacing": null,
+        "link_style": null
+      },
+      "paragraph_spacing": 18
+    }
+  },
+  "styles": {
+    "colors": {
+      "background": null,
+      "title": "rgb(60, 71, 91)",
+      "body": "rgb(60, 71, 91)",
+      "link": null
+    },
+    "radius": {
+      "container": null
+    },
+    "shadows": {
+      "container": null
+    },
+    "spacing": {
+      "container_margin": {
+        "top": 0,
+        "right": 0,
+        "bottom": 24,
+        "left": 0
+      },
+      "container_padding": {
+        "top": 0,
+        "right": 10,
+        "bottom": 0,
+        "left": 10
+      }
+    }
+  },
+  "nextActions": [
+    "自动注入回填失败→启用半自动回填C：记录此次失败原因（可能由 CSP/Execution World 隔离/执行时序导致），保留再次尝试入口。",
+    "半自动回填C（先 1440，后 1024/390）：1) 采集 title/body 字号、行高、颜色；2) 记录段落间距 paragraph_spacing 与列表项间距 list_item_spacing；3) 估算 link_style（颜色、下划线、hover）；4) 记录 container_padding；5) 校验 title 的 margin_bottom。",
+    "若需入库：将 Downloads 中三档截图移动至 docs/blueprints/.../modules/description/ 并把 screenshots.*.path 更新为相对路径（遵守 file-system-rules）。",
+    "若内容被折叠：点击 readMoreSelector 展开后再次截图，补充展开态的排版与度量。",
+    "当获得可靠数值时，仅覆盖 measurements/styles 中对应的 null 字段；不可验证项继续保留为 null。",
+    "注入重试计划：切换 MAIN/ISOLATED 注入、延时 1500–3000ms、必要时滚动至容器首/尾再采集。"
+  ]
+}

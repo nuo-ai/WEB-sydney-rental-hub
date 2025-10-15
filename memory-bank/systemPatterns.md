@@ -126,3 +126,52 @@
   - 小步补丁（replace_in_file 优先），每次只改 1–2 个区域；保持可回滚。
   - 先完成 P0（Toast/Loading/预览/骨架/错误）再进行 P1（Markdown/地图/日历）。
   - 仅消费语义/组件层 Token；禁止硬编码数值；遵守可访问性与焦点环规范。
+
+---
+
+## 新增原则（2025-10-15 增补）
+
+### 1) 像素复刻“蓝图法”
+- 不一定需要先画原型图；对标现有网页时，直接做“多断点测量 → 复刻蓝图（结构+度量） → Tokens 落表 → 叠图验收”更高效。
+- 蓝图产物：
+  - blueprint-raw.json（结构/文案/模块分区）
+  - tokens-suggestion.json（colors/radius/shadows/spacing/typography/layout）
+  - 断点截图（1440/1024/390）用于视觉回归与叠图
+- 合规边界：仅抓“度量与指标”，不保存受版权保护资产（图片/字体/Logo/文案）。
+
+### 2) 有头/无头 80/20 组合
+- 80% 通用组件使用“有头 shadcn”（速度快、可访问性稳、一致性高）。
+- 20% 高度定制模块（Gallery 缩略条、Sticky CTA、Map Overlay、Floorplan Zoom 等）使用“无头/半无头”以获得像素级可控性。
+
+### 3) TS alias 与声明约定
+- 保证 `tsconfig.app.json` 可见：
+  - `compilerOptions.baseUrl="."` 与 `paths["@/*"]=["./src/*"]`（避免 vue-tsc -b 引用失败）
+  - `include` 至少包含：`"src/env.d.ts"`, `"src/**/*.d.ts"`, `"src/**/*.vue"`, `"src/**/*.ts?(x)"`
+- 新建 `src/env.d.ts`：
+  ```ts
+  /// <reference types="vite/client" />
+  declare module '*.vue' {
+    import type { DefineComponent } from 'vue'
+    const component: DefineComponent<{}, {}, any>
+    export default component
+  }
+  ```
+- 第三方库类型：
+  - 若无 @types，临时在 env.d.ts `declare module 'xxx'`，后续优先安装官方类型包。
+
+### 4) 蓝图采集执行模式（chrome-mcp · 2025-10-15 增补）
+- 断点规范：1440 / 1024 / 390；DPR=2；stabilizationDelayMs=1500；仅采集“度量与指标”，不保存受版权保护资产。
+- 选择器发现：优先使用 data-testid 与语义关键词（gallery/summary/price/cta/feature 等），通过 `chrome_get_interactive_elements` 辅助定位。
+- 截图策略：
+  - 元素截图优先：`chrome_screenshot` + `selector`，`savePng=true`，`storeBase64=false`，减少仓库膨胀与配额风险。
+  - 全页截图：受 `MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND` 限流，需分步、间隔重试；失败时以元素截图为准。
+  - 文件落点：默认保存到系统 Downloads（浏览器下载目录）；如需入库，按文件系统规则由人工移动至 `docs/blueprints/domain/<slug>/...`，再将 JSON 中绝对路径改为相对路径。
+- 抽取策略（占位 → 回填）：
+  - 先写“可靠度量”（如容器 width/height、三断点截图路径）；其余字段（padding/radius/shadow/typography/spacing/button 样式）统一置 `null`，避免错误数据入库。
+  - 回填路径A（自动）：定点采集 `window.getComputedStyle(el)` 的关键属性，通过唯一 console 标记/可见节点输出抓取；回填后覆盖 `null`。
+  - 回填路径B（半自动）：对照三档 PNG 截图人工核对，逐项回填，确保“参数不遗漏”。
+- 模块产物约定：`docs/blueprints/domain/<slug>/modules/<module>.json`
+  - 内容包含 `selectors.hint/detected/primaryContainer`、`screenshots.{1440,1024,390}`、`measurements/*`、`styles/*`、`notes/nextActions`。
+- 风险与回滚：
+  - CSP/扩展隔离可能导致脚本注入与 computedStyle 抽取不稳定；发生时立即切换“截图 + 半自动回填”。
+  - 始终优先 replace_in_file 小步补丁；严禁一次性大改与写入不确定值。

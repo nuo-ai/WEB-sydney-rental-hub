@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "url": "https://www.domain.com.au/8-1-defries-avenue-zetland-nsw-2017-17803938",
+    "slug": "8-1-defries-avenue-zetland-nsw-2017-17803938",
+    "generatedAt": "2025-10-15T06:03:00+11:00",
+    "notes": [
+      "chrome-mcp 成功打开页面与注入探针；受截图限流影响，已先获取 1440 视口截图（base64 未持久化到仓库，避免大文件），将切换 PNG 保存策略以避免配额与体积问题。",
+      "本文件为页面级 tokens 草案占位，将在 3 断点截图落盘后补全度量。"
+    ]
+  },
+  "parameters": {
+    "breakpoints": [1440, 1024, 390],
+    "dpr": 2,
+    "waitUntil": "networkidle",
+    "stabilizationDelayMs": 1500,
+    "locale": "en-AU",
+    "timezone": "Australia/Sydney",
+    "ignoreSelectors": ["[data-testid=\"ad\"]", "iframe", "video"]
+  },
+  "layout": {
+    "container_max_width": null,
+    "padding_x": null,
+    "grid_gap": null,
+    "main_aside_ratio": null
+  },
+  "colors": {
+    "text": null,
+    "background": null,
+    "link": null,
+    "buttonBg": null,
+    "buttonText": null,
+    "cardBg": null,
+    "border": null
+  },
+  "radius": {
+    "button": null,
+    "card": null
+  },
+  "shadows": {
+    "button": null,
+    "card": null
+  },
+  "spacing_scale": {
+    "paragraphGap": null
+  },
+  "typography_scale": {
+    "h1": null,
+    "h2": null,
+    "body": null
+  },
+  "screenshots": {
+    "1440": {
+      "status": "saved_viewport_png",
+      "saved": true,
+      "path": "screenshots/1440-viewport.png",
+      "notes": "已保存 PNG 视口截图（下载目录）。如需纳入仓库请由用户手动移动至 docs/blueprints/.../screenshots/（遵循文件系统规则）。",
+      "repo_base64_path": "docs/blueprints/domain/8-1-defries-avenue-zetland-nsw-2017-17803938/screenshots/1440-viewport.base64"
+    },
+    "1024": {
+      "status": "saved_viewport_png",
+      "saved": true,
+      "path": "screenshots/1024-viewport.png",
+      "notes": "已保存 PNG 视口截图（下载目录）。如需纳入仓库请由用户手动移动至 docs/blueprints/.../screenshots/（遵循文件系统规则）。"
+    },
+    "390": {
+      "status": "saved_viewport_png",
+      "saved": true,
+      "path": "screenshots/390-viewport.png",
+      "notes": "已保存 PNG 视口截图（下载目录）。如需纳入仓库请由用户手动移动至 docs/blueprints/.../screenshots/（遵循文件系统规则）。"
+    }
+  },
+  "nextActions": [
+    "页面级截图已完成并已批准（task-8）。将 Downloads 中三档 viewport PNG 按需入库：移动至 docs/blueprints/.../screenshots/ 并把 screenshots.*.path 更新为相对路径（遵守 file-system-rules）。",
+    "若已存在仓库内 base64 备份（如 1440-viewport.base64），仅作临时引用；优先使用 PNG 相对路径作为正式入库路径。",
+    "回填页面级 tokens：layout/colors/radius/shadows/spacing/typography 采用“半自动回填 C”+ 人工对照截图，仅覆盖可验证字段，其他继续保留为 null。",
+    "同步模块级回填节奏：features/description 先完成 1440，再推进 1024/390，字段命名保持一致以便后续聚合。"
+  ]
+}

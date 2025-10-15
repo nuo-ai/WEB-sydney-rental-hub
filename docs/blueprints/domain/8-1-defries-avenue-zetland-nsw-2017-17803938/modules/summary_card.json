@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "module": "summary_card",
+    "url": "https://www.domain.com.au/8-1-defries-avenue-zetland-nsw-2017-17803938",
+    "slug": "8-1-defries-avenue-zetland-nsw-2017-17803938",
+    "generatedAt": "2025-10-15T08:15:30+11:00",
+    "notes": [
+      "来源：chrome_get_interactive_elements 已定位到 summary/price/cta 相关节点，见 selectors.detected",
+      "策略：先完成 3 断点元素截图与基础容器尺寸；复杂度量（字号/行距/按钮样式/圆角/阴影/间距）在截图或探针可行时回填，确保“参数不遗漏”"
+    ]
+  },
+  "parameters": {
+    "breakpoints": [1440, 1024, 390],
+    "dpr": 2,
+    "stabilizationDelayMs": 1500,
+    "ignoreSelectors": ["video", "iframe"]
+  },
+  "selectors": {
+    "hint": ["[class*=summary]", "[class*=price]", "[class*=cta]", "[data-testid*=summary]", "[data-testid*=price]", "[data-testid*=cta]"],
+    "detected": [
+      "[data-testid=\"listing-details__residential-header-ctas\"]",
+      "[data-testid=\"listing-details__summary\"]",
+      "[data-testid=\"listing-details__summary-left-column\"]",
+      "[data-testid=\"listing-details__summary-title\"]",
+      "[data-testid=\"listing-details__address-cta-buttons\"]",
+      "[data-testid=\"listing-summary-property-type\"]",
+      "[data-testid=\"listing-summary-strip\"]",
+      "[data-testid=\"mobile-inline-ctas\"]",
+      "[data-testid=\"listing-details__sticky-cta-wrapper\"]",
+      "[data-testid=\"listing-details__sticky-cta\"]",
+      "[data-testid=\"listing-details__phone-cta-button\"]",
+      "[data-testid=\"listing-details__agent-details__cta-button\"]"
+    ],
+    "primaryContainer": "[data-testid=\"listing-details__summary\"]",
+    "title": "[data-testid=\"listing-details__summary-title\"]",
+    "leftColumn": "[data-testid=\"listing-details__summary-left-column\"]",
+    "strip": "[data-testid=\"listing-summary-strip\"]",
+    "desktopHeaderCtas": "[data-testid=\"listing-details__residential-header-ctas\"]",
+    "mobileInlineCtas": "[data-testid=\"mobile-inline-ctas\"]"
+  },
+  "screenshots": {
+    "1440": {
+      "status": "saved_element_png",
+      "saved": true,
+      "path": "/home/nuoai/Downloads/docs_blueprints_domain_8-1-defries-avenue-zetland-nsw-2017-17803938_modules_summary_card_1440-element_png_2025-10-14T21-16-47-510Z.png",
+      "type": "element",
+      "selector": "[data-testid=\"listing-details__summary\"]"
+    },
+    "1024": {
+      "status": "saved_element_png",
+      "saved": true,
+      "path": "/home/nuoai/Downloads/docs_blueprints_domain_8-1-defries-avenue-zetland-nsw-2017-17803938_modules_summary_card_1024-element_png_2025-10-14T21-17-56-113Z.png",
+      "type": "element",
+      "selector": "[data-testid=\"listing-details__summary\"]"
+    },
+    "390": {
+      "status": "saved_element_png",
+      "saved": true,
+      "path": "/home/nuoai/Downloads/docs_blueprints_domain_8-1-defries-avenue-zetland-nsw-2017-17803938_modules_summary_card_390-element_png_2025-10-14T21-19-11-771Z.png",
+      "type": "element",
+      "selector": "[data-testid=\"listing-details__summary\"]"
+    }
+  },
+  "measurements": {
+    "card": {
+      "outer_margin": null,
+      "padding_x": null,
+      "padding_y": null,
+      "radius": null,
+      "shadow": null,
+      "width": 659,
+      "height": 170
+    },
+    "typography": {
+      "title": { "fontSize": null, "lineHeight": null, "fontWeight": null },
+      "subtitle": { "fontSize": null, "lineHeight": null, "fontWeight": null },
+      "features_row": { "fontSize": null, "lineHeight": null, "icon_size": null }
+    },
+    "spacing": {
+      "row_gap": null,
+      "column_gap": null,
+      "section_gap": null
+    },
+    "cta_button": {
+      "primary": {
+        "width": null,
+        "height": null,
+        "padding_x": null,
+        "padding_y": null,
+        "radius": null,
+        "style": { "bg": null, "text": null, "border": null, "shadow": null }
+      },
+      "secondary": {
+        "width": null,
+        "height": null,
+        "padding_x": null,
+        "padding_y": null,
+        "radius": null,
+        "style": { "bg": null, "text": null, "border": null, "shadow": null }
+      }
+    }
+  },
+  "styles": {
+    "colors": {
+      "card_bg": null,
+      "title": null,
+      "subtitle": null,
+      "text": null,
+      "border": null
+    }
+  },
+  "nextActions": [
+    "按断点对 primaryContainer 进行元素截图（PNG，Downloads 保存），记录路径至 screenshots.*",
+    "依据交互元素 rect 或截图半自动回填 measurements.card.width/height 与间距/半径/阴影/按钮样式等",
+    "若需要将截图纳入仓库，请人工移动至 docs/blueprints/.../modules/summary_card/ 并更新本文件路径"
+  ]
+}

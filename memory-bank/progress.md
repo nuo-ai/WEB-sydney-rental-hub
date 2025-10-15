@@ -1,8 +1,31 @@
-# 项目进展与演进（精简版）
+# 项目进展与演进（精简版)
 
 **说明**: 仅保近 30 天关键里程碑，详细过程请查看对应 commit/PR
 
 ## 近期重要里程碑（2025-10）
+
+### web-shadcn Tabs 集成与蓝图抓取（完成）
+- **2025-10-15｜Tabs 组件家族 + 详情页集成**
+  - 新增 `Tabs/TabsList/TabsTrigger/TabsContent`，带可访问属性（aria-selected/role=tab/tabpanel、data-state）
+  - 在 `PropertyDetail.vue` 中将 Description/Features 合并为 `Details` 卡片下的 Tabs 切换，贴近 Domain 详情页信息节奏
+- **2025-10-15｜类型与别名修复**
+  - `tsconfig.app.json` include 增加 `src/env.d.ts` 与 `*.d.ts`
+  - 新增 `src/env.d.ts`（`declare module '*.vue'`），消除 .vue 导入类型报错
+- **2025-10-15｜蓝图抓取（初版）**
+  - 通过 `web_fetch` 生成结构蓝图：`docs/blueprints/domain/8-1-defries-avenue-zetland-nsw-2017-17803938/blueprint-raw.json`
+  - 已抽取结构与文案要点（价格/地址/媒体计数/特征/预约/描述摘要/学区/市场与社区/FAQ/模块分区）
+  - 视觉 Tokens（颜色/间距/圆角/阴影/排版）与布局度量（容器宽/列比/gap）标记为 TODO，待真实浏览器探针补齐
+- **待处理（跟踪事项 · 编号化）**
+  - [T-001] `vue-tsc` 报错（`@/lib/utils`、`@/components/ui/*`、`markdown-it` 类型）：在 `tsconfig.app.json` 显式声明 `baseUrl="."` 与 `paths["@/*"]=["./src/*"]`，并安装 `@types/markdown-it` 或临时在 `src/env.d.ts` 声明
+  - [T-002] shadcn 批次 A 组件缺口：DatePicker/Calendar、Sheet/Drawer、Select/Combobox、Tooltip/Popover/Dropdown、Progress/Spinner、Label/Form（按 P0 优先级推进）
+  - [T-003] 视觉蓝图探针与 tokens-suggestion.json：在 1440/1024/390 注入探针，生成 tokens-suggestion.json 与截图基线
+
+- **2025-10-15｜Domain PDP 蓝图探针（页面级+模块）**
+  - task-8 页面级 tokens-suggestion.json 占位 + 3 断点视口截图（PNG，Downloads）→ Approved
+  - task-9 hero_gallery 三断点元素截图 + 容器尺寸（1440≈1425×506.34）→ Approved
+  - task-10 summary_card 三断点元素截图 + 容器尺寸（1440=659×170）→ Approved
+  - 受限记录：fullPage 截图限流（MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND）；CSP/扩展隔离使 computedStyle 抽取不稳；采用“占位→回填”，先写可靠度量，避免错误数据入库
+  - 后续：task-11~16（features/description/inspections/other_rentals_from_agency/agents_contact/enquiry_form）按相同流程推进
 
 ### 新应用 web-shadcn + PropertyDetail MVP（完成）
 - **2025-10-15｜新建 apps/web-shadcn（Vite+Vue3+TS+Tailwind v4+shadcn-vue，基色 Zinc）**  
