@@ -1,0 +1,149 @@
+---
+title: 组件库 (shadcn-vue)
+description: 基于 shadcn-vue 和 Tailwind CSS v4 的组件库
+---
+
+# 组件库 (shadcn-vue)
+
+本项目使用 [shadcn-vue](https://shadcn-vue.com) 作为基础组件库，结合 Tailwind CSS v4 构建 UI 系统。
+
+## 核心组件
+
+### Button 按钮
+
+基础交互组件，支持多种样式变体和尺寸。
+
+```vue
+<script setup>
+import Button from '@/components/ui/Button.vue'
+</script>
+
+<template>
+  <Button variant="default">默认按钮</Button>
+  <Button variant="outline">轮廓按钮</Button>
+  <Button variant="ghost">幽灵按钮</Button>
+  <Button size="lg">大按钮</Button>
+  <Button size="sm">小按钮</Button>
+</template>
+```
+
+### Card 卡片
+
+用于展示内容的容器组件，包含多个子组件：
+
+- `Card` - 主容器
+- `CardHeader` - 头部区域
+- `CardTitle` - 标题
+- `CardDescription` - 描述
+- `CardContent` - 内容区域
+
+```vue
+<script setup>
+import Card from '@/components/ui/Card.vue'
+import CardHeader from '@/components/ui/CardHeader.vue'
+import CardTitle from '@/components/ui/CardTitle.vue'
+import CardDescription from '@/components/ui/CardDescription.vue'
+import CardContent from '@/components/ui/CardContent.vue'
+</script>
+
+<template>
+  <Card>
+    <CardHeader>
+      <CardTitle>卡片标题</CardTitle>
+      <CardDescription>卡片描述</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <p>卡片内容</p>
+    </CardContent>
+  </Card>
+</template>
+```
+
+### Sheet 抽屉
+
+模态对话框组件，用于展示额外信息或操作。
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import Sheet from '@/components/ui/Sheet.vue'
+</script>
+
+<template>
+  <Sheet :open="isOpen" @update:open="setIsOpen">
+    <template #title>抽屉标题</template>
+    <template #description>抽屉描述信息</template>
+    
+    <div class="py-4">
+      <p>抽屉内容</p>
+    </div>
+    
+    <template #footer>
+      <div class="flex justify-end gap-2 mt-4">
+        <Button variant="outline" @click="close">取消</Button>
+        <Button @click="confirm">确认</Button>
+      </div>
+    </template>
+  </Sheet>
+</template>
+```
+
+## 安装方式
+
+由于 shadcn-vue CLI 在当前项目中存在配置问题，我们采用手动安装方式：
+
+```bash
+# 1. 确保依赖已安装
+cd apps/vue-juwo
+npm install shadcn-vue @headlessui/vue
+
+# 2. 手动创建组件文件到 src/components/ui/
+# 3. 在组件中导入使用
+```
+
+## 组件变体系统
+
+使用 [class-variance-authority](https://cva.style) 来管理组件变体：
+
+```ts
+import { cva } from 'class-variance-authority'
+
+export const buttonVariants = cva(
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        link: 'text-primary underline-offset-4 hover:underline',
+      },
+      size: {
+        default: 'h-10 px-4 py-2',
+        sm: 'h-9 rounded-md px-3',
+        lg: 'h-11 rounded-md px-8',
+        icon: 'h-10 w-10',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  },
+)
+```
+
+## 工具函数
+
+### cn 函数
+
+合并 Tailwind CSS 类名的工具函数：
+
+```ts
+import { cn } from '@/lib/utils'
+
+// 使用示例
+const classes = cn('bg-red-500', 'text-white', 'hover:bg-red-600')
+// 结果: "bg-red-500 text-white hover:bg-red-600"

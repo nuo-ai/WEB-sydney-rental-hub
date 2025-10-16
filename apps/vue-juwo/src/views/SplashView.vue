@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import Button from '@/components/ui/Button.vue'
 
 const router = useRouter()
 
 // 3 秒兜底自动跳转到列表页（移动端常见品牌页行为）
 onMounted(() => {
   const timer = setTimeout(() => {
-    // 若用户未点击“进入”，则自动进入列表页
+    // 若用户未点击"进入"，则自动进入列表页
     router.push('/listings')
   }, 3000)
 
@@ -15,7 +16,7 @@ onMounted(() => {
   return () => clearTimeout(timer)
 })
 
-// 点击“进入”按钮的显式跳转
+// 点击"进入"按钮的显式跳转
 function enter() {
   router.push('/listings')
 }
@@ -40,13 +41,13 @@ function enter() {
 
     <!-- 进入按钮 -->
     <section class="w-full px-6 pb-10">
-      <button
+      <Button
         class="w-full h-12 rounded-xl bg-white text-black font-medium active:scale-[0.99] transition"
         @click="enter"
         aria-label="进入房源列表"
       >
         进入
-      </button>
+      </Button>
       <p class="mt-3 text-center text-xs text-white/50">3 秒后将自动进入</p>
     </section>
   </main>

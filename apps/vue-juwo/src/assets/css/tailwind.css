@@ -1,3 +1,72 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@theme inline {
+  --max-w-mobile: 420px;                   /* 移动端容器规范 */
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.08);
+  --radius-sheet-top: 1rem;
+}
+
+/* 全局主题变量与基础样式 */
+@layer base {
+  :root {
+    /* 主题主色与文本/背景（参考 demo.html 变量口径） */
+    --color-primary: #06C7C4;
+    --color-primary-foreground: #ffffff;
+
+    --color-background: #ffffff;        /* 背景（背景浅色） */
+    --color-foreground: #1d293f;        /* 主文本色 */
+    --color-muted: #f8f9fa;             /* 弱背景/分组背景 */
+    --color-muted-foreground: #6c757d;  /* 次文本色 */
+    --color-border: #e0e0e0;            /* 边框色 */
+    --color-panel: #f8f9fa;             /* 面板背景 */
+    --color-selected: #f0f2f5;          /* 选中背景 */
+  }
+
+  /* 暗色主题占位（后续可切换 data-theme="dark" 启用） */
+  [data-theme="dark"] {
+    --color-primary: #06C7C4;
+    --color-primary-foreground: #0b0f14;
+
+    --color-background: #0b0f14;
+    --color-foreground: #f5f7fa;
+    --color-muted: #10151f;
+    --color-muted-foreground: #9aa4b2;
+    --color-border: #2a2f3a;
+    --color-panel: #10151f;
+    --color-selected: #18212d;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    /* 全局禁止横向滚动，保证 420px 容器规范下不出现溢出条 */
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* 便捷工具类 */
+@layer utilities {
+  /* 统一 420px 移动端容器 */
+  .container-mobile {
+    max-width: theme(--max-w-mobile);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* 卡片阴影与底部弹层圆角的语义工具类 */
+  .shadow-card {
+    box-shadow: theme(--shadow-card);
+  }
+  .rounded-sheet-top {
+    border-top-left-radius: theme(--radius-sheet-top);
+    border-top-right-radius: theme(--radius-sheet-top);
+  }
+}

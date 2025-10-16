@@ -18,6 +18,7 @@
     - 采用 `shadcn-vue` 和 `tailwindcss` 作为核心 UI 构建方案。
     - UI 设计遵循 `shadcn-vue` 和 `tailwindcss` 的设计系统，仅对颜色等进行定制化。
     - 优先复用 `packages/ui` 中的设计令牌和基础组件。
+    - **组件安装方式**: 由于 shadcn-vue CLI 存在配置问题，采用手动安装方式创建组件到 `src/components/ui/`
 
 ## Monorepo 原则
 
