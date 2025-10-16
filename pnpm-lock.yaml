@@ -149,6 +149,9 @@ importers:
 
   apps/vue-juwo:
     dependencies:
+      '@headlessui/vue':
+        specifier: ^1.7.22
+        version: 1.7.23(vue@3.5.22(typescript@5.9.3))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1992,6 +1995,12 @@ packages:
     peerDependencies:
       react: ^16 || ^17 || ^18
       react-dom: ^16 || ^17 || ^18
+
+  '@headlessui/vue@1.7.23':
+    resolution: {integrity: sha512-JzdCNqurrtuu0YW6QaDtR2PIYCKPUWq28csDyMvN4zmGccmE7lz40Is6hc3LA4HFeCI7sekZ/PQMTNmn9I/4Wg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      vue: ^3.2.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -13341,6 +13350,11 @@ snapshots:
       client-only: 0.0.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+
+  '@headlessui/vue@1.7.23(vue@3.5.22(typescript@5.9.3))':
+    dependencies:
+      '@tanstack/vue-virtual': 3.13.12(vue@3.5.22(typescript@5.9.3))
+      vue: 3.5.22(typescript@5.9.3)
 
   '@humanfs/core@0.19.1': {}
 

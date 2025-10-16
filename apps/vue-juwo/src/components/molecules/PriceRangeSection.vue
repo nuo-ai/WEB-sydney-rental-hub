@@ -34,9 +34,10 @@ const emit = defineEmits<{
   (e: 'update:max', value: number | null): void
 }>()
 
-function onSelectRange(val: string | null) {
+function onSelectRange(val: string | string[] | null) {
+  const next = Array.isArray(val) ? val[0] ?? null : val
   // 选择段位时，父层将据此设置 price = { rangeKey: val }；本组件不直接改 min/max（可由父层派生）
-  emit('update:modelValue', val)
+  emit('update:modelValue', next)
 }
 
 function onMinChange(v: number | null) {
