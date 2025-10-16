@@ -101,7 +101,10 @@ const properties = ref<Property[]>([
 // 收藏/更多占位交互
 function onToggleFavorite(id: string, next: boolean) {
   const i = properties.value.findIndex(p => p.id === id)
-  if (i >= 0) properties.value[i] = { ...properties.value[i], favorited: next }
+  if (i >= 0) {
+    const current = properties.value[i]!
+    properties.value[i] = { ...current, favorited: next }
+  }
 }
 function onMoreActions(id: string) {
   // TODO: 打开操作菜单（分享/举报 等）；当前仅 console 占位

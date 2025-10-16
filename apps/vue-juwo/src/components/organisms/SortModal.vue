@@ -40,8 +40,9 @@ function choose(val: string) {
 }
 
 function resetDefault() {
-  if (props.options.length > 0) {
-    emit('update:modelValue', props.options[0])
+  const first = props.options[0]
+  if (typeof first === 'string') {
+    emit('update:modelValue', first)
   }
 }
 
