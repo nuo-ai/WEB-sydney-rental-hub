@@ -1,17 +1,18 @@
 /** Tailwind config for apps/web
  * 注意：
- * - 关闭 preflight，避免重置样式干扰 Element Plus
+ * - 启用 preflight，使用 shadcn-vue 的样式重置
  * - 支持暗色触发：class 与 [data-theme="dark"]（与现有切换逻辑兼容）
  * - 布局/排版刻度（spacing/fontSize/screens）可按需扩展
  */
 export default {
   darkMode: ['class', '[data-theme="dark"]'],
   corePlugins: {
-    preflight: false
+    preflight: true
   },
   content: [
     './index.html',
-    './src/**/*.{js,ts,vue,jsx,tsx}'
+    './src/**/*.{js,ts,vue,jsx,tsx}',
+    '../../packages/ui/src/**/*.{js,ts,vue,jsx,tsx}'
   ],
   theme: {
     extend: {
@@ -46,5 +47,5 @@ export default {
       }
     }
   },
-  plugins: []
+  plugins: [require("tailwindcss-animate")]
 }

@@ -75,7 +75,7 @@
       <!-- 主体内容 - Domain风格卡片布局 -->
       <main class="content-container">
         <!-- 新增：单张白卡一体化容器 -->
-        <div class="content-card">
+        <Card class="content-card">
           <!-- 白色信息卡片 -->
           <section class="info-card">
             <!-- 价格 -->
@@ -243,7 +243,7 @@
           </section>
 
           <!-- 通勤计算器 - 已移至独立页面 -->
-        </div>
+        </Card>
       </main>
 
       <!-- 底部固定操作栏 -->

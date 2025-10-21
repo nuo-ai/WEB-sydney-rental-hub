@@ -62,6 +62,41 @@ const router = createRouter({
       name: 'CardsDemo',
       component: () => import('../views/CardsDemo.vue'),
     },
+    {
+      path: '/calendar-demo',
+      name: 'CalendarDemo',
+      component: () => import('../views/CalendarDemo.vue'),
+    },
+    {
+      path: '/calendar-showcase',
+      name: 'CalendarShowcase',
+      component: () => import('../views/CalendarShowcase.vue'),
+    },
+    {
+      path: '/calendar-test',
+      name: 'CalendarTestView',
+      component: () => import('../views/CalendarTestView.vue'),
+    },
+    {
+      path: '/button-test',
+      name: 'ButtonTestView',
+      component: () => import('../views/ButtonTestView.vue'),
+    },
+    {
+      path: '/input-test',
+      name: 'InputTestView',
+      component: () => import('../views/InputTestView.vue'),
+    },
+    {
+      path: '/card-test',
+      name: 'CardTestView',
+      component: () => import('../views/CardTestView.vue'),
+    },
+    {
+      path: '/badge-test',
+      name: 'BadgeTestView',
+      component: () => import('../views/BadgeTestView.vue'),
+    },
   ],
 })
 

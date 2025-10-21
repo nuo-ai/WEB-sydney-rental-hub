@@ -1,0 +1,142 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup shadcn-vue Integration",
+        "description": "Integrate shadcn-vue components via the shadcn-ui-mcp-vue server and configure the monorepo structure.",
+        "details": "1. Install shadcn-vue dependencies using the shadcn-ui-mcp-vue server\n2. Configure package.json to reference @sydney-rental-hub/ui alias\n3. Update tsconfig.json with proper path mappings\n4. Verify installation by importing a sample component",
+        "testStrategy": "Verify component rendering in a test sandbox and confirm workspace alias resolves correctly",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Migrate BaseCard to shadcn-vue",
+        "description": "Replace Element Plus Card with shadcn-vue's Card component while maintaining existing API",
+        "details": "1. Import shadcn-vue Card component\n2. Map existing props (title, shadow, etc.) to shadcn-vue's implementation\n3. Preserve event handlers (e.g., @click)\n4. Update styles to match design system using Tailwind classes",
+        "testStrategy": "Visual regression testing against existing implementation and unit tests for API compatibility",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Migrate BaseBadge to shadcn-vue",
+        "description": "Replace Element Plus Badge with shadcn-vue's Badge component",
+        "details": "1. Use shadcn-vue Badge component\n2. Map props: type (primary/success/etc.), is-dot, hidden\n3. Maintain slot-based content rendering\n4. Ensure CSS transitions match existing behavior",
+        "testStrategy": "Snapshot testing with different badge variants and visibility states",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Migrate BaseToggle to shadcn-vue",
+        "description": "Replace Element Plus Switch with shadcn-vue's Switch component",
+        "details": "1. Implement shadcn-vue Switch\n2. Map props: v-model, disabled, active-text/inactive-text\n3. Preserve keyboard accessibility\n4. Maintain event emissions (change, input)",
+        "testStrategy": "Manual testing of state changes and automated checks for v-model synchronization",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Migrate BaseSearchInput",
+        "description": "Implement search input using BaseInput and BaseButton with icon",
+        "details": "1. Combine shadcn-vue Input and Button components\n2. Implement search icon (magnifying glass) via lucide-vue\n3. Maintain v-model binding and clear functionality\n4. Preserve keyboard event handling (enter key)",
+        "testStrategy": "Form submission testing and accessibility checks for screen readers",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Migrate BaseChip",
+        "description": "Implement chip component using shadcn-vue's Badge/Button combination",
+        "details": "1. Use Badge for static chips, Button for interactive ones\n2. Map props: variant (filled/outlined), color, disabled\n3. Implement close button functionality using shadcn-vue Icons\n4. Maintain removal animation",
+        "testStrategy": "Interaction testing for clickable/dismissible variants and visual variant validation",
+        "priority": "medium",
+        "dependencies": [
+          1,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Create BaseCard Test View",
+        "description": "Implement dedicated test view for BaseCard",
+        "details": "1. Create /views/BaseCardTestView.vue\n2. Implement multiple card variants (default, with header/footer, loading state)\n3. Add prop controls for dynamic testing\n4. Integrate with Vue Router under /test/card",
+        "testStrategy": "Manual visual verification across all states and responsive layouts",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Create BaseBadge Test View",
+        "description": "Implement dedicated test view for BaseBadge",
+        "details": "1. Create /views/BaseBadgeTestView.vue\n2. Showcase all badge variants (types, dot mode, custom colors)\n3. Implement interactive prop controls\n4. Add accessibility test section",
+        "testStrategy": "Visual validation of badge styles and screen reader announcements",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Create BaseToggle Test View",
+        "description": "Implement dedicated test view for BaseToggle",
+        "details": "1. Create /views/BaseToggleTestView.vue\n2. Include basic toggle, disabled state, and text variants\n3. Add state synchronization demo\n4. Implement keyboard navigation tests",
+        "testStrategy": "Manual state toggling and automated state persistence checks",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Create SearchInput and BaseChip Test Views",
+        "description": "Implement test views for remaining components",
+        "details": "1. Create /views/BaseSearchInputTestView.vue with search history demo\n2. Create /views/BaseChipTestView.vue with interactive chip sets\n3. Implement filter/search integration demo\n4. Add accessibility test sections for both components",
+        "testStrategy": "Search functionality validation and chip interaction testing with multiple users",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-21T12:48:34.051Z",
+      "updated": "2025-10-21T12:48:34.051Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

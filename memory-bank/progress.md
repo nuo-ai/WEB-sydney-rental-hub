@@ -4,6 +4,13 @@
 
 ## 近期重要里程碑（2025-10）
 
+### UI库纠偏与开发环境修复（完成）
+- **2025-10-22｜reka-ui 清退与 Calendar 替换**:
+  - 移除 reka-ui/react-day-picker，避免跨框架混用；@sydney-rental-hub/ui：Calendar 改为封装 @vuepic/vue-datepicker（纯 Vue），Button/Badge 去 Primitive 保持 API 兼容。
+  - apps/web 安装 @vuepic/vue-datepicker 并在 vite.config.js 增加 optimizeDeps.include；清理 .vite 后以 --force 启动修复“Outdated Optimize Dep/动态 import 失败”。
+  - 代理链路验证：/api → http://localhost:8000 正常；路由与页面功能恢复。
+  - 后续 P1：清理旧 calendar 子组件与统一导出路径。
+  
 ### Web 主题层重构：Tailwind v4 + EP 桥接（完成）
 - **2025-10-14｜apps/web 统一主题**:
   - 引入 Tailwind v4（@tailwindcss/postcss，preflight=false），新增核心 HSL 变量 theme.css 与 Element Plus 桥接 el-theme-bridge.css。
@@ -11,6 +18,24 @@
   - 修复从 /cards-demo 跳转详情 404：CardsDemo 预注入 store.currentProperty，详情页 onMounted fetch guard。
   - DevServer 使用 5199/strictPort，避免端口冲突。
 - **后续计划**: P0 变量收敛（卡片/详情命中项），P1 密度统一（Tailwind 间距/字号量表），P2 试点 shadcn-vue（保留 EP 复杂组件）。
+
+### shadcn-vue 组件规范与实现映射（完成）
+- **2025-10-21｜UI 组件标准化**:
+  - 新增 `.clinerules/shadcn-usage.md` 定义 shadcn 组件使用规范，要求通过 MCP 服务器获取组件代码和演示
+  - 新增 `.clinerules/ui-implement.md` 基于房产应用用户体验结构规划，详细映射适合的 shadcn-vue 组件到各个 UI 场景
+  - 更新 `memory-bank/systemPatterns.md` 和 `memory-bank/techContext.md` 记录新的组件开发规范
+
+### Calendar 组件实现与集成（完成）
+- **2025-10-21｜核心组件实现**:
+  - 基于 shadcn-vue 规范实现完整的 Calendar 组件族（包含 Calendar, CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarNextButton, CalendarPrevButton）
+  - 创建 `packages/ui/src/lib/utils.ts` 工具函数支持组件样式合并
+  - 添加路由示例页面 `/calendar-demo` 和 `/calendar-showcase` 用于组件验证
+  - 为房源预约、筛选面板等业务场景提供可复用的日期选择基础组件
+- **2025-10-21｜组件导入路径修复**:
+  - 修复所有 shadcn-vue calendar 组件的 `@/lib/utils` 导入路径问题，统一改为相对路径 `../../../lib/utils`
+  - 修复 Card 组件系列（Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter）的导入路径问题
+  - 为 CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading, CalendarCell 组件添加缺失的 `cn` 函数导入
+  - 创建 CalendarTestView.vue 测试组件并添加到路由，确保所有修复的组件能够正常工作
 
 ### Button 组件令牌化与接入（完成）
 - **2025-10-13｜组件层 Token 与组件对齐**:
@@ -99,43 +124,3 @@
 - **2025-10-07｜TorUI 评估启动**: 计划引入 TorUI 组件库，确保 VS Code 下支持主题/Design Token 定制与调试。
 - **2025-10-07｜Design Token 行动计划**: 以颜色、字体、图标、标签、间距为首轮统一对象，搭建"原子组件 → 业务组件"链路，并参考 Polaris Migrator 的自动化策略。
 - **2025-10-07｜MVP 功能聚焦**: 第一阶段聚焦房源筛选/排序/搜索-查看-收藏-客服下单，后续再扩展地铁/站点筛选、帖子发布、付费通知等功能。
-
-## 近期重要里程碑（2025-09）
-
-### 保存搜索功能完成
-- **2025-09-16｜保存搜索功能**: Zillow风格弹窗，智能命名，本地存储，完整事件链路｜组件：SaveSearchModal + FilterTabs + HomeView
-- **2025-09-16｜事件处理优化**: 修复事件传递断裂，添加用户反馈提示｜技术：Vue事件发射链路完整性
-- **2025-09-16｜Profile 管理完成**: 已保存搜索管理（列表/重命名/删除）接入 Profile 页（SavedSearchesManager + Profile 视图）
-
-### 筛选系统 P0 完成
-- **2025-09-15｜URL 幂等与状态同步**: 应用后可直链/刷新恢复，不写空键｜溯源：17527a4..c713d9f
-- **2025-09-15｜统一预估计数**: "应用（N）"与列表 total 对齐，失败降级｜溯源：e8e25d5..41b7586
-- **2025-09-14｜分组边界隔离**: 跨面板不覆盖，仅更新指定分组｜溯源：fceb35f..e8e25d5
-- **2025-09-14｜家具筛选语义优化**: ETL 两阶段判定，勾选"有家具"更准确｜溯源：3064c42..f288eef
-- **2025-09-16｜筛选向导组件**: FilterWizard 组件开发完成，尚未接入主流程（主页仍使用 FilterPanel），将以特性开关评估接入
-
-### 设计系统合规性冲刺
-- **2025-10-05｜Storybook 基础搭建**: 接入 Vue3+Vite Storybook、注册 BaseButton/BaseChip/BaseBadge、PropertyCard、FilterPanel stories，并补充 Tokens 文档页；preview 注入 Pinia/i18n/ElementPlus 与内存 localStorage 以兼容 Chromatic
-- **2025-09-12｜导航收敛**: 顶栏聚焦"搜索/收藏/AI助手/我的"｜溯源：47cab8b..125e590
-- **2025-09-11｜图标系统统一**: 全站 lucide-vue-next + currentColor｜溯源：fe8f012..2a9dd4d
-- **2025-09-11｜规格行变量驱动**: 列表与详情"图标+数字"尺寸间距一致｜溯源：5b7254c..25ff698
-- **2025-09-10｜设计令牌护栏**: Stylelint 强制 var(--*)，禁止硬编码色｜溯源：9984dff..0b6e146
-- **2025-09-10｜详情页令牌化**: 移除 Font Awesome 与硬编码色｜溯源：aaa5b8b..f201a24
-
-### 用户体验优化
-- **2025-09-12｜移动端卡片紧凑**: 高度 250→180，首屏可见更多｜溯源：008be0c..0e36a05
-- **2025-09-10｜中文化与文字系统**: UI 中文化，文字节奏统一｜溯源：3e4ea72..c45d86a
-- **2025-09-09｜数据同步修复**: 看房时间/空出日期与 CSV 一致｜溯源：53ff509..1b96baa
-- **2025-09-08｜排序功能**: 支持价格/日期/区域/看房时间排序｜溯源：7bd269b..54ba6c1
-
-### 性能与稳定性
-- **2025-09-08｜筛选系统重构**: V1 契约稳定，V2 映射可回滚｜溯源：48bad16..bade186
-- **2025-09-06｜分页参数加固**: 计数/列表彻底解耦｜溯源：commit 范围略
-- **2025-09-05｜筛选体验栈**: URL 同步、错误策略、性能观测｜溯源：commit 范围略
-- **2025-09-04｜通勤精度修复**: 与 Google Directions 对齐｜溯源：commit 范围略
-
-## 历史重要节点
-
-- **2025-01-30｜虚拟滚动优化**: DOM 节点减少 99.8%，列表加载提升 83%
-- **早期｜API 响应优化**: 服务端响应从 8-10 秒降至 0.4-0.5 秒，提升 20 倍
-- **早期｜数据库索引**: 筛选查询从 2.2 秒降至 0.59 秒，提升 3.7 倍

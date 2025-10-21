@@ -1,0 +1,48 @@
+# Product Requirements Document (PRD): shadcn-vue Migration
+
+## 1. Overview
+
+The primary goal is to systematically migrate the existing UI components in the Sydney Rental Hub's web application from their current implementation (Element Plus and custom components) to the `shadcn-vue` component library. This initiative aims to modernize the tech stack, unify the design system, and improve developer experience.
+
+## 2. Scope
+
+This migration will be executed in phases, starting with the core "Base" components located in the `@sydney-rental-hub/ui` package.
+
+### In Scope:
+
+-   **Phase 1: Core Component Migration**:
+    -   `BaseCard`
+    -   `BaseBadge`
+    -   `BaseChip`
+    -   `BaseToggle`
+    -   `BaseSearchInput`
+-   For each component, the migration must maintain API compatibility (props, events) to minimize refactoring in the main application.
+-   Each migrated component must be accompanied by a dedicated test view (`/views/*TestView.vue`) for verification.
+
+### Out of Scope (For Now):
+
+-   Complex business components (e.g., `PropertyCard`).
+-   Direct modification of the `apps/web` application logic, other than updating test views.
+-   Migration of Element Plus components that do not have a `shadcn-vue` equivalent (e.g., complex tables, trees).
+
+## 3. User Stories / Features
+
+-   **As a developer, I want `BaseCard` to be migrated to `shadcn-vue`'s `Card` component so that I can have a consistent card layout.**
+-   **As a developer, I want `BaseBadge` to be migrated to `shadcn-vue`'s `Badge` component for consistent tag and label styling.**
+-   **As a developer, I want `BaseChip` to be migrated, likely using a combination of `Badge` or a styled `Button`, to maintain its functionality.**
+-   **As a developer, I want `BaseToggle` to be migrated to `shadcn-vue`'s `Switch` component.**
+-   **As a developer, I want `BaseSearchInput` to be refactored using the new `BaseInput` and `BaseButton` (with icon) components.**
+
+## 4. Technical Requirements
+
+-   All new `shadcn-vue` components must be added via the `shadcn-ui-mcp-vue` server to ensure consistency.
+-   The existing monorepo structure must be respected, with shared components residing in `packages/ui`.
+-   Imports in the `apps/web` application must use the workspace alias `@sydney-rental-hub/ui`.
+
+## 5. Acceptance Criteria
+
+-   `BaseCard`, `BaseBadge`, `BaseChip`, `BaseToggle`, and `BaseSearchInput` are successfully refactored to use `shadcn-vue` components.
+-   All migrated components retain their original props and functionality.
+-   The application builds successfully without any new errors.
+-   Dedicated test views for each component are created and accessible via routing.
+-   The visual appearance of the migrated components closely matches the design system's intent.

@@ -1,7 +1,7 @@
 # 技术上下文 (Technical Context)
 
 **文档状态**: 生存文档 (Living Document)  
-**最后更新**: 2025-10-14
+**最后更新**: 2025-10-22
 
 ---
 
@@ -15,6 +15,8 @@
 - **小程序实验**: `apps/uni-app` (uni-app Vite 模板) 与 `apps/mini-program` 保留用于探索跨端实现。 
 - **包管理与任务编排**: pnpm@9.1.0 + Turborepo；Node.js 建议版本 >= 20。 
 - **测试**: Vitest 3.x 用于单元测试，Playwright 用于端到端与视觉回归校验。
+- **shadcn-vue 组件库**: 通过 MCP 服务器集成，使用 `.clinerules/ui-implement.md` 中定义的组件映射规范，为房产应用提供现代化 UI 组件。
+- **Calendar 组件**: 遵循“完全规避 reka-ui”的约束，设计系统封装 `@vuepic/vue-datepicker`（纯 Vue），提供最小 API（v-model / mode: single|range / class），统一样式通过 `clsx` + `tailwind-merge` 的 `cn` 实现；不再引入 `reka-ui` 或 React 生态依赖。Monorepo 下为确保 Vite 预打包可见性，在 `apps/web` 安装该依赖并于 `vite.config.js` 的 `optimizeDeps.include` 显式声明。
 
 ---
 
@@ -95,6 +97,3 @@
 
 - **2025-10-14**: apps/web 引入 Tailwind v4（`@tailwindcss/postcss`，preflight=false），新增 `src/styles/theme.css`（核心 HSL 变量）与 `src/styles/el-theme-bridge.css`（EP 变量映射），`darkMode` 同时支持 `.dark` 与 `[data-theme="dark"]`；/globals-demo 与 /cards-demo 验证统一视觉与可访问性（focus-visible 由 `--ring` 驱动）；修复 /cards-demo → 详情页 404（store 预注入 + fetch guard）；DevServer 使用 5199/strictPort。
 - **2025-10-13**: 新增 `component.button.*`（primary/secondary/ghost/link；sm/md/lg；含状态与通用项），构建产物包含 `--component-button-*`；`BaseButton.vue` 改为消费组件层 Token；记录 Token collisions(3) 待清理。
-- **2025-02-14**: 完成 Storybook 8.6.x 版本统一，移除 npm 锁文件与过时原型 HTML，确保 pnpm + Turborepo 为唯一依赖来源。
-- **2025-01**: 引入 Vitest 3.x 与 Playwright 1.55 作为统一测试栈，并在 `apps/web` 中扩展样式 Lint 规则。 
-- **2024 Q4**: 完成设计 Token 分层重构，将 CSS 变量输出迁移到 `packages/ui`，Astro 设计站改为直接消费该包。

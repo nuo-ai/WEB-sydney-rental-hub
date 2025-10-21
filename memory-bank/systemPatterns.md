@@ -21,17 +21,45 @@
 - 使用 `pnpm` + `Turborepo` 统筹所有应用与包。新增项目需在 `pnpm-workspace.yaml` 中登记，并在 `turbo.json` 中定义缓存/依赖关系。 
 - 根 `package.json` 提供统一脚本；请优先通过 `pnpm <script>` 而非直接调用子包二进制，以便复用 Turbo 缓存。 
 - 共享代码应沉淀到 `packages/*`，业务应用避免彼此直接引用源文件。
+- Vite 预打包可见性（Monorepo 要点）：跨包使用的第三方依赖需在消费应用（如 `apps/web`）也安装一份，并在 `vite.config.js` 的 `optimizeDeps.include` 显式声明；否则可能出现“Outdated Optimize Dep / 动态 import 失败”。
+- DevServer 缓存策略：依赖/配置变更后，清理 `apps/web/node_modules/.vite` 并以 `--force` 重启；浏览器端使用 `Ctrl+F5` 强制刷新以清除旧时间戳模块缓存。
 
 ---
 
 ## 组件开发模式
 
-- **提取流程**: 在业务应用中发现的基础 UI 优先抽离到 `packages/ui`，补充 Storybook stories 与单元测试，再通过工作区引用。 
+- **提取流程**: 在业务应用中发现的基础 UI 优先抽离到 `packages/ui`，补充 Storybook stories 与单元测试，再通过工作区引用。
+- **工作区导入**: 应用（如 `apps/web`）必须通过包名 (`@sydney-rental-hub/ui`) 从 `packages/ui` 导入共享组件，禁止使用相对路径 (`../packages/`) 或路径别名 (`@/`) 进行跨包导入。 
 - **样式约束**: 
   - 组件仅消费组件层 Token（component.*），页面可用语义层；禁止直接消费原始层 
   - 禁止硬编码颜色/间距/字号等数值；必须使用 Design Token。 
   - CSS 自定义属性不得提供 `var(--token, #fff)` 形式的兜底值，以防止绕过暗色主题。 
 - **可访问性**: 使用 `@storybook/addon-a11y` 校验组件无障碍问题，并在业务代码中继承同样的语义标签/ARIA 属性。
+- **shadcn-vue 组件规范**: 使用 `.clinerules/shadcn-usage.md` 中定义的规则，通过 MCP 服务器获取组件代码和演示，确保组件实现的一致性和正确性。
+
+### BaseButton 组件迁移模式
+
+- **API 兼容性**: 迁移过程中保持原有的 props API 不变，确保业务代码无需修改即可平滑过渡
+- **变体映射**: 将 Element Plus 的按钮变体（primary/secondary/ghost/danger/link）正确映射到 shadcn-vue 的对应变体（default/secondary/ghost/destructive/link）
+- **尺寸映射**: 将原有的 small/medium/large 尺寸映射到 shadcn-vue 的 sm/default/lg 尺寸
+- **状态处理**: 正确处理 loading、disabled、block 等状态属性，保持原有功能
+- **图标支持**: 保留前置图标和后置图标插槽功能，确保图标显示正确
+- **事件处理**: 保持原有的事件处理逻辑，确保点击等交互正常工作
+- **样式合并**: 使用 cn 函数进行 class 合并，确保样式正确应用
+- **测试验证**: 创建独立的测试视图和路由，验证所有功能正常工作
+
+### Card 组件迁移模式
+- **组件族创建**: 对于由多个子组件构成的 `shadcn-vue` 组件（如 Card），需在 `packages/ui/src/components/ui/` 目录下完整创建所有相关文件（`Card`, `CardHeader`, `CardTitle`, `CardContent`, 等）。
+- **封装与兼容**: 将原有的 `BaseCard` 重构为一个简单的、仅包裹 `<Card>` 的封装组件，以保持对现有代码的向后兼容。
+- **组合式使用**: 在新的测试视图 (`CardTestView.vue`) 中，演示如何直接组合使用 `Card` 的各个子组件，为未来的开发提供范例。
+
+### Calendar 组件实现模式（更新）
+
+- **实现策略**：设计系统封装 `@vuepic/vue-datepicker`（纯 Vue），对外暴露最小 API：`v-model`、`mode: 'single'|'range'`、`class`；禁止引入 `reka-ui` 或任何 React 生态依赖。
+- **对外规范**：业务应用仅从 `@sydney-rental-hub/ui` 导入 `Calendar`，禁止跨包 `src` 相对路径导入；后续统一通过包导出子路径以稳定依赖。
+- **样式与合并**：统一使用 `packages/ui/src/lib/utils.ts` 的 `cn`（`clsx` + `tailwind-merge`）合并类名，保持与主题 Token 一致。
+- **迁移与兼容**：旧的 calendar 子组件文件暂留以保兼容，但不再导出；在确认无引用后删除（P1 清理）。
+- **MCP 原则说明**：若 MCP 提供的 shadcn-vue Calendar 依赖 `reka-ui`，在本项目“禁止引入 reka-ui”的约束下，采用纯 Vue 替代方案并由设计系统封装，保证一致风格与更低耦合。
 
 ---
 

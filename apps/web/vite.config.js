@@ -76,7 +76,7 @@ export default defineConfig(async () => {
     },
     server: {
     // 固定端口，避免 Google Maps API 限制问题
-    port: 5174,
+    port: 5178,
     strictPort: true,
     // 如果端口被占用则报错，而不是尝试下一个端口
     host: true,
@@ -101,6 +101,9 @@ export default defineConfig(async () => {
         secure: false,
       },
     },
+    },
+    optimizeDeps: {
+      include: ["@vuepic/vue-datepicker"]
     },
     // 仅在 Storybook 环境下加载测试配置
     test: testConfig,

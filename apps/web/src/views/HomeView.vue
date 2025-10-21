@@ -507,9 +507,9 @@ onMounted(async () => {
       const plainFilters = { ...(route.query || {}) }
       await propertiesStore.applyFilters(plainFilters)
     } else {
-      // 无可用上下文时才加载“无筛选”列表，避免覆盖筛选结果
+      // 无可用上下文时才加载"无筛选"列表，避免覆盖筛选结果
       if (propertiesStore.filteredProperties.length === 0) {
-        loadProperties()
+        await loadProperties()
       }
     }
   } catch (e) {

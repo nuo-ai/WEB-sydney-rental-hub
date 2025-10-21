@@ -1,5 +1,5 @@
 <template>
-  <div class="property-card fade-in bg-background text-foreground border border-border rounded-[var(--radius)] shadow-sm hover:shadow-lg transition-all duration-200">
+  <Card class="property-card fade-in bg-background text-foreground border border-border rounded-[var(--radius)] shadow-sm hover:shadow-lg transition-all duration-200">
     <!-- 图片轮播区域 -->
     <div class="property-image-container">
       <el-carousel
@@ -126,7 +126,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </Card>
 </template>
 
 <script setup>

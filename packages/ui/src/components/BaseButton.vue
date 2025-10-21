@@ -1,6 +1,6 @@
 <!--
   BaseButton - 可复用的按钮组件
-  基于设计令牌系统构建，提供一致的按钮体验
+  基于 shadcn-vue Button 组件构建，提供一致的按钮体验
 
   使用示例：
   <BaseButton @click="handleClick">默认按钮</BaseButton>
@@ -9,62 +9,46 @@
 -->
 
 <template>
-  <button
-    class="base-button"
-    :class="[
-      `base-button--${variant}`,
-      `base-button--${size}`,
-      {
-        'base-button--loading': loading,
-        'base-button--disabled': disabled,
-        'base-button--block': block,
-      },
-    ]"
+  <Button
+    :variant="buttonVariant"
+    :size="buttonSize"
     :type="type"
     :disabled="disabled || loading"
+    :class="cn(
+      block ? 'w-full' : '',
+      disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : '',
+      loading ? 'cursor-wait' : ''
+    )"
     @click="handleClick"
   >
     <!-- 加载图标 -->
-    <svg
-      v-if="loading"
-      class="base-button__loading-icon"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="M21 12a9 9 0 11-6.219-8.56" />
-    </svg>
+    <Loader2Icon v-if="loading" class="w-4 h-4 animate-spin" />
 
     <!-- 前置图标 -->
-    <span v-if="$slots.icon && !loading" class="base-button__icon">
-      <slot name="icon" />
-    </span>
+    <slot v-else-if="$slots.icon" name="icon" />
 
     <!-- 按钮文本 -->
-    <span v-if="$slots.default" class="base-button__text">
-      <slot />
-    </span>
+    <slot />
 
     <!-- 后置图标 -->
-    <span v-if="$slots.iconRight && !loading" class="base-button__icon base-button__icon--right">
-      <slot name="iconRight" />
-    </span>
-  </button>
+    <slot v-if="$slots.iconRight && !loading" name="iconRight" />
+  </Button>
 </template>
 
 <script setup>
-// 中文注释：基于设计令牌的可复用按钮组件
+import { computed } from 'vue'
+import { Loader2Icon } from 'lucide-vue-next'
+import { Button } from './ui/button'
+import { cn } from '../lib/utils'
 
-defineProps({
-  // 按钮变体：primary（主要）、secondary（次要）、ghost（幽灵）、danger（危险）
+// 中文注释：基于 shadcn-vue 的可复用按钮组件
+
+const props = defineProps({
+  // 按钮变体：primary（主要）、secondary（次要）、ghost（幽灵）、link
   variant: {
     type: String,
     default: 'secondary',
-  validator: (value) => ['primary', 'secondary', 'ghost', 'link'].includes(value),
+    validator: (value) => ['primary', 'secondary', 'ghost', 'link'].includes(value),
   },
 
   // 按钮尺寸：small（小）、medium（中）、large（大）
@@ -102,228 +86,31 @@ defineProps({
 
 const emit = defineEmits(['click'])
 
+// 映射旧的 variant 到新的 shadcn-vue variant
+const buttonVariant = computed(() => {
+  const variantMap = {
+    primary: 'default',
+    secondary: 'secondary',
+    ghost: 'ghost',
+    link: 'link'
+  }
+  return variantMap[props.variant] || 'secondary'
+})
+
+// 映射旧的 size 到新的 shadcn-vue size
+const buttonSize = computed(() => {
+  const sizeMap = {
+    small: 'sm',
+    medium: 'default',
+    large: 'lg'
+  }
+  return sizeMap[props.size] || 'default'
+})
+
 // 处理点击事件
 const handleClick = (event) => {
-  emit('click', event)
+  if (!props.disabled && !props.loading) {
+    emit('click', event)
+  }
 }
 </script>
-
-<style scoped>
-.base-button {
-  /* 基础样式使用设计令牌 */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--component-button-gap);
-  padding: var(--component-button-size-md-padding-y) var(--component-button-size-md-padding-x);
-  font-size: var(--component-button-size-md-font-size);
-  font-weight: var(--component-button-font-weight);
-  line-height: var(--line-height-normal);
-  border-radius: var(--component-button-radius);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: var(--component-button-transition);
-  text-decoration: none;
-  white-space: nowrap;
-  user-select: none;
-  outline: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.base-button__text {
-  flex: 1;
-}
-
-.base-button__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.base-button__loading-icon {
-  width: 16px;
-  height: 16px;
-  animation: spin 1s linear infinite;
-}
-
-/* 按钮变体样式 */
-
-/* 主要按钮 */
-.base-button--primary {
-  background-color: var(--component-button-primary-bg);
-  color: var(--component-button-primary-text);
-  border-color: var(--component-button-primary-border);
-}
-
-.base-button--primary:hover:not(:disabled) {
-  background-color: var(--component-button-primary-hover-bg);
-  border-color: var(--component-button-primary-border);
-}
-
-.base-button--primary:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-/* 次要按钮 */
-.base-button--secondary {
-  background-color: var(--component-button-secondary-bg);
-  color: var(--component-button-secondary-text);
-  border-color: var(--component-button-secondary-border);
-}
-
-.base-button--secondary:hover:not(:disabled) {
-  background-color: var(--component-button-secondary-hover-bg);
-  color: var(--component-button-secondary-hover-text);
-  border-color: var(--component-button-secondary-hover-border);
-}
-
-.base-button--secondary:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-/* 幽灵按钮 */
-.base-button--ghost {
-  background-color: var(--component-button-ghost-bg);
-  color: var(--component-button-ghost-text);
-  border-color: transparent;
-}
-
-.base-button--ghost:hover:not(:disabled) {
-  background-color: var(--component-button-ghost-hover-bg);
-  color: var(--component-button-ghost-hover-text);
-}
-
-/* 文本按钮 */
-.base-button--link {
-  background-color: transparent;
-  color: var(--component-button-link-text);
-  border-color: transparent;
-}
-.base-button--link:hover:not(:disabled) {
-  color: var(--component-button-link-hover-text);
-  text-decoration: underline;
-}
-.base-button--link:active:not(:disabled) {
-  color: var(--component-button-link-active-text);
-}
-
-
-
-/* 按钮尺寸 */
-
-.base-button--small {
-  padding: var(--component-button-size-sm-padding-y) var(--component-button-size-sm-padding-x);
-  font-size: var(--component-button-size-sm-font-size);
-  gap: var(--component-button-gap);
-  /* TODO: Replace with token */
-  height: 32px; 
-}
-
-.base-button--small .base-button__loading-icon {
-  width: 14px;
-  height: 14px;
-}
-
-.base-button--medium {
-  padding: var(--component-button-size-md-padding-y) var(--component-button-size-md-padding-x);
-  font-size: var(--component-button-size-md-font-size);
-  gap: var(--component-button-gap);
-  /* TODO: Replace with token */
-  height: 40px;
-}
-
-.base-button--large {
-  padding: var(--component-button-size-lg-padding-y) var(--component-button-size-lg-padding-x);
-  font-size: var(--component-button-size-lg-font-size);
-  gap: var(--component-button-gap);
-  /* TODO: Replace with token */
-  height: 48px;
-}
-
-.base-button--large .base-button__loading-icon {
-  width: 18px;
-  height: 18px;
-}
-
-/* 状态样式 */
-
-.base-button--disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.base-button--loading {
-  cursor: wait;
-}
-
-.base-button--loading .base-button__text,
-.base-button--loading .base-button__icon {
-  opacity: 0.7;
-}
-
-/* 块级按钮 */
-.base-button--block {
-  width: 100%;
-}
-
-/* 焦点样式 */
-.base-button:focus-visible {
-  outline: var(--component-button-focus-ring-width) solid var(--component-button-focus-ring-color);
-  outline-offset: 2px;
-}
-
-/* 加载动画 */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 响应式调整 */
-@media (width <= 767px) {
-  .base-button {
-    padding: calc(var(--component-button-size-md-padding-y) + 2px) var(--component-button-size-md-padding-x);
-    font-size: var(--component-button-size-md-font-size);
-  }
-
-  .base-button--small {
-    padding: var(--space-sm) var(--space-md);
-  }
-
-  .base-button--large {
-    padding: calc(var(--space-lg) + 2px) var(--space-xl);
-  }
-}
-
-/* 按钮组合样式（当多个按钮相邻时） */
-.base-button + .base-button {
-  margin-left: var(--space-md);
-}
-
-/* 在 flex 容器中的按钮间距 */
-.base-button-group {
-  display: flex;
-  gap: var(--space-md);
-  align-items: center;
-}
-
-.base-button-group .base-button {
-  margin: 0;
-}
-
-/* 垂直按钮组 */
-.base-button-group--vertical {
-  flex-direction: column;
-}
-
-.base-button-group--vertical .base-button {
-  width: 100%;
-}
-</style>

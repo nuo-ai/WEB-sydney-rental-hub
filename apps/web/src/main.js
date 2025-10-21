@@ -16,9 +16,12 @@ import './styles/cursor-globals.css' // 经清理的 cursor globals（置于 sty
 import './styles/cursor-globals-override.css' // 变量映射兜底（保持品牌语义）
 import './styles/cursor-globals-debug.css' // 调试：右下角徽标，确认 globals 生效
 // 统一主题变量与 Tailwind（不启用 preflight）
-import './styles/theme.css'
-import './styles/el-theme-bridge.css'
+import './styles/shadcn-theme.css' // 新的 shadcn-vue 主题文件
 import './styles/tailwind.css'
+
+// 移除旧的 Element Plus 桥接样式
+// import './styles/theme.css'
+// import './styles/el-theme-bridge.css'
 
 /* 调试：始终注入调试类，显示右下角徽标（确认全局样式链路生效）。确认后可改回仅 DEV。 */
 if (typeof document !== 'undefined') {

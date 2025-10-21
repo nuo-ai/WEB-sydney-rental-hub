@@ -18,7 +18,11 @@
     "./dist/tokens.css": "./src/styles/tokens.css",
     "./styles/tokens.css": "./src/styles/tokens.css",
     "./tokens": "./dist/style-dictionary/json/tokens.json",
-    "./dist/tokens.mjs": "./dist/tokens.mjs"
+    "./dist/tokens.mjs": "./dist/tokens.mjs",
+    "./src/components/ui/calendar/index": "./src/components/ui/calendar/index.ts",
+    "./src/components/ui/button/index": "./src/components/ui/button/index.ts",
+    "./src/components/ui/card/index": "./src/components/ui/card/index.ts",
+    "./src/components/ui/badge/index": "./src/components/ui/badge/index.ts"
   },
   "scripts": {
     "lint": "echo 'Linting @sydney-rental-hub/ui... (no-op)'",
@@ -46,5 +50,11 @@
     "storybook": "^8.6.14",
     "vite": "^5.0.0",
     "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "@vuepic/vue-datepicker": "^11.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1"
   }
 }

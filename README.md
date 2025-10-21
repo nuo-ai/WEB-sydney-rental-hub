@@ -25,7 +25,25 @@
 
 ## 本地开发
 
-请参考 **`memory-bank/techContext.md`** 中的 “本地开发环境设置” 部分，来启动您的本地开发服务器。
+1.  **安装依赖**
+    ```bash
+    pnpm install
+    ```
+
+2.  **启动前端开发服务器**
+    要单独启动 `web` 应用，请在项目根目录运行：
+    ```bash
+    pnpm --filter @web-sydney/web dev
+    ```
+    应用将运行在 `http://localhost:5176`。
+
+3.  **启动所有服务**
+    如果您想同时启动前后端等所有服务，请运行：
+    ```bash
+    pnpm dev
+    ```
+
+更多详细信息，请参考 **`memory-bank/techContext.md`** 中的 “本地开发环境设置” 部分。
 
 ---
 

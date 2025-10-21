@@ -7,3 +7,9 @@ export { default as BaseInput } from './components/BaseInput.vue'
 export { default as BaseListItem } from './components/BaseListItem.vue'
 export { default as BaseSearchInput } from './components/BaseSearchInput.vue'
 export { default as BaseToggle } from './components/BaseToggle.vue'
+
+// UI Components
+export * from './components/ui/badge'
+export * from './components/ui/button'
+export * from './components/ui/card'
+export * from './components/ui/calendar'
