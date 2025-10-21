@@ -97,6 +97,16 @@ const router = createRouter({
       name: 'BadgeTestView',
       component: () => import('../views/BadgeTestView.vue'),
     },
+    {
+      path: '/select-test',
+      name: 'SelectTestView',
+      component: () => import('../views/SelectTestView.vue'),
+    },
+    {
+      path: '/tabs-test',
+      name: 'TabsTestView',
+      component: () => import('../views/TabsTestView.vue'),
+    },
   ],
 })
 
