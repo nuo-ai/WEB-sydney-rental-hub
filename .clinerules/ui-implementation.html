@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Brief overview</title>
+            <style>
+/* From extension bierner.markdown-checkbox */
+.contains-task-list {
+    padding-left: 0;
+}
+
+.contains-task-list li {
+    margin-left: 24px;
+}
+
+.contains-task-list .task-list-item {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.contains-task-list .contains-task-list {
+    padding-left: 20px;
+} 
+/* From extension jebbs.markdown-extended */
+@font-face {
+  font-family: "Material Icons";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Material Icons"), local("MaterialIcons-Regular"), url("data:application/x-font-woff;charset=utf-8;base64,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") format("woff");
+}
+
+.admonition {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12), 0 3px 1px -2px rgba(0, 0, 0, .2);
+  position: relative;
+  margin: 1.5625em 0;
+  padding: 0 1.2rem;
+  border-left: .4rem solid rgba(68, 138, 255, .8);
+  border-radius: .2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  overflow: auto;
+}
+
+.admonition>p {
+  margin-top: .8rem;
+}
+
+.admonition>.admonition-title {
+  margin: 0 -1.2rem;
+  padding: .8rem 1.2rem .8rem 3.6rem;
+  border-bottom: 1px solid rgba(68, 138, 255, .2);
+  background-color: rgba(68, 138, 255, .1);
+  font-weight: 700;
+}
+
+.admonition>.admonition-title:before {
+  position: absolute;
+  left: 1.2rem;
+  font-size: 1.5rem;
+  color: rgba(68, 138, 255, .8);
+  content: "\E3C9";
+}
+
+.admonition>.admonition-title:before {
+  font-family: Material Icons;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  line-height: 2rem;
+  text-transform: none;
+  white-space: nowrap;
+  speak: none;
+  word-wrap: normal;
+  direction: ltr;
+}
+
+.admonition.summary,
+.admonition.abstract,
+.admonition.tldr {
+  border-left-color: rgba(0, 176, 255, .8);
+}
+
+.admonition.summary>.admonition-title,
+.admonition.abstract>.admonition-title,
+.admonition.tldr>.admonition-title {
+  background-color: rgba(0, 176, 255, .1);
+  border-bottom-color: rgba(0, 176, 255, .2);
+}
+
+.admonition.summary>.admonition-title:before,
+.admonition.abstract>.admonition-title:before,
+.admonition.tldr>.admonition-title:before {
+  color: rgba(0, 176, 255, 1);
+  ;
+  content: "\E8D2";
+}
+
+.admonition.hint,
+.admonition.tip {
+  border-left-color: rgba(0, 191, 165, .8);
+}
+
+.admonition.hint>.admonition-title,
+.admonition.tip>.admonition-title {
+  background-color: rgba(0, 191, 165, .1);
+  border-bottom-color: rgba(0, 191, 165, .2);
+}
+
+.admonition.hint>.admonition-title:before,
+.admonition.tip>.admonition-title:before {
+  color: rgba(0, 191, 165, 1);
+  content: "\E80E";
+}
+
+.admonition.info,
+.admonition.todo {
+  border-left-color: rgba(0, 184, 212, .8);
+}
+
+.admonition.info>.admonition-title,
+.admonition.todo>.admonition-title {
+  background-color: rgba(0, 184, 212, .1);
+  border-bottom-color: rgba(0, 184, 212, .2);
+}
+
+.admonition.info>.admonition-title:before,
+.admonition.todo>.admonition-title:before {
+  color: rgba(0, 184, 212, 1);
+  ;
+  content: "\E88E";
+}
+
+.admonition.success,
+.admonition.check,
+.admonition.done {
+  border-left-color: rgba(0, 200, 83, .8);
+}
+
+.admonition.success>.admonition-title,
+.admonition.check>.admonition-title,
+.admonition.done>.admonition-title {
+  background-color: rgba(0, 200, 83, .1);
+  border-bottom-color: rgba(0, 200, 83, .2);
+}
+
+.admonition.success>.admonition-title:before,
+.admonition.check>.admonition-title:before,
+.admonition.done>.admonition-title:before {
+  color: rgba(0, 200, 83, 1);
+  ;
+  content: "\E876";
+}
+
+.admonition.question,
+.admonition.help,
+.admonition.faq {
+  border-left-color: rgba(100, 221, 23, .8);
+}
+
+.admonition.question>.admonition-title,
+.admonition.help>.admonition-title,
+.admonition.faq>.admonition-title {
+  background-color: rgba(100, 221, 23, .1);
+  border-bottom-color: rgba(100, 221, 23, .2);
+}
+
+.admonition.question>.admonition-title:before,
+.admonition.help>.admonition-title:before,
+.admonition.faq>.admonition-title:before {
+  color: rgba(100, 221, 23, 1);
+  ;
+  content: "\E887";
+}
+
+.admonition.warning,
+.admonition.attention,
+.admonition.caution {
+  border-left-color: rgba(255, 145, 0, .8);
+}
+
+.admonition.warning>.admonition-title,
+.admonition.attention>.admonition-title,
+.admonition.caution>.admonition-title {
+  background-color: rgba(255, 145, 0, .1);
+  border-bottom-color: rgba(255, 145, 0, .2);
+}
+
+.admonition.attention>.admonition-title:before {
+  color: rgba(255, 145, 0, 1);
+  content: "\E417";
+}
+
+.admonition.warning>.admonition-title:before,
+.admonition.caution>.admonition-title:before {
+  color: rgba(255, 145, 0, 1);
+  content: "\E002";
+}
+
+.admonition.failure,
+.admonition.fail,
+.admonition.missing {
+  border-left-color: rgba(255, 82, 82, .8);
+}
+
+.admonition.failure>.admonition-title,
+.admonition.fail>.admonition-title,
+.admonition.missing>.admonition-title {
+  background-color: rgba(255, 82, 82, .1);
+  border-bottom-color: rgba(255, 82, 82, .2);
+}
+
+.admonition.failure>.admonition-title:before,
+.admonition.fail>.admonition-title:before,
+.admonition.missing>.admonition-title:before {
+  color: rgba(255, 82, 82, 1);
+  ;
+  content: "\E14C";
+}
+
+.admonition.danger,
+.admonition.error,
+.admonition.bug {
+  border-left-color: rgba(255, 23, 68, .8);
+}
+
+.admonition.danger>.admonition-title,
+.admonition.error>.admonition-title,
+.admonition.bug>.admonition-title {
+  background-color: rgba(255, 23, 68, .1);
+  border-bottom-color: rgba(255, 23, 68, .2);
+}
+
+.admonition.danger>.admonition-title:before {
+  color: rgba(255, 23, 68, 1);
+  content: "\E3E7";
+}
+
+.admonition.error>.admonition-title:before {
+  color: rgba(255, 23, 68, 1);
+  content: "\E14C";
+}
+
+.admonition.bug>.admonition-title:before {
+  color: rgba(255, 23, 68, 1);
+  content: "\E868";
+}
+
+.admonition.example,
+.admonition.snippet {
+  border-left-color: rgba(0, 184, 212, .8);
+}
+
+.admonition.example>.admonition-title,
+.admonition.snippet>.admonition-title {
+  background-color: rgba(0, 184, 212, .1);
+  border-bottom-color: rgba(0, 184, 212, .2);
+}
+
+.admonition.example>.admonition-title:before,
+.admonition.snippet>.admonition-title:before {
+  color: rgba(0, 184, 212, 1);
+  ;
+  content: "\E242";
+}
+
+.admonition.quote,
+.admonition.cite {
+  border-left-color: rgba(158, 158, 158, .8);
+}
+
+.admonition.quote>.admonition-title,
+.admonition.cite>.admonition-title {
+  background-color: rgba(158, 158, 158, .1);
+  border-bottom-color: rgba(158, 158, 158, .2);
+}
+
+.admonition.quote>.admonition-title:before,
+.admonition.cite>.admonition-title:before {
+  color: rgba(158, 158, 158, 1);
+  ;
+  content: "\E244";
+}
+.vscode-light kbd,
+.vscode-dark kbd,
+.vscode-high-contrast kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 11px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  line-height: 10px;
+  vertical-align: middle;
+  border: solid 1px #d1d5da;
+  border-bottom-color: #c6cbd1;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #c6cbd1;
+}
+
+.vscode-light kbd {
+  color: #444d56;
+  background-color: #fafbfc;
+}
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h2 id="brief-overview">Brief overview</h2>
+<p>This rule file defines the UI component implementation plan for the Sydney Rental Hub project using shadcn-vue components. It maps the application structure to appropriate shadcn components.</p>
+<h2 id="navigation-components">Navigation Components</h2>
+<h3 id="bottom-navigation-bar-22">Bottom Navigation Bar (2.2)</h3>
+<ul>
+<li>navigation-menu - 用于底部导航栏，包含首页、消息、收藏、我的四个主要导航项</li>
+</ul>
+<h3 id="top-header-bar-21">Top Header Bar (2.1)</h3>
+<ul>
+<li>card - 用于首页顶部栏，包含位置信息和用户状态</li>
+<li>button - 用于返回按钮和用户状态图标按钮</li>
+<li>sheet - 用于汉堡菜单展开面板</li>
+</ul>
+<h2 id="page-structure-components">Page Structure Components</h2>
+<h3 id="home-page-31">Home Page (3.1)</h3>
+<ul>
+<li>input - 用于顶部栏的位置搜索输入框</li>
+<li>button - 用于过滤栏的位置、排序、筛选按钮</li>
+<li>card - 用于房源卡片容器</li>
+<li>badge - 用于房源卡片上的&quot;新上线&quot;标签</li>
+<li>button - 用于房源卡片的收藏和更多操作按钮</li>
+<li>skeleton - 用于房源卡片加载状态</li>
+</ul>
+<h3 id="message-page-32">Message Page (3.2)</h3>
+<ul>
+<li>card - 用于消息页面的空状态显示</li>
+<li>avatar - 用于消息项的头像显示</li>
+<li>badge - 用于未读消息红点</li>
+<li>card - 用于聊天详情页面的消息气泡容器</li>
+</ul>
+<h3 id="favorites--history-page-33">Favorites &amp; History Page (3.3)</h3>
+<ul>
+<li>tabs - 用于&quot;我的收藏&quot;和&quot;我的足迹&quot;标签页切换</li>
+<li>card - 用于标签页内容容器</li>
+<li>badge - 用于房源标签网格显示</li>
+<li>button - 用于浮动操作按钮组(PK对比、地图)</li>
+</ul>
+<h3 id="property-detail-page-34">Property Detail Page (3.4)</h3>
+<ul>
+<li>carousel - 用于房源图片轮播展示</li>
+<li>card - 用于价格、地址、房型元数据等信息展示</li>
+<li>badge - 用于房源特征标签显示</li>
+<li>button - 用于底部主操作栏的电话咨询和立即预约按钮</li>
+<li>collapsible - 用于房源描述的收起/展开功能</li>
+</ul>
+<h3 id="my-page-35">My Page (3.5)</h3>
+<ul>
+<li>card - 用于用户信息、统计信息展示</li>
+<li>avatar - 用于用户头像显示</li>
+<li>button - 用于功能卡片和设置按钮</li>
+<li>sheet - 用于设置页面的选项列表</li>
+</ul>
+<h2 id="popupoverlay-components">Popup/Overlay Components</h2>
+<h3 id="listing-options-menu-41">Listing Options Menu (4.1)</h3>
+<ul>
+<li>dropdown-menu - 用于房源操作菜单(分享、隐藏)</li>
+</ul>
+<h3 id="location-selection-panel-42">Location Selection Panel (4.2)</h3>
+<ul>
+<li>drawer - 用于位置选择面板，从底部上滑显示</li>
+<li>input - 用于搜索框</li>
+<li>button - 用于热门区域标签和确定按钮</li>
+</ul>
+<h3 id="sorting-options-panel-43">Sorting Options Panel (4.3)</h3>
+<ul>
+<li>drawer - 用于排序方式面板</li>
+<li>button - 用于排序选项列表项</li>
+</ul>
+<h3 id="filter-conditions-panel-44">Filter Conditions Panel (4.4)</h3>
+<ul>
+<li>drawer - 用于筛选条件面板</li>
+<li>checkbox - 用于多选筛选条件</li>
+<li>select - 用于单选筛选条件</li>
+<li>slider - 用于租金范围筛选</li>
+<li>calendar - 用于入住日期选择</li>
+</ul>
+<h2 id="form-components">Form Components</h2>
+<h3 id="user-authentication-16">User Authentication (1.6)</h3>
+<ul>
+<li>input - 用于手机号输入</li>
+<li>button - 用于微信一键注册/登录按钮</li>
+<li>dialog - 用于确认登出对话框</li>
+</ul>
+<h3 id="personal-info-edit-17">Personal Info Edit (1.7)</h3>
+<ul>
+<li>input - 用于用户名、手机号等信息编辑</li>
+<li>select - 用于性别选择</li>
+<li>button - 用于保存按钮</li>
+<li>dialog - 用于注销账号确认</li>
+</ul>
+<h3 id="appointment-booking-14">Appointment Booking (1.4)</h3>
+<ul>
+<li>calendar - 用于选择预约日期</li>
+<li>select - 用于选择预约时间</li>
+<li>button - 用于提交预约</li>
+<li>dialog - 用于预约成功确认</li>
+</ul>
+<h2 id="data-display-components">Data Display Components</h2>
+<h3 id="property-cards-31-33">Property Cards (3.1, 3.3)</h3>
+<ul>
+<li>card - 用于房源卡片整体结构</li>
+<li>table - 用于房型元数据显示(2 🛏️ 2 🛁 1 🚗)</li>
+<li>badge - 用于房源标签显示</li>
+</ul>
+<h3 id="comparison-features-15">Comparison Features (1.5)</h3>
+<ul>
+<li>dialog - 用于房源对比页面显示</li>
+<li>card - 用于对比项容器</li>
+<li>table - 用于对比数据展示</li>
+</ul>
+<h2 id="layout-components">Layout Components</h2>
+<h3 id="global-layout">Global Layout</h3>
+<ul>
+<li>sidebar - 用于整体应用布局管理</li>
+<li>separator - 用于页面元素分割线</li>
+<li>scroll-area - 用于长内容滚动区域</li>
+</ul>
+<h2 id="utility-components">Utility Components</h2>
+<h3 id="loading--states">Loading &amp; States</h3>
+<ul>
+<li>skeleton - 用于加载状态显示</li>
+<li>spinner - 用于加载指示器</li>
+<li>empty - 用于空状态显示</li>
+</ul>
+<h3 id="notifications">Notifications</h3>
+<ul>
+<li>sonner - 用于消息提示和通知</li>
+<li>tooltip - 用于按钮提示信息</li>
+<li>alert - 用于重要信息提示</li>
+</ul>
+<h2 id="implementation-priority">Implementation Priority</h2>
+<ol>
+<li>navigation-menu - 底部导航基础</li>
+<li>card - 核心内容容器</li>
+<li>button - 交互按钮</li>
+<li>tabs - 标签页切换</li>
+<li>drawer - 弹出面板</li>
+<li>input/select - 表单输入</li>
+<li>calendar - 日期选择</li>
+<li>other components as needed</li>
+</ol>
+
+            
+            
+        </body>
+        </html>
