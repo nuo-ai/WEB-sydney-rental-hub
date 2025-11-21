@@ -34,6 +34,7 @@ import pandas as pd
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from urllib3.exceptions import ProtocolError as Urllib3ProtocolError
 from lxml import etree # type: ignore
 
 # 导入增强版特征提取器
@@ -81,7 +82,14 @@ def load_config() -> dict:
     config_path = CONFIG_DIR / 'crawler_config.yaml'
     if not config_path.exists():
         default_config_content = {
-            'network': {'max_retries': 3, 'backoff_factor': 0.5, 'retry_statuses': [500, 502, 503, 504], 'timeout': 20},
+            'network': {
+                'max_retries': 3,
+                'backoff_factor': 0.5,
+                'retry_statuses': [500, 502, 503, 504],
+                'timeout': 20,
+                'connect_timeout': 10,
+                'read_timeout': 20
+            },
             'headers': {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36'},
             'performance': {'requests_per_second': 1.5, 'batch_size': 50, 'results_per_page_threshold': 10,
                             'delay_min': 0.8, 'delay_max': 2.2, 'page_delay_min': 2.0, 'page_delay_max': 3.5,
@@ -312,8 +320,19 @@ def safe_request(func):
         retries = CONFIG['network']['max_retries']
         backoff_factor = CONFIG['network']['backoff_factor']
         last_exception = None
+        self_ref = args[0] if args else None
         for i_retry in range(retries):
             try: return func(*args, **kwargs)
+            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectTimeout,
+                    requests.exceptions.ConnectionError, Urllib3ProtocolError) as e_net:
+                last_exception = e_net
+                if self_ref and hasattr(self_ref, '_reset_session'):
+                    logger.warning("检测到网络异常，重置会话以清空连接池后重试...")
+                    try: self_ref._reset_session()
+                    except Exception as reset_exc: logger.debug(f"重置会话时出错: {reset_exc}")
+                if i_retry < retries - 1:
+                    wait_time = (2 ** i_retry) * backoff_factor
+                    logger.warning(f"请求失败 ({i_retry+1}/{retries})，{wait_time:.1f}s后重试: {e_net}"); time.sleep(wait_time)
             except requests.exceptions.RequestException as e:
                 last_exception = e
                 if i_retry < retries - 1:
@@ -326,12 +345,29 @@ def safe_request(func):
 
 class RequestManager:
     def __init__(self):
+        self.connect_timeout = CONFIG['network'].get('connect_timeout', CONFIG['network']['timeout'])
+        self.read_timeout = CONFIG['network'].get('read_timeout', CONFIG['network']['timeout'])
         self.session = self._create_session(); self.last_request_time = 0; self._lock = threading.Lock()
     def _create_session(self) -> requests.Session:
         s = requests.Session()
-        rs = Retry(total=CONFIG['network']['max_retries'], backoff_factor=CONFIG['network']['backoff_factor'], status_forcelist=CONFIG['network']['retry_statuses'])
+        rs = Retry(
+            total=CONFIG['network']['max_retries'],
+            connect=CONFIG['network']['max_retries'],
+            read=CONFIG['network']['max_retries'],
+            backoff_factor=CONFIG['network']['backoff_factor'],
+            status_forcelist=CONFIG['network']['retry_statuses'],
+            allowed_methods=frozenset(['GET', 'HEAD']),
+            respect_retry_after_header=True,
+            raise_on_status=False
+        )
         a = HTTPAdapter(max_retries=rs); s.mount("http://", a); s.mount("https://", a)
         s.headers.update(CONFIG['headers']); return s
+    def _reset_session(self) -> None:
+        try:
+            self.session.close()
+        except Exception as e_close:
+            logger.debug(f"关闭旧的session时发生问题: {e_close}")
+        self.session = self._create_session()
     def _wait_for_rate_limit(self):
         with self._lock:
             current_time = time.time(); elapsed = current_time - self.last_request_time
@@ -345,7 +381,8 @@ class RequestManager:
     def get(self, url: str, **kwargs) -> requests.Response:
         try:
             self._wait_for_rate_limit()
-            resp = self.session.get(url, timeout=CONFIG['network']['timeout'], **kwargs)
+            timeout_cfg = kwargs.pop('timeout', (self.connect_timeout, self.read_timeout))
+            resp = self.session.get(url, timeout=timeout_cfg, **kwargs)
             resp.raise_for_status()
             if not resp.content: raise requests.exceptions.RequestException("空响应内容")
             ct = resp.headers.get('content-type', '')
